@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#131D50</color>
+    <color name="colorPrimaryDark">#131D50</color>
+    <color name="colorAccent">#46AA31</color>
+    <color name="btnColor">#006ea0</color>
+    <color name="white">#ffffff</color>
+    <color name="alertGreen">#46AA31</color>
+    <color name="alertAmber">#F3A500</color>
+    <color name="alertRed">#E10514</color>
+    <color name="home_text">#686868</color>
+    <color name="home_g">#000000</color>
+</resources>
