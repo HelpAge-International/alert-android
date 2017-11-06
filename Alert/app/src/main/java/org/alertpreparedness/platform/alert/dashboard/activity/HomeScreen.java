@@ -1,4 +1,4 @@
-package com.example.faizmohideen.alert.activity;
+package org.alertpreparedness.platform.alert.dashboard.activity;
 
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -7,7 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
-import com.example.faizmohideen.alert.R;
+import org.alertpreparedness.platform.alert.R;
+
 
 public class HomeScreen extends AppCompatActivity {
 
@@ -28,7 +29,7 @@ public class HomeScreen extends AppCompatActivity {
     }
 
     private void setUpNavigationView() {
-        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.nav_advanced, R.string.app_name) {};
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, org.alertpreparedness.platform.alert.R.string.nav_advanced, org.alertpreparedness.platform.alert.R.string.app_name) {};
         mDrawerLayout.setDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
     }

@@ -10,4 +10,5 @@
     <color name="alertRed">#E10514</color>
     <color name="home_text">#686868</color>
     <color name="home_g">#000000</color>
+    <color name="hintGray">#bfc0c2</color>
 </resources>

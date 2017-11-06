@@ -1,4 +1,4 @@
-package com.example.faizmohideen.alert.other;
+package org.alertpreparedness.platform.alert.helper;
 
 import android.content.Context;
 import android.graphics.Bitmap;
