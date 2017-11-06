@@ -13,7 +13,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 
 public class LoginScreen extends AppCompatActivity implements View.OnClickListener {
 
@@ -22,11 +31,18 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     private Button btn_login;
     private TextView txt_forgotPasword;
     private ProgressDialog progressDialog;
+    private FirebaseAuth firebaseAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
+    private final static String TAG = "LoginActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_screen);
+
+        progressDialog = new ProgressDialog(this);
+        firebaseAuth = FirebaseAuth.getInstance();
 
         et_emailAddress = (EditText) findViewById(R.id.email_address);
         et_password = (EditText) findViewById(R.id.password);
@@ -43,6 +59,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
         if(view==btn_login){
             loginUser();
         }
+
         if(view==txt_forgotPasword){
 
         }
@@ -50,5 +67,43 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
     private void loginUser() {
 
+        String email = et_emailAddress.getText().toString().trim();
+        String password = et_password.getText().toString().trim();
+
+        if(TextUtils.isEmpty(email)){
+            Toast.makeText(this, "Please enter your email!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(TextUtils.isEmpty(password)){
+            Toast.makeText(this, "Please enter your password!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        progressDialog.setMessage("Logging you in...");
+        progressDialog.show();
+
+        firebaseAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
+                        progressDialog.dismiss();
+
+                        if(task.isSuccessful()){
+                            finish();
+                            startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+                        }
+
+                        // If sign in fails, display a message to the user. If sign in succeeds
+                        // the auth state listener will be notified and logic to handle the
+                        // signed in user can be handled in the listener.
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "signInWithEmail:failed | "+ task.getException().getMessage());
+                            Toast.makeText(LoginScreen.this, "The password you entered is incorrect. Please check and try again!"+ task.getException().getMessage(),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 }
