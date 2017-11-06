@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -17,18 +16,59 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay"/>
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tlRisk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/alertAmber"
+            app:tabIndicatorColor="@color/alertGreen" />
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_risk_monitoring"/>
+    <include layout="@layout/content_risk_monitoring" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+    <!--<android.support.design.widget.FloatingActionButton-->
+    <!--android:id="@+id/fab"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="bottom|end"-->
+    <!--android:layout_margin="@dimen/fab_margin"-->
+    <!--app:srcCompat="@android:drawable/ic_dialog_email"/>-->
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/faMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email"/>
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        app:menu_colorRipple="#99FFFFFF"
+        app:menu_fab_size="normal"
+        app:menu_shadowColor="#66000000"
+        app:menu_shadowRadius="4dp"
+        app:menu_shadowXOffset="1dp"
+        app:menu_shadowYOffset="3dp"
+        app:menu_showShadow="true">
+        <!--fab:menu_colorNormal="@color/manager_primary"-->
+        <!--fab:menu_colorPressed="@color/manager_primary"-->
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/faMenuIndividual"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fabSize="mini"/>
+        <!--fab:fab_colorNormal="@color/manager_primary"-->
+        <!--fab:fab_colorPressed="@color/manager_primary"-->
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/faMenuGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fabSize="mini"/>
+        <!--fab:fab_colorNormal="@color/manager_primary"-->
+        <!--fab:fab_colorPressed="@color/manager_primary"-->
+
+    </com.github.clans.fab.FloatingActionMenu>
 
 </android.support.design.widget.CoordinatorLayout>

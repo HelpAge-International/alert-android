@@ -13,6 +13,9 @@ public final class Constants {
     //firebase related
     public static final String UID = "live";
 
+    //animation delay
+    public static final int MENU_CLOSING_DURATION = 250;
+
 
 
 }

@@ -10,9 +10,14 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.risk_monitoring.RiskMonitoringActivity;
+import org.alertpreparedness.platform.alert.utils.Constants;
+
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
 import timber.log.Timber;
 
 
@@ -27,7 +32,6 @@ public class HomeScreen extends AppCompatActivity {
     @BindView(R.id.my_drawer_layout)
     DrawerLayout mMyDrawerLayout;
 
-    private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private Toolbar toolbar;
     private NavigationView navigationView;
@@ -39,19 +43,20 @@ public class HomeScreen extends AppCompatActivity {
         setContentView(R.layout.activity_home_screen);
         ButterKnife.bind(this);
 
-        initListners();
+        initListeners();
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.my_drawer_layout);
         setUpNavigationView();
 
     }
 
-    private void initListners() {
+    private void initListeners() {
         mNavView.setNavigationItemSelectedListener((menuItem) -> {
-            Timber.d(menuItem.toString());
+            mMyDrawerLayout.closeDrawers();
             switch (menuItem.getItemId()) {
                 case R.id.nav_risk:
-
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x->{
+                        RiskMonitoringActivity.startActivity(this);
+                    });
                     break;
                 case R.id.nav_home:
                     break;
@@ -61,9 +66,9 @@ public class HomeScreen extends AppCompatActivity {
     }
 
     private void setUpNavigationView() {
-        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.nav_advanced, R.string.app_name) {
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, mMyDrawerLayout, toolbar, R.string.nav_advanced, R.string.app_name) {
         };
-        mDrawerLayout.setDrawerListener(actionBarDrawerToggle);
+        mMyDrawerLayout.setDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
     }
 

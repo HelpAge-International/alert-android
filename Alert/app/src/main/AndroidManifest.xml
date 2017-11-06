@@ -24,6 +24,7 @@
             android:theme="@style/Theme.AppCompat.NoActionBar"/>
         <activity
             android:name=".dashboard.activity.HomeScreen"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"/>
 
         <meta-data
@@ -33,6 +34,8 @@
         <activity
             android:name=".risk_monitoring.RiskMonitoringActivity"
             android:label="@string/title_activity_risk_monitoring"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
