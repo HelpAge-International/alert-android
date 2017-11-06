@@ -1,4 +1,4 @@
-package com.example.faizmohideen.alert.activity;
+package org.alertpreparedness.platform.alert.dashboard.activity;
 
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -7,7 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
-import com.example.faizmohideen.alert.R;
+import org.alertpreparedness.platform.alert.R;
+
 
 public class HomeScreen extends AppCompatActivity {
 

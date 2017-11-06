@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.faizmohideen.alert">
+    package="org.alertpreparedness.platform.alert">
 
     <application
         android:allowBackup="true"
@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.MainActivity"
+            android:name=".login.activity.SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,11 +20,11 @@
         </activity>
 
         <activity
-            android:name=".activity.LoginScreen"
+            android:name=".login.activity.LoginScreen"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
 
         <activity
-            android:name=".activity.HomeScreen"
+            android:name=".dashboard.activity.HomeScreen"
             android:theme="@style/AppTheme.NoActionBar"/>
 
         <meta-data
