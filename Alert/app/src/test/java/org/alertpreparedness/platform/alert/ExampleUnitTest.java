@@ -1,4 +1,4 @@
-package com.example.faizmohideen.alert;
+package org.alertpreparedness.platform.alert;
 
 import org.junit.Test;
 

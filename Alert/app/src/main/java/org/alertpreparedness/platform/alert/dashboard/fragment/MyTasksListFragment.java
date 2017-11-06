@@ -1,17 +1,14 @@
-package com.example.faizmohideen.alert.fragment;
+package org.alertpreparedness.platform.alert.dashboard.fragment;
 
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
-
-import com.example.faizmohideen.alert.R;
 
 
 /**
@@ -31,9 +28,9 @@ public class MyTasksListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_my_tasks_list, container, false);
+        View view =  inflater.inflate(org.alertpreparedness.platform.alert.R.layout.fragment_my_tasks_list, container, false);
 
-        myTasksListView = (RecyclerView) view.findViewById(R.id.tasks_list_view);
+        myTasksListView = (RecyclerView) view.findViewById(org.alertpreparedness.platform.alert.R.id.tasks_list_view);
 
         layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);

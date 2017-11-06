@@ -1,15 +1,13 @@
-package com.example.faizmohideen.alert.activity;
+package org.alertpreparedness.platform.alert.login;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
-import com.example.faizmohideen.alert.R;
 
 public class LoginScreen extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login_screen);
+        setContentView(org.alertpreparedness.platform.alert.R.layout.activity_login_screen);
     }
 }

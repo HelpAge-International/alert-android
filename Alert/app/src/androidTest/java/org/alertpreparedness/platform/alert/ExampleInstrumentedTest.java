@@ -1,4 +1,4 @@
-package com.example.faizmohideen.alert;
+package org.alertpreparedness.platform.alert;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
