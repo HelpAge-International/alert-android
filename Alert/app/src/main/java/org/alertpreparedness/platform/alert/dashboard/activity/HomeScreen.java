@@ -29,7 +29,7 @@ public class HomeScreen extends AppCompatActivity {
     }
 
     private void setUpNavigationView() {
-        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, org.alertpreparedness.platform.alert.R.string.nav_advanced, org.alertpreparedness.platform.alert.R.string.app_name) {};
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.nav_advanced, R.string.app_name) {};
         mDrawerLayout.setDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
     }

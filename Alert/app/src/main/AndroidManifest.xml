@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="org.alertpreparedness.platform.alert.login.activity.SplashActivity"
+            android:name=".login.activity.SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,11 +20,11 @@
         </activity>
 
         <activity
-            android:name="org.alertpreparedness.platform.alert.login.activity.LoginScreen"
+            android:name=".login.activity.LoginScreen"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
 
         <activity
-            android:name="org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen"
+            android:name=".dashboard.activity.HomeScreen"
             android:theme="@style/AppTheme.NoActionBar"/>
 
         <meta-data
