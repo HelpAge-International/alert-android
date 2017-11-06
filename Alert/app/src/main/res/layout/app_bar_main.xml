@@ -7,7 +7,7 @@
     android:fitsSystemWindows="true"
     app:theme="@style/myCustomAppBarTheme"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
-    tools:context="com.example.faizmohideen.alert.org.example.faizmohideen.alert.activity.HomeScreen">
+    tools:context="org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
