@@ -9,14 +9,12 @@
     <FrameLayout
         android:id="@+id/mainScreen"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/darker_gray">
+        android:layout_height="match_parent">
 
         <!-- Include Appbar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/black"
             android:orientation="vertical">
 
             <include
