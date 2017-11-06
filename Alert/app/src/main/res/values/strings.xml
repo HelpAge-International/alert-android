@@ -33,5 +33,8 @@
         <item>Logout</item>
     </string-array>
 
+    <string name="loading">Loading…</string>
+    <string name="title_activity_risk_monitoring">RiskMonitoringActivity</string>
+
 
 </resources>

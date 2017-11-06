@@ -10,4 +10,9 @@ public final class Constants {
     public static final String APP_STATUS_UAT = "uat";
     public static final String APP_STATUS_LIVE = "live";
 
+    //firebase related
+    public static final String UID = "live";
+
+
+
 }
