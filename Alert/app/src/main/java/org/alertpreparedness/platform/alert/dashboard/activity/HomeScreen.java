@@ -26,7 +26,6 @@ public class HomeScreen extends AppCompatActivity {
     private Menu menu;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
