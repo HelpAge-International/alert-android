@@ -39,6 +39,7 @@
     <string name="risk_monitoring">Risk Monitoring</string>
     <string name="active">ACTIVE</string>
     <string name="archived">ARCHIVED</string>
+    <string name="next_update">Next update</string>
 
 
 </resources>

@@ -24,7 +24,7 @@
         tools:text="Country Context"/>
 
     <ImageView
-        android:id="@+id/imArrow"
+        android:id="@+id/ivArrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
