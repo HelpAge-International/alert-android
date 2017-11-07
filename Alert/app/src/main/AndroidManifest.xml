@@ -38,6 +38,13 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity
+            android:name=".risk_monitoring.RiskActivity"
+            android:label="@string/title_activity_risk"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

@@ -1,9 +1,10 @@
 package org.alertpreparedness.platform.alert;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -17,26 +18,16 @@ import com.google.firebase.auth.FirebaseUser;
 
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 
-import butterknife.ButterKnife;
-
 
 public abstract class BaseActivity extends AppCompatActivity implements FirebaseAuth.AuthStateListener {
 
     public ProgressDialog mProgressDialog;
     private FirebaseAuth mAuth;
 
-    public abstract void initViews();
-
-    public abstract void initToolbar();
-
-    @CallSuper
-    protected void onCreate(@Nullable Bundle savedInstanceState, int resourceId) {
-//        checkAuth();
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(resourceId);
-        ButterKnife.bind(this);
-        initToolbar();
-        initViews();
+        AlertApplication.mActivities.add(this);
     }
 
     @Override
@@ -45,6 +36,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Firebase
         if (mAuth != null) {
             mAuth.removeAuthStateListener(this);
         }
+        AlertApplication.mActivities.remove(this);
+//        int index = AlertApplication.mActivities.indexOf(this);
+//        AlertApplication.mActivities.remove(index);
     }
 
     protected void checkAuth() {
@@ -103,17 +97,23 @@ public abstract class BaseActivity extends AppCompatActivity implements Firebase
         }
     }
 
-//    @Override
-//    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-//        // If Not authenticated again
-//        if (firebaseAuth.getCurrentUser() == null) {
-//            // User has logged out
+    public void clearAllActivites() {
+        for (Activity activity : AlertApplication.mActivities) {
+            activity.finish();
+        }
+    }
+
+    @Override
+    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+        // If Not authenticated again
+        if (firebaseAuth.getCurrentUser() == null) {
+            // User has logged out
 //            PreferHelper.putString(getApplicationContext(), Constants.UID, "");
 //            PreferHelper.putString(getApplicationContext(), Constants.USER_PASSWORD, "");
 //            Intent i = new Intent(getApplicationContext(), LoginActivity.class);
 //            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //            startActivity(i);
 //            finish();
-//        }
-//    }
+        }
+    }
 }

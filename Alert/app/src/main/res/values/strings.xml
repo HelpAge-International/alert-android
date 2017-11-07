@@ -35,6 +35,10 @@
 
     <string name="loading">Loading…</string>
     <string name="title_activity_risk_monitoring">RiskMonitoringActivity</string>
+    <string name="title_activity_risk">RiskActivity</string>
+    <string name="risk_monitoring">Risk Monitoring</string>
+    <string name="active">ACTIVE</string>
+    <string name="archived">ARCHIVED</string>
 
 
 </resources>

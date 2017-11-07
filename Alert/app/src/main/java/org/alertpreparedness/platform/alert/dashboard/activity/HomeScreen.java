@@ -4,13 +4,14 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import org.alertpreparedness.platform.alert.AlertApplication;
+import org.alertpreparedness.platform.alert.BaseActivity;
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.risk_monitoring.RiskMonitoringActivity;
+import org.alertpreparedness.platform.alert.risk_monitoring.RiskActivity;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
 import java.util.concurrent.TimeUnit;
@@ -18,10 +19,9 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
-import timber.log.Timber;
 
 
-public class HomeScreen extends AppCompatActivity {
+public class HomeScreen extends BaseActivity {
 
     @BindView(R.id.txt_title)
     TextView mTxtTitle;
@@ -54,8 +54,9 @@ public class HomeScreen extends AppCompatActivity {
             mMyDrawerLayout.closeDrawers();
             switch (menuItem.getItemId()) {
                 case R.id.nav_risk:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x->{
-                        RiskMonitoringActivity.startActivity(this);
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> {
+//                        RiskMonitoringActivity.startActivity(this);
+                        startActivity(RiskActivity.RiskIntent.getIntent(AlertApplication.getContext()));
                     });
                     break;
                 case R.id.nav_home:

@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.alert;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 
@@ -10,6 +11,9 @@ import net.danlew.android.joda.JodaTimeAndroid;
 
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import timber.log.Timber;
 
@@ -34,6 +38,8 @@ public class AlertApplication extends Application {
 
     @SuppressLint("StaticFieldLeak")
     private static Context sContext;
+
+    public static List<Activity> mActivities = new ArrayList<>();
 
     @Override
     public void onCreate() {
