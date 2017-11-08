@@ -54,14 +54,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
-                android:text="@string/next_update"
-                tools:text="Next update"/>
+                android:textColor="@color/alertGreen"
+                android:text="@string/next_update"/>
 
             <TextView
                 android:id="@+id/tvIndicatorDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
+                android:textColor="@color/alertGreen"
                 tools:text="09 Nov 2017"/>
 
         </LinearLayout>

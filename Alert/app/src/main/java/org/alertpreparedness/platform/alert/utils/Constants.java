@@ -14,7 +14,10 @@ public final class Constants {
     public static final String UID = "live";
 
     //animation delay
-    public static final int MENU_CLOSING_DURATION = 250;
+    public static final long MENU_CLOSING_DURATION = 250;
+
+    //other
+    public static final String HAZARD_ID = "hazard_id";
 
 
 

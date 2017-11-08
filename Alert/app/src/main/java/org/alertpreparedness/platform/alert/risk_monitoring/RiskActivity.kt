@@ -4,11 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_risk.*
 import kotlinx.android.synthetic.main.content_risk.*
 import org.alertpreparedness.platform.alert.BaseActivity
 import org.alertpreparedness.platform.alert.R
+import org.alertpreparedness.platform.alert.utils.Constants
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 class RiskActivity : BaseActivity() {
 
@@ -43,6 +46,18 @@ class RiskActivity : BaseActivity() {
         fabRiskIndicator.setOnClickListener({
             Timber.d("create indicator")
             fabRiskMenu.close(true)
+            Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe {
+                AddIndicatorActivity.startActivity(this@RiskActivity)
+//                val dialog = HazardSelectionDialog()
+//                dialog.show(supportFragmentManager, "hazard_selection")
+//                dialog.setOnSelectionListener(object :HazardSelectionListener {
+//                    override fun selectedHazardId(hazardId: String) {
+//                        Timber.d("selected hazard id: %s",hazardId)
+//                        AddIndicatorActivity.startActivity(this@RiskActivity, hazardId)
+//                    }
+//
+//                })
+            }
         })
         fabRiskAlert.setOnClickListener({
             Timber.d("create alert")
