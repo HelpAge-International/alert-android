@@ -30,9 +30,12 @@ class RiskActivity : BaseActivity() {
 
     private fun initView() {
         setSupportActionBar(toolbar)
-//        val supportActionBar = supportActionBar
-//        supportActionBar?.title = getString(R.string.risk_monitoring)
+        val supportActionBar = supportActionBar
+        supportActionBar?.title = getString(R.string.risk_monitoring)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp)
 
+        fabRiskMenu.setClosedOnTouchOutside(true)
 
         tlRisk.addTab(tlRisk.newTab())
         tlRisk.addTab(tlRisk.newTab())
@@ -48,15 +51,6 @@ class RiskActivity : BaseActivity() {
             fabRiskMenu.close(true)
             Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe {
                 AddIndicatorActivity.startActivity(this@RiskActivity)
-//                val dialog = HazardSelectionDialog()
-//                dialog.show(supportFragmentManager, "hazard_selection")
-//                dialog.setOnSelectionListener(object :HazardSelectionListener {
-//                    override fun selectedHazardId(hazardId: String) {
-//                        Timber.d("selected hazard id: %s",hazardId)
-//                        AddIndicatorActivity.startActivity(this@RiskActivity, hazardId)
-//                    }
-//
-//                })
             }
         })
         fabRiskAlert.setOnClickListener({

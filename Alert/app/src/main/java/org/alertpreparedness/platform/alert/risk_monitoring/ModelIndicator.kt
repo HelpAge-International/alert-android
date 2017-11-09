@@ -79,6 +79,32 @@ data class ModelTrigger(val durationType:String, val frequencyValue:Int, val tri
     }
 }
 
+data class ModelSource(val sourceName:String, val sourceLink:String = ""):Parcelable {
+    constructor(parcel: Parcel) : this(
+            parcel.readString(),
+            parcel.readString()) {
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(sourceName)
+        parcel.writeString(sourceLink)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<ModelSource> {
+        override fun createFromParcel(parcel: Parcel): ModelSource {
+            return ModelSource(parcel)
+        }
+
+        override fun newArray(size: Int): Array<ModelSource?> {
+            return arrayOfNulls(size)
+        }
+    }
+}
+
 //public id: string;
 //public category: HazardScenario = 0;
 //public triggerSelected: number;

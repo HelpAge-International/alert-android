@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.PopupMenu
@@ -12,12 +13,17 @@ import kotlinx.android.synthetic.main.content_add_indicator.*
 import org.alertpreparedness.platform.alert.R
 import timber.log.Timber
 
-class AddIndicatorActivity : AppCompatActivity() {
+class AddIndicatorActivity : AppCompatActivity(),OnSourceDeleteListener {
 
     private lateinit var mPopupMenu: PopupMenu
     private lateinit var mPopupMenuFrequencyGreen: PopupMenu
     private lateinit var mPopupMenuFrequencyAmber: PopupMenu
     private lateinit var mPopupMenuFrequencyRed: PopupMenu
+    private lateinit var dialogSource: SourceDialogFragment
+    private lateinit var mSources: MutableList<ModelSource>
+    private lateinit var mSourceAdapter: SourceRVAdapter
+    private lateinit var mDialogAssign:AssignToDialogFragment
+    private var mSelectedAssignPosition = 0
 
     companion object {
         fun startActivity(context: Context) {
@@ -35,6 +41,7 @@ class AddIndicatorActivity : AppCompatActivity() {
     }
 
     private fun initData() {
+        mSources = mutableListOf()
     }
 
     private fun initViews() {
@@ -42,7 +49,13 @@ class AddIndicatorActivity : AppCompatActivity() {
         val supportActionBar = supportActionBar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.add_indicator)
-        supportActionBar?.setHomeAsUpIndicator(android.R.drawable.ic_delete)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_close_white_24dp)
+
+        rvSources.hasFixedSize()
+        rvSources.layoutManager = LinearLayoutManager(this)
+        mSourceAdapter = SourceRVAdapter(mSources)
+        rvSources.adapter = mSourceAdapter
+        mSourceAdapter.setOnSourceDeleteListener(this)
 
         mPopupMenu = PopupMenu(this, tvSelectHazard)
         mPopupMenu.menu.add("menu 1")
@@ -57,6 +70,9 @@ class AddIndicatorActivity : AppCompatActivity() {
 
         mPopupMenuFrequencyRed = PopupMenu(this, tvRedFrequency)
         mPopupMenuFrequencyRed.menuInflater.inflate(R.menu.popup_menu_frequency, mPopupMenuFrequencyRed.menu)
+
+        dialogSource = SourceDialogFragment()
+        mDialogAssign = AssignToDialogFragment()
     }
 
     private fun initListeners() {
@@ -66,37 +82,63 @@ class AddIndicatorActivity : AppCompatActivity() {
         }
 
         mPopupMenu.setOnMenuItemClickListener { p0 ->
-            when (p0?.title) {
-                "menu 1" -> {
-                    Timber.d("1 clicked")
-                    true
-                }
-                else -> {
-                    Timber.d("2 clicked")
-                    true
-                }
-            }
+            Timber.d("menu: %s", p0?.title)
+            tvSelectHazard.text = p0?.title
+            true
         }
 
         tvIndicatorAddSource.setOnClickListener {
-            SourceDialogFragment().show(supportFragmentManager, "dialog_source")
+            dialogSource.show(supportFragmentManager, "dialog_source")
         }
+
+        dialogSource.setOnSourceCreatedListener(object : SourceCreateListener {
+            override fun getCreatedSource(source: ModelSource) {
+                Timber.d("source: %s", source)
+                mSources.add(source)
+                mSourceAdapter.notifyItemInserted(mSources.size-1)
+            }
+        })
 
         tvGreenFrequency.setOnClickListener {
             mPopupMenuFrequencyGreen.show()
+        }
+
+        mPopupMenuFrequencyGreen.setOnMenuItemClickListener { menuItem ->
+            tvGreenFrequency.text = menuItem.title
+            true
         }
 
         tvAmberFrequency.setOnClickListener {
             mPopupMenuFrequencyAmber.show()
         }
 
+        mPopupMenuFrequencyAmber.setOnMenuItemClickListener { menuItem ->
+            tvAmberFrequency.text = menuItem.title
+            true
+        }
+
         tvRedFrequency.setOnClickListener {
             mPopupMenuFrequencyRed.show()
         }
 
-        tvAssignTo.setOnClickListener {
-            AssignToDialogFragment().show(supportFragmentManager, "dialog_assign")
+        mPopupMenuFrequencyRed.setOnMenuItemClickListener { menuItem ->
+            tvRedFrequency.text = menuItem.title
+            true
         }
+
+        tvAssignTo.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putInt("assign_position", mSelectedAssignPosition)
+            mDialogAssign.arguments = bundle
+            mDialogAssign.show(supportFragmentManager, "dialog_assign")
+        }
+
+        mDialogAssign.setOnAssignToListener(object :AssignToListener{
+            override fun userAssignedTo(userId: String, position: Int) {
+                tvAssignTo.text = userId
+                mSelectedAssignPosition = position
+            }
+        })
 
         llIndicatorSelectLocation.setOnClickListener {
             LocationSelectionDialogFragment().show(supportFragmentManager, "dialog_location_selection")
@@ -110,6 +152,9 @@ class AddIndicatorActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
+            android.R.id.home -> {
+                finish()
+            }
             R.id.menuAddIndicator -> {
                 Timber.d("save clicked!")
             }
@@ -118,6 +163,11 @@ class AddIndicatorActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun sourceRemovePosition(position: Int) {
+        mSources.removeAt(position)
+        mSourceAdapter.notifyItemRemoved(position)
     }
 
 }

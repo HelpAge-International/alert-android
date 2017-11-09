@@ -29,6 +29,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_margin="10dp"
-        android:src="@android:drawable/arrow_down_float"/>
+        android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
 
 </LinearLayout>

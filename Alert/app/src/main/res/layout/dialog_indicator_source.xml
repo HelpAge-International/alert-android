@@ -9,6 +9,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
+        android:maxLines="1"
+        android:inputType="text"
+        android:imeOptions="actionDone"
         android:hint="@string/source_name"/>
 
     <EditText
@@ -16,6 +19,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
+        android:maxLines="1"
+        android:inputType="text"
+        android:imeOptions="actionDone"
         android:hint="@string/link_to_source_optional"/>
 
 </LinearLayout>

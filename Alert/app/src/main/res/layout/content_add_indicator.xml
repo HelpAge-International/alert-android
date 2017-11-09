@@ -42,6 +42,8 @@
             android:paddingEnd="20dp"
             android:paddingRight="20dp"
             android:maxLines="1"
+            android:imeOptions="actionDone"
+            android:inputType="text"
             android:background="@android:color/transparent"
             android:textCursorDrawable="@drawable/cursor_color"
             android:hint="@string/indicator_name"/>
@@ -93,6 +95,8 @@
                     android:paddingEnd="15dp"
                     android:paddingRight="15dp"
                     android:maxLines="1"
+                    android:inputType="text"
+                    android:imeOptions="actionDone"
                     android:background="@android:color/transparent"
                     android:textCursorDrawable="@drawable/cursor_color"
                     android:hint="@string/green_trigger_name"/>
@@ -134,6 +138,7 @@
                         android:paddingRight="15dp"
                         android:textSize="16sp"
                         android:inputType="number"
+                        android:imeOptions="actionDone"
                         android:gravity="center_vertical"
                         android:background="@android:color/transparent"
                         android:hint="@string/_0"/>
@@ -152,9 +157,9 @@
                         android:paddingLeft="15dp"
                         android:paddingEnd="15dp"
                         android:paddingRight="15dp"
-                        android:drawableRight="@android:drawable/arrow_down_float"
+                        android:drawableRight="@drawable/ic_arrow_drop_down_black_24dp"
                         android:hint="@string/frequency"
-                        android:drawableEnd="@android:drawable/arrow_down_float"
+                        android:drawableEnd="@drawable/ic_arrow_drop_down_black_24dp"
                         android:drawablePadding="10dp"/>
 
                 </LinearLayout>
@@ -190,6 +195,8 @@
                     android:paddingEnd="15dp"
                     android:paddingRight="15dp"
                     android:maxLines="1"
+                    android:inputType="text"
+                    android:imeOptions="actionDone"
                     android:background="@android:color/transparent"
                     android:textCursorDrawable="@drawable/cursor_color"
                     android:hint="@string/amber_trigger_name"/>
@@ -231,6 +238,7 @@
                         android:paddingRight="15dp"
                         android:textSize="16sp"
                         android:inputType="number"
+                        android:imeOptions="actionDone"
                         android:gravity="center_vertical"
                         android:background="@android:color/transparent"
                         android:hint="@string/_0"/>
@@ -249,9 +257,9 @@
                         android:paddingLeft="15dp"
                         android:paddingEnd="15dp"
                         android:paddingRight="15dp"
-                        android:drawableRight="@android:drawable/arrow_down_float"
+                        android:drawableRight="@drawable/ic_arrow_drop_down_black_24dp"
                         android:hint="@string/frequency"
-                        android:drawableEnd="@android:drawable/arrow_down_float"
+                        android:drawableEnd="@drawable/ic_arrow_drop_down_black_24dp"
                         android:drawablePadding="10dp"/>
 
                 </LinearLayout>
@@ -287,6 +295,8 @@
                     android:paddingEnd="15dp"
                     android:paddingRight="15dp"
                     android:maxLines="1"
+                    android:inputType="text"
+                    android:imeOptions="actionDone"
                     android:background="@android:color/transparent"
                     android:textCursorDrawable="@drawable/cursor_color"
                     android:hint="@string/red_trigger_name"/>
@@ -328,6 +338,7 @@
                         android:paddingRight="15dp"
                         android:textSize="16sp"
                         android:inputType="number"
+                        android:imeOptions="actionDone"
                         android:gravity="center_vertical"
                         android:background="@android:color/transparent"
                         android:hint="@string/_0"/>
@@ -346,9 +357,9 @@
                         android:paddingLeft="15dp"
                         android:paddingEnd="15dp"
                         android:paddingRight="15dp"
-                        android:drawableRight="@android:drawable/arrow_down_float"
+                        android:drawableRight="@drawable/ic_arrow_drop_down_black_24dp"
                         android:hint="@string/frequency"
-                        android:drawableEnd="@android:drawable/arrow_down_float"
+                        android:drawableEnd="@drawable/ic_arrow_drop_down_black_24dp"
                         android:drawablePadding="10dp"/>
 
                 </LinearLayout>
