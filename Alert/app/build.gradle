@@ -71,6 +71,8 @@ dependencies {
     //Architecture Components
     implementation "android.arch.lifecycle:common-java8:1.0.0"
     implementation "android.arch.lifecycle:extensions:1.0.0"
+    //json
+    compile 'com.google.code.gson:gson:2.8.2'
 
 }
 

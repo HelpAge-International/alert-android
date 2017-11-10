@@ -391,7 +391,7 @@
         <LinearLayout
             android:id="@+id/llIndicatorSelectLocation"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="wrap_content"
             android:paddingStart="15dp"
             android:paddingLeft="15dp"
             android:paddingEnd="15dp"
@@ -409,12 +409,24 @@
                 android:text="@string/geographical_location_of_indicator_monitoring"/>
 
             <TextView
+                android:id="@+id/tvIndicatorLocation"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:paddingTop="3dp"
                 android:textSize="16sp"
+                android:gravity="center_vertical"
                 android:textColor="@android:color/black"
                 tools:text="National"/>
+
+            <TextView
+                android:id="@+id/tvIndicatorMyLocation"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:paddingTop="3dp"
+                android:textSize="16sp"
+                android:visibility="gone"
+                android:textColor="@android:color/black"
+                tools:text="city, country, 2342342342342,234234234234"/>
 
         </LinearLayout>
         <View
@@ -423,8 +435,10 @@
             android:background="@color/divider_color"/>
 
         <android.support.v7.widget.RecyclerView
+            android:id="@+id/rvLocationSubNational"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/tvIndicatorSelectSubNational"
@@ -436,6 +450,7 @@
             android:paddingRight="20dp"
             android:gravity="center_vertical"
             android:textSize="16sp"
+            android:visibility="gone"
             android:hint="Select area"/>
 
     </LinearLayout>

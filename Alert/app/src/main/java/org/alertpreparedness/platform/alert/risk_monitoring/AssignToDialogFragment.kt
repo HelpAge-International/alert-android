@@ -19,8 +19,7 @@ class AssignToDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): AlertDialog {
         if (arguments != null) {
-            defaultPosition = arguments.getInt("assign_position")
-            Timber.d("arguments have value!!")
+            defaultPosition = arguments.getInt(AddIndicatorActivity.ASSIGN_POSITION)
         }
         return AlertDialog.Builder(activity)
                 .setTitle(getString(R.string.assign_to))

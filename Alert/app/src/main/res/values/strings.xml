@@ -56,6 +56,7 @@
     <string name="source_name">Source Name</string>
     <string name="link_to_source_optional">Link to source (optional)</string>
     <string name="assign_to">Assign to</string>
+    <string name="title_activity_select_area">SelectAreaActivity</string>
 
 
 </resources>

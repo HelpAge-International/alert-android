@@ -7,29 +7,37 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.PopupMenu
 import kotlinx.android.synthetic.main.activity_add_indicator.*
 import kotlinx.android.synthetic.main.content_add_indicator.*
 import org.alertpreparedness.platform.alert.R
 import timber.log.Timber
 
-class AddIndicatorActivity : AppCompatActivity(),OnSourceDeleteListener {
+class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
 
     private lateinit var mPopupMenu: PopupMenu
     private lateinit var mPopupMenuFrequencyGreen: PopupMenu
     private lateinit var mPopupMenuFrequencyAmber: PopupMenu
     private lateinit var mPopupMenuFrequencyRed: PopupMenu
-    private lateinit var dialogSource: SourceDialogFragment
+    private lateinit var mDialogSource: SourceDialogFragment
     private lateinit var mSources: MutableList<ModelSource>
     private lateinit var mSourceAdapter: SourceRVAdapter
-    private lateinit var mDialogAssign:AssignToDialogFragment
+    private lateinit var mDialogAssign: AssignToDialogFragment
+    private lateinit var mDialogLocation: LocationSelectionDialogFragment
     private var mSelectedAssignPosition = 0
+    private var mSelectedLocation = 0
 
     companion object {
         fun startActivity(context: Context) {
             val intent = Intent(context, AddIndicatorActivity::class.java)
             context.startActivity(intent)
         }
+
+        val SELECTED_LOCATION = "selected_location"
+        val ASSIGN_POSITION = "assign_position"
+        val LOCATION_LIST = listOf<String>("National", "Subnational", "Use my location")
+        val AREA_REQUEST_CODE = 100
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,8 +79,9 @@ class AddIndicatorActivity : AppCompatActivity(),OnSourceDeleteListener {
         mPopupMenuFrequencyRed = PopupMenu(this, tvRedFrequency)
         mPopupMenuFrequencyRed.menuInflater.inflate(R.menu.popup_menu_frequency, mPopupMenuFrequencyRed.menu)
 
-        dialogSource = SourceDialogFragment()
+        mDialogSource = SourceDialogFragment()
         mDialogAssign = AssignToDialogFragment()
+        mDialogLocation = LocationSelectionDialogFragment()
     }
 
     private fun initListeners() {
@@ -88,14 +97,14 @@ class AddIndicatorActivity : AppCompatActivity(),OnSourceDeleteListener {
         }
 
         tvIndicatorAddSource.setOnClickListener {
-            dialogSource.show(supportFragmentManager, "dialog_source")
+            mDialogSource.show(supportFragmentManager, "dialog_source")
         }
 
-        dialogSource.setOnSourceCreatedListener(object : SourceCreateListener {
+        mDialogSource.setOnSourceCreatedListener(object : SourceCreateListener {
             override fun getCreatedSource(source: ModelSource) {
                 Timber.d("source: %s", source)
                 mSources.add(source)
-                mSourceAdapter.notifyItemInserted(mSources.size-1)
+                mSourceAdapter.notifyItemInserted(mSources.size - 1)
             }
         })
 
@@ -128,12 +137,12 @@ class AddIndicatorActivity : AppCompatActivity(),OnSourceDeleteListener {
 
         tvAssignTo.setOnClickListener {
             val bundle = Bundle()
-            bundle.putInt("assign_position", mSelectedAssignPosition)
+            bundle.putInt(ASSIGN_POSITION, mSelectedAssignPosition)
             mDialogAssign.arguments = bundle
             mDialogAssign.show(supportFragmentManager, "dialog_assign")
         }
 
-        mDialogAssign.setOnAssignToListener(object :AssignToListener{
+        mDialogAssign.setOnAssignToListener(object : AssignToListener {
             override fun userAssignedTo(userId: String, position: Int) {
                 tvAssignTo.text = userId
                 mSelectedAssignPosition = position
@@ -141,7 +150,49 @@ class AddIndicatorActivity : AppCompatActivity(),OnSourceDeleteListener {
         })
 
         llIndicatorSelectLocation.setOnClickListener {
-            LocationSelectionDialogFragment().show(supportFragmentManager, "dialog_location_selection")
+            val bundle = Bundle()
+            bundle.putInt(SELECTED_LOCATION, mSelectedLocation)
+            mDialogLocation.arguments = bundle
+            mDialogLocation.show(supportFragmentManager, "dialog_location_selection")
+        }
+
+        mDialogLocation.setOnLocationSelectedListener(object : OnLocationSelected {
+            override fun locationSelected(location: Int) {
+                tvIndicatorLocation.text = LOCATION_LIST[location]
+                mSelectedLocation = location
+                when (location) {
+                    0 -> {
+                        tvIndicatorSelectSubNational.visibility = View.GONE
+                        rvLocationSubNational.visibility = View.GONE
+                        tvIndicatorMyLocation.visibility = View.GONE
+                    }
+                    1 -> {
+                        tvIndicatorSelectSubNational.visibility = View.VISIBLE
+                        rvLocationSubNational.visibility = View.VISIBLE
+                        tvIndicatorMyLocation.visibility = View.GONE
+                    }
+                    else -> {
+                        tvIndicatorSelectSubNational.visibility = View.GONE
+                        rvLocationSubNational.visibility = View.GONE
+                        tvIndicatorMyLocation.visibility = View.VISIBLE
+                    }
+                }
+            }
+        })
+
+        tvIndicatorSelectSubNational.setOnClickListener {
+            startActivityForResult(Intent(this, SelectAreaActivity::class.java), AREA_REQUEST_CODE)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            AREA_REQUEST_CODE -> {
+                Timber.d("returned from select area")
+            }
+            else -> {
+            }
         }
     }
 
@@ -155,7 +206,7 @@ class AddIndicatorActivity : AppCompatActivity(),OnSourceDeleteListener {
             android.R.id.home -> {
                 finish()
             }
-            R.id.menuAddIndicator -> {
+            R.id.menuSave -> {
                 Timber.d("save clicked!")
             }
             else -> {

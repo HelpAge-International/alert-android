@@ -12,6 +12,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".login.activity.SplashActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -21,6 +22,7 @@
         </activity>
         <activity
             android:name=".login.activity.LoginScreen"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar"/>
         <activity
             android:name=".dashboard.activity.HomeScreen"
@@ -48,6 +50,12 @@
         <activity
             android:name=".risk_monitoring.AddIndicatorActivity"
             android:label="@string/title_activity_add_indicator"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".risk_monitoring.SelectAreaActivity"
+            android:label="@string/title_activity_select_area"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
