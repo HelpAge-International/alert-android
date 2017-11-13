@@ -1,28 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/green_alert_toolbar"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/actionBarSize"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/colorPrimaryDark"
-    app:theme="@style/myCustomAppBarTheme"
-    app:popupTheme="@style/ThemeOverlay.AppCompat.Dark">
+    android:background="@color/colorPrimaryDark">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/txt_title"
-                android:layout_width="212dp"
-                android:layout_height="25dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:background="@drawable/alert_green"
-                android:fontFamily="@font/alef"
-                android:gravity="center"
-                android:text="@string/green_text"
-                android:textColor="@android:color/white"
-                android:textSize="15sp" />
+        <TextView
+            android:id="@+id/txt_title"
+            android:layout_width="212dp"
+            android:layout_height="25dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/alert_green"
+            android:fontFamily="@font/alef"
+            android:gravity="center"
+            android:text="@string/green_text"
+            android:textColor="@android:color/white"
+            android:textSize="15sp" />
 
     </RelativeLayout>
 

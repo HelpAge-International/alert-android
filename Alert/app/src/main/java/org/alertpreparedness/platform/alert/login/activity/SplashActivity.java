@@ -1,17 +1,22 @@
 package org.alertpreparedness.platform.alert.login.activity;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import org.alertpreparedness.platform.alert.BaseActivity;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        startActivity(new Intent(SplashActivity.this, HomeScreen.class));
+        String uid = getUid();
+        if (uid != null) {
+            startActivity(new Intent(SplashActivity.this, HomeScreen.class));
+        } else {
+            startActivity(new Intent(SplashActivity.this, LoginScreen.class));
+        }
         finish();
     }
 }
