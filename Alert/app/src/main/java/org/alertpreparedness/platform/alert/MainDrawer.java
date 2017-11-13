@@ -27,7 +27,7 @@ public class MainDrawer extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private NavigationView navigationView;
-    private FirebaseAuth firebaseAuth;
+    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     protected FrameLayout content;
 
     protected void onCreateDrawer(final int layoutResID) {

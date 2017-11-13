@@ -1,30 +1,28 @@
 package org.alertpreparedness.platform.alert.dashboard.activity;
 
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import android.util.Log;
+import android.widget.Toast;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
+import org.alertpreparedness.platform.alert.helper.UserInfo;
+import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
 
 public class HomeScreen extends  MainDrawer {
+    private User user;
+    private String[] users = {"administratorCountry", "countryDirector", "ert", "ertLeader", "partner"};
 
-    private Toolbar toolbar;
-    private NavigationView navigationView;
-    private FirebaseAuth firebaseAuth;
-    private Menu menu;
+    public static final String mypreference = "mypref";
+    public static final String userKey = "UserType";
+
+    public static final PreferHelper sharedPreferences = new PreferHelper();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +33,9 @@ public class HomeScreen extends  MainDrawer {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+
+        for(int i = 0; i < users.length; i++) {
+            UserInfo.getUserType(this, users[i]);
+        }
     }
-
-
 }
