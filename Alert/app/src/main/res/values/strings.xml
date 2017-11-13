@@ -37,5 +37,29 @@
         <item>Logout</item>
     </string-array>
 
+    <string name="loading">Loading…</string>
+    <string name="title_activity_risk_monitoring">RiskMonitoringActivity</string>
+    <string name="title_activity_risk">RiskActivity</string>
+    <string name="risk_monitoring">Risk Monitoring</string>
+    <string name="active">ACTIVE</string>
+    <string name="archived">ARCHIVED</string>
+    <string name="next_update">Next update</string>
+    <string name="title_activity_add_indicator">AddIndicatorActivity</string>
+    <string name="add_indicator">Add indicator</string>
+    <string name="save">SAVE</string>
+    <string name="cancel">CANCEL</string>
+    <string name="hazard">Hazard</string>
+    <string name="indicator_name">Indicator name</string>
+    <string name="green_trigger_name">Green trigger name</string>
+    <string name="amber_trigger_name">Amber trigger name</string>
+    <string name="red_trigger_name">Red trigger name</string>
+    <string name="update_every">Update every</string>
+    <string name="_0">0</string>
+    <string name="frequency">Frequency</string>
+    <string name="geographical_location_of_indicator_monitoring">Geographical location of indicator monitoring</string>
+    <string name="source_name">Source Name</string>
+    <string name="link_to_source_optional">Link to source (optional)</string>
+    <string name="assign_to">Assign to</string>
+
 
 </resources>

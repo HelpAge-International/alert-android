@@ -23,7 +23,8 @@
             android:name=".login.activity.LoginScreen"
             android:theme="@style/SplashTheme" />
         <activity
-            android:name=".dashboard.activity.HomeScreen"/>
+            android:name=".dashboard.activity.HomeScreen"
+            android:screenOrientation="portrait" />
 
         <meta-data
             android:name="preloaded_fonts"
@@ -31,6 +32,27 @@
 
         <activity
             android:name=".MainDrawer" />
+
+        <activity
+            android:name=".risk_monitoring.RiskMonitoringActivity"
+            android:label="@string/title_activity_risk_monitoring"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".risk_monitoring.RiskActivity"
+            android:label="@string/title_activity_risk"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".risk_monitoring.AddIndicatorActivity"
+            android:label="@string/title_activity_add_indicator"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

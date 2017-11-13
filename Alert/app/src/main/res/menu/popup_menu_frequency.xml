@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/frequency_hour"
+        android:title="Hours" />
+    <item
+        android:id="@+id/frequency_day"
+        android:title="Days" />
+    <item
+        android:id="@+id/frequency_week"
+        android:title="Weeks" />
+    <item
+        android:id="@+id/frequency_month"
+        android:title="Months" />
+</menu>
