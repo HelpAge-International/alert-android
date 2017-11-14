@@ -16,9 +16,22 @@ public final class Constants {
     //animation delay
     public static final long MENU_CLOSING_DURATION = 250;
 
-    //other
+    //hazard
     public static final String HAZARD_ID = "hazard_id";
+    public static final String HAZARD_PATH = "hazard";
+    public static final String INDICATOR_PATH = "indicator";
+    public static final String[] HAZARD_SCENARIO = {"Cold Wave", "Conflict", "Cyclone", "Drought", "Earthquake", "Epidemic", "Fire", "Flash Flood", "Flood", "Heat Wave", "Heavy Rain", "Humanitarian Access",
+            "Insect Infestation", "Landslide", "Locust Infestation", "Mudslide", "Population Displacement", "Population Return", "Snow Avalanche", "Snowfall", "Storm", "Storm Surge", "Technological Disaster", "Tornado", "Tsunami", "Violent Wind", "Volcano"};
+    public static final String[] INDICATOR_GEO_LOCATION = {"National", "Subnational", "Use my location"};
+    public static final String[] TRIGGER_LEVEL = {"Average or falling", "Potential challenges & risks", "Red alert"};
 
+    //indicator-geo-location
+    public static final int NATIONAL = 0;
+    public static final int SUBNATIONAL = 1;
+    public static final int MY_LOCATION = 2;
 
-
+    //indicator-geo-location
+    public static final int TRIGGER_GREEN = 0;
+    public static final int TRIGGER_AMBER = 1;
+    public static final int TRIGGER_RED = 2;
 }

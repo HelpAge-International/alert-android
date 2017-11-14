@@ -1,8 +1,13 @@
 package org.alertpreparedness.platform.alert.risk_monitoring
 
 import com.google.gson.Gson
+import durdinapps.rxfirebase2.RxFirebaseDatabase
+import io.reactivex.Flowable
 import io.reactivex.Observable
 import org.alertpreparedness.platform.alert.AlertApplication
+import org.alertpreparedness.platform.alert.utils.Constants
+import org.alertpreparedness.platform.alert.utils.FirebaseHelper
+import org.alertpreparedness.platform.alert.utils.PreferHelper
 import org.json.JSONObject
 
 /**
@@ -10,6 +15,8 @@ import org.json.JSONObject
  */
 
 object RiskMonitoringService {
+
+    val gson: Gson = Gson()
 
     fun readJsonFile(): Observable<String> {
         return Observable.create { subscriber ->
@@ -21,7 +28,7 @@ object RiskMonitoringService {
         }
     }
 
-    fun mapJasonToCountryData(jsonObject:JSONObject, gson: Gson) :Observable<CountryJsonData> {
+    fun mapJasonToCountryData(jsonObject: JSONObject, gson: Gson): Observable<CountryJsonData> {
         return Observable.range(0, 249)
                 .map {
                     if (!jsonObject.isNull(it.toString())) {
@@ -37,4 +44,28 @@ object RiskMonitoringService {
                     }
                 }
     }
+
+    fun getHazards(countryId: String): Flowable<List<ModelHazard>> {
+
+        val hazardsRef = FirebaseHelper.getHazardsRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), countryId)
+        return RxFirebaseDatabase.observeValueEvent(hazardsRef, { snap ->
+            snap.children.map {
+                val fromJson = gson.fromJson(it.value.toString(), ModelHazard::class.java)
+                return@map fromJson.copy(id = it.key)
+            }
+        })
+
+    }
+
+    fun getIndicators(hazardId:String) : Flowable<List<ModelIndicator>> {
+        val indicatorRef = FirebaseHelper.getIndicatorsRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), hazardId)
+        return RxFirebaseDatabase.observeValueEvent(indicatorRef, {snap ->
+            snap.children.map {
+                val fromJson = gson.fromJson(it.value.toString(), ModelIndicator::class.java)
+                return@map fromJson.copy(id = it.key)
+            }
+        })
+    }
+
+
 }

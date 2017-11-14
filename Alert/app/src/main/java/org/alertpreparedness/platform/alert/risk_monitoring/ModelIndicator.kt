@@ -6,9 +6,10 @@ import android.os.Parcelable
 /**
  * Created by fei on 07/11/2017.
  */
-data class ModelIndicator(val id:String, val hazardScenario:ModelHazard, val triggerSelected:Int,
-                          val name:String, val assignee:String, val geoLocation:Int,
-                          val updatedAt:Long, val dueDate:Long, val source: List<String>, val trigger:List<ModelTrigger>):Parcelable {
+data class ModelIndicator(val id: String, val hazardScenario: ModelHazard, val triggerSelected: Int,
+                          val name: String, val assignee: String?, val geoLocation: Int,
+                          val updatedAt: Long, val dueDate: Long, val source: List<ModelSource>, val trigger: List<ModelTrigger>) : Parcelable {
+
     constructor(parcel: Parcel) : this(
             parcel.readString(),
             parcel.readParcelable(ModelHazard::class.java.classLoader),
@@ -18,9 +19,11 @@ data class ModelIndicator(val id:String, val hazardScenario:ModelHazard, val tri
             parcel.readInt(),
             parcel.readLong(),
             parcel.readLong(),
-            parcel.createStringArrayList(),
+            parcel.createTypedArrayList(ModelSource),
             parcel.createTypedArrayList(ModelTrigger)) {
     }
+
+    constructor() : this("", ModelHazard("", -1, true, false, 10, 0, null), -1, "", null, -1, 0, 0, listOf(), listOf())
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(id)
@@ -31,7 +34,7 @@ data class ModelIndicator(val id:String, val hazardScenario:ModelHazard, val tri
         parcel.writeInt(geoLocation)
         parcel.writeLong(updatedAt)
         parcel.writeLong(dueDate)
-        parcel.writeStringList(source)
+        parcel.writeTypedList(source)
         parcel.writeTypedList(trigger)
     }
 
@@ -48,10 +51,14 @@ data class ModelIndicator(val id:String, val hazardScenario:ModelHazard, val tri
             return arrayOfNulls(size)
         }
     }
+
 }
 
 
-data class ModelTrigger(val durationType:String, val frequencyValue:Int, val triggerValue:String):Parcelable {
+data class ModelTrigger(val durationType: String, val frequencyValue: Int, val triggerValue: String) : Parcelable {
+
+    constructor():this("", -1, "")
+
     constructor(parcel: Parcel) : this(
             parcel.readString(),
             parcel.readInt(),
@@ -79,7 +86,10 @@ data class ModelTrigger(val durationType:String, val frequencyValue:Int, val tri
     }
 }
 
-data class ModelSource(val sourceName:String, val sourceLink:String = ""):Parcelable {
+data class ModelSource(val sourceName: String, val sourceLink: String?) : Parcelable {
+
+    constructor() : this("", null)
+
     constructor(parcel: Parcel) : this(
             parcel.readString(),
             parcel.readString()) {

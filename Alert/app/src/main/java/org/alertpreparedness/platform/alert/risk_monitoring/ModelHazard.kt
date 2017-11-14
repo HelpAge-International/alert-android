@@ -6,7 +6,10 @@ import android.os.Parcelable
 /**
  * Created by fei on 07/11/2017.
  */
-data class ModelHazard(val id:String, val hazardScenario:Int, val isActive:Boolean, val isSeasonal:Boolean, val risk:Int, val timeCreated:Long, val otherName:String):Parcelable {
+data class ModelHazard(val id:String, val hazardScenario:Int, val isActive:Boolean, val isSeasonal:Boolean, val risk:Int, val timeCreated:Long, val otherName:String?):Parcelable {
+
+    constructor() : this("", -1, true, false, 10, 0, null)
+
     constructor(parcel: Parcel) : this(
             parcel.readString(),
             parcel.readInt(),
