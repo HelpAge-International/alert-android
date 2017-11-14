@@ -12,6 +12,7 @@ import java.io.Serializable;
 @IgnoreExtraProperties
 public class User implements Serializable {
 
+    public String userID;
     public String userType;
     public String agencyAdminID;
     public String countryID;
@@ -21,12 +22,17 @@ public class User implements Serializable {
 
     // Default constructor required for calls to
     // DataSnapshot.getValue(User.class)
-    public User(String userType, String agencyAdminID, String countryID, String systemAdminID) {
+    public User(String userID, String userType, String agencyAdminID, String countryID, String systemAdminID) {
+        this.userID = userID;
         this.userType = userType;
         this.agencyAdminID = agencyAdminID;
         this.countryID = countryID;
         this.systemAdminID = systemAdminID;
 
+    }
+
+    public String getUserID() {
+        return userID;
     }
 
     public String getUserType() {

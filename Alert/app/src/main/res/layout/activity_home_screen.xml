@@ -24,11 +24,14 @@
             android:layout_width="match_parent"
             android:layout_height="?android:attr/actionBarSize" />
 
+        <include
+            android:id="@+id/home_main_content"
+            layout="@layout/my_tasks_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-    <FrameLayout
-                android:id="@+id/mainScreen"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>    </LinearLayout>
+
+    </LinearLayout>
 
         <!-- Include Home Default Body -->
         <!--<include-->
