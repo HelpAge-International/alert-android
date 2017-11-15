@@ -97,7 +97,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Firebase
         }
     }
 
-    public void clearAllActivites() {
+    public void clearAllActivities() {
         for (Activity activity : AlertApplication.mActivities) {
             activity.finish();
         }

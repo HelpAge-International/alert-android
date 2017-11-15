@@ -39,12 +39,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         holder.img_task.setBackgroundResource(R.drawable.home_task_red);
 
         if(tasks.getTaskType().equals("action")) {
-            System.out.println("This is "+tasks.getTaskType());
             holder.txt_taskStatus.setText(getTaskStatusString("red", "action"));
             holder.txt_taskName.setText(tasks.getTaskName());
         }else if(tasks.getTaskType().equals("indicator")){
-            System.out.println("This is "+tasks.getTaskType());
-           //holder.img_task.setBackgroundResource(R.drawable.home_task_amber);
             holder.txt_taskStatus.setText(getTaskStatusString("red", "indicator"));
             holder.txt_taskName.setText(tasks.getTaskName());
         }

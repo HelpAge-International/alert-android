@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#131D50</color>
     <color name="colorPrimaryDark">#131D50</color>
-    <color name="colorAccent">#46AA31</color>
+    <color name="colorAccent">#131D50</color>
     <color name="btnColor">#006ea0</color>
     <color name="white">#ffffff</color>
     <color name="alertGreen">#46AA31</color>
@@ -17,4 +17,5 @@
     <color name="grey_title">#66000000</color>
     <color name="divider_color">#FFEAEAEA</color>
     <color name="remove_button">#E10514</color>
+    <color name="hazard_tab_color">#F3F3F3</color>
 </resources>

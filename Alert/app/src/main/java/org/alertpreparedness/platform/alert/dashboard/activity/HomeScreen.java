@@ -23,12 +23,18 @@ import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.Tasks;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.risk_monitoring.NetworkService;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+
+import io.reactivex.disposables.Disposable;
+import timber.log.Timber;
 
 
 public class HomeScreen extends MainDrawer {
@@ -39,11 +45,8 @@ public class HomeScreen extends MainDrawer {
     private List<Tasks> tasksList;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-    ;
 
-    public String countryID;
-    public String agencyAdminID;
-    public String systemAdminID;
+    public static String countryID, agencyAdminID, systemAdminID, networkCountryID;
 
     private String[] usersID;
     private String[] users = {"administratorCountry", "countryDirector", "ert", "ertLeader", "partner"};
@@ -72,8 +75,9 @@ public class HomeScreen extends MainDrawer {
         countryID = UserInfo.getUser(this).countryID;
         agencyAdminID = UserInfo.getUser(this).agencyAdminID;
         systemAdminID = UserInfo.getUser(this).systemAdminID;
+        networkCountryID = UserInfo.getUser(this).networkCountryID;
 
-        usersID = new String[]{countryID, agencyAdminID, systemAdminID};
+        usersID = new String[]{networkCountryID, countryID, agencyAdminID, systemAdminID};
 
         myTaskRecyclerView = (RecyclerView) findViewById(R.id.tasks_list_view);
         myTaskRecyclerView.setHasFixedSize(true);
@@ -101,16 +105,14 @@ public class HomeScreen extends MainDrawer {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         String asignee = (String) dataSnapshot.child("asignee").getValue();
-                        // System.out.println("Node " + asignee+" = "+ UserInfo.userID);
+                        System.out.println("User " + UserInfo.userID);
 
-                        if (asignee != null && asignee.equals(UserInfo.userID)) {
-                            //System.out.println("Actions "+asignee);
-                            String taskName = (String) dataSnapshot.child("task").getValue();
-                            long dueDate = (long) dataSnapshot.child("dueDate").getValue();
+                        String task = (String) dataSnapshot.child("task").getValue();
+                        //System.out.println("Task " + task);
+                        //long dueDate = (long) dataSnapshot.child("dueDate").getValue();
 
-                            //System.out.println(taskName);
-                            Tasks tasks = new Tasks("red", "action", taskName, dueDate);
-
+                        if (asignee != null && task != null && asignee.equals(UserInfo.userID)) {
+                            Tasks tasks = new Tasks("red", "action", task);
                             tasksList.add(tasks);
                             myTaskRecyclerView.setAdapter(taskAdapter);
                         }
@@ -143,14 +145,11 @@ public class HomeScreen extends MainDrawer {
                         //System.out.println("Indicators " + dataSnapshot.getValue());
                         String asignee = (String) dataSnapshot.child("assignee").getValue();
                         // System.out.println("Node " + asignee+" = "+ UserInfo.userID);
+                        String taskName = (String) dataSnapshot.child("name").getValue();
 
-                        if (asignee != null && asignee.equals(UserInfo.userID)) {
-                            //System.out.println("Indicators " + asignee);
-                            String taskName = (String) dataSnapshot.child("name").getValue();
-                            long dueDate = (long) dataSnapshot.child("dueDate").getValue();
-
-                            //System.out.println(taskName);
-                            Tasks tasks = new Tasks("red", "indicator", taskName, dueDate);
+                        if (asignee != null && taskName != null && asignee.equals(UserInfo.userID)) {
+                           // long dueDate = (long) dataSnapshot.child("dueDate").getValue();
+                            Tasks tasks = new Tasks("red", "indicator", taskName);
 
                             tasksList.add(tasks);
                             myTaskRecyclerView.setAdapter(taskAdapter);

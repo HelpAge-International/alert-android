@@ -2,17 +2,12 @@ package org.alertpreparedness.platform.alert;
 
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.support.annotation.LayoutRes;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
@@ -22,8 +17,14 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
+import org.alertpreparedness.platform.alert.risk_monitoring.RiskActivity;
+import org.alertpreparedness.platform.alert.utils.Constants;
 
-public class MainDrawer extends AppCompatActivity {
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+
+public class MainDrawer extends BaseActivity {
 
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
@@ -51,10 +52,17 @@ public class MainDrawer extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
+                drawerLayout.closeDrawers();
                 switch (item.getItemId()) {
+                    case R.id.nav_home:
+                        Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x->{
+                            startActivity(new Intent(MainDrawer.this, HomeScreen.class));
+                        });
+                        break;
                     case R.id.nav_risk:
-                        startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+                        Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x->{
+                            startActivity(RiskActivity.RiskIntent.getIntent(MainDrawer.this));
+                        });
                         break;
                     case R.id.nav_logout:
                         firebaseAuth.signOut();

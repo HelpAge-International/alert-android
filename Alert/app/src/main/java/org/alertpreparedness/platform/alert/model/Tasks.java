@@ -11,11 +11,10 @@ public class Tasks {
     private String taskName;
     private long dueDate;
 
-    public Tasks(String alertLevel, String taskType, String taskName, long dueDate) {
+    public Tasks(String alertLevel, String taskType, String taskName) {
         this.alertLevel = alertLevel;
         this.taskType = taskType;
         this.taskName = taskName;
-        this.dueDate = dueDate;
     }
 
     public String getAlertLevel() {

@@ -13,12 +13,35 @@ import timber.log.Timber
 
 class LocationSelectionDialogFragment : DialogFragment() {
 
+    private var mListener: OnLocationSelected? = null
+
+    private var mPosition: Int = 0
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+
+        if (arguments != null) {
+            mPosition = arguments.getInt(AddIndicatorActivity.SELECTED_LOCATION)
+        }
+
         return AlertDialog.Builder(activity)
                 .setTitle("Location selection")
-                .setSingleChoiceItems(arrayOf("National", "Subnational", "Use my location"), 0) { _, position -> Timber.d("position: %s", position) }
-                .setPositiveButton(getString(R.string.save), null)
+                .setSingleChoiceItems(arrayOf("National", "Subnational", "Use my location"), mPosition) { _, position ->
+                    Timber.d("position: %s", position)
+                    mPosition = position
+                }
+                .setPositiveButton(getString(R.string.save), { _, _ ->
+                    mListener?.locationSelected(mPosition)
+                })
                 .setNegativeButton(getString(R.string.cancel), null)
                 .create()
     }
+
+    fun setOnLocationSelectedListener(listener: OnLocationSelected?) {
+        mListener = listener
+    }
+
+}
+
+interface OnLocationSelected {
+    fun locationSelected(location: Int)
 }

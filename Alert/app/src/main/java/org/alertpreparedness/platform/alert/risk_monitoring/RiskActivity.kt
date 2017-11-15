@@ -7,13 +7,13 @@ import android.view.Menu
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_risk.*
 import kotlinx.android.synthetic.main.content_risk.*
-import org.alertpreparedness.platform.alert.BaseActivity
+import org.alertpreparedness.platform.alert.MainDrawer
 import org.alertpreparedness.platform.alert.R
 import org.alertpreparedness.platform.alert.utils.Constants
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-class RiskActivity : BaseActivity() {
+class RiskActivity : MainDrawer() {
 
     companion object RiskIntent {
         fun getIntent(context: Context): Intent {
@@ -23,7 +23,8 @@ class RiskActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_risk)
+//        setContentView(R.layout.activity_risk)
+        onCreateDrawer(R.layout.activity_risk)
         initView()
         initListeners()
     }
@@ -65,7 +66,7 @@ class RiskActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        clearAllActivites()
+        clearAllActivities()
     }
 
 }

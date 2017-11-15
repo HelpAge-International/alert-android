@@ -14,8 +14,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.risk_monitoring.NetworkService;
 
 import java.util.Locale;
+import java.util.Map;
+
+import io.reactivex.disposables.Disposable;
 
 /**
  * Created by faizmohideen on 08/11/2017.
@@ -70,13 +74,21 @@ public class UserInfo {
         String agencyAdmin = userNode.child("agencyAdmin").getChildren().iterator().next().getKey();
         String systemAdmin = userNode.child("systemAdmin").getChildren().iterator().next().getKey();
         String countryId = userNode.child("countryId").getValue(String.class);
-        
-        User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin);
-        Toast.makeText(context,
-                String.format(Locale.getDefault(), "user: %s, type: %s, agency: %s, system: %s, country: %s",
-                        userID, userType, agencyAdmin, systemAdmin, countryId),
-                Toast.LENGTH_LONG).show();
-        saveUser(context, user);
+
+        NetworkService.INSTANCE.mapNetworksForCountry(agencyAdmin, countryId).subscribe(
+                (Map<String, String> stringStringMap) -> {
+                    for(String key: stringStringMap.keySet()) {
+
+                        String networkID = stringStringMap.get(key);
+                        User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin, networkID);
+                        Toast.makeText(context,
+                                String.format(Locale.getDefault(), "user: %s, type: %s, agency: %s, system: %s, country: %s, network: %s",
+                                        userID, userType, agencyAdmin, systemAdmin, countryId, networkID),
+                                Toast.LENGTH_LONG).show();
+                        saveUser(context, user);
+                    }
+                }
+        );
     }
 
     public static String getUserTypeString(String node){

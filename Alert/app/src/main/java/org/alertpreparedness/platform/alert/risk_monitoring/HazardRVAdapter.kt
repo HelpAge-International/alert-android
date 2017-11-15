@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.risk_monitoring
 
+import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -12,7 +13,10 @@ import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder
 import de.hdodenhof.circleimageview.CircleImageView
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.R
+import org.alertpreparedness.platform.alert.utils.Constants
 import org.jetbrains.anko.find
+import org.jetbrains.anko.textColor
+import org.joda.time.DateTime
 import timber.log.Timber
 
 /**
@@ -36,6 +40,7 @@ class HazardViewHolder(itemView: View) : GroupViewHolder(itemView) {
 }
 
 class IndicatorViewHolder(itemView: View) : ChildViewHolder(itemView) {
+
     private val indicatorTitle: TextView = itemView.findViewById(R.id.tvIndicatorName)
     private val indicatorGeo: TextView = itemView.find(R.id.tvIndicatorGeo)
     private val indicatorLevel: TextView = itemView.find(R.id.tvIndicatorLevel)
@@ -45,15 +50,47 @@ class IndicatorViewHolder(itemView: View) : ChildViewHolder(itemView) {
 
     init {
         indicatorLayout.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-//        indicatorNextUpdate.text = AlertApplication.getContext().getString(R.string.next_update)
     }
 
     fun onBind(indicator: ModelIndicator) {
         indicatorTitle.text = indicator.name
-        indicatorGeo.text = indicator.geoLocation.toString()
-        indicatorLevel.text = indicator.triggerSelected.toString()
-        indicatorDue.text = indicator.dueDate.toString()
-        indicatorLevel.setOnClickListener { Timber.d("id: %s",indicator.id) }
+        indicatorGeo.text = Constants.INDICATOR_GEO_LOCATION[indicator.geoLocation]
+        val dateTime = DateTime(indicator.dueDate)
+        indicatorDue.text = String.format("%s %s %s", dateTime.dayOfMonth().asText, dateTime.monthOfYear().asShortText, dateTime.year().asText)
+
+        when (indicator.triggerSelected) {
+            Constants.TRIGGER_GREEN -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_green, AlertApplication.getContext().theme)
+                } else {
+                    indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_green)
+                }
+                indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_GREEN]
+                indicatorNextUpdate.textColor = AlertApplication.getContext().resources.getColor(R.color.alertGreen)
+                indicatorDue.textColor = AlertApplication.getContext().resources.getColor(R.color.alertGreen)
+            }
+            Constants.TRIGGER_AMBER -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_amber, AlertApplication.getContext().theme)
+                } else {
+                    indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_amber)
+                }
+                indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_AMBER]
+                indicatorNextUpdate.textColor = AlertApplication.getContext().resources.getColor(R.color.alertAmber)
+                indicatorDue.textColor = AlertApplication.getContext().resources.getColor(R.color.alertAmber)
+            }
+            else -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_red, AlertApplication.getContext().theme)
+                } else {
+                    indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_red)
+                }
+                indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_RED]
+                indicatorNextUpdate.textColor = AlertApplication.getContext().resources.getColor(R.color.alertRed)
+                indicatorDue.textColor = AlertApplication.getContext().resources.getColor(R.color.alertRed)
+            }
+        }
+        indicatorLevel.setOnClickListener { Timber.d("id: %s", indicator.id) }
     }
 }
 

@@ -17,17 +17,23 @@ public class User implements Serializable {
     public String agencyAdminID;
     public String countryID;
     public String systemAdminID;
+    public String networkCountryID;
 
     //public static User sharedInstance = new User();
 
     // Default constructor required for calls to
     // DataSnapshot.getValue(User.class)
-    public User(String userID, String userType, String agencyAdminID, String countryID, String systemAdminID) {
+    public User(String userID, String userType, String agencyAdminID, String countryID, String systemAdminID, String networkCountryID) {
         this.userID = userID;
         this.userType = userType;
         this.agencyAdminID = agencyAdminID;
         this.countryID = countryID;
         this.systemAdminID = systemAdminID;
+        this.networkCountryID = networkCountryID;
+    }
+
+
+    public User() {
 
     }
 
@@ -49,6 +55,10 @@ public class User implements Serializable {
 
     public String getSystemAdminID() {
         return systemAdminID;
+    }
+
+    public String getNetworkCountryID() {
+        return networkCountryID;
     }
 
     public void saveToPreferences(SharedPreferences prefs){
