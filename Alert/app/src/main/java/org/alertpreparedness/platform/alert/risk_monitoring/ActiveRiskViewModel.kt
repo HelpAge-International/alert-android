@@ -24,6 +24,8 @@ class ActiveRiskViewModel : ViewModel() {
     private var mHazardNameMapNetwork = mutableMapOf<String, String>()
     private var mGroups = mutableListOf<ExpandableGroup<ModelIndicator>>()
     private var mLiveData: MutableLiveData<MutableList<ExpandableGroup<ModelIndicator>>> = MutableLiveData()
+    private val agencyId = UserInfo.getUser(AlertApplication.getContext()).agencyAdminID
+    private val countryId = UserInfo.getUser(AlertApplication.getContext()).countryID
 
     fun getLiveGroups(): LiveData<MutableList<ExpandableGroup<ModelIndicator>>> {
         loadGroups()
@@ -31,8 +33,7 @@ class ActiveRiskViewModel : ViewModel() {
     }
 
     private fun loadGroups() {
-        val agencyId = UserInfo.getUser(AlertApplication.getContext()).agencyAdminID
-        val countryId = UserInfo.getUser(AlertApplication.getContext()).countryID
+
         Timber.d("agency id: %s", agencyId)
         Timber.d("country id: %s", countryId)
         val disposableCountryContext = RiskMonitoringService.getIndicators(countryId)
@@ -44,9 +45,9 @@ class ActiveRiskViewModel : ViewModel() {
                     Timber.d("group index: %s", groupIndex)
                     if (groupIndex != -1) {
                         val existItems = mGroups[groupIndex].items
-                        val totalItems = existItems.plus(indicators)
+                        val totalItems = existItems.plus(indicators).distinctBy { it.id }
                         mGroups.removeAt(groupIndex)
-                        mGroups.add(0, ExpandableGroup("Country Context", indicators))
+                        mGroups.add(0, ExpandableGroup("Country Context", totalItems))
                     } else {
                         mGroups.add(0, group)
                     }
@@ -72,9 +73,9 @@ class ActiveRiskViewModel : ViewModel() {
                                         Timber.d("group index: %s", groupIndex)
                                         if (groupIndex != -1) {
                                             val existItems = mGroups[groupIndex].items
-                                            val totalItems = existItems.plus(indicators)
+                                            val totalItems = existItems.plus(indicators).distinctBy { it.id }
                                             mGroups.removeAt(groupIndex)
-                                            mGroups.add(ExpandableGroup(mHazardNameMap[it.id], indicators))
+                                            mGroups.add(ExpandableGroup(mHazardNameMap[it.id], totalItems))
                                         } else {
                                             mGroups.add(group)
                                         }
@@ -86,43 +87,76 @@ class ActiveRiskViewModel : ViewModel() {
                 })
         mDisposables.add(disposableHazard)
 
-//        val disposableNetwork = NetworkService.mapNetworksForCountry(agencyId, countryId)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe({ networkMap ->
-//                    networkMap.forEach { (networkId, networkCountryId) ->
-//                        Timber.d("networkId: %s, networkCountryId: %s", networkId, networkCountryId)
-//                        mDisposables.add(RiskMonitoringService.getHazards(networkCountryId)
-//                                .subscribeOn(Schedulers.io())
-//                                .observeOn(AndroidSchedulers.mainThread())
-//                                .subscribe({ hazards: List<ModelHazard>? ->
-//                                    hazards?.forEach {
-//                                        if (it.id != networkCountryId) {
-//                                            mHazardNameMapNetwork.put(it.id, Constants.HAZARD_SCENARIO[it.hazardScenario])
-//                                            mDisposables.add(RiskMonitoringService.getIndicators(it.id)
-//                                                    .subscribeOn(Schedulers.io())
-//                                                    .observeOn(AndroidSchedulers.mainThread())
-//                                                    .subscribe({ indicators ->
-//                                                        mIndicatorMapNetwork.put(it.id, indicators)
-//                                                        val group = ExpandableGroup(mHazardNameMapNetwork[it.id], indicators)
-//                                                        val groupIndex = getGroupIndex(group.title, mGroups)
-//                                                        Timber.d("group index: %s", groupIndex)
-//                                                        if (groupIndex != -1) {
-//                                                            val existItems = mGroups[groupIndex].items
-//                                                            val totalItems = mIndicatorMapNetwork[it.id]?.let { it1 -> existItems.plus(it1) }
-//                                                            mGroups.removeAt(groupIndex)
-//                                                            mGroups.add(ExpandableGroup(mHazardNameMap[it.id], totalItems))
-//                                                        } else {
-//                                                            mGroups.add(group)
-//                                                        }
-//                                                        mLiveData.value = mGroups
-//                                                    }))
-//                                        }
-//                                    }
-//                                }))
-//                    }
-//                })
-//        mDisposables.add(disposableNetwork)
+        val disposableNetwork = NetworkService.mapNetworksForCountry(agencyId, countryId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ networkMap ->
+                    networkMap.forEach { (networkId, networkCountryId) ->
+                        Timber.d("networkId: %s, networkCountryId: %s", networkId, networkCountryId)
+
+                        mDisposables.add(NetworkService.getNetworkDetail(networkId)
+                                .subscribe({ network ->
+                                    Timber.d(network.toString())
+
+                                    mDisposables.add(RiskMonitoringService.getHazards(networkCountryId)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe({ hazards: List<ModelHazard>? ->
+                                                hazards?.forEach {
+                                                    if (it.id != networkCountryId) {
+                                                        mHazardNameMapNetwork.put(it.id, Constants.HAZARD_SCENARIO[it.hazardScenario])
+                                                        mDisposables.add(RiskMonitoringService.getIndicatorsForAssignee(it.id, network.name)
+                                                                .subscribeOn(Schedulers.io())
+                                                                .observeOn(AndroidSchedulers.mainThread())
+                                                                .subscribe({ indicators ->
+                                                                    mIndicatorMapNetwork.put(it.id, indicators)
+                                                                    val group = ExpandableGroup(mHazardNameMapNetwork[it.id], indicators)
+                                                                    val groupIndex = getGroupIndex(group.title, mGroups)
+                                                                    Timber.d("group index: %s", groupIndex)
+                                                                    if (groupIndex != -1) {
+                                                                        val existItems = mGroups[groupIndex].items
+                                                                        val totalItems = mIndicatorMapNetwork[it.id]?.let { it1 -> existItems.plus(it1).distinctBy { it.id } }
+                                                                        if (totalItems?.isNotEmpty() == true) {
+                                                                            mGroups.removeAt(groupIndex)
+                                                                            mGroups.add(ExpandableGroup(mHazardNameMapNetwork[it.id], totalItems))
+                                                                        }
+                                                                    } else {
+                                                                        if (group.items.isNotEmpty()) {
+                                                                            mGroups.add(group)
+                                                                        }
+                                                                    }
+                                                                    mLiveData.value = mGroups
+                                                                }))
+                                                    }
+                                                    mDisposables.add(RiskMonitoringService.getIndicatorsForAssignee(networkCountryId, network.name)
+                                                            .subscribeOn(Schedulers.io())
+                                                            .observeOn(AndroidSchedulers.mainThread())
+                                                            .subscribe({ indicators ->
+                                                                val group = ExpandableGroup("Country Context", indicators)
+                                                                val groupIndex = getGroupIndex(group.title, mGroups)
+                                                                Timber.d("group index: %s", groupIndex)
+                                                                if (groupIndex != -1) {
+                                                                    val existItems = mGroups[groupIndex].items
+                                                                    val totalItems = existItems.plus(indicators).distinctBy { it.id }
+                                                                    if (totalItems.isNotEmpty()) {
+                                                                        mGroups.removeAt(groupIndex)
+                                                                        mGroups.add(0, ExpandableGroup("Country Context", totalItems))
+                                                                    }
+                                                                } else {
+                                                                    if (group.items.isNotEmpty()) {
+                                                                        mGroups.add(0, group)
+                                                                    }
+                                                                }
+                                                                mLiveData.value = mGroups
+                                                            }))
+                                                }
+                                            }))
+
+                                })
+                        )
+                    }
+                })
+        mDisposables.add(disposableNetwork)
 
     }
 

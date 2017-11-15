@@ -1,14 +1,18 @@
 package org.alertpreparedness.platform.alert.risk_monitoring
 
 import com.google.gson.Gson
+import com.google.gson.stream.JsonReader
 import durdinapps.rxfirebase2.RxFirebaseDatabase
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import org.alertpreparedness.platform.alert.AlertApplication
+import org.alertpreparedness.platform.alert.helper.UserInfo
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.alertpreparedness.platform.alert.utils.FirebaseHelper
 import org.alertpreparedness.platform.alert.utils.PreferHelper
 import org.json.JSONObject
+import timber.log.Timber
+import java.io.StringReader
 
 /**
  * Created by Fei on 11/11/2017.
@@ -67,15 +71,22 @@ object RiskMonitoringService {
         })
     }
 
-//    fun getIndicatorsForAssignee(hazardId: String): Flowable<List<ModelIndicator>> {
-//        val indicatorRef = FirebaseHelper.getIndicatorsRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), hazardId).orderByChild("assignee").equalTo(UserInfo.getUser(AlertApplication.getContext()).)
-//        return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
-//            snap.children.map {
-//                val fromJson = gson.fromJson(it.value.toString(), ModelIndicator::class.java)
-//                return@map fromJson.copy(id = it.key)
-//            }
-//        })
-//    }
+    fun getIndicatorsForAssignee(hazardId: String, networkId:String?): Flowable<List<ModelIndicator>> {
+        val indicatorRef = FirebaseHelper.getIndicatorsRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), hazardId).orderByChild("assignee").equalTo(UserInfo.getUser(AlertApplication.getContext()).userID)
+        return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
+            Timber.d("number of network indicators: %s", snap.childrenCount)
+            snap.children.map {
+                val reader = JsonReader(StringReader(it.value.toString()))
+                reader.isLenient = true
+                val fromJson = gson.fromJson<ModelIndicator>(reader, ModelIndicator::class.java)
+                if (networkId != null) {
+                    return@map fromJson.copy(id = it.key, networkId = networkId)
+                } else {
+                    return@map fromJson.copy(id = it.key)
+                }
+            }
+        })
+    }
 
 
 }

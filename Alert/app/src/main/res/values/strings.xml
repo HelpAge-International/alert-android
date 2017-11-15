@@ -37,6 +37,7 @@
         <item>Logout</item>
     </string-array>
 
+    <string name="my_tasks">My Tasks</string>
     <string name="loading">Loading…</string>
     <string name="title_activity_risk_monitoring">RiskMonitoringActivity</string>
     <string name="title_activity_risk">RiskActivity</string>

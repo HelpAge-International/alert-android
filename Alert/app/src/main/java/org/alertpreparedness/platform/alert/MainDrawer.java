@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
@@ -27,7 +29,7 @@ public class MainDrawer extends BaseActivity {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private NavigationView navigationView;
-    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private FirebaseAuth firebaseAuth;
     protected FrameLayout content;
 
     protected void onCreateDrawer(final int layoutResID) {
@@ -35,6 +37,8 @@ public class MainDrawer extends BaseActivity {
 
         content = (FrameLayout) findViewById(R.id.content_frame);
         getLayoutInflater().inflate(layoutResID, content, true);
+
+        firebaseAuth = FirebaseAuth.getInstance();
 
         drawerLayout = (DrawerLayout) findViewById(R.id.main_drawer_layout);
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);

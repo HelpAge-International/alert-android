@@ -47,6 +47,7 @@ class IndicatorViewHolder(itemView: View) : ChildViewHolder(itemView) {
     private val indicatorDue: TextView = itemView.find(R.id.tvIndicatorDate)
     private val indicatorNextUpdate: TextView = itemView.find(R.id.tvIndicatorNextUpdate)
     private val indicatorLayout: LinearLayout = itemView.find(R.id.llRiskIndicator)
+    private val indicatorNetworkId: TextView = itemView.find(R.id.tvIndicatorNetworkName)
 
     init {
         indicatorLayout.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -57,6 +58,12 @@ class IndicatorViewHolder(itemView: View) : ChildViewHolder(itemView) {
         indicatorGeo.text = Constants.INDICATOR_GEO_LOCATION[indicator.geoLocation]
         val dateTime = DateTime(indicator.dueDate)
         indicatorDue.text = String.format("%s %s %s", dateTime.dayOfMonth().asText, dateTime.monthOfYear().asShortText, dateTime.year().asText)
+        if (indicator.networkId != null) {
+            indicatorNetworkId.text = indicator.networkId
+            indicatorNetworkId.visibility = View.VISIBLE
+        } else {
+            indicatorNetworkId.visibility = View.GONE
+        }
 
         when (indicator.triggerSelected) {
             Constants.TRIGGER_GREEN -> {

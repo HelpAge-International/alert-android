@@ -9,7 +9,7 @@
     <color name="alertAmber">#F3A500</color>
     <color name="alertRed">#E10514</color>
     <color name="home_text">#686868</color>
-    <color name="home_g">#000000</color>
+    <color name="home_g">#64000000</color>
     <color name="hintGray">#bfc0c2</color>
     <color name="risk_fab_color">#006EA0</color>
     <color name="app_bar_color">#131D50</color>

@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.model.Tasks;
 
 
 /**
@@ -29,7 +30,7 @@ public class MyTasksListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_my_tasks_list, container, false);
+        View view =  inflater.inflate(R.layout.my_tasks_list, container, false);
 
         myTasksListView = (RecyclerView) view.findViewById(R.id.tasks_list_view);
 

@@ -8,7 +8,7 @@ import android.os.Parcelable
  */
 data class ModelIndicator(val id: String, val hazardScenario: ModelHazard, val triggerSelected: Int,
                           val name: String, val assignee: String?, val geoLocation: Int,
-                          val updatedAt: Long, val dueDate: Long, val source: List<ModelSource>, val trigger: List<ModelTrigger>, val networkId:String?) : Parcelable {
+                          val updatedAt: Long, val dueDate: Long, val source: List<ModelSource>?, val trigger: List<ModelTrigger>, val networkId:String?) : Parcelable {
 
     constructor() : this("", ModelHazard("", -1, true, false, 10, 0, null), -1, "", null, -1, 0, 0, listOf(), listOf(), null)
 
