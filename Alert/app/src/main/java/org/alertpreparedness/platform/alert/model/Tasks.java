@@ -5,51 +5,33 @@ package org.alertpreparedness.platform.alert.model;
  */
 
 public class Tasks {
-    private String redAlertLevel;
-    private String amberAlertLevel;
-    private String actionType;
-    private String indicatorType;
+
+    private String alertLevel;
+    private String taskType;
     private String taskName;
     private long dueDate;
 
-    public Tasks(String taskName, long dueDate) {
-        this.redAlertLevel = "red";
-        this.amberAlertLevel = "amber";
-        this.actionType = "action";
-        this.indicatorType = "indicator";
+    public Tasks(String alertLevel, String taskType, String taskName, long dueDate) {
+        this.alertLevel = alertLevel;
+        this.taskType = taskType;
         this.taskName = taskName;
         this.dueDate = dueDate;
     }
 
-    public String getActionType() {
-        return actionType;
+    public String getAlertLevel() {
+        return alertLevel;
     }
 
-    public void setActionType(String actionType) {
-        this.actionType = actionType;
+    public void setAlertLevel(String alertLevel) {
+        this.alertLevel = alertLevel;
     }
 
-    public String getIndicatorType() {
-        return indicatorType;
+    public String getTaskType() {
+        return taskType;
     }
 
-    public void setIndicatorType(String indicatorType) {
-        this.indicatorType = indicatorType;
-    }
-
-    public String getAmberAlertLevel() {
-        return amberAlertLevel;
-    }
-
-    public void setAmberAlertLevel(String amberAlertLevel) {
-        this.amberAlertLevel = amberAlertLevel;
-    }
-    public String getRedAlertLevel() {
-        return redAlertLevel;
-    }
-
-    public void setRedAlertLevel(String redAlertLevel) {
-        this.redAlertLevel = redAlertLevel;
+    public void setTaskType(String taskType) {
+        this.taskType = taskType;
     }
 
     public String getTaskName() {

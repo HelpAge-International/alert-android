@@ -31,14 +31,15 @@ import java.util.Calendar;
 import java.util.List;
 
 
-public class HomeScreen extends  MainDrawer {
+public class HomeScreen extends MainDrawer {
     private User user;
     private RecyclerView alertRecyclerView;
     private RecyclerView myTaskRecyclerView;
     private TaskAdapter taskAdapter;
     private List<Tasks> tasksList;
     private FirebaseDatabase firebaseDatabase;
-    private DatabaseReference database = FirebaseDatabase.getInstance().getReference();;
+    private DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+    ;
 
     public String countryID;
     public String agencyAdminID;
@@ -64,7 +65,7 @@ public class HomeScreen extends  MainDrawer {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        for(int i = 0; i < users.length; i++) {
+        for (int i = 0; i < users.length; i++) {
             UserInfo.getUserType(this, users[i]);
         }
 
@@ -85,114 +86,110 @@ public class HomeScreen extends  MainDrawer {
         taskAdapter = new TaskAdapter(tasksList);
         firebaseDatabase = FirebaseDatabase.getInstance();
 
-        for(int i = 0; i < usersID.length; i++) {
-            getActionsFromFirebase(usersID[i]);
-        }
-        for(int i = 0; i < usersID.length; i++) {
-            getIndicatorsFromFirebase(usersID[i]);
+        for (int i = 0; i < usersID.length; i++) {
+            getTasksFromFirebase(usersID[i]);
         }
     }
 
-    public String getActionsFromFirebase(String node){
+    public void getTasksFromFirebase(String node) {
 
-            database.child("sand").child("action").child(node).addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    String asignee = (String) dataSnapshot.child("asignee").getValue();
-                    // System.out.println("Node " + asignee+" = "+ UserInfo.userID);
+        String type[] = {"action", "indicator"};
 
-                    if (asignee != null && asignee.equals(UserInfo.userID)) {
-                        //System.out.println("Actions "+asignee);
-                        String taskName = (String) dataSnapshot.child("task").getValue();
-                        long dueDate = (long) dataSnapshot.child("dueDate").getValue();
+        for (int i = 0; i < type.length; i++) {
+            if(type[i].equals("action")) {
+                database.child("sand").child("action").child(node).addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        String asignee = (String) dataSnapshot.child("asignee").getValue();
+                        // System.out.println("Node " + asignee+" = "+ UserInfo.userID);
 
-                        //System.out.println(taskName);
-                        Tasks tasks = new Tasks(taskName, dueDate);
+                        if (asignee != null && asignee.equals(UserInfo.userID)) {
+                            //System.out.println("Actions "+asignee);
+                            String taskName = (String) dataSnapshot.child("task").getValue();
+                            long dueDate = (long) dataSnapshot.child("dueDate").getValue();
 
-                        tasksList.add(tasks);
-                        myTaskRecyclerView.setAdapter(taskAdapter);
+                            //System.out.println(taskName);
+                            Tasks tasks = new Tasks("red", "action", taskName, dueDate);
+
+                            tasksList.add(tasks);
+                            myTaskRecyclerView.setAdapter(taskAdapter);
+                        }
                     }
 
-                }
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    }
 
-                }
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    }
 
-                }
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                    }
 
-                }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+            }else if(type[i].equals("indicator")) {
+                database.child("sand").child("indicator").child(node).addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        //System.out.println("Indicators " + dataSnapshot.getValue());
+                        String asignee = (String) dataSnapshot.child("assignee").getValue();
+                        // System.out.println("Node " + asignee+" = "+ UserInfo.userID);
 
-                }
-            });
-        return "action";
-    }
+                        if (asignee != null && asignee.equals(UserInfo.userID)) {
+                            //System.out.println("Indicators " + asignee);
+                            String taskName = (String) dataSnapshot.child("name").getValue();
+                            long dueDate = (long) dataSnapshot.child("dueDate").getValue();
 
-    public String getIndicatorsFromFirebase(String node){
+                            //System.out.println(taskName);
+                            Tasks tasks = new Tasks("red", "indicator", taskName, dueDate);
 
-        database.child("sand").child("indicator").child(node).addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                System.out.println("Indicators "+dataSnapshot.getValue());
-                String asignee = (String) dataSnapshot.child("assignee").getValue();
-                // System.out.println("Node " + asignee+" = "+ UserInfo.userID);
+                            tasksList.add(tasks);
+                            myTaskRecyclerView.setAdapter(taskAdapter);
+                        }
 
-                if (asignee != null && asignee.equals(UserInfo.userID)) {
-                    System.out.println("Indicators "+asignee);
-                    String taskName = (String) dataSnapshot.child("name").getValue();
-                    long dueDate = (long) dataSnapshot.child("dueDate").getValue();
+                    }
 
-                    //System.out.println(taskName);
-                    Tasks tasks = new Tasks(taskName, dueDate);
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-                    tasksList.add(tasks);
-                    myTaskRecyclerView.setAdapter(taskAdapter);
-                }
+                    }
 
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
             }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        return "indicator";
+        }
     }
 
 
-    public static boolean isDueToday(long milliSeconds){
-        System.out.println("Is "+ milliSeconds+" > "+MILLIS_PER_DAY);
+    public static boolean isDueToday(long milliSeconds) {
+        System.out.println("Is " + milliSeconds + " > " + MILLIS_PER_DAY);
         boolean isDueToday = milliSeconds > MILLIS_PER_DAY;
         return isDueToday;
     }
 
-    public static String getDate(long milliSeconds, String dateFormat)
-    {
+    public static String getDate(long milliSeconds, String dateFormat) {
         // Create a DateFormatter object for displaying date in specified format.
         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
 
