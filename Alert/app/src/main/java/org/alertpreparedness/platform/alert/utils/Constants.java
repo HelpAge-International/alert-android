@@ -18,8 +18,6 @@ public final class Constants {
 
     //hazard
     public static final String HAZARD_ID = "hazard_id";
-    public static final String HAZARD_PATH = "hazard";
-    public static final String INDICATOR_PATH = "indicator";
     public static final String[] HAZARD_SCENARIO = {"Cold Wave", "Conflict", "Cyclone", "Drought", "Earthquake", "Epidemic", "Fire", "Flash Flood", "Flood", "Heat Wave", "Heavy Rain", "Humanitarian Access",
             "Insect Infestation", "Landslide", "Locust Infestation", "Mudslide", "Population Displacement", "Population Return", "Snow Avalanche", "Snowfall", "Storm", "Storm Surge", "Technological Disaster", "Tornado", "Tsunami", "Violent Wind", "Volcano"};
     public static final String[] INDICATOR_GEO_LOCATION = {"National", "Subnational", "Use my location"};

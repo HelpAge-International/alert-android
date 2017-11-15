@@ -16,7 +16,7 @@ import org.json.JSONObject
 
 object RiskMonitoringService {
 
-    val gson: Gson = Gson()
+    private val gson: Gson = Gson()
 
     fun readJsonFile(): Observable<String> {
         return Observable.create { subscriber ->
@@ -57,9 +57,9 @@ object RiskMonitoringService {
 
     }
 
-    fun getIndicators(hazardId:String) : Flowable<List<ModelIndicator>> {
+    fun getIndicators(hazardId: String): Flowable<List<ModelIndicator>> {
         val indicatorRef = FirebaseHelper.getIndicatorsRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), hazardId)
-        return RxFirebaseDatabase.observeValueEvent(indicatorRef, {snap ->
+        return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
             snap.children.map {
                 val fromJson = gson.fromJson(it.value.toString(), ModelIndicator::class.java)
                 return@map fromJson.copy(id = it.key)

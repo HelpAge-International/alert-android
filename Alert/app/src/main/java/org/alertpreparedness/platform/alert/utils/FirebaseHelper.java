@@ -14,11 +14,15 @@ import com.google.firebase.database.DatabaseReference;
 public class FirebaseHelper {
 
     public static DatabaseReference getHazardsRef(String appStatus, String countryId) {
-        return AppUtils.getDatabase().getReference(appStatus).child(Constants.HAZARD_PATH).child(countryId);
+        return AppUtils.getDatabase().getReference(appStatus).child("hazard").child(countryId);
     }
 
     public static DatabaseReference getIndicatorsRef(String appStatus, String hazardId) {
-        return AppUtils.getDatabase().getReference(appStatus).child(Constants.INDICATOR_PATH).child(hazardId);
+        return AppUtils.getDatabase().getReference(appStatus).child("indicator").child(hazardId);
+    }
+
+    public static DatabaseReference getNetworkMapRef(String appStatus, String agencyId, String countryId) {
+        return AppUtils.getDatabase().getReference(appStatus).child("countryOffice").child(agencyId).child(countryId).child("networks");
     }
 
     /******employee references*****/

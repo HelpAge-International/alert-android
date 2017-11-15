@@ -8,7 +8,9 @@ import android.os.Parcelable
  */
 data class ModelIndicator(val id: String, val hazardScenario: ModelHazard, val triggerSelected: Int,
                           val name: String, val assignee: String?, val geoLocation: Int,
-                          val updatedAt: Long, val dueDate: Long, val source: List<ModelSource>, val trigger: List<ModelTrigger>) : Parcelable {
+                          val updatedAt: Long, val dueDate: Long, val source: List<ModelSource>, val trigger: List<ModelTrigger>, val networkId:String?) : Parcelable {
+
+    constructor() : this("", ModelHazard("", -1, true, false, 10, 0, null), -1, "", null, -1, 0, 0, listOf(), listOf(), null)
 
     constructor(parcel: Parcel) : this(
             parcel.readString(),
@@ -20,10 +22,9 @@ data class ModelIndicator(val id: String, val hazardScenario: ModelHazard, val t
             parcel.readLong(),
             parcel.readLong(),
             parcel.createTypedArrayList(ModelSource),
-            parcel.createTypedArrayList(ModelTrigger)) {
+            parcel.createTypedArrayList(ModelTrigger),
+            parcel.readString()) {
     }
-
-    constructor() : this("", ModelHazard("", -1, true, false, 10, 0, null), -1, "", null, -1, 0, 0, listOf(), listOf())
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(id)
@@ -36,6 +37,7 @@ data class ModelIndicator(val id: String, val hazardScenario: ModelHazard, val t
         parcel.writeLong(dueDate)
         parcel.writeTypedList(source)
         parcel.writeTypedList(trigger)
+        parcel.writeString(networkId)
     }
 
     override fun describeContents(): Int {
@@ -51,9 +53,9 @@ data class ModelIndicator(val id: String, val hazardScenario: ModelHazard, val t
             return arrayOfNulls(size)
         }
     }
-
 }
 
+/************************************************************************************************************************/
 
 data class ModelTrigger(val durationType: String, val frequencyValue: Int, val triggerValue: String) : Parcelable {
 
@@ -85,6 +87,8 @@ data class ModelTrigger(val durationType: String, val frequencyValue: Int, val t
         }
     }
 }
+
+/************************************************************************************************************************/
 
 data class ModelSource(val sourceName: String, val sourceLink: String?) : Parcelable {
 
