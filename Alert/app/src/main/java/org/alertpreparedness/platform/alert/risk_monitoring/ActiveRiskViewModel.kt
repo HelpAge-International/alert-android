@@ -1,62 +1,39 @@
 package org.alertpreparedness.platform.alert.risk_monitoring
 
-
-import android.arch.lifecycle.Observer
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
-import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.fragment_active_risk.*
 import org.alertpreparedness.platform.alert.AlertApplication
-import org.alertpreparedness.platform.alert.R
 import org.alertpreparedness.platform.alert.helper.UserInfo
 import org.alertpreparedness.platform.alert.utils.Constants
-import org.jetbrains.anko.find
 import timber.log.Timber
 
-
 /**
- * A simple [Fragment] subclass.
+ * Created by fei on 14/11/2017.
  */
-class ActiveRiskFragment : Fragment() {
+class ActiveRiskViewModel: ViewModel() {
 
+    var test:Int = 0
     private val mDisposables: CompositeDisposable = CompositeDisposable()
     private var mIndicatorMap = mutableMapOf<String, List<ModelIndicator>>()
     private var mHazardNameMap = mutableMapOf<String, String>()
     private var mGroups = mutableListOf<ExpandableGroup<ModelIndicator>>()
-    private lateinit var mViewModel:ActiveRiskViewModel
+    private var mLiveData:MutableLiveData<MutableList<ExpandableGroup<ModelIndicator>>>? = null
 
-
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-//        initData()
-        mViewModel = ViewModelProviders.of(this).get(ActiveRiskViewModel::class.java)
-        mViewModel.loadGroups()
-        // Inflate the layout for this fragment
-        val view = inflater?.inflate(R.layout.fragment_active_risk, container, false)
-        val rvRiskActive: RecyclerView? = view?.find(R.id.rvRiskActive)
-        rvRiskActive?.layoutManager = LinearLayoutManager(AlertApplication.getContext())
-        val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
-        rvRiskActive?.addItemDecoration(decoration)
-        mViewModel.getLiveGroups().observe(this, Observer<MutableList<ExpandableGroup<ModelIndicator>>> {
-            rvRiskActive?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>)
-        })
-        return view
+    fun getLiveGroups() :  LiveData<MutableList<ExpandableGroup<ModelIndicator>>>  {
+        if (mLiveData == null) {
+            mLiveData = MutableLiveData()
+        }
+        loadGroups()
+        return mLiveData as MutableLiveData<MutableList<ExpandableGroup<ModelIndicator>>>
     }
 
-    private fun initData() {
-        val countryId = UserInfo.getUser(activity).countryID
+    fun loadGroups() {
+        val countryId = UserInfo.getUser(AlertApplication.getContext()).countryID
         Timber.d("country id: %s", countryId)
         val disposableHazard = RiskMonitoringService.getHazards(countryId)
                 .subscribeOn(Schedulers.io())
@@ -77,7 +54,8 @@ class ActiveRiskFragment : Fragment() {
                                             mGroups.removeAt(groupIndex)
                                         }
                                         mGroups.add(group)
-                                        rvRiskActive.adapter = HazardAdapter(mGroups)
+                                        mLiveData?.value = mGroups
+//                                        rvRiskActive.adapter = HazardAdapter(mGroups)
                                     })
                             mDisposables.add(disposableIndicator)
                         }
@@ -86,12 +64,15 @@ class ActiveRiskFragment : Fragment() {
         mDisposables.add(disposableHazard)
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    fun getGroups():List<ExpandableGroup<ModelIndicator>> {
+        return mGroups
+    }
+
+    override fun onCleared() {
+        super.onCleared()
         mDisposables.clear()
     }
 
     private fun getGroupIndex(id: String, list: List<ExpandableGroup<ModelIndicator>>): Int = list.map { it.title }.indexOf(id)
-
 
 }
