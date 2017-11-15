@@ -5,6 +5,7 @@ import durdinapps.rxfirebase2.RxFirebaseDatabase
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import org.alertpreparedness.platform.alert.AlertApplication
+import org.alertpreparedness.platform.alert.helper.UserInfo
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.alertpreparedness.platform.alert.utils.FirebaseHelper
 import org.alertpreparedness.platform.alert.utils.PreferHelper
@@ -65,6 +66,16 @@ object RiskMonitoringService {
                 return@map fromJson.copy(id = it.key)
             }
         })
+    }
+
+    fun getIndicatorsForAssignee(hazardId: String): Flowable<List<ModelIndicator>> {
+//        val indicatorRef = FirebaseHelper.getIndicatorsRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), hazardId).orderByChild("assignee").equalTo(UserInfo.getUser(AlertApplication.getContext()).)
+//        return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
+//            snap.children.map {
+//                val fromJson = gson.fromJson(it.value.toString(), ModelIndicator::class.java)
+//                return@map fromJson.copy(id = it.key)
+//            }
+//        })
     }
 
 
