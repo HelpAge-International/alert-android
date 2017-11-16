@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.risk_monitoring
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -11,8 +12,17 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.common.GooglePlayServicesUtil
+import com.google.android.gms.common.api.GoogleApi
+import com.google.android.gms.common.api.GoogleApiActivity
+import com.google.android.gms.location.*
+import com.google.android.gms.tasks.OnFailureListener
+import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_add_indicator.*
 import kotlinx.android.synthetic.main.content_add_indicator.*
+import org.alertpreparedness.platform.alert.Manifest
 import org.alertpreparedness.platform.alert.R
 import org.alertpreparedness.platform.alert.utils.Constants
 import timber.log.Timber
@@ -37,6 +47,9 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
     private var mIsCountryContext = false
     private var mStaff: List<ModelUserPublic>? = null
 
+    private lateinit var mFusedLocationClient: FusedLocationProviderClient
+    private lateinit var mLocationCallback: LocationCallback
+
     companion object {
         fun startActivity(context: Context) {
             val intent = Intent(context, AddIndicatorActivity::class.java)
@@ -59,8 +72,24 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
         initListeners()
     }
 
+    override fun onResume() {
+        super.onResume()
+        val available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this)
+        if (available != ConnectionResult.SUCCESS) {
+            GoogleApiAvailability.getInstance().getErrorDialog(this, available, 0).show()
+        } else {
+            Timber.d("Google Api is ready")
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback)
+    }
+
 
     private fun initData() {
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         mSources = mutableListOf()
         mViewModel.getStaffLive().observe(this, Observer { users ->
             mStaff = users
@@ -202,6 +231,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
                         tvIndicatorSelectSubNational.visibility = View.GONE
                         rvLocationSubNational.visibility = View.GONE
                         tvIndicatorMyLocation.visibility = View.VISIBLE
+                        getLocation()
                     }
                 }
             }
@@ -210,6 +240,49 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
         tvIndicatorSelectSubNational.setOnClickListener {
             startActivityForResult(Intent(this, SelectAreaActivity::class.java), AREA_REQUEST_CODE)
         }
+
+        mLocationCallback = object : LocationCallback() {
+            override fun onLocationResult(p0: LocationResult?) {
+                super.onLocationResult(p0)
+                val location = p0?.lastLocation
+                tvIndicatorMyLocation.text = String.format("(%s,%s)", location?.latitude, location?.longitude)
+            }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getLocation() {
+        val permission = RxPermissions(this)
+        permission
+                .request(android.Manifest.permission.ACCESS_FINE_LOCATION)
+                .subscribe({ granted ->
+                    if (granted) {
+                        mFusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                            if (location != null) {
+                                Timber.d("location: %s / %s", location.longitude, location.latitude)
+                                tvIndicatorMyLocation.text = String.format("(%s,%s)", location.latitude, location.longitude)
+                            } else {
+                                Timber.d("no location cached, need to request new")
+                                val locationRequest = LocationRequest()
+                                locationRequest.interval = 10000
+                                locationRequest.fastestInterval = 5000
+                                locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+                                val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+                                val client = LocationServices.getSettingsClient(this)
+                                val task = client.checkLocationSettings(builder.build())
+                                task.addOnSuccessListener {
+                                    mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, null)
+                                }
+                                task.addOnFailureListener(this, {
+                                    Timber.d("location settings failed!!!")
+                                })
+                            }
+                        }
+                    } else {
+                        Timber.d("Permission request denied")
+                    }
+                })
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
