@@ -11,7 +11,6 @@ import org.alertpreparedness.platform.alert.utils.Constants
 import org.alertpreparedness.platform.alert.utils.FirebaseHelper
 import org.alertpreparedness.platform.alert.utils.PreferHelper
 import org.json.JSONObject
-import timber.log.Timber
 import java.io.StringReader
 
 /**
@@ -74,7 +73,6 @@ object RiskMonitoringService {
     fun getIndicatorsForAssignee(hazardId: String, networkId:String?): Flowable<List<ModelIndicator>> {
         val indicatorRef = FirebaseHelper.getIndicatorsRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), hazardId).orderByChild("assignee").equalTo(UserInfo.getUser(AlertApplication.getContext()).userID)
         return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
-            Timber.d("number of network indicators: %s", snap.childrenCount)
             snap.children.map {
                 val reader = JsonReader(StringReader(it.value.toString()))
                 reader.isLenient = true

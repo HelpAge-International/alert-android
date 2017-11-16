@@ -29,6 +29,14 @@ public class FirebaseHelper {
         return AppUtils.getDatabase().getReference(appStatus).child("network").child(networkId);
     }
 
+    public static DatabaseReference getStaffCountry(String appStatus, String countryId) {
+        return AppUtils.getDatabase().getReference(appStatus).child("staff").child(countryId);
+    }
+
+    public static DatabaseReference getUserDetail(String appStatus, String userId) {
+        return AppUtils.getDatabase().getReference(appStatus).child("userPublic").child(userId);
+    }
+
     /******employee references*****/
 //    public static DatabaseReference getEmployeePublicRef(String appStatus, String companyKey, String uid) {
 //        return AppUtils.getDatabase().getReference(appStatus).child(Constants.COMPANY_DATA).child(companyKey).child(Constants.EMPLOYEE_PUBLIC_DATA).child(uid);

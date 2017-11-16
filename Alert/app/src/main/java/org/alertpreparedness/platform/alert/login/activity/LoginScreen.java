@@ -21,6 +21,12 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
+import org.alertpreparedness.platform.alert.helper.UserInfo;
+
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import io.reactivex.functions.Consumer;
 
 public class LoginScreen extends AppCompatActivity implements View.OnClickListener {
 
@@ -31,6 +37,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     private ProgressDialog progressDialog;
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private String[] users = {"administratorCountry", "countryDirector", "ert", "ertLeader", "partner"};
 
     private final static String TAG = "LoginActivity";
 
@@ -54,11 +61,11 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onClick(View view) {
-        if(view==btn_login){
+        if (view == btn_login) {
             loginUser();
         }
 
-        if(view==txt_forgotPasword){
+        if (view == txt_forgotPasword) {
             startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://platform.alertpreparedness.org/forgot-password")));
         }
     }
@@ -68,12 +75,12 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
         String email = et_emailAddress.getText().toString().trim();
         String password = et_password.getText().toString().trim();
 
-        if(TextUtils.isEmpty(email)){
+        if (TextUtils.isEmpty(email)) {
             Toast.makeText(this, "Please enter your email!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if(TextUtils.isEmpty(password)){
+        if (TextUtils.isEmpty(password)) {
             Toast.makeText(this, "Please enter your password!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -88,17 +95,28 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
                         Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
                         progressDialog.dismiss();
 
-                        if(task.isSuccessful()){
-                            finish();
-                            startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+                        if (task.isSuccessful()) {
+                            for (int i = 0; i < users.length; i++) {
+                                UserInfo.getUserType(LoginScreen.this, users[i]);
+                            }
+                            Observable.timer(3000, TimeUnit.MILLISECONDS).take(1).subscribe(new Consumer<Long>() {
+                                @Override
+                                public void accept(Long aLong) throws Exception {
+                                    finish();
+                                    startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+                                }
+                            });
+//                            finish();
+//                            startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+
                         }
 
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithEmail:failed | "+ task.getException().getMessage());
-                            Toast.makeText(LoginScreen.this, "The password you entered is incorrect. Please check and try again!"+ task.getException().getMessage(),
+                            Log.w(TAG, "signInWithEmail:failed | " + task.getException().getMessage());
+                            Toast.makeText(LoginScreen.this, "The password you entered is incorrect. Please check and try again!" + task.getException().getMessage(),
                                     Toast.LENGTH_SHORT).show();
                         }
                     }

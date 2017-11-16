@@ -6,7 +6,7 @@ import android.os.Parcelable
 /**
  * Created by fei on 07/11/2017.
  */
-data class ModelIndicator(val id: String, val hazardScenario: ModelHazard, val triggerSelected: Int,
+data class ModelIndicator(val id: String, var hazardScenario: ModelHazard, val triggerSelected: Int,
                           val name: String, val assignee: String?, val geoLocation: Int,
                           val updatedAt: Long, val dueDate: Long, val source: List<ModelSource>?, val trigger: List<ModelTrigger>, val networkId:String?) : Parcelable {
 

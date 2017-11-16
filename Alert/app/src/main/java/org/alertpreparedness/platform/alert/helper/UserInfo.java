@@ -14,8 +14,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.Constants;
 
 import java.util.Locale;
+
+import timber.log.Timber;
 
 /**
  * Created by faizmohideen on 08/11/2017.
@@ -33,6 +36,7 @@ public class UserInfo {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+                        Timber.d("uid: %s", userID);
                         //Callback for user type
                         //finishedCallback.callback(dataSnapshot.child(userID).exists(), nodeName);
                         if(dataSnapshot.child(userID).exists()){
@@ -66,7 +70,7 @@ public class UserInfo {
 
     private static void populateUser(Context context,String nodeName, DataSnapshot userNode) {
         String userID = UserInfo.userID;
-        String userType = getUserTypeString(nodeName);
+        int userType = getUserTypeString(nodeName);
         String agencyAdmin = userNode.child("agencyAdmin").getChildren().iterator().next().getKey();
         String systemAdmin = userNode.child("systemAdmin").getChildren().iterator().next().getKey();
         String countryId = userNode.child("countryId").getValue(String.class);
@@ -79,20 +83,20 @@ public class UserInfo {
         saveUser(context, user);
     }
 
-    public static String getUserTypeString(String node){
+    public static int getUserTypeString(String node){
         switch (node) {
             case "administratorCountry":
-                return "Country Admin";
+                return Constants.CountryAdmin;
             case "countryDirector":
-                return "Country Director";
+                return Constants.CountryDirector;
             case "ert":
-                return  "Ert";
+                return  Constants.Ert;
             case "ertLeader":
-                return "Ert Leader";
+                return Constants.ErtLeader;
             case "partner":
-                return "Partner";
+                return Constants.PartnerUser;
             default:
-                return null;
+                return -1;
         }
     }
 

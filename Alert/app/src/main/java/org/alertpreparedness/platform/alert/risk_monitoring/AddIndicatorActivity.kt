@@ -1,5 +1,7 @@
 package org.alertpreparedness.platform.alert.risk_monitoring
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -12,6 +14,7 @@ import android.widget.PopupMenu
 import kotlinx.android.synthetic.main.activity_add_indicator.*
 import kotlinx.android.synthetic.main.content_add_indicator.*
 import org.alertpreparedness.platform.alert.R
+import org.alertpreparedness.platform.alert.utils.Constants
 import timber.log.Timber
 
 class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
@@ -28,6 +31,12 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
     private var mSelectedAssignPosition = 0
     private var mSelectedLocation = 0
 
+    private val mIndicatorModel = ModelIndicator()
+    private lateinit var mViewModel: AddIndicatorViewModel
+    private var mHazards: List<ModelHazard>? = null
+    private var mIsCountryContext = false
+    private var mStaff: List<ModelUserPublic>? = null
+
     companion object {
         fun startActivity(context: Context) {
             val intent = Intent(context, AddIndicatorActivity::class.java)
@@ -35,6 +44,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
         }
 
         val SELECTED_LOCATION = "selected_location"
+        val STAFF_SELECTION = "staff_selection"
         val ASSIGN_POSITION = "assign_position"
         val LOCATION_LIST = listOf<String>("National", "Subnational", "Use my location")
         val AREA_REQUEST_CODE = 100
@@ -43,13 +53,18 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_indicator)
+        mViewModel = ViewModelProviders.of(this).get(AddIndicatorViewModel::class.java)
         initData()
         initViews()
         initListeners()
     }
 
+
     private fun initData() {
         mSources = mutableListOf()
+        mViewModel.getStaffLive().observe(this, Observer { users ->
+            mStaff = users
+        })
     }
 
     private fun initViews() {
@@ -66,8 +81,11 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
         mSourceAdapter.setOnSourceDeleteListener(this)
 
         mPopupMenu = PopupMenu(this, tvSelectHazard)
-        mPopupMenu.menu.add("menu 1")
-        mPopupMenu.menu.add("menu 2")
+        mPopupMenu.menu.add("Country Context")
+        mViewModel.getHazardsLive().observe(this, Observer<List<ModelHazard>> {
+            mHazards = it
+            mHazards?.forEach { mPopupMenu.menu.add(Constants.HAZARD_SCENARIO_NAME[it.hazardScenario]) }
+        })
         mPopupMenu.menuInflater.inflate(R.menu.popup_template_menu, mPopupMenu.menu)
 
         mPopupMenuFrequencyGreen = PopupMenu(this, tvGreenFrequency)
@@ -93,6 +111,14 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
         mPopupMenu.setOnMenuItemClickListener { p0 ->
             Timber.d("menu: %s", p0?.title)
             tvSelectHazard.text = p0?.title
+            //TODO NEED UPDATE THIS WHEN SUBMIT
+            if (p0?.title?.equals("Country Context") == true) {
+                mIsCountryContext = true
+            } else {
+                mIsCountryContext = false
+                mIndicatorModel.hazardScenario = mHazards?.get(mHazards!!.map { Constants.HAZARD_SCENARIO_NAME[it.hazardScenario] }.indexOf(p0?.title)) ?: ModelHazard()
+            }
+            Timber.d(mIndicatorModel.toString())
             true
         }
 
@@ -152,6 +178,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
         llIndicatorSelectLocation.setOnClickListener {
             val bundle = Bundle()
             bundle.putInt(SELECTED_LOCATION, mSelectedLocation)
+//            bundle.putInt(STAFF_SELECTION, mStaff)
             mDialogLocation.arguments = bundle
             mDialogLocation.show(supportFragmentManager, "dialog_location_selection")
         }

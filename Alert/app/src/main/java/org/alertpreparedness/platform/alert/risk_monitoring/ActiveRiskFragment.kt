@@ -35,7 +35,7 @@ class ActiveRiskFragment : Fragment() {
         rvRiskActive?.layoutManager = LinearLayoutManager(AlertApplication.getContext())
         val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
         rvRiskActive?.addItemDecoration(decoration)
-        mViewModel.getLiveGroups().observe(this, Observer<MutableList<ExpandableGroup<ModelIndicator>>> {
+        mViewModel.getLiveGroups(true).observe(this, Observer<MutableList<ExpandableGroup<ModelIndicator>>> {
             val size = it?.size ?: 0
             if (size > 0) {pbLoading?.hide()}
             rvRiskActive?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>)
