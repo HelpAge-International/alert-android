@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.alertpreparedness.platform.alert">
-    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".AlertApplication"
         android:allowBackup="true"
@@ -27,41 +29,34 @@
         <activity
             android:name=".dashboard.activity.HomeScreen"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <activity
-            android:name=".MainDrawer" />
-
-        <activity
-            android:name=".risk_monitoring.RiskMonitoringActivity"
-            android:label="@string/title_activity_risk_monitoring"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+        <activity android:name=".MainDrawer" />
         <activity
             android:name=".risk_monitoring.RiskActivity"
             android:label="@string/title_activity_risk"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".risk_monitoring.AddIndicatorActivity"
             android:label="@string/title_activity_add_indicator"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".risk_monitoring.SelectAreaActivity"
             android:label="@string/title_activity_select_area"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".dashboard.activity.CreateAlertActivity"
+            android:label="@string/title_activity_create_alert"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

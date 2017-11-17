@@ -16,6 +16,7 @@
     <string name="nav_my_country">My Country</string>
     <string name="nav_logout">Logout</string>
 
+    <!-- Nav -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="openDrawer">open_drawer</string>
@@ -37,15 +38,19 @@
         <item>Logout</item>
     </string-array>
 
-    <string name="my_tasks">My Tasks</string>
-    <string name="loading">Loading…</string>
+    <!-- Activity label -->
     <string name="title_activity_risk_monitoring">RiskMonitoringActivity</string>
     <string name="title_activity_risk">RiskActivity</string>
+    <string name="title_activity_add_indicator">AddIndicatorActivity</string>
+    <string name="title_activity_create_alert">Create alert</string>
+
+    <!-- Other -->
+    <string name="my_tasks">My Tasks</string>
+    <string name="loading">Loading…</string>
     <string name="risk_monitoring">Risk Monitoring</string>
     <string name="active">ACTIVE</string>
     <string name="archived">ARCHIVED</string>
     <string name="next_update">Next update</string>
-    <string name="title_activity_add_indicator">AddIndicatorActivity</string>
     <string name="add_indicator">Add indicator</string>
     <string name="save">SAVE</string>
     <string name="cancel">CANCEL</string>
@@ -63,6 +68,5 @@
     <string name="assign_to">Assign to</string>
     <string name="title_activity_select_area">SelectAreaActivity</string>
     <string name="no_indicators_have_been_added">No indicators have been added</string>
-
 
 </resources>

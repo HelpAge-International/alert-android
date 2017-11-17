@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.alert.login.activity;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,8 +22,12 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
+import org.alertpreparedness.platform.alert.helper.UserInfo;
+import org.alertpreparedness.platform.alert.model.User;
 
-public class LoginScreen extends AppCompatActivity implements View.OnClickListener {
+import java.util.Observable;
+
+public class LoginScreen extends AppCompatActivity implements View.OnClickListener, AuthCallback {
 
     private EditText et_emailAddress;
     private EditText et_password;
@@ -33,6 +38,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     private final static String TAG = "LoginActivity";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +60,11 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onClick(View view) {
-        if(view==btn_login){
+        if (view == btn_login) {
             loginUser();
         }
 
-        if(view==txt_forgotPasword){
+        if (view == txt_forgotPasword) {
             startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://platform.alertpreparedness.org/forgot-password")));
         }
     }
@@ -68,12 +74,12 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
         String email = et_emailAddress.getText().toString().trim();
         String password = et_password.getText().toString().trim();
 
-        if(TextUtils.isEmpty(email)){
+        if (TextUtils.isEmpty(email)) {
             Toast.makeText(this, "Please enter your email!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if(TextUtils.isEmpty(password)){
+        if (TextUtils.isEmpty(password)) {
             Toast.makeText(this, "Please enter your password!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -88,20 +94,31 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
                         Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
                         progressDialog.dismiss();
 
-                        if(task.isSuccessful()){
-                            finish();
-                            startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+                        if (task.isSuccessful()) {
+                            UserInfo.authUser(LoginScreen.this);
                         }
 
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithEmail:failed | "+ task.getException().getMessage());
-                            Toast.makeText(LoginScreen.this, "The password you entered is incorrect. Please check and try again!"+ task.getException().getMessage(),
+                            Log.w(TAG, "signInWithEmail:failed | " + task.getException().getMessage());
+                            Toast.makeText(LoginScreen.this, "The password you entered is incorrect. Please check and try again!" + task.getException().getMessage(),
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
     }
+
+    @Override
+    public void onUserAuthorized(User user) {
+        startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+        finish();
+    }
+
+    @Override
+    public Context getContext() {
+        return this;
+    }
 }
+

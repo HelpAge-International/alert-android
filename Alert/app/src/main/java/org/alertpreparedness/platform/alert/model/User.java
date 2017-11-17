@@ -13,7 +13,7 @@ import java.io.Serializable;
 public class User implements Serializable {
 
     public String userID;
-    public String userType;
+    public int userType;
     public String agencyAdminID;
     public String countryID;
     public String systemAdminID;
@@ -23,7 +23,7 @@ public class User implements Serializable {
 
     // Default constructor required for calls to
     // DataSnapshot.getValue(User.class)
-    public User(String userID, String userType, String agencyAdminID, String countryID, String systemAdminID, String networkCountryID) {
+    public User(String userID, int userType, String agencyAdminID, String countryID, String systemAdminID, String networkCountryID) {
         this.userID = userID;
         this.userType = userType;
         this.agencyAdminID = agencyAdminID;
@@ -31,7 +31,6 @@ public class User implements Serializable {
         this.systemAdminID = systemAdminID;
         this.networkCountryID = networkCountryID;
     }
-
 
     public User() {
 
@@ -41,7 +40,7 @@ public class User implements Serializable {
         return userID;
     }
 
-    public String getUserType() {
+    public int getUserType() {
         return userType;
     }
 

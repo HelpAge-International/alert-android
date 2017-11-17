@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.dashboard.activity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -8,7 +9,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.view.Window;
 import android.widget.Adapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
@@ -37,7 +41,7 @@ import io.reactivex.disposables.Disposable;
 import timber.log.Timber;
 
 
-public class HomeScreen extends MainDrawer {
+public class HomeScreen extends MainDrawer implements View.OnClickListener {
     private User user;
     private RecyclerView alertRecyclerView;
     private RecyclerView myTaskRecyclerView;
@@ -45,32 +49,27 @@ public class HomeScreen extends MainDrawer {
     private List<Tasks> tasksList;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-
+    private TextView appBarTitle;
+    private Toolbar toolbar;
     public static String countryID, agencyAdminID, systemAdminID, networkCountryID;
 
     private String[] usersID;
-    private String[] users = {"administratorCountry", "countryDirector", "ert", "ertLeader", "partner"};
-
     public static final String mypreference = "mypref";
     public static final String userKey = "UserType";
     public static final PreferHelper sharedPreferences = new PreferHelper();
-    public final static long MILLIS_PER_DAY = 24 * 60 * 60 * 1000L;
 
-    public String dateFormat = "dd/MM/yyyy hh:mm:ss.SSS";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.onCreateDrawer(R.layout.activity_home_screen);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.alert_appbar);
+        toolbar = (Toolbar) findViewById(R.id.alert_appbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-
-        for (int i = 0; i < users.length; i++) {
-            UserInfo.getUserType(this, users[i]);
-        }
 
         countryID = UserInfo.getUser(this).countryID;
         agencyAdminID = UserInfo.getUser(this).agencyAdminID;
@@ -78,6 +77,9 @@ public class HomeScreen extends MainDrawer {
         networkCountryID = UserInfo.getUser(this).networkCountryID;
 
         usersID = new String[]{networkCountryID, countryID, agencyAdminID, systemAdminID};
+
+        appBarTitle = (TextView) findViewById(R.id.alert_bar_title);
+        appBarTitle.setOnClickListener(this);
 
         myTaskRecyclerView = (RecyclerView) findViewById(R.id.tasks_list_view);
         myTaskRecyclerView.setHasFixedSize(true);
@@ -105,16 +107,16 @@ public class HomeScreen extends MainDrawer {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         String asignee = (String) dataSnapshot.child("asignee").getValue();
-                        System.out.println("User " + UserInfo.userID);
-
                         String task = (String) dataSnapshot.child("task").getValue();
-                        //System.out.println("Task " + task);
-                        //long dueDate = (long) dataSnapshot.child("dueDate").getValue();
 
                         if (asignee != null && task != null && asignee.equals(UserInfo.userID)) {
-                            Tasks tasks = new Tasks("red", "action", task);
-                            tasksList.add(tasks);
-                            myTaskRecyclerView.setAdapter(taskAdapter);
+                            if(dataSnapshot.hasChild("dueDate")) {
+                                long dueDate = (long) dataSnapshot.child("dueDate").getValue();
+                                Tasks tasks = new Tasks("red", "action", task, dueDate);
+
+                                tasksList.add(tasks);
+                                myTaskRecyclerView.setAdapter(taskAdapter);
+                            }
                         }
                     }
 
@@ -142,19 +144,19 @@ public class HomeScreen extends MainDrawer {
                 database.child("sand").child("indicator").child(node).addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        //System.out.println("Indicators " + dataSnapshot.getValue());
                         String asignee = (String) dataSnapshot.child("assignee").getValue();
-                        // System.out.println("Node " + asignee+" = "+ UserInfo.userID);
                         String taskName = (String) dataSnapshot.child("name").getValue();
+                       // long dueDate = (long) dataSnapshot.child("dueDate").getValue();
 
                         if (asignee != null && taskName != null && asignee.equals(UserInfo.userID)) {
-                           // long dueDate = (long) dataSnapshot.child("dueDate").getValue();
-                            Tasks tasks = new Tasks("red", "indicator", taskName);
+                            if(dataSnapshot.hasChild("dueDate")) {
+                                long dueDate = (long) dataSnapshot.child("dueDate").getValue();
+                                Tasks tasks = new Tasks("red", "indicator", taskName, dueDate);
 
-                            tasksList.add(tasks);
-                            myTaskRecyclerView.setAdapter(taskAdapter);
+                                tasksList.add(tasks);
+                                myTaskRecyclerView.setAdapter(taskAdapter);
+                            }
                         }
-
                     }
 
                     @Override
@@ -182,19 +184,10 @@ public class HomeScreen extends MainDrawer {
     }
 
 
-    public static boolean isDueToday(long milliSeconds) {
-        System.out.println("Is " + milliSeconds + " > " + MILLIS_PER_DAY);
-        boolean isDueToday = milliSeconds > MILLIS_PER_DAY;
-        return isDueToday;
-    }
-
-    public static String getDate(long milliSeconds, String dateFormat) {
-        // Create a DateFormatter object for displaying date in specified format.
-        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
-
-        // Create a calendar object that will convert the date and time value in milliseconds to date.
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(milliSeconds);
-        return formatter.format(calendar.getTime());
+    @Override
+    public void onClick(View view) {
+        if(view==appBarTitle){
+            startActivity(new Intent(getApplicationContext(), CreateAlertActivity.class));
+        }
     }
 }

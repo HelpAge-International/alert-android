@@ -13,9 +13,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
+import org.alertpreparedness.platform.alert.login.activity.AuthCallback;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.NetworkService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -30,26 +33,29 @@ public class UserInfo {
     public static DatabaseReference database = FirebaseDatabase.getInstance().getReference();
     public static final String PREFS_USER = "prefs_user";
 
+    private static String[] users = {"administratorCountry", "countryDirector", "ert", "ertLeader", "partner"};
+
     //Cross-check if the logged-in user ID matches the ID under different node.
-    public static void getUserType(final Context context, final String nodeName){
-        database.child("sand")
-                .child(nodeName)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        //Callback for user type
-                        //finishedCallback.callback(dataSnapshot.child(userID).exists(), nodeName);
-                        if(dataSnapshot.child(userID).exists()){
-                            DataSnapshot userNode = dataSnapshot.child(userID);
-                            //System.out.println("DATA "+ dataSnapshot.child(userID));
-                            populateUser(context, nodeName, userNode);
-                        }else{
-                            //System.out.println("False");
+    public static void authUser(final AuthCallback authCallback){
+        for (String nodeName : users) {
+            database.child("sand")
+                    .child(nodeName)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.child(userID).exists()) {
+                                DataSnapshot userNode = dataSnapshot.child(userID);
+                                populateUser(authCallback, nodeName, userNode);
+                            } else {
+                                //System.out.println("False");
+                            }
                         }
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) { }
-                });
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+        }
     }
 
     public static void saveUser(Context context, User user){
@@ -68,9 +74,9 @@ public class UserInfo {
         return new Gson().fromJson(serializedUser, User.class);
     }
 
-    private static void populateUser(Context context,String nodeName, DataSnapshot userNode) {
+    private static void populateUser(AuthCallback callback, String nodeName, DataSnapshot userNode) {
         String userID = UserInfo.userID;
-        String userType = getUserTypeString(nodeName);
+        int userType = getUserTypeString(nodeName);
         String agencyAdmin = userNode.child("agencyAdmin").getChildren().iterator().next().getKey();
         String systemAdmin = userNode.child("systemAdmin").getChildren().iterator().next().getKey();
         String countryId = userNode.child("countryId").getValue(String.class);
@@ -79,32 +85,35 @@ public class UserInfo {
                 (Map<String, String> stringStringMap) -> {
                     for(String key: stringStringMap.keySet()) {
 
+                        //System.out.println("Agency "+ agencyAdmin);
                         String networkID = stringStringMap.get(key);
                         User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin, networkID);
-                        Toast.makeText(context,
-                                String.format(Locale.getDefault(), "user: %s, type: %s, agency: %s, system: %s, country: %s, network: %s",
-                                        userID, userType, agencyAdmin, systemAdmin, countryId, networkID),
+                        Toast.makeText(callback.getContext(),
+                                String.format(Locale.getDefault(), "user: %s, type: %s, agency: %s, system: %s, country: %s",
+                                        userID, userType, agencyAdmin, systemAdmin, countryId),
                                 Toast.LENGTH_LONG).show();
-                        saveUser(context, user);
+
+                        saveUser(callback.getContext(), user);
+                        callback.onUserAuthorized(user);
                     }
                 }
         );
     }
 
-    public static String getUserTypeString(String node){
+    public static int getUserTypeString(String node){
         switch (node) {
             case "administratorCountry":
-                return "Country Admin";
+                return 1;
             case "countryDirector":
-                return "Country Director";
+                return 2;
             case "ert":
-                return  "Ert";
+                return 3;
             case "ertLeader":
-                return "Ert Leader";
+                return 4;
             case "partner":
-                return "Partner";
+                return 5;
             default:
-                return null;
+                return -1;
         }
     }
 
