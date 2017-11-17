@@ -59,8 +59,6 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener {
     public static final PreferHelper sharedPreferences = new PreferHelper();
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

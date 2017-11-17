@@ -43,12 +43,12 @@
                 android:drawableLeft="@drawable/login_person"
                 android:drawablePadding="15dip"
                 android:ems="10"
-                android:hint="Email Address"
+                android:hint="@string/email_address"
                 android:textColorHint="@color/hintGray"
                 android:inputType="textEmailAddress"
                 android:paddingLeft="15dp"
                 android:textColor="@color/colorPrimaryDark"
-                android:textSize="15dp"
+                android:textSize="15sp"
                 tools:layout_editor_absoluteX="8dp"
                 tools:layout_editor_absoluteY="0dp" />
         </RelativeLayout>

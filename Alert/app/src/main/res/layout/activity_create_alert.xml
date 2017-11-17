@@ -6,4 +6,31 @@
     android:layout_height="match_parent"
     tools:context="org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity">
 
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <include
+            android:id="@+id/action_bar"
+            layout="@layout/action_bar"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/actionBarSize" />
+
+        <EditText
+            android:id="@+id/editTextSelectHazard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/select_hazard"
+            android:inputType="textPersonName"
+            android:textColor="@color/colorPrimaryDark"
+            android:textColorHint="@color/hintGray"
+            android:textSize="15sp"
+            android:drawableLeft="@drawable/alert_hazard"/>
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>

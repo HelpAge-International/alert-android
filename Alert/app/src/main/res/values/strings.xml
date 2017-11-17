@@ -68,5 +68,9 @@
     <string name="assign_to">Assign to</string>
     <string name="title_activity_select_area">SelectAreaActivity</string>
     <string name="no_indicators_have_been_added">No indicators have been added</string>
+    <string name="text_create_alert">Create alert</string>
+    <string name="email_address">Email Address</string>
+    <string name="password">Password</string>
+    <string name="select_hazard">Select a hazard</string>
 
 </resources>

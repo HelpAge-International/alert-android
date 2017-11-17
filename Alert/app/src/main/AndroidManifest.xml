@@ -30,7 +30,7 @@
             android:name=".dashboard.activity.HomeScreen"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data
             android:name="preloaded_fonts"
@@ -42,21 +42,21 @@
             android:label="@string/title_activity_risk"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".risk_monitoring.AddIndicatorActivity"
             android:label="@string/title_activity_add_indicator"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".risk_monitoring.SelectAreaActivity"
             android:label="@string/title_activity_select_area"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".dashboard.activity.CreateAlertActivity"
             android:label="@string/title_activity_create_alert"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
