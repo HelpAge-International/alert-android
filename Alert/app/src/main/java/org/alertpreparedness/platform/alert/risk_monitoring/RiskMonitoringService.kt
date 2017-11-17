@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.risk_monitoring
 
+import com.google.android.gms.tasks.Task
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import durdinapps.rxfirebase2.RxFirebaseDatabase
@@ -68,6 +69,12 @@ object RiskMonitoringService {
                 return@map fromJson.copy(id = it.key)
             }
         })
+    }
+
+    fun addIndicatorToHazard(indicator: ModelIndicator): Task<Void>? {
+        val indicatorRef = FirebaseHelper.getIndicatorsRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), indicator.hazardScenario.id)
+        val key = indicatorRef.push().key
+        return indicatorRef.child(key).setValue(indicator)
     }
 
     fun getIndicatorsForAssignee(hazardId: String, networkId:String?): Flowable<List<ModelIndicator>> {

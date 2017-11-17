@@ -2,6 +2,7 @@ package org.alertpreparedness.platform.alert.risk_monitoring
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import com.google.android.gms.tasks.Task
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import org.alertpreparedness.platform.alert.AlertApplication
@@ -30,6 +31,7 @@ class AddIndicatorViewModel : ViewModel() {
 
     private fun getHazards(countryId: String) {
         mDisposables.add(RiskMonitoringService.getHazards(countryId)
+                .map { it.filter { it.isActive } }
                 .subscribe({ hazards ->
                     mHazards.value = hazards
                 })
@@ -52,6 +54,8 @@ class AddIndicatorViewModel : ViewModel() {
                 })
         )
     }
+
+    fun addIndicator(indicator: ModelIndicator): Task<Void>? = RiskMonitoringService.addIndicatorToHazard(indicator)
 
     override fun onCleared() {
         super.onCleared()

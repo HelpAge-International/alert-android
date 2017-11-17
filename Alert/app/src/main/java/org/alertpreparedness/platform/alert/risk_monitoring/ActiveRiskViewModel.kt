@@ -65,13 +65,13 @@ class ActiveRiskViewModel : ViewModel() {
                 .subscribe({ hazards: List<ModelHazard>? ->
                     hazards?.forEach {
                         if (it.id != countryId) {
-                            mHazardNameMap.put(it.id, Constants.HAZARD_SCENARIO_NAME[it.hazardScenario])
-                            val disposableIndicator = RiskMonitoringService.getIndicators(it.id)
+                            mHazardNameMap.put(it.id!!, Constants.HAZARD_SCENARIO_NAME[it.hazardScenario])
+                            val disposableIndicator = RiskMonitoringService.getIndicators(it.id!!)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe({ indicators ->
-                                        mIndicatorMap.put(it.id, indicators)
-                                        val group = ExpandableGroup(mHazardNameMap[it.id], indicators)
+                                        mIndicatorMap.put(it.id!!, indicators)
+                                        val group = ExpandableGroup(mHazardNameMap[it.id!!], indicators)
                                         val groupIndex = getGroupIndex(group.title, mGroups)
                                         if (groupIndex != -1) {
                                             val existItems = mGroups[groupIndex].items
@@ -84,7 +84,7 @@ class ActiveRiskViewModel : ViewModel() {
 //                                            val totalItems = existItems.plus(indicators).distinctBy { it.id }
                                             if (totalItems.isNotEmpty()) {
                                                 mGroups.removeAt(groupIndex)
-                                                mGroups.add(ExpandableGroup(mHazardNameMap[it.id], totalItems))
+                                                mGroups.add(ExpandableGroup(mHazardNameMap[it.id!!], totalItems))
                                             } else {
                                                 mGroups.removeAt(groupIndex)
                                             }
@@ -120,24 +120,24 @@ class ActiveRiskViewModel : ViewModel() {
                                                 hazards?.forEach {
                                                     //get network indicators for hazard
                                                     if (it.id != networkCountryId) {
-                                                        mHazardNameMapNetwork.put(it.id, Constants.HAZARD_SCENARIO_NAME[it.hazardScenario])
-                                                        mDisposables.add(RiskMonitoringService.getIndicatorsForAssignee(it.id, network.name)
+                                                        mHazardNameMapNetwork.put(it.id!!, Constants.HAZARD_SCENARIO_NAME[it.hazardScenario])
+                                                        mDisposables.add(RiskMonitoringService.getIndicatorsForAssignee(it.id!!, network.name)
                                                                 .subscribeOn(Schedulers.io())
                                                                 .observeOn(AndroidSchedulers.mainThread())
                                                                 .subscribe({ indicators ->
-                                                                    mIndicatorMapNetwork.put(it.id, indicators)
-                                                                    val group = ExpandableGroup(mHazardNameMapNetwork[it.id], indicators)
+                                                                    mIndicatorMapNetwork.put(it.id!!, indicators)
+                                                                    val group = ExpandableGroup(mHazardNameMapNetwork[it.id!!], indicators)
                                                                     val groupIndex = getGroupIndex(group.title, mGroups)
                                                                     if (groupIndex != -1) {
                                                                         val existItems = mGroups[groupIndex].items
                                                                         val totalItems = if (it.isActive == isActive) {
-                                                                            mIndicatorMapNetwork[it.id]?.let { it1 -> existItems.plus(it1).distinctBy { it.id } }
+                                                                            mIndicatorMapNetwork[it.id!!]?.let { it1 -> existItems.plus(it1).distinctBy { it.id } }
                                                                         } else {
                                                                             removeListFromList(existItems, indicators)
                                                                         }
                                                                         if (totalItems?.isNotEmpty() == true) {
                                                                             mGroups.removeAt(groupIndex)
-                                                                            mGroups.add(ExpandableGroup(mHazardNameMapNetwork[it.id], totalItems))
+                                                                            mGroups.add(ExpandableGroup(mHazardNameMapNetwork[it.id!!], totalItems))
                                                                         } else {
                                                                             mGroups.removeAt(groupIndex)
                                                                         }

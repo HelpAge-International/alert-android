@@ -6,11 +6,22 @@ import android.os.Parcelable
 /**
  * Created by fei on 07/11/2017.
  */
-data class ModelIndicator(val id: String, var hazardScenario: ModelHazard, val triggerSelected: Int,
-                          val name: String, val assignee: String?, val geoLocation: Int,
-                          val updatedAt: Long, val dueDate: Long, val source: List<ModelSource>?, val trigger: List<ModelTrigger>, val networkId:String?) : Parcelable {
+data class ModelIndicator(val id: String?, var hazardScenario: ModelHazard, val triggerSelected: Int,
+                          var name: String, var assignee: String?, var geoLocation: Int,
+                          var updatedAt: Long, var dueDate: Long, var source: List<ModelSource>, var trigger: List<ModelTrigger>, val networkId: String?, val agencyId:String?, val countryOfficeId:String?) : Parcelable {
 
-    constructor() : this("", ModelHazard("", -1, true, false, 10, 0, null), -1, "", null, -1, 0, 0, listOf(), listOf(), null)
+    constructor() : this(null, ModelHazard(), 0, "", null, -1, 0, 0, listOf(), listOf(), null, null, null)
+
+
+
+    fun validateModel() : String = when {
+        name.isEmpty() -> "Indicator name can not be empty!"
+        geoLocation == -1 -> "Location can not be empty!"
+        dueDate == 0.toLong() -> "Due date can not be empty"
+        updatedAt == 0.toLong() -> "Update time can not be empty"
+        source.isEmpty() ->"No source added for this indicator!"
+        else -> ""
+    }
 
     constructor(parcel: Parcel) : this(
             parcel.readString(),
@@ -23,6 +34,8 @@ data class ModelIndicator(val id: String, var hazardScenario: ModelHazard, val t
             parcel.readLong(),
             parcel.createTypedArrayList(ModelSource),
             parcel.createTypedArrayList(ModelTrigger),
+            parcel.readString(),
+            parcel.readString(),
             parcel.readString()) {
     }
 
@@ -38,6 +51,8 @@ data class ModelIndicator(val id: String, var hazardScenario: ModelHazard, val t
         parcel.writeTypedList(source)
         parcel.writeTypedList(trigger)
         parcel.writeString(networkId)
+        parcel.writeString(agencyId)
+        parcel.writeString(countryOfficeId)
     }
 
     override fun describeContents(): Int {
@@ -59,7 +74,7 @@ data class ModelIndicator(val id: String, var hazardScenario: ModelHazard, val t
 
 data class ModelTrigger(val durationType: String, val frequencyValue: Int, val triggerValue: String) : Parcelable {
 
-    constructor():this("", -1, "")
+    constructor() : this("", -1, "")
 
     constructor(parcel: Parcel) : this(
             parcel.readString(),
@@ -85,6 +100,16 @@ data class ModelTrigger(val durationType: String, val frequencyValue: Int, val t
         override fun newArray(size: Int): Array<ModelTrigger?> {
             return arrayOfNulls(size)
         }
+    }
+
+    fun validateModel(): Boolean {
+        var validation = true
+        when {
+            durationType.isEmpty() -> validation = false
+            frequencyValue == -1 -> validation = false
+            triggerValue.isEmpty() -> validation = false
+        }
+        return validation
     }
 }
 
@@ -116,6 +141,13 @@ data class ModelSource(val sourceName: String, val sourceLink: String?) : Parcel
         override fun newArray(size: Int): Array<ModelSource?> {
             return arrayOfNulls(size)
         }
+    }
+
+    fun validateModel(): Boolean {
+        if (sourceName.isEmpty()) {
+            return false
+        }
+        return true
     }
 }
 

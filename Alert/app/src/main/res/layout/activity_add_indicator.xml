@@ -23,4 +23,11 @@
 
     <include layout="@layout/content_add_indicator"/>
 
+    <ProgressBar
+        android:id="@+id/pbAddIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_gravity="center"/>
+
 </android.support.design.widget.CoordinatorLayout>

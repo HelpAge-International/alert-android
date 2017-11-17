@@ -115,7 +115,7 @@ public class AppUtils {
     public static FirebaseDatabase getDatabase() {
         if (sDatabase == null) {
             sDatabase = FirebaseDatabase.getInstance();
-//            sDatabase.setPersistenceEnabled(true);
+            sDatabase.setPersistenceEnabled(true);
         }
         return sDatabase;
     }

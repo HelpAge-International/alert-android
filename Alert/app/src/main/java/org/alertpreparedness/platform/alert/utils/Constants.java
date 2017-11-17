@@ -33,6 +33,8 @@ public final class Constants {
     public static final int TRIGGER_AMBER = 1;
     public static final int TRIGGER_RED = 2;
 
+    //INDICATOR-FREQUENCY
+
     //user type
     public static final int CountryDirector = 1;
     public static final int CountryAdmin = 2;

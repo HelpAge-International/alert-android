@@ -14,18 +14,16 @@ import android.view.View
 import android.widget.PopupMenu
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import com.google.android.gms.common.GooglePlayServicesUtil
-import com.google.android.gms.common.api.GoogleApi
-import com.google.android.gms.common.api.GoogleApiActivity
 import com.google.android.gms.location.*
-import com.google.android.gms.tasks.OnFailureListener
 import com.tbruyelle.rxpermissions2.RxPermissions
+import es.dmoral.toasty.Toasty
 import kotlinx.android.synthetic.main.activity_add_indicator.*
 import kotlinx.android.synthetic.main.content_add_indicator.*
-import org.alertpreparedness.platform.alert.Manifest
 import org.alertpreparedness.platform.alert.R
 import org.alertpreparedness.platform.alert.utils.Constants
+import org.joda.time.DateTime
 import timber.log.Timber
+import java.util.*
 
 class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
 
@@ -45,7 +43,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
     private lateinit var mViewModel: AddIndicatorViewModel
     private var mHazards: List<ModelHazard>? = null
     private var mIsCountryContext = false
-    private var mStaff: List<ModelUserPublic>? = null
+    private var mStaff: ArrayList<ModelUserPublic>? = null
 
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private lateinit var mLocationCallback: LocationCallback
@@ -60,6 +58,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
         val STAFF_SELECTION = "staff_selection"
         val ASSIGN_POSITION = "assign_position"
         val LOCATION_LIST = listOf<String>("National", "Subnational", "Use my location")
+        val TRIGGER_FREQUENCY_LIST = listOf<String>("Hours", "Days", "Weeks", "Months")
         val AREA_REQUEST_CODE = 100
     }
 
@@ -92,7 +91,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         mSources = mutableListOf()
         mViewModel.getStaffLive().observe(this, Observer { users ->
-            mStaff = users
+            mStaff = ArrayList(users)
         })
     }
 
@@ -193,14 +192,16 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
         tvAssignTo.setOnClickListener {
             val bundle = Bundle()
             bundle.putInt(ASSIGN_POSITION, mSelectedAssignPosition)
+            mStaff?.let { bundle.putSerializable(STAFF_SELECTION, mStaff) }
             mDialogAssign.arguments = bundle
             mDialogAssign.show(supportFragmentManager, "dialog_assign")
         }
 
         mDialogAssign.setOnAssignToListener(object : AssignToListener {
-            override fun userAssignedTo(userId: String, position: Int) {
-                tvAssignTo.text = userId
+            override fun userAssignedTo(user: ModelUserPublic?, position: Int) {
+                user?.let { tvAssignTo.text = String.format("%s %s", user.firstName, user.lastName) }
                 mSelectedAssignPosition = position
+                mIndicatorModel.assignee = user?.id
             }
         })
 
@@ -216,6 +217,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
             override fun locationSelected(location: Int) {
                 tvIndicatorLocation.text = LOCATION_LIST[location]
                 mSelectedLocation = location
+                mIndicatorModel.geoLocation = location
                 when (location) {
                     0 -> {
                         tvIndicatorSelectSubNational.visibility = View.GONE
@@ -308,6 +310,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
             }
             R.id.menuSave -> {
                 Timber.d("save clicked!")
+                saveIndicator()
             }
             else -> {
                 Timber.d("noting clicked")
@@ -315,6 +318,84 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
         }
         return super.onOptionsItemSelected(item)
     }
+
+    private fun saveIndicator() {
+        pbAddIndicator.visibility = View.VISIBLE
+        mIndicatorModel.source = mSources
+        val triggerGreen = ModelTrigger(if (TRIGGER_FREQUENCY_LIST.contains(tvGreenFrequency.text.toString())) TRIGGER_FREQUENCY_LIST[TRIGGER_FREQUENCY_LIST.indexOf(tvGreenFrequency.text.toString())] else "",
+                if (etIndicatorGreenValue.text.toString().isNotEmpty()) etIndicatorGreenValue.text.toString().toInt() else -1,
+                tvIndicatorGreenName.text.toString())
+        if (!triggerGreen.validateModel()) {
+            Toasty.error(this, "Green trigger is not valid, please double check!").show()
+            return
+        }
+        val triggerAmber = ModelTrigger(if (TRIGGER_FREQUENCY_LIST.contains(tvAmberFrequency.text.toString())) TRIGGER_FREQUENCY_LIST[TRIGGER_FREQUENCY_LIST.indexOf(tvAmberFrequency.text.toString())] else "",
+                if (etIndicatorAmberValue.text.toString().isNotEmpty()) etIndicatorAmberValue.text.toString().toInt() else -1,
+                tvIndicatorAmberName.text.toString())
+        if (!triggerAmber.validateModel()) {
+            Toasty.error(this, "Amber trigger is not valid, please double check!").show()
+            return
+        }
+        val triggerRed = ModelTrigger(if (TRIGGER_FREQUENCY_LIST.contains(tvRedFrequency.text.toString())) TRIGGER_FREQUENCY_LIST[TRIGGER_FREQUENCY_LIST.indexOf(tvRedFrequency.text.toString())] else "",
+                if (etIndicatorRedValue.text.toString().isNotEmpty()) etIndicatorRedValue.text.toString().toInt() else -1,
+                tvIndicatorRedName.text.toString())
+        if (!triggerRed.validateModel()) {
+            Toasty.error(this, "Red trigger is not valid, please double check!").show()
+            return
+        }
+        if (!mIsCountryContext && mIndicatorModel.hazardScenario.validateModel().isNotEmpty()) {
+            Toasty.error(this, mIndicatorModel.hazardScenario.validateModel()).show()
+            return
+        }
+        mIndicatorModel.trigger = listOf<ModelTrigger>(triggerGreen, triggerAmber, triggerRed)
+        mIndicatorModel.name = tvAddIndicatorName.text.toString()
+        when (mIndicatorModel.triggerSelected) {
+            0 -> {
+                mIndicatorModel.dueDate = getDueDate(mIndicatorModel.trigger[0])
+            }
+            1 -> {
+                mIndicatorModel.dueDate = getDueDate(mIndicatorModel.trigger[1])
+            }
+            else -> {
+                mIndicatorModel.dueDate = getDueDate(mIndicatorModel.trigger[2])
+            }
+        }
+        mIndicatorModel.updatedAt = DateTime.now().millis
+        if (mIndicatorModel.validateModel().isNotEmpty()) {
+            Toasty.error(this, mIndicatorModel.validateModel()).show()
+            return
+        }
+        Timber.d(mIndicatorModel.toString())
+        pushToDatabase(mIndicatorModel)
+    }
+
+    private fun pushToDatabase(mIndicatorModel: ModelIndicator) {
+        mViewModel.addIndicator(mIndicatorModel)?.addOnCompleteListener {
+            pbAddIndicator.visibility = View.GONE
+            Toasty.success(this, "Indicator added successfully").show()
+            finish()
+        }
+                ?.addOnFailureListener {
+                    Toasty.error(this, "Failed to add indicator, please retry").show()
+                    finish()
+                }
+    }
+
+    private fun getDueDate(modelTrigger: ModelTrigger): Long =
+            when (TRIGGER_FREQUENCY_LIST.indexOf(modelTrigger.durationType)) {
+                0 -> {
+                    DateTime.now().plusHours(modelTrigger.frequencyValue).millis
+                }
+                1 -> {
+                    DateTime.now().plusDays(modelTrigger.frequencyValue).millis
+                }
+                2 -> {
+                    DateTime.now().plusWeeks(modelTrigger.frequencyValue).millis
+                }
+                else -> {
+                    DateTime.now().plusMonths(modelTrigger.frequencyValue).millis
+                }
+            }
 
     override fun sourceRemovePosition(position: Int) {
         mSources.removeAt(position)
