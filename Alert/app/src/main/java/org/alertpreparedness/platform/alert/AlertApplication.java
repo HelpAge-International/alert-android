@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.leakcanary.LeakCanary;
 
 import net.danlew.android.joda.JodaTimeAndroid;
@@ -45,6 +46,7 @@ public class AlertApplication extends Application {
     public void onCreate() {
         super.onCreate();
         sContext = getApplicationContext();
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         // JODA
         JodaTimeAndroid.init(this);

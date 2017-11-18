@@ -18,15 +18,21 @@ class AddIndicatorViewModel : ViewModel() {
     private val countryId = UserInfo.getUser(AlertApplication.getContext()).countryID
     private val mHazards: MutableLiveData<List<ModelHazard>> = MutableLiveData()
     private val mStaff: MutableLiveData<List<ModelUserPublic>> = MutableLiveData()
+    private val mOtherNamesLive:MutableLiveData<Pair<String, String>> = MutableLiveData()
 
-    fun getHazardsLive() : MutableLiveData<List<ModelHazard>> {
+    fun getHazardsLive(): MutableLiveData<List<ModelHazard>> {
         getHazards(countryId)
         return mHazards
     }
 
-    fun getStaffLive() : MutableLiveData<List<ModelUserPublic>> {
+    fun getStaffLive(): MutableLiveData<List<ModelUserPublic>> {
         getStaff()
         return mStaff
+    }
+
+    fun getHazardOtherNameMapLive(hazard: ModelHazard): MutableLiveData<Pair<String, String>> {
+        getHazardOtherName(hazard)
+        return mOtherNamesLive
     }
 
     private fun getHazards(countryId: String) {
@@ -42,15 +48,23 @@ class AddIndicatorViewModel : ViewModel() {
         val users = mutableListOf<ModelUserPublic>()
         mDisposables.add(StaffService.getCountryStaff(countryId)
                 .doOnSubscribe { users.clear() }
-                .flatMap({ids ->
+                .flatMap({ ids ->
                     return@flatMap Flowable.fromIterable(ids)
                 })
-                .flatMap({id ->
+                .flatMap({ id ->
                     return@flatMap StaffService.getUserDetail(id)
                 })
-                .subscribe({user ->
+                .subscribe({ user ->
                     users.add(user)
                     mStaff.value = users
+                })
+        )
+    }
+
+    private fun getHazardOtherName(hazard: ModelHazard) {
+        mDisposables.add(RiskMonitoringService.getHazardOtherName(hazard)
+                .subscribe({ pair ->
+                    mOtherNamesLive.value = pair
                 })
         )
     }

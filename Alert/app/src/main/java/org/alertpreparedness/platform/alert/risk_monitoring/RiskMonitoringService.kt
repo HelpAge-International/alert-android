@@ -54,18 +54,31 @@ object RiskMonitoringService {
         val hazardsRef = FirebaseHelper.getHazardsRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), countryId)
         return RxFirebaseDatabase.observeValueEvent(hazardsRef, { snap ->
             snap.children.map {
-                val fromJson = gson.fromJson(it.value.toString(), ModelHazard::class.java)
+                val toJson = gson.toJson(it.value)
+                val reader = JsonReader(StringReader(toJson.trim()))
+                reader.isLenient = true
+                val fromJson = gson.fromJson<ModelHazard>(reader, ModelHazard::class.java)
                 return@map fromJson.copy(id = it.key)
             }
         })
+    }
 
+    fun getHazardOtherName(hazard: ModelHazard): Flowable<Pair<String, String>> {
+        val hazardsOtherNameRef = FirebaseHelper.getHazardsOtherNameRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), hazard.otherName)
+        return RxFirebaseDatabase.observeValueEvent(hazardsOtherNameRef)
+                .map { snap ->
+                    hazard.id?.let { Pair<String, String>(it, JSONObject(gson.toJson(snap.value)).getString("name")) }
+                }
     }
 
     fun getIndicators(hazardId: String): Flowable<List<ModelIndicator>> {
         val indicatorRef = FirebaseHelper.getIndicatorsRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), hazardId)
         return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
             snap.children.map {
-                val fromJson = gson.fromJson(it.value.toString(), ModelIndicator::class.java)
+                val toJson = gson.toJson(it.value)
+                val reader = JsonReader(StringReader(toJson.trim()))
+                reader.isLenient = true
+                val fromJson = gson.fromJson<ModelIndicator>(reader, ModelIndicator::class.java)
                 return@map fromJson.copy(id = it.key)
             }
         })
@@ -77,11 +90,12 @@ object RiskMonitoringService {
         return indicatorRef.child(key).setValue(indicator)
     }
 
-    fun getIndicatorsForAssignee(hazardId: String, networkId:String?): Flowable<List<ModelIndicator>> {
+    fun getIndicatorsForAssignee(hazardId: String, networkId: String?): Flowable<List<ModelIndicator>> {
         val indicatorRef = FirebaseHelper.getIndicatorsRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), hazardId).orderByChild("assignee").equalTo(UserInfo.getUser(AlertApplication.getContext()).userID)
         return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
             snap.children.map {
-                val reader = JsonReader(StringReader(it.value.toString()))
+                val toJson = gson.toJson(it.value)
+                val reader = JsonReader(StringReader(toJson.trim()))
                 reader.isLenient = true
                 val fromJson = gson.fromJson<ModelIndicator>(reader, ModelIndicator::class.java)
                 if (networkId != null) {

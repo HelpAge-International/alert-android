@@ -48,6 +48,8 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private lateinit var mLocationCallback: LocationCallback
 
+    private val mHazardOtherNamesMap = mutableMapOf<String, String>()
+
     companion object {
         fun startActivity(context: Context) {
             val intent = Intent(context, AddIndicatorActivity::class.java)
@@ -112,7 +114,19 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
         mPopupMenu.menu.add("Country Context")
         mViewModel.getHazardsLive().observe(this, Observer<List<ModelHazard>> {
             mHazards = it
-            mHazards?.forEach { mPopupMenu.menu.add(Constants.HAZARD_SCENARIO_NAME[it.hazardScenario]) }
+            mHazards?.forEach {
+                when (it.hazardScenario) {
+                    -1 -> {
+                        mViewModel.getHazardOtherNameMapLive(it).observe(this, Observer { pair ->
+                            pair?.first?.let { mHazardOtherNamesMap[pair.first] = pair.second }
+                            mPopupMenu.menu.add(pair?.second)
+                        })
+                    }
+                    else -> {
+                        mPopupMenu.menu.add(Constants.HAZARD_SCENARIO_NAME[it.hazardScenario])
+                    }
+                }
+            }
         })
         mPopupMenu.menuInflater.inflate(R.menu.popup_template_menu, mPopupMenu.menu)
 
@@ -144,7 +158,15 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
                 mIsCountryContext = true
             } else {
                 mIsCountryContext = false
-                mIndicatorModel.hazardScenario = mHazards?.get(mHazards!!.map { Constants.HAZARD_SCENARIO_NAME[it.hazardScenario] }.indexOf(p0?.title)) ?: ModelHazard()
+                if (Constants.HAZARD_SCENARIO_NAME.contains(p0?.title)) {
+                    mIndicatorModel.hazardScenario = mHazards?.map { Constants.HAZARD_SCENARIO_NAME[it.hazardScenario] }?.indexOf(p0?.title)?.let { mHazards?.get(it) } ?: ModelHazard()
+                } else {
+                    Timber.d("other hazard name")
+                    val customHazards = mHazards?.filter { it.hazardScenario == -1 }
+                    Timber.d("custom size: %s", customHazards?.size)
+                    Timber.d(mHazardOtherNamesMap.toString())
+                    mIndicatorModel.hazardScenario = customHazards?.map { mHazardOtherNamesMap[it.id] }?.indexOf(p0?.title)?.let { customHazards[it] } ?: ModelHazard()
+                }
             }
             Timber.d(mIndicatorModel.toString())
             true

@@ -17,6 +17,10 @@ public class FirebaseHelper {
         return AppUtils.getDatabase().getReference(appStatus).child("hazard").child(countryId);
     }
 
+    public static DatabaseReference getHazardsOtherNameRef(String appStatus, String nameId) {
+        return AppUtils.getDatabase().getReference(appStatus).child("hazardOther").child(nameId);
+    }
+
     public static DatabaseReference getIndicatorsRef(String appStatus, String hazardId) {
         return AppUtils.getDatabase().getReference(appStatus).child("indicator").child(hazardId);
     }
