@@ -62,7 +62,18 @@ class ActiveRiskViewModel : ViewModel() {
                         val groupIndex = getGroupIndex(group.title, mGroups)
                         if (groupIndex != -1) {
                             val existItems = mGroups[groupIndex].items
-                            val totalItems = existItems.plus(indicators).distinctBy { it.id }
+                            var totalItems = existItems
+                            indicators.forEach { i ->
+                                if (existItems.map { it.id }.contains(i.id)) {
+                                    val index = existItems.map { it.id }.indexOf(i.id)
+                                    totalItems[index] = i
+                                } else {
+                                    totalItems.add(i)
+                                }
+                            }
+                            val toDeleteList = existItems.filter { it.networkId == null }.filter { !indicators.map { it.id }.contains(it.id) }
+                            totalItems = totalItems.filter { !toDeleteList.map { it.id }.contains(it.id) }
+
                             mGroups.removeAt(groupIndex)
                             mGroups.add(0, ExpandableGroup("Country Context", totalItems))
                         } else {
@@ -104,11 +115,21 @@ class ActiveRiskViewModel : ViewModel() {
                                             val groupIndex = getGroupIndex(group.title, mGroups)
                                             if (groupIndex != -1) {
                                                 val existItems = mGroups[groupIndex].items
-                                                val totalItems = if (it.isActive == isActive) {
-                                                    existItems.plus(indicators).distinctBy { it.id }
+                                                var totalItems = existItems
+                                                if (it.isActive == isActive) {
+
+                                                    indicators.forEach { i ->
+                                                        if (existItems.map { it.id }.contains(i.id)) {
+                                                            val index = existItems.map { it.id }.indexOf(i.id)
+                                                            totalItems[index] = i
+                                                        } else {
+                                                            totalItems.add(i)
+                                                        }
+                                                    }
+                                                    val toDeleteList = existItems.filter { it.networkId == null }.filter { !indicators.map { it.id }.contains(it.id) }
+                                                    totalItems = totalItems.filter { !toDeleteList.map { it.id }.contains(it.id) }
                                                 } else {
-                                                    Timber.d("remove list")
-                                                    removeListFromList(existItems, indicators)
+                                                    totalItems = removeListFromList(existItems, indicators)
                                                 }
                                                 if (totalItems.isNotEmpty()) {
                                                     mGroups.removeAt(groupIndex)
@@ -180,10 +201,20 @@ class ActiveRiskViewModel : ViewModel() {
                                                                         val groupIndex = getGroupIndex(group.title, mGroups)
                                                                         if (groupIndex != -1) {
                                                                             val existItems = mGroups[groupIndex].items
-                                                                            val totalItems = if (it.isActive == isActive) {
-                                                                                mIndicatorMapNetwork[it.id!!]?.let { it1 -> existItems.plus(it1).distinctBy { it.id } }
+                                                                            var totalItems = existItems
+                                                                            if (it.isActive == isActive) {
+                                                                                indicators.forEach { i ->
+                                                                                    if (existItems.map { it.id }.contains(i.id)) {
+                                                                                        val index = existItems.map { it.id }.indexOf(i.id)
+                                                                                        totalItems[index] = i
+                                                                                    } else {
+                                                                                        totalItems.add(i)
+                                                                                    }
+                                                                                }
+                                                                                val toDeleteList = existItems.filter { it.networkId != null }.filter { !indicators.map { it.id }.contains(it.id) }
+                                                                                totalItems = totalItems.filter { !toDeleteList.map { it.id }.contains(it.id) }
                                                                             } else {
-                                                                                removeListFromList(existItems, indicators)
+                                                                                totalItems = removeListFromList(existItems, indicators)
                                                                             }
                                                                             if (totalItems?.isNotEmpty() == true) {
                                                                                 mGroups.removeAt(groupIndex)
@@ -211,7 +242,17 @@ class ActiveRiskViewModel : ViewModel() {
                                                                     val groupIndex = getGroupIndex(group.title, mGroups)
                                                                     if (groupIndex != -1) {
                                                                         val existItems = mGroups[groupIndex].items
-                                                                        val totalItems = existItems.plus(indicators).distinctBy { it.id }
+                                                                        var totalItems = existItems
+                                                                        indicators.forEach { i ->
+                                                                            if (existItems.map { it.id }.contains(i.id)) {
+                                                                                val index = existItems.map { it.id }.indexOf(i.id)
+                                                                                totalItems[index] = i
+                                                                            } else {
+                                                                                totalItems.add(i)
+                                                                            }
+                                                                        }
+                                                                        val toDeleteList = existItems.filter { it.networkId == null }.filter { !indicators.map { it.id }.contains(it.id) }
+                                                                        totalItems = totalItems.filter { !toDeleteList.map { it.id }.contains(it.id) }
                                                                         if (totalItems.isNotEmpty()) {
                                                                             mGroups.removeAt(groupIndex)
                                                                             mGroups.add(0, ExpandableGroup("Country Context", totalItems))
