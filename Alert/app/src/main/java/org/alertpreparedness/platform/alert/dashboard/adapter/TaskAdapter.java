@@ -82,9 +82,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             txt_taskName = (TextView) itemView.findViewById(R.id.task_name);
         }
 
-        public void bind(Tasks tasks) {
-            txt_taskName.setText(tasks.getTaskName());
-            if (tasks.getTaskType().equals("action")) {
+        public void bind(Tasks tasks){
+            txt_taskName.setText(tasks.getTaskName()); if (tasks.getTaskType().equals("action")) {
                 txt_taskStatus.setText(getTaskStatusString("red", "action"));
             } else if (tasks.getTaskType().equals("indicator")) {
                 txt_taskStatus.setText(getTaskStatusString("red", "indicator"));
@@ -102,11 +101,21 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         return "A " + level + " " + type + " needs to be completed today";
     }
 
-    public boolean isDueToday(long milliSeconds) {
+    public  boolean isDueToday(long milliSeconds) {
         Calendar today = Calendar.getInstance();
         Calendar date = Calendar.getInstance();
         date.setTimeInMillis(milliSeconds);
         System.out.println(format.format(new Date(milliSeconds)));
-        return today.get(Calendar.DAY_OF_YEAR) - 2 == date.get(Calendar.DAY_OF_YEAR);
+        return  today.get(Calendar.DAY_OF_YEAR) - 2 == date.get(Calendar.DAY_OF_YEAR);
+    }
+
+    public static String getDate(long milliSeconds, String dateFormat) {
+        // Create a DateFormatter object for displaying date in specified format.
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.getDefault());
+
+        // Create a calendar object that will convert the date and time value in milliseconds to date.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        return formatter.format(calendar.getTime());
     }
 }
