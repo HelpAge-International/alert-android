@@ -14,8 +14,11 @@ import org.alertpreparedness.platform.alert.model.Tasks;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by faizmohideen on 13/11/2017.
@@ -24,11 +27,12 @@ import java.util.List;
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
     List<Tasks> listArray;
-    HomeScreen home = new HomeScreen();
     public final static long MILLIS_PER_DAY = 24 * 60 * 60 * 1000L;
     public String dateFormat = "dd/MM/yyyy hh:mm:ss.SSS";
+    private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
 
     public TaskAdapter(List<Tasks> List) {
+
         this.listArray = List;
     }
 
@@ -48,17 +52,22 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         //System.out.println(dateFormat.format(date));
 
         //System.out.println("Is due today: " + isDueToday(tasks.getDueDate()));
-        if (isDueToday(tasks.getDueDate())) {
-            if (tasks.getTaskType().equals("action")) {
-                this.listArray.get(position);
-                holder.txt_taskStatus.setText(getTaskStatusString("red", "action"));
-                holder.txt_taskName.setText(tasks.getTaskName());
-            } else if (tasks.getTaskType().equals("indicator")) {
-                holder.txt_taskStatus.setText(getTaskStatusString("red", "indicator"));
-                holder.txt_taskName.setText(tasks.getTaskName());
-            }
-        }
 
+        holder.bind(tasks);
+    }
+
+    public void add(Tasks tasks) {
+        listArray.add(tasks);
+        Collections.sort(listArray, new Comparator<Tasks>() {
+            @Override
+            public int compare(Tasks o1, Tasks o2) {
+                System.out.println(o1.getDueDate() + " " + o2.getDueDate());
+                if (o1.getDueDate() > o2.getDueDate()) return -1;
+                if (o1.getDueDate() < o2.getDueDate()) return 1;
+                return 0;
+            }
+        });
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -72,6 +81,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             txt_taskStatus = (TextView) itemView.findViewById(R.id.task_status);
             txt_taskName = (TextView) itemView.findViewById(R.id.task_name);
         }
+
+        public void bind(Tasks tasks) {
+            txt_taskName.setText(tasks.getTaskName());
+            if (tasks.getTaskType().equals("action")) {
+                txt_taskStatus.setText(getTaskStatusString("red", "action"));
+            } else if (tasks.getTaskType().equals("indicator")) {
+                txt_taskStatus.setText(getTaskStatusString("red", "indicator"));
+            }
+            img_task.setImageResource(isDueToday(tasks.getDueDate()) ? R.drawable.home_task_red : R.drawable.home_task_amber);
+        }
     }
 
     @Override
@@ -80,25 +99,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     }
 
     public static String getTaskStatusString(String level, String type) {
-        String taskStatusString = "A " + level + " " + type + " needs to be completed today";
-        return taskStatusString;
+        return "A " + level + " " + type + " needs to be completed today";
     }
 
-    public static boolean isDueToday(long milliSeconds) {
-        long todaysDate = System.currentTimeMillis();
-        long oneDayInMillis = todaysDate + MILLIS_PER_DAY;
-        //System.out.println("Is " + milliSeconds + " > " + oneDayInMillis);
-        boolean isDueToday =  milliSeconds < oneDayInMillis;
-        return isDueToday;
-    }
-
-    public static String getDate(long milliSeconds, String dateFormat) {
-        // Create a DateFormatter object for displaying date in specified format.
-        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
-
-        // Create a calendar object that will convert the date and time value in milliseconds to date.
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(milliSeconds);
-        return formatter.format(calendar.getTime());
+    public boolean isDueToday(long milliSeconds) {
+        Calendar today = Calendar.getInstance();
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(milliSeconds);
+        System.out.println(format.format(new Date(milliSeconds)));
+        return today.get(Calendar.DAY_OF_YEAR) - 2 == date.get(Calendar.DAY_OF_YEAR);
     }
 }

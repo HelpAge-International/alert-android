@@ -88,6 +88,8 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener {
 
         tasksList = new ArrayList<>();
         taskAdapter = new TaskAdapter(tasksList);
+
+        myTaskRecyclerView.setAdapter(taskAdapter);
         firebaseDatabase = FirebaseDatabase.getInstance();
 
         for (int i = 0; i < usersID.length; i++) {
@@ -112,8 +114,7 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener {
                                 long dueDate = (long) dataSnapshot.child("dueDate").getValue();
                                 Tasks tasks = new Tasks("red", "action", task, dueDate);
 
-                                tasksList.add(tasks);
-                                myTaskRecyclerView.setAdapter(taskAdapter);
+                                taskAdapter.add(tasks);
                             }
                         }
                     }
@@ -144,7 +145,7 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener {
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         String asignee = (String) dataSnapshot.child("assignee").getValue();
                         String taskName = (String) dataSnapshot.child("name").getValue();
-                       // long dueDate = (long) dataSnapshot.child("dueDate").getValue();
+                        // long dueDate = (long) dataSnapshot.child("dueDate").getValue();
 
                         if (asignee != null && taskName != null && asignee.equals(UserInfo.userID)) {
                             if(dataSnapshot.hasChild("dueDate")) {
@@ -152,7 +153,7 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener {
                                 Tasks tasks = new Tasks("red", "indicator", taskName, dueDate);
 
                                 tasksList.add(tasks);
-                                myTaskRecyclerView.setAdapter(taskAdapter);
+                                //myTaskRecyclerView.setAdapter(taskAdapter);
                             }
                         }
                     }

@@ -6,10 +6,10 @@ package org.alertpreparedness.platform.alert.model;
 
 public class Tasks {
 
-    public static String alertLevel;
-    public static String taskType;
-    public static String taskName;
-    public static long dueDate;
+    public String alertLevel;
+    public String taskType;
+    public String taskName;
+    public long dueDate;
 
     public Tasks(String alertLevel, String taskType, String taskName, long dueDate) {
         this.alertLevel = alertLevel;
@@ -19,7 +19,7 @@ public class Tasks {
     }
 
 
-    public static String getAlertLevel() {
+    public String getAlertLevel() {
         return alertLevel;
     }
 
@@ -27,7 +27,7 @@ public class Tasks {
         this.alertLevel = alertLevel;
     }
 
-    public static String getTaskType() {
+    public String getTaskType() {
         return taskType;
     }
 
@@ -35,7 +35,7 @@ public class Tasks {
         this.taskType = taskType;
     }
 
-    public static String getTaskName() {
+    public String getTaskName() {
         return taskName;
     }
 
@@ -43,7 +43,7 @@ public class Tasks {
         this.taskName = taskName;
     }
 
-    public static long getDueDate() {
+    public long getDueDate() {
         return dueDate;
     }
 
