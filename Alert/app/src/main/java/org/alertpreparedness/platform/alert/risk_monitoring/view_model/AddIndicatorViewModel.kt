@@ -1,12 +1,22 @@
-package org.alertpreparedness.platform.alert.risk_monitoring
+package org.alertpreparedness.platform.alert.risk_monitoring.view_model
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.google.android.gms.tasks.Task
+import com.google.gson.Gson
 import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.helper.UserInfo
+import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData
+import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelHazard
+import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
+import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelUserPublic
+import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService
+import org.alertpreparedness.platform.alert.risk_monitoring.service.StaffService
+import org.json.JSONObject
 
 /**
  * Created by fei on 16/11/2017.
@@ -19,6 +29,8 @@ class AddIndicatorViewModel : ViewModel() {
     private val mHazards: MutableLiveData<List<ModelHazard>> = MutableLiveData()
     private val mStaff: MutableLiveData<List<ModelUserPublic>> = MutableLiveData()
     private val mOtherNamesLive:MutableLiveData<Pair<String, String>> = MutableLiveData()
+    private val mCountryJsonDtaLive:MutableLiveData<List<CountryJsonData>> = MutableLiveData()
+    private val mCountryDataList: ArrayList<CountryJsonData> = arrayListOf()
 
     fun getHazardsLive(): MutableLiveData<List<ModelHazard>> {
         getHazards(countryId)
@@ -33,6 +45,32 @@ class AddIndicatorViewModel : ViewModel() {
     fun getHazardOtherNameMapLive(hazard: ModelHazard): MutableLiveData<Pair<String, String>> {
         getHazardOtherName(hazard)
         return mOtherNamesLive
+    }
+
+    fun getCountryJsonDataLive(): MutableLiveData<List<CountryJsonData>> {
+        getCountryJson()
+        return mCountryJsonDtaLive
+    }
+
+    private fun getCountryJson() {
+        mDisposables.add(
+                RiskMonitoringService.readJsonFile()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({ fileText ->
+                            val jsonObject = JSONObject(fileText)
+                            mDisposables.add(
+                                    RiskMonitoringService.mapJasonToCountryData(jsonObject, Gson())
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe({ countryData: CountryJsonData ->
+                                                mCountryDataList.add(countryData)
+                                                mCountryJsonDtaLive.value = mCountryDataList
+                                            })
+                            )
+
+                        })
+        )
     }
 
     private fun getHazards(countryId: String) {

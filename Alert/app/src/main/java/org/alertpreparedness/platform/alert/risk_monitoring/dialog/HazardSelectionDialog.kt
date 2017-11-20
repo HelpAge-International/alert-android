@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.risk_monitoring
+package org.alertpreparedness.platform.alert.risk_monitoring.dialog
 
 import android.app.AlertDialog
 import android.os.Bundle

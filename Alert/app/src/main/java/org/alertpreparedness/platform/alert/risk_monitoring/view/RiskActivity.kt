@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.risk_monitoring
+package org.alertpreparedness.platform.alert.risk_monitoring.view
 
 import android.content.Context
 import android.content.Intent
@@ -9,6 +9,7 @@ import kotlinx.android.synthetic.main.activity_risk.*
 import kotlinx.android.synthetic.main.content_risk.*
 import org.alertpreparedness.platform.alert.MainDrawer
 import org.alertpreparedness.platform.alert.R
+import org.alertpreparedness.platform.alert.risk_monitoring.adapter.RiskPagerAdapter
 import org.alertpreparedness.platform.alert.utils.Constants
 import timber.log.Timber
 import java.util.concurrent.TimeUnit

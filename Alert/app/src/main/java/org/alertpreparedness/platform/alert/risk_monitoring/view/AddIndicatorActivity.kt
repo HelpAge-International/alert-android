@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.risk_monitoring
+package org.alertpreparedness.platform.alert.risk_monitoring.view
 
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
@@ -20,12 +20,18 @@ import es.dmoral.toasty.Toasty
 import kotlinx.android.synthetic.main.activity_add_indicator.*
 import kotlinx.android.synthetic.main.content_add_indicator.*
 import org.alertpreparedness.platform.alert.R
+import org.alertpreparedness.platform.alert.risk_monitoring.adapter.AreaRVAdapter
+import org.alertpreparedness.platform.alert.risk_monitoring.adapter.OnAreaDeleteListener
+import org.alertpreparedness.platform.alert.risk_monitoring.adapter.OnSourceDeleteListener
+import org.alertpreparedness.platform.alert.risk_monitoring.adapter.SourceRVAdapter
+import org.alertpreparedness.platform.alert.risk_monitoring.dialog.*
+import org.alertpreparedness.platform.alert.risk_monitoring.model.*
+import org.alertpreparedness.platform.alert.risk_monitoring.view_model.AddIndicatorViewModel
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.joda.time.DateTime
 import timber.log.Timber
-import java.util.*
 
-class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
+class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnAreaDeleteListener {
 
     private lateinit var mPopupMenu: PopupMenu
     private lateinit var mPopupMenuFrequencyGreen: PopupMenu
@@ -33,7 +39,9 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
     private lateinit var mPopupMenuFrequencyRed: PopupMenu
     private lateinit var mDialogSource: SourceDialogFragment
     private lateinit var mSources: MutableList<ModelSource>
+    private lateinit var mAreas: MutableList<ModelIndicatorLocation>
     private lateinit var mSourceAdapter: SourceRVAdapter
+    private lateinit var mAreaAdapter: AreaRVAdapter
     private lateinit var mDialogAssign: AssignToDialogFragment
     private lateinit var mDialogLocation: LocationSelectionDialogFragment
     private var mSelectedAssignPosition = 0
@@ -49,6 +57,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
     private lateinit var mLocationCallback: LocationCallback
 
     private val mHazardOtherNamesMap = mutableMapOf<String, String>()
+    private var mCountryJsonList: List<CountryJsonData> = listOf()
 
     companion object {
         fun startActivity(context: Context) {
@@ -59,7 +68,11 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
         val SELECTED_LOCATION = "selected_location"
         val STAFF_SELECTION = "staff_selection"
         val ASSIGN_POSITION = "assign_position"
+        val COUNTRY_JSON_DATA = "country_json_data"
         val LOCATION_LIST = listOf<String>("National", "Subnational", "Use my location")
+        val NATIONAL = 0
+        val SUBNATIONAL = 1
+        val USER_MY_LOCATION = 2
         val TRIGGER_FREQUENCY_LIST = listOf<String>("Hours", "Days", "Weeks", "Months")
         val AREA_REQUEST_CODE = 100
     }
@@ -92,8 +105,19 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
     private fun initData() {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         mSources = mutableListOf()
+        mAreas = mutableListOf()
         mViewModel.getStaffLive().observe(this, Observer { users ->
             mStaff = ArrayList(users)
+        })
+        mViewModel.getCountryJsonDataLive().observe(this, Observer { countryList ->
+            countryList?.let {
+                mCountryJsonList = countryList
+                if (countryList.size == 248) {
+                    mAreaAdapter = AreaRVAdapter(mAreas, countryList)
+                    rvLocationSubNational.adapter = mAreaAdapter
+                    mAreaAdapter.setOnAreaDeleteListener(this)
+                }
+            }
         })
     }
 
@@ -109,6 +133,13 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
         mSourceAdapter = SourceRVAdapter(mSources)
         rvSources.adapter = mSourceAdapter
         mSourceAdapter.setOnSourceDeleteListener(this)
+
+        rvLocationSubNational.hasFixedSize()
+        rvLocationSubNational.layoutManager = LinearLayoutManager(this)
+        mAreaAdapter = AreaRVAdapter(mAreas, mCountryJsonList)
+        rvLocationSubNational.adapter = mAreaAdapter
+        mAreaAdapter.setOnAreaDeleteListener(this)
+
 
         mPopupMenu = PopupMenu(this, tvSelectHazard)
         mPopupMenu.menu.add("Country Context")
@@ -159,7 +190,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
             } else {
                 mIsCountryContext = false
                 if (Constants.HAZARD_SCENARIO_NAME.contains(p0?.title)) {
-                    mIndicatorModel.hazardScenario = mHazards?.map { Constants.HAZARD_SCENARIO_NAME[it.hazardScenario] }?.indexOf(p0?.title)?.let { mHazards?.get(it) } ?: ModelHazard()
+                    mIndicatorModel.hazardScenario = mHazards?.filter { it.hazardScenario >= 0 }?.map { Constants.HAZARD_SCENARIO_NAME[it.hazardScenario] }?.indexOf(p0?.title)?.let { mHazards?.get(it) } ?: ModelHazard()
                 } else {
                     Timber.d("other hazard name")
                     val customHazards = mHazards?.filter { it.hazardScenario == -1 }
@@ -270,6 +301,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
                 super.onLocationResult(p0)
                 val location = p0?.lastLocation
                 tvIndicatorMyLocation.text = String.format("(%s,%s)", location?.latitude, location?.longitude)
+                mIndicatorModel.gps = ModelGps(latitude = location?.latitude.toString(), longitude = location?.longitude.toString())
             }
         }
     }
@@ -285,6 +317,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
                             if (location != null) {
                                 Timber.d("location: %s / %s", location.longitude, location.latitude)
                                 tvIndicatorMyLocation.text = String.format("(%s,%s)", location.latitude, location.longitude)
+                                mIndicatorModel.gps = ModelGps(latitude = location.latitude.toString(), longitude = location.longitude.toString())
                             } else {
                                 Timber.d("no location cached, need to request new")
                                 val locationRequest = LocationRequest()
@@ -314,6 +347,13 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
         when (requestCode) {
             AREA_REQUEST_CODE -> {
                 Timber.d("returned from select area")
+                val area = data?.getParcelableExtra<ModelIndicatorLocation>(SelectAreaActivity.SELECTED_AREA)
+                Timber.d(area?.toString())
+                area?.let {
+                    mAreas.add(area)
+                    mIndicatorModel.affectedLocation = mAreas
+                    mAreaAdapter.notifyItemInserted(mAreas.size - 1)
+                }
             }
             else -> {
             }
@@ -342,23 +382,22 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
     }
 
     private fun saveIndicator() {
-        pbAddIndicator.visibility = View.VISIBLE
         mIndicatorModel.source = mSources
-        val triggerGreen = ModelTrigger(if (TRIGGER_FREQUENCY_LIST.contains(tvGreenFrequency.text.toString())) TRIGGER_FREQUENCY_LIST[TRIGGER_FREQUENCY_LIST.indexOf(tvGreenFrequency.text.toString())] else "",
+        val triggerGreen = ModelTrigger(if (TRIGGER_FREQUENCY_LIST.contains(tvGreenFrequency.text.toString())) TRIGGER_FREQUENCY_LIST.indexOf(tvGreenFrequency.text.toString()).toString() else "",
                 if (etIndicatorGreenValue.text.toString().isNotEmpty()) etIndicatorGreenValue.text.toString().toInt() else -1,
                 tvIndicatorGreenName.text.toString())
         if (!triggerGreen.validateModel()) {
             Toasty.error(this, "Green trigger is not valid, please double check!").show()
             return
         }
-        val triggerAmber = ModelTrigger(if (TRIGGER_FREQUENCY_LIST.contains(tvAmberFrequency.text.toString())) TRIGGER_FREQUENCY_LIST[TRIGGER_FREQUENCY_LIST.indexOf(tvAmberFrequency.text.toString())] else "",
+        val triggerAmber = ModelTrigger(if (TRIGGER_FREQUENCY_LIST.contains(tvAmberFrequency.text.toString())) TRIGGER_FREQUENCY_LIST.indexOf(tvAmberFrequency.text.toString()).toString() else "",
                 if (etIndicatorAmberValue.text.toString().isNotEmpty()) etIndicatorAmberValue.text.toString().toInt() else -1,
                 tvIndicatorAmberName.text.toString())
         if (!triggerAmber.validateModel()) {
             Toasty.error(this, "Amber trigger is not valid, please double check!").show()
             return
         }
-        val triggerRed = ModelTrigger(if (TRIGGER_FREQUENCY_LIST.contains(tvRedFrequency.text.toString())) TRIGGER_FREQUENCY_LIST[TRIGGER_FREQUENCY_LIST.indexOf(tvRedFrequency.text.toString())] else "",
+        val triggerRed = ModelTrigger(if (TRIGGER_FREQUENCY_LIST.contains(tvRedFrequency.text.toString())) TRIGGER_FREQUENCY_LIST.indexOf(tvRedFrequency.text.toString()).toString() else "",
                 if (etIndicatorRedValue.text.toString().isNotEmpty()) etIndicatorRedValue.text.toString().toInt() else -1,
                 tvIndicatorRedName.text.toString())
         if (!triggerRed.validateModel()) {
@@ -383,23 +422,50 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
             }
         }
         mIndicatorModel.updatedAt = DateTime.now().millis
+
         if (mIndicatorModel.validateModel().isNotEmpty()) {
             Toasty.error(this, mIndicatorModel.validateModel()).show()
             return
         }
+
+        when {
+            mIndicatorModel.geoLocation == SUBNATIONAL -> {
+                if (mIndicatorModel.validateLocation().isNotEmpty()) {
+                    Timber.d(mIndicatorModel.validateLocation())
+                    Toasty.error(this, mIndicatorModel.validateLocation()).show()
+                    return
+                }
+                mIndicatorModel.gps = null
+            }
+            mIndicatorModel.geoLocation == NATIONAL -> {
+                mIndicatorModel.affectedLocation = null
+                mIndicatorModel.gps = null
+            }
+            else -> {
+                if (mIndicatorModel.validateGps().isNotEmpty()) {
+                    Toasty.error(this, mIndicatorModel.validateGps()).show()
+                    return
+                }
+                mIndicatorModel.affectedLocation = null
+            }
+        }
+
+
         Timber.d(mIndicatorModel.toString())
+        pbAddIndicator.visibility = View.VISIBLE
+
         pushToDatabase(mIndicatorModel)
     }
 
     private fun pushToDatabase(mIndicatorModel: ModelIndicator) {
-        mViewModel.addIndicator(mIndicatorModel)?.addOnCompleteListener {
-            pbAddIndicator.visibility = View.GONE
-            Toasty.success(this, "Indicator added successfully").show()
-            finish()
-        }
+        mViewModel.addIndicator(mIndicatorModel)
+                ?.addOnCompleteListener {
+                    pbAddIndicator.visibility = View.GONE
+                    Toasty.success(this, "Indicator added successfully").show()
+                    finish()
+                }
                 ?.addOnFailureListener {
                     Toasty.error(this, "Failed to add indicator, please retry").show()
-                    finish()
                 }
     }
 
@@ -422,6 +488,12 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener {
     override fun sourceRemovePosition(position: Int) {
         mSources.removeAt(position)
         mSourceAdapter.notifyItemRemoved(position)
+    }
+
+    override fun areaRemovePosition(position: Int) {
+        Timber.d("delete area position: %s", position)
+        mAreas.removeAt(position)
+        mAreaAdapter.notifyItemRemoved(position)
     }
 
 }

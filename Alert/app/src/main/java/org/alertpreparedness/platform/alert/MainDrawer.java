@@ -12,12 +12,10 @@ import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.FirebaseDatabase;
 
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
-import org.alertpreparedness.platform.alert.risk_monitoring.RiskActivity;
+import org.alertpreparedness.platform.alert.risk_monitoring.view.RiskActivity;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
 import java.util.concurrent.TimeUnit;

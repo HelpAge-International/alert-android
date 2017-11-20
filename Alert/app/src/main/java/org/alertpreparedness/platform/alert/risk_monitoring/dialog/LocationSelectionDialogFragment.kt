@@ -1,10 +1,11 @@
-package org.alertpreparedness.platform.alert.risk_monitoring
+package org.alertpreparedness.platform.alert.risk_monitoring.dialog
 
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import org.alertpreparedness.platform.alert.R
+import org.alertpreparedness.platform.alert.risk_monitoring.view.AddIndicatorActivity
 import timber.log.Timber
 
 /**

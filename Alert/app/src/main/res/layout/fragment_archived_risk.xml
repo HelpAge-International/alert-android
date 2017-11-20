@@ -3,7 +3,7 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              android:background="@android:color/white"
-             tools:context="org.alertpreparedness.platform.alert.risk_monitoring.ActiveRiskFragment">
+             tools:context="org.alertpreparedness.platform.alert.risk_monitoring.view.ActiveRiskFragment">
 
     <TextView
         android:id="@+id/tvNoIndicatorsArchived"

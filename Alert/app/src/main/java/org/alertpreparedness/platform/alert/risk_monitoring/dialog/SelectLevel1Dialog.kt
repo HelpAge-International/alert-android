@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.risk_monitoring
+package org.alertpreparedness.platform.alert.risk_monitoring.dialog
 
 import android.R
 import android.app.AlertDialog
@@ -6,6 +6,9 @@ import android.app.Dialog
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.widget.ArrayAdapter
+import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData
+import org.alertpreparedness.platform.alert.risk_monitoring.model.LevelOneValuesItem
+import org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity
 
 /**
  * Created by Fei on 11/11/2017.

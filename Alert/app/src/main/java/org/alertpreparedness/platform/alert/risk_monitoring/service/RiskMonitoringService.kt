@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.risk_monitoring
+package org.alertpreparedness.platform.alert.risk_monitoring.service
 
 import com.google.android.gms.tasks.Task
 import com.google.gson.Gson
@@ -8,6 +8,9 @@ import io.reactivex.Flowable
 import io.reactivex.Observable
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.helper.UserInfo
+import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData
+import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelHazard
+import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.alertpreparedness.platform.alert.utils.FirebaseHelper
 import org.alertpreparedness.platform.alert.utils.PreferHelper
@@ -36,13 +39,10 @@ object RiskMonitoringService {
         return Observable.range(0, 249)
                 .map {
                     if (!jsonObject.isNull(it.toString())) {
-//                            Timber.d(it)
                         val value = jsonObject.get(it.toString()).toString()
                         val countryData = gson.fromJson(value, CountryJsonData::class.java)
                         countryData.countryId = it
                         return@map countryData
-//                            Timber.d(countryData.toString())
-//                        mCountryDataMap.put(it, countryData)
                     } else {
                         return@map CountryJsonData(it, listOf())
                     }

@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.risk_monitoring
+package org.alertpreparedness.platform.alert.risk_monitoring.view_model
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
@@ -10,6 +10,10 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.helper.UserInfo
+import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelHazard
+import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
+import org.alertpreparedness.platform.alert.risk_monitoring.service.NetworkService
+import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService
 import org.alertpreparedness.platform.alert.utils.Constants
 import timber.log.Timber
 

@@ -1,10 +1,12 @@
-package org.alertpreparedness.platform.alert.risk_monitoring
+package org.alertpreparedness.platform.alert.risk_monitoring.adapter
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.R
+import org.alertpreparedness.platform.alert.risk_monitoring.view.ActiveRiskFragment
+import org.alertpreparedness.platform.alert.risk_monitoring.view.ArchivedRiskFragment
 
 /**
  * Created by fei on 07/11/2017.

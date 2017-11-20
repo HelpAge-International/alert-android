@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.risk_monitoring
+package org.alertpreparedness.platform.alert.risk_monitoring.dialog
 
 import android.app.AlertDialog
 import android.os.Bundle
@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.EditText
 import es.dmoral.toasty.Toasty
 import org.alertpreparedness.platform.alert.R
+import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelSource
 import org.jetbrains.anko.find
 
 /**
@@ -16,7 +17,7 @@ class SourceDialogFragment: DialogFragment() {
 
     private lateinit var etName:EditText
     private lateinit var etSource:EditText
-    private var listener:SourceCreateListener? = null
+    private var listener: SourceCreateListener? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): AlertDialog {
         val view = View.inflate(activity, R.layout.dialog_indicator_source, null)
@@ -45,11 +46,11 @@ class SourceDialogFragment: DialogFragment() {
         etSource = view.find(R.id.etSourceLink)
     }
 
-    fun setOnSourceCreatedListener(sourceListener:SourceCreateListener) {
+    fun setOnSourceCreatedListener(sourceListener: SourceCreateListener) {
         listener = sourceListener
     }
 }
 
 interface SourceCreateListener {
-    fun getCreatedSource(source:ModelSource)
+    fun getCreatedSource(source: ModelSource)
 }

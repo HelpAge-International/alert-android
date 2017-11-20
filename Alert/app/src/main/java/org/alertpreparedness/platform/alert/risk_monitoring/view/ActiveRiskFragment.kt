@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.risk_monitoring
+package org.alertpreparedness.platform.alert.risk_monitoring.view
 
 
 import android.arch.lifecycle.Observer
@@ -15,6 +15,9 @@ import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
 import kotlinx.android.synthetic.main.fragment_active_risk.*
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.R
+import org.alertpreparedness.platform.alert.risk_monitoring.view_model.ActiveRiskViewModel
+import org.alertpreparedness.platform.alert.risk_monitoring.adapter.HazardAdapter
+import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.jetbrains.anko.find
 
 
@@ -23,7 +26,7 @@ import org.jetbrains.anko.find
  */
 class ActiveRiskFragment : Fragment() {
 
-    private lateinit var mViewModel:ActiveRiskViewModel
+    private lateinit var mViewModel: ActiveRiskViewModel
 
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,

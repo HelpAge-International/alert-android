@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.risk_monitoring
+package org.alertpreparedness.platform.alert.risk_monitoring.adapter
 
 import android.support.v7.widget.RecyclerView
 import android.view.View
@@ -8,6 +8,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.R
+import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelSource
 import org.jetbrains.anko.find
 import timber.log.Timber
 
@@ -23,7 +24,7 @@ class SourceRVAdapter(private val sources: MutableList<ModelSource>) : RecyclerV
     }
 
     override fun onBindViewHolder(holder: SourceViewHolder?, position: Int) {
-        holder?.tvSourceName?.text = sources[position].sourceName
+        holder?.tvSourceName?.text = sources[position].name
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): SourceViewHolder {
@@ -36,7 +37,7 @@ class SourceRVAdapter(private val sources: MutableList<ModelSource>) : RecyclerV
 
 }
 
-class SourceViewHolder(itemView: View, listener:OnSourceDeleteListener?) : RecyclerView.ViewHolder(itemView) {
+class SourceViewHolder(itemView: View, listener: OnSourceDeleteListener?) : RecyclerView.ViewHolder(itemView) {
 
     val tvSourceName: TextView = itemView.find(R.id.tvSourceItemName)
     val btnRemove: Button = itemView.find(R.id.btnSourceItemRemove)

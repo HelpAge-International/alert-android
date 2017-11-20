@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="org.alertpreparedness.platform.alert.risk_monitoring.RiskActivity"
+    tools:context="org.alertpreparedness.platform.alert.risk_monitoring.view.RiskActivity"
     tools:showIn="@layout/activity_risk">
 
     <android.support.v4.view.ViewPager

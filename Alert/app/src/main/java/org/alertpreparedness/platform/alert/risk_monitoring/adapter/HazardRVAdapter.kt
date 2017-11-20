@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.risk_monitoring
+package org.alertpreparedness.platform.alert.risk_monitoring.adapter
 
 import android.os.Build
 import android.view.View
@@ -13,6 +13,7 @@ import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder
 import de.hdodenhof.circleimageview.CircleImageView
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.R
+import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.jetbrains.anko.find
 import org.jetbrains.anko.textColor
