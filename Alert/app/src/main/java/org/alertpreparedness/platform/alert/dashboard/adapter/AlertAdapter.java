@@ -72,6 +72,8 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
                     img_alert_colour.setImageResource(R.drawable.red_alert_left);
                     txt_hazard_name.setText(Constants.HAZARD_SCENARIO_NAME[i]);
                 }else if(i==alert.getHazardScenario() && alert.getAlertLevel() == Constants.TRIGGER_AMBER){
+                    txt_alert_level.setText(R.string.amber_alert_text);
+                    img_alert_colour.setImageResource(R.drawable.amber_alert_left);
                     txt_hazard_name.setText(Constants.HAZARD_SCENARIO_NAME[i]);
                 }else if(alert.getOtherName()!=null){
                     txt_hazard_name.setText(alert.getOtherName());

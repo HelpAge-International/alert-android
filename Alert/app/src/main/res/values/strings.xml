@@ -73,5 +73,7 @@
     <string name="password">Password</string>
     <string name="select_hazard">Select a hazard</string>
     <string name="red_alert_text">Red Alert</string>
-
+    <string name="amber_alert_text">Amber Alert</string>
+    <string name="amber_alert_level">Amber Alert Level</string>
+    <string name="red_alert_level">Red Alert Level</string>
 </resources>

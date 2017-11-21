@@ -38,14 +38,17 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener {
     private List<Tasks> tasksList;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-    private TextView appBarTitle;
     private Toolbar toolbar;
+    private String[] usersID;
+    private Alert alert;
+
+    public static TextView appBarTitle;
     public static AlertAdapter alertAdapter;
     public static List<Alert> alertList;
     public static RecyclerView alertRecyclerView;
     public static String countryID, agencyAdminID, systemAdminID, networkCountryID;
 
-    private String[] usersID;
+
     public static final String mypreference = "mypref";
     public static final String userKey = "UserType";
     public static final PreferHelper sharedPreferences = new PreferHelper();
@@ -68,9 +71,8 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener {
 
         usersID = new String[]{networkCountryID, countryID};
 
-        appBarTitle = (TextView) findViewById(R.id.alert_bar_title);
+        appBarTitle = (TextView) findViewById(R.id.custom_bar_title);
         appBarTitle.setOnClickListener(this);
-
 
         alertRecyclerView = (RecyclerView) findViewById(R.id.alert_list_view);
         alertRecyclerView.setHasFixedSize(true);
@@ -103,6 +105,8 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener {
         for (String ids : usersID) {
             getTasksFromFirebase(ids);
         }
+
+
     }
 
     public void getTasksFromFirebase(String node) {

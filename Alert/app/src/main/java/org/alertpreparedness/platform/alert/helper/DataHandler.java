@@ -41,6 +41,15 @@ public class DataHandler extends HomeScreen{
                         long population = (long) dataSnapshot.child("estimatedPopulation").getValue();
                         if(hazardScenario != -1) {
                             Alert alert = new Alert(alertLevel, hazardScenario, population, null);
+
+                            if(alert.getAlertLevel() == 2){
+                                appBarTitle.setText(R.string.red_alert_level);
+                                appBarTitle.setBackgroundResource(R.drawable.alert_red);
+                            }else if(alert.getAlertLevel() != 2 && alert.getAlertLevel() == 1){
+                                appBarTitle.setText(R.string.amber_alert_level);
+                                appBarTitle.setBackgroundResource(R.drawable.alert_amber);
+                            }
+
                             alertAdapter.add(alert);
                         }else if (dataSnapshot.child("otherName").exists()){
                             String nameId = (String) dataSnapshot.child("otherName").getValue();
@@ -79,6 +88,7 @@ public class DataHandler extends HomeScreen{
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String name = (String) dataSnapshot.child("name").getValue();
                 Alert alert = new Alert(alertLevel, hazardScenario, population, name);
+
                 alertAdapter.add(alert);
             }
 

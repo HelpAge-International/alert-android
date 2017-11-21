@@ -15,7 +15,7 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/alert_bar_title"
+            android:id="@+id/custom_bar_title"
             android:layout_width="212dp"
             android:layout_height="25dp"
             android:layout_centerHorizontal="true"
