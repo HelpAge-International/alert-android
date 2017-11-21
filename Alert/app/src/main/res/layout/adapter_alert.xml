@@ -25,7 +25,7 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/imageView"
+                android:id="@+id/img_alert_colour"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -34,27 +34,29 @@
                 app:srcCompat="@drawable/amber_alert_left" />
 
             <TextView
-                android:id="@+id/txt_amber"
+                android:id="@+id/txt_alert_level"
                 android:layout_width="48dp"
                 android:layout_height="36dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="11dp"
+                android:layout_marginTop="8dp"
                 android:text="Amber Alert"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/imageView" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginLeft="8dp" />
 
             <ImageView
                 android:id="@+id/img_hazard_icon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="14dp"
-                app:layout_constraintStart_toEndOf="@+id/imageView"
+                app:layout_constraintStart_toEndOf="@+id/img_alert_colour"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/bg_circle" />
+                app:srcCompat="@drawable/bg_circle"
+                android:layout_marginLeft="8dp" />
 
             <TextView
                 android:id="@+id/txt_hazard_name"

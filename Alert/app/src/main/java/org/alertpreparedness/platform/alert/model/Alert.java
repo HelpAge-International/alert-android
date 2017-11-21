@@ -9,12 +9,14 @@ public class Alert {
     public int numOfAreas;
     public long hazardScenario;
     public long population;
+    public String otherName;
     public String reason;
 
-    public Alert(long alertLevel, long hazardScenario, long population) {
+    public Alert(long alertLevel, long hazardScenario, long population, String otherName) {
         this.alertLevel = alertLevel;
         this.hazardScenario = hazardScenario;
         this.population = population;
+        this.otherName = otherName;
     }
 
     public int getNumOfAreas() {
@@ -55,6 +57,14 @@ public class Alert {
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    public String getOtherName() {
+        return otherName;
+    }
+
+    public void setOtherName(String otherName) {
+        this.otherName = otherName;
     }
 
 

@@ -72,5 +72,6 @@
     <string name="email_address">Email Address</string>
     <string name="password">Password</string>
     <string name="select_hazard">Select a hazard</string>
+    <string name="red_alert_text">Red Alert</string>
 
 </resources>

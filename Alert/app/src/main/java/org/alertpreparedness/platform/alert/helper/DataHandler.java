@@ -11,6 +11,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
@@ -33,16 +34,20 @@ public class DataHandler extends HomeScreen{
         database.child("sand").child("alert").child(ids).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                //System.out.println("USER: "+userID);
-                System.out.println("DATA: "+dataSnapshot.child("alertLevel").getValue());
-               // if(dataSnapshot.child("alertLevel").getValue()!=null) {
-                    long alertLevel = dataSnapshot.child("alertLevel").getValue(long.class);
-                    long hazardScenario = dataSnapshot.child("hazardScenario").getValue(long.class);
-                    long population = dataSnapshot.child("estimatedPopulation").getValue(long.class);
-
-                Alert alert = new Alert(alertLevel, hazardScenario, population);
-                alertAdapter.add(alert);
-                //}
+                if(dataSnapshot.child("alertLevel").getValue()!= null) {
+                    long alertLevel = (long) dataSnapshot.child("alertLevel").getValue();
+                    if(alertLevel != 0) {
+                        long hazardScenario = (long) dataSnapshot.child("hazardScenario").getValue();
+                        long population = (long) dataSnapshot.child("estimatedPopulation").getValue();
+                        if(hazardScenario != -1) {
+                            Alert alert = new Alert(alertLevel, hazardScenario, population, null);
+                            alertAdapter.add(alert);
+                        }else if (dataSnapshot.child("otherName").exists()){
+                            String nameId = (String) dataSnapshot.child("otherName").getValue();
+                            setOtherName(nameId, alertLevel, hazardScenario, population);
+                        }
+                    }
+                }
             }
 
             @Override
@@ -68,6 +73,21 @@ public class DataHandler extends HomeScreen{
 
     }
 
+    private static void setOtherName(String nameId, long alertLevel, long hazardScenario, long population) {
+        database.child("sand").child("hazardOther").child(nameId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String name = (String) dataSnapshot.child("name").getValue();
+                Alert alert = new Alert(alertLevel, hazardScenario, population, name);
+                alertAdapter.add(alert);
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
 
 }
