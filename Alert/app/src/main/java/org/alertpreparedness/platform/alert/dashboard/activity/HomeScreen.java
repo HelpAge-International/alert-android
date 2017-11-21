@@ -34,25 +34,23 @@ import java.util.List;
 public class HomeScreen extends MainDrawer implements View.OnClickListener {
     private User user;
     private RecyclerView myTaskRecyclerView;
-    private TaskAdapter taskAdapter;
-    private List<Tasks> tasksList;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference database = FirebaseDatabase.getInstance().getReference();
     private Toolbar toolbar;
     private String[] usersID;
     private Alert alert;
 
+    public static TaskAdapter taskAdapter;
+    public static List<Tasks> tasksList;
     public static TextView appBarTitle;
     public static AlertAdapter alertAdapter;
     public static List<Alert> alertList;
     public static RecyclerView alertRecyclerView;
     public static String countryID, agencyAdminID, systemAdminID, networkCountryID;
 
-
     public static final String mypreference = "mypref";
     public static final String userKey = "UserType";
     public static final PreferHelper sharedPreferences = new PreferHelper();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,95 +101,9 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener {
         }
 
         for (String ids : usersID) {
-            getTasksFromFirebase(ids);
+            DataHandler.getTasksFromFirebase(ids);
         }
 
-
-    }
-
-    public void getTasksFromFirebase(String node) {
-
-        String types[] = {"action", "indicator"};
-
-        for (String type : types) {
-            if(type.equals("action")) {
-                database.child("sand").child("action").child(node).addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        String asignee = (String) dataSnapshot.child("asignee").getValue();
-                        String task = (String) dataSnapshot.child("task").getValue();
-
-                        if (asignee != null && task != null && asignee.equals(UserInfo.userID)) {
-                            if(dataSnapshot.hasChild("dueDate")) {
-                                long dueDate = (long) dataSnapshot.child("dueDate").getValue();
-                                Tasks tasks = new Tasks("red", "action", task, dueDate);
-
-                                taskAdapter.add(tasks);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-            }else if(type.equals("indicator")) {
-                database.child("sand").child("indicator").child(node).addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        String asignee = (String) dataSnapshot.child("assignee").getValue();
-                        String taskName = (String) dataSnapshot.child("name").getValue();
-                        // long dueDate = (long) dataSnapshot.child("dueDate").getValue();
-
-                        if (asignee != null && taskName != null && asignee.equals(UserInfo.userID)) {
-                            if(dataSnapshot.hasChild("dueDate")) {
-                                long dueDate = (long) dataSnapshot.child("dueDate").getValue();
-                                Tasks tasks = new Tasks("red", "indicator", taskName, dueDate);
-
-                                tasksList.add(tasks);
-                                //myTaskRecyclerView.setAdapter(taskAdapter);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-            }
-        }
     }
 
 

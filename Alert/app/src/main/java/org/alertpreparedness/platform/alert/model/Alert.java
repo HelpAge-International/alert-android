@@ -6,24 +6,25 @@ package org.alertpreparedness.platform.alert.model;
 
 public class Alert {
     public long alertLevel;
-    public int numOfAreas;
+    public long numOfAreas;
     public long hazardScenario;
     public long population;
     public String otherName;
     public String reason;
 
-    public Alert(long alertLevel, long hazardScenario, long population, String otherName) {
+    public Alert(long alertLevel, long hazardScenario, long population, long numOfAreas, String otherName) {
         this.alertLevel = alertLevel;
         this.hazardScenario = hazardScenario;
         this.population = population;
+        this.numOfAreas = numOfAreas;
         this.otherName = otherName;
     }
 
-    public int getNumOfAreas() {
+    public long getNumOfAreas() {
         return numOfAreas;
     }
 
-    public void setNumOfAreas(int numOfAreas) {
+    public void setNumOfAreas(long numOfAreas) {
         this.numOfAreas = numOfAreas;
     }
 

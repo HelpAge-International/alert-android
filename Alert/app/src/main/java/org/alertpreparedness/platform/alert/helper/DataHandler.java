@@ -17,6 +17,7 @@ import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.model.Alert;
+import org.alertpreparedness.platform.alert.model.Tasks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,11 +37,14 @@ public class DataHandler extends HomeScreen{
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if(dataSnapshot.child("alertLevel").getValue()!= null) {
                     long alertLevel = (long) dataSnapshot.child("alertLevel").getValue();
+                    long numberOfAreas = dataSnapshot.child("affectedAreas").getChildrenCount();
+
                     if(alertLevel != 0) {
                         long hazardScenario = (long) dataSnapshot.child("hazardScenario").getValue();
                         long population = (long) dataSnapshot.child("estimatedPopulation").getValue();
+
                         if(hazardScenario != -1) {
-                            Alert alert = new Alert(alertLevel, hazardScenario, population, null);
+                            Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas, null);
 
                             if(alert.getAlertLevel() == 2){
                                 appBarTitle.setText(R.string.red_alert_level);
@@ -53,7 +57,7 @@ public class DataHandler extends HomeScreen{
                             alertAdapter.add(alert);
                         }else if (dataSnapshot.child("otherName").exists()){
                             String nameId = (String) dataSnapshot.child("otherName").getValue();
-                            setOtherName(nameId, alertLevel, hazardScenario, population);
+                            setOtherName(nameId, alertLevel, hazardScenario, numberOfAreas, population);
                         }
                     }
                 }
@@ -82,13 +86,12 @@ public class DataHandler extends HomeScreen{
 
     }
 
-    private static void setOtherName(String nameId, long alertLevel, long hazardScenario, long population) {
+    private static void setOtherName(String nameId, long alertLevel, long hazardScenario, long numOfAreas, long population) {
         database.child("sand").child("hazardOther").child(nameId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String name = (String) dataSnapshot.child("name").getValue();
-                Alert alert = new Alert(alertLevel, hazardScenario, population, name);
-
+                Alert alert = new Alert(alertLevel, hazardScenario, population, numOfAreas, name);
                 alertAdapter.add(alert);
             }
 
@@ -98,6 +101,91 @@ public class DataHandler extends HomeScreen{
             }
         });
 
+    }
+
+    public static void getTasksFromFirebase(String node) {
+
+        String types[] = {"action", "indicator"};
+
+        for (String type : types) {
+            if(type.equals("action")) {
+                database.child("sand").child("action").child(node).addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        String asignee = (String) dataSnapshot.child("asignee").getValue();
+                        String task = (String) dataSnapshot.child("task").getValue();
+
+                        if (asignee != null && task != null && asignee.equals(UserInfo.userID)) {
+                            if(dataSnapshot.hasChild("dueDate")) {
+                                long dueDate = (long) dataSnapshot.child("dueDate").getValue();
+                                Tasks tasks = new Tasks("red", "action", task, dueDate);
+
+                                taskAdapter.add(tasks);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }else if(type.equals("indicator")) {
+                database.child("sand").child("indicator").child(node).addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        String asignee = (String) dataSnapshot.child("assignee").getValue();
+                        String taskName = (String) dataSnapshot.child("name").getValue();
+                        // long dueDate = (long) dataSnapshot.child("dueDate").getValue();
+
+                        if (asignee != null && taskName != null && asignee.equals(UserInfo.userID)) {
+                            if(dataSnapshot.hasChild("dueDate")) {
+                                long dueDate = (long) dataSnapshot.child("dueDate").getValue();
+                                Tasks tasks = new Tasks("red", "indicator", taskName, dueDate);
+
+                                tasksList.add(tasks);
+                                //myTaskRecyclerView.setAdapter(taskAdapter);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+        }
     }
 
 }

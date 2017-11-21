@@ -54,7 +54,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         TextView txt_num_of_people;
         ImageView img_alert_colour;
         ImageView img_hazard_icon;
-
+        Alert alert;
         public ViewHolder(View itemView) {
             super(itemView);
 
@@ -71,18 +71,30 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
                     txt_alert_level.setText(R.string.red_alert_text);
                     img_alert_colour.setImageResource(R.drawable.red_alert_left);
                     txt_hazard_name.setText(Constants.HAZARD_SCENARIO_NAME[i]);
+                    txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(),alert.getNumOfAreas()));
+
                 }else if(i==alert.getHazardScenario() && alert.getAlertLevel() == Constants.TRIGGER_AMBER){
                     txt_alert_level.setText(R.string.amber_alert_text);
                     img_alert_colour.setImageResource(R.drawable.amber_alert_left);
                     txt_hazard_name.setText(Constants.HAZARD_SCENARIO_NAME[i]);
-                }else if(alert.getOtherName()!=null){
+                    txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(),alert.getNumOfAreas()));
+                }else if(alert.getOtherName()!= null){
                     txt_hazard_name.setText(alert.getOtherName());
+                    txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(),alert.getNumOfAreas()));
+                }
+            }
+        }
+
+        public void fetchIcon(String hazardName){
+            for(int i = 0; i < Constants.HAZARD_ICON_NAME.length; i++) {
+                if (hazardName == Constants.HAZARD_ICON_NAME[i]) {
+                   //TODO Set icons
                 }
             }
         }
     }
 
-    private String getNumOfPeopleText(String population, int numOfAreas) {
+    private String getNumOfPeopleText(long population, long numOfAreas) {
         return population+" people affected in "+numOfAreas+" area";
     }
 }
