@@ -1,6 +1,5 @@
 package org.alertpreparedness.platform.alert.risk_monitoring.service
 
-import com.google.android.gms.tasks.Task
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import durdinapps.rxfirebase2.RxFirebaseDatabase
@@ -10,6 +9,7 @@ import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.helper.UserInfo
 import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelHazard
+import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelHazardCountryContext
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.alertpreparedness.platform.alert.utils.FirebaseHelper
@@ -84,10 +84,16 @@ object RiskMonitoringService {
         })
     }
 
-    fun addIndicatorToHazard(indicator: ModelIndicator): Task<Void>? {
-        val indicatorRef = FirebaseHelper.getIndicatorsRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), indicator.hazardScenario.id)
+    fun addIndicatorToHazard(indicator: ModelIndicator, countryContext: Boolean) {
+        val indicatorRef = FirebaseHelper.getIndicatorsRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), if (countryContext) UserInfo.getUser(AlertApplication.getContext()).countryID else indicator.hazardScenario.id)
         val key = indicatorRef.push().key
-        return indicatorRef.child(key).setValue(indicator)
+        if (countryContext) {
+            indicatorRef.child(key).setValue(indicator).continueWith {
+                indicatorRef.child(key).child("hazardScenario").setValue(ModelHazardCountryContext())
+            }
+        } else {
+            indicatorRef.child(key).setValue(indicator)
+        }
     }
 
     fun getIndicatorsForAssignee(hazardId: String, networkId: String?): Flowable<List<ModelIndicator>> {

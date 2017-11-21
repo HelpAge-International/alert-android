@@ -17,7 +17,7 @@ import java.util.*
 class AssignToDialogFragment : DialogFragment() {
 
     private var mListener: AssignToListener? = null
-    private val data = arrayOf<String>("id1", "id2", "d3", "d4", "d5", "d6", "d7", "d8", "d9")
+//    private val data = arrayOf<String>("id1", "id2", "d3", "d4", "d5", "d6", "d7", "d8", "d9")
     private var mPosition = 0
     private var defaultPosition = 0
     private var mStaff: ArrayList<ModelUserPublic>? = null
@@ -26,6 +26,9 @@ class AssignToDialogFragment : DialogFragment() {
         if (arguments != null) {
             defaultPosition = arguments.getInt(AddIndicatorActivity.ASSIGN_POSITION)
             mStaff = arguments.getSerializable(AddIndicatorActivity.STAFF_SELECTION) as ArrayList<ModelUserPublic>
+            if (mStaff?.first()?.firstName != "Unassigned") {
+                mStaff!!.add(0, ModelUserPublic(firstName = "Unassigned"))
+            }
         }
         val adapter = if (mStaff != null) ArrayAdapter<String>(activity, android.R.layout.simple_list_item_single_choice, mStaff?.map { it.firstName + " " + it.lastName }) else ArrayAdapter<ModelUserPublic>(activity, android.R.layout.simple_list_item_single_choice, emptyArray())
         return AlertDialog.Builder(activity)

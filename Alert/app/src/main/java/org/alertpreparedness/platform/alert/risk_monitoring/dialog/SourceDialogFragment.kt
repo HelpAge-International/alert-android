@@ -8,6 +8,7 @@ import android.widget.EditText
 import es.dmoral.toasty.Toasty
 import org.alertpreparedness.platform.alert.R
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelSource
+import org.alertpreparedness.platform.alert.utils.AppUtils
 import org.jetbrains.anko.find
 
 /**
@@ -30,6 +31,7 @@ class SourceDialogFragment: DialogFragment() {
                 .setPositiveButton("SAVE", {_,_ ->
                     run {
 //                        Timber.d("selected: %s, %s", etName.text, etSource.text)
+                        AppUtils.hideSoftKeyboard(activity, view)
                         val source = ModelSource(etName.text.toString(), etSource.text.toString())
                         if (!source.validateModel()) {
                             Toasty.error(activity, "Source name can not be empty").show()

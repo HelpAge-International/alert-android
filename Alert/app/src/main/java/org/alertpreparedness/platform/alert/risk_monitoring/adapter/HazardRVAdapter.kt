@@ -16,6 +16,7 @@ import org.alertpreparedness.platform.alert.R
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.jetbrains.anko.find
+import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.textColor
 import org.joda.time.DateTime
 import timber.log.Timber
@@ -37,7 +38,98 @@ class HazardViewHolder(itemView: View) : GroupViewHolder(itemView) {
 
     fun setHazardTitle(group: ExpandableGroup<ModelIndicator>) {
         hazardTitle.text = group.title
+        hazardIcon.imageResource = getHazardImg(hazardTitle.text.toString())
+//        hazardIcon.background = getHazardImg(hazardTitle.text.toString())
     }
+
+    private fun getHazardImg(title: String): Int =
+            when (title) {
+                "Cold Wave" -> {
+                    R.drawable.cold_wave
+                }
+                "Conflict" -> {
+                    R.drawable.conflict
+                }
+                "Cyclone" -> {
+                    R.drawable.cyclone
+                }
+                "Drought" -> {
+                    R.drawable.drought
+                }
+                "Earthquake" -> {
+                    R.drawable.earthquake
+                }
+                "Epidemic" -> {
+                    R.drawable.epidemic
+                }
+                "Fire" -> {
+                    R.drawable.fire
+                }
+                "Flash Flood" -> {
+                    R.drawable.flash_flood
+                }
+                "Flood" -> {
+                    R.drawable.flood
+                }
+                "Heat Wave" -> {
+                    R.drawable.heat_wave
+                }
+                "Heavy Rain" -> {
+                    R.drawable.heavy_rain
+                }
+                "Humanitarian Access" -> {
+                    R.drawable.humanitarian_access
+                }
+                "Insect Infestation" -> {
+                    R.drawable.insect_infestation
+                }
+                "Landslide" -> {
+                    R.drawable.landslide_mudslide
+                }
+                "Locust Infestation" -> {
+                    R.drawable.locust_infestation
+                }
+                "Mudslide" -> {
+                    R.drawable.landslide_mudslide
+                }
+                "Population Displacement" -> {
+                    R.drawable.population_displacement
+                }
+                "Population Return" -> {
+                    R.drawable.population_return
+                }
+                "Snow Avalanche" -> {
+                    R.drawable.snow_avalanche
+                }
+                "Snowfall" -> {
+                    R.drawable.snowfall
+                }
+                "Storm" -> {
+                    R.drawable.storm
+                }
+                "Storm Surge" -> {
+                    R.drawable.storm_surge
+                }
+                "Technological Disaster" -> {
+                    R.drawable.technological_disaster
+                }
+                "Tornado" -> {
+                    R.drawable.tornado
+                }
+                "Tsunami" -> {
+                    R.drawable.tsunami
+                }
+                "Violent Wind" -> {
+                    R.drawable.violent_wind
+                }
+                "Volcano" -> {
+                    R.drawable.volcano
+                }
+                else -> {
+                    R.drawable.other
+                }
+            }
+
 }
 
 class IndicatorViewHolder(itemView: View) : ChildViewHolder(itemView) {

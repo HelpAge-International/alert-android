@@ -5,6 +5,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.location.Location
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -19,6 +20,7 @@ import com.tbruyelle.rxpermissions2.RxPermissions
 import es.dmoral.toasty.Toasty
 import kotlinx.android.synthetic.main.activity_add_indicator.*
 import kotlinx.android.synthetic.main.content_add_indicator.*
+import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.R
 import org.alertpreparedness.platform.alert.risk_monitoring.adapter.AreaRVAdapter
 import org.alertpreparedness.platform.alert.risk_monitoring.adapter.OnAreaDeleteListener
@@ -27,9 +29,11 @@ import org.alertpreparedness.platform.alert.risk_monitoring.adapter.SourceRVAdap
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.*
 import org.alertpreparedness.platform.alert.risk_monitoring.model.*
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.AddIndicatorViewModel
+import org.alertpreparedness.platform.alert.utils.AppUtils
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.joda.time.DateTime
 import timber.log.Timber
+import java.util.*
 
 class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnAreaDeleteListener {
 
@@ -68,12 +72,10 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
         val SELECTED_LOCATION = "selected_location"
         val STAFF_SELECTION = "staff_selection"
         val ASSIGN_POSITION = "assign_position"
-        val COUNTRY_JSON_DATA = "country_json_data"
-        val LOCATION_LIST = listOf<String>("National", "Subnational", "Use my location")
+        val LOCATION_LIST = listOf("National", "Subnational", "Use my location")
         val NATIONAL = 0
         val SUBNATIONAL = 1
-        val USER_MY_LOCATION = 2
-        val TRIGGER_FREQUENCY_LIST = listOf<String>("Hours", "Days", "Weeks", "Months")
+        val TRIGGER_FREQUENCY_LIST = listOf("Hours", "Days", "Weeks", "Months")
         val AREA_REQUEST_CODE = 100
     }
 
@@ -177,6 +179,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
 
     private fun initListeners() {
         tvSelectHazard.setOnClickListener {
+            AppUtils.hideSoftKeyboard(AlertApplication.getContext(), tvSelectHazard)
             Timber.d("show popup menu")
             mPopupMenu.show()
         }
@@ -184,7 +187,6 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
         mPopupMenu.setOnMenuItemClickListener { p0 ->
             Timber.d("menu: %s", p0?.title)
             tvSelectHazard.text = p0?.title
-            //TODO NEED UPDATE THIS WHEN SUBMIT
             if (p0?.title?.equals("Country Context") == true) {
                 mIsCountryContext = true
             } else {
@@ -216,6 +218,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
         })
 
         tvGreenFrequency.setOnClickListener {
+            AppUtils.hideSoftKeyboard(AlertApplication.getContext(), tvGreenFrequency)
             mPopupMenuFrequencyGreen.show()
         }
 
@@ -225,6 +228,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
         }
 
         tvAmberFrequency.setOnClickListener {
+            AppUtils.hideSoftKeyboard(AlertApplication.getContext(), tvAmberFrequency)
             mPopupMenuFrequencyAmber.show()
         }
 
@@ -234,6 +238,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
         }
 
         tvRedFrequency.setOnClickListener {
+            AppUtils.hideSoftKeyboard(AlertApplication.getContext(), tvRedFrequency)
             mPopupMenuFrequencyRed.show()
         }
 
@@ -254,7 +259,11 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
             override fun userAssignedTo(user: ModelUserPublic?, position: Int) {
                 user?.let { tvAssignTo.text = String.format("%s %s", user.firstName, user.lastName) }
                 mSelectedAssignPosition = position
-                mIndicatorModel.assignee = user?.id
+                if (user?.id?.isNotEmpty()!!) {
+                    mIndicatorModel.assignee = user.id
+                } else {
+                    mIndicatorModel.assignee = null
+                }
             }
         })
 
@@ -302,6 +311,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
                 val location = p0?.lastLocation
                 tvIndicatorMyLocation.text = String.format("(%s,%s)", location?.latitude, location?.longitude)
                 mIndicatorModel.gps = ModelGps(latitude = location?.latitude.toString(), longitude = location?.longitude.toString())
+                fetchAddress(location)
             }
         }
     }
@@ -313,11 +323,13 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
                 .request(android.Manifest.permission.ACCESS_FINE_LOCATION)
                 .subscribe({ granted ->
                     if (granted) {
+                        pbAddIndicator.visibility = View.VISIBLE
                         mFusedLocationClient.lastLocation.addOnSuccessListener { location ->
                             if (location != null) {
                                 Timber.d("location: %s / %s", location.longitude, location.latitude)
                                 tvIndicatorMyLocation.text = String.format("(%s,%s)", location.latitude, location.longitude)
                                 mIndicatorModel.gps = ModelGps(latitude = location.latitude.toString(), longitude = location.longitude.toString())
+                                fetchAddress(location)
                             } else {
                                 Timber.d("no location cached, need to request new")
                                 val locationRequest = LocationRequest()
@@ -331,6 +343,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
                                     mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, null)
                                 }
                                 task.addOnFailureListener(this, {
+                                    pbAddIndicator.visibility = View.GONE
                                     Timber.d("location settings failed!!!")
                                 })
                             }
@@ -340,6 +353,21 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
                     }
                 })
 
+    }
+
+    private fun fetchAddress(location: Location?) {
+        if (location != null) {
+            mViewModel.getAddressLive(location).observe(this, Observer { address ->
+                pbAddIndicator.visibility = View.GONE
+                if (address!!.isNotEmpty()) {
+                    tvIndicatorMyLocation.text = String.format("%s, %s", address, tvIndicatorMyLocation.text)
+                    mIndicatorModel.gps?.address = address
+                }
+            })
+        } else {
+            pbAddIndicator.visibility = View.GONE
+            Toasty.warning(this, "Location is not available").show()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -375,7 +403,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
                 saveIndicator()
             }
             else -> {
-                Timber.d("noting clicked")
+                Timber.d("nothing clicked")
             }
         }
         return super.onOptionsItemSelected(item)
@@ -408,7 +436,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
             Toasty.error(this, mIndicatorModel.hazardScenario.validateModel()).show()
             return
         }
-        mIndicatorModel.trigger = listOf<ModelTrigger>(triggerGreen, triggerAmber, triggerRed)
+        mIndicatorModel.trigger = listOf(triggerGreen, triggerAmber, triggerRed)
         mIndicatorModel.name = tvAddIndicatorName.text.toString()
         when (mIndicatorModel.triggerSelected) {
             0 -> {
@@ -436,6 +464,7 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
                     return
                 }
                 mIndicatorModel.gps = null
+                mIndicatorModel.resetLevels()
             }
             mIndicatorModel.geoLocation == NATIONAL -> {
                 mIndicatorModel.affectedLocation = null
@@ -450,23 +479,14 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
             }
         }
 
-
         Timber.d(mIndicatorModel.toString())
-        pbAddIndicator.visibility = View.VISIBLE
-
         pushToDatabase(mIndicatorModel)
     }
 
     private fun pushToDatabase(mIndicatorModel: ModelIndicator) {
-        mViewModel.addIndicator(mIndicatorModel)
-                ?.addOnCompleteListener {
-                    pbAddIndicator.visibility = View.GONE
-                    Toasty.success(this, "Indicator added successfully").show()
-                    finish()
-                }
-                ?.addOnFailureListener {
-                    Toasty.error(this, "Failed to add indicator, please retry").show()
-                }
+        mViewModel.addIndicator(mIndicatorModel, mIsCountryContext)
+        Toasty.success(this, "Indicator added successfully").show()
+        finish()
     }
 
     private fun getDueDate(modelTrigger: ModelTrigger): Long =

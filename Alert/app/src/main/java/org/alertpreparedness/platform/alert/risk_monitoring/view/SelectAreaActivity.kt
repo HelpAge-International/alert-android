@@ -21,6 +21,7 @@ import org.alertpreparedness.platform.alert.risk_monitoring.model.LevelOneValues
 import org.alertpreparedness.platform.alert.risk_monitoring.model.LevelTwoValuesItem
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation
 import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService
+import org.alertpreparedness.platform.alert.utils.Constants
 import org.json.JSONObject
 import timber.log.Timber
 
@@ -113,7 +114,7 @@ class SelectAreaActivity : AppCompatActivity() {
                     tvSelectLevel2.hint = "Optional"
                 }
                 mCountrySelected = countryJsonData.countryId
-                tvSelectCountry.text = countryJsonData.countryId.toString()
+                tvSelectCountry.text = Constants.COUNTRIES[countryJsonData.countryId.toInt()]
             }
         })
 

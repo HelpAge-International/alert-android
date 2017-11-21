@@ -7,6 +7,7 @@ import android.support.v4.app.DialogFragment
 import android.widget.ArrayAdapter
 import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData
 import org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity
+import org.alertpreparedness.platform.alert.utils.Constants
 
 /**
  * Created by Fei on 11/11/2017.
@@ -19,7 +20,7 @@ class SelectCountryDialog: DialogFragment() {
         @Suppress("UNCHECKED_CAST")
         val countryDataList = arguments.getSerializable(SelectAreaActivity.SELECT_DIALOG_ARGS) as ArrayList<CountryJsonData>
         return AlertDialog.Builder(activity)
-                .setAdapter(ArrayAdapter<String>(activity, android.R.layout.simple_list_item_1, countryDataList.map { it.countryId.toString() }), {dialog, position ->
+                .setAdapter(ArrayAdapter<String>(activity, android.R.layout.simple_list_item_1, countryDataList.map { Constants.COUNTRIES[it.countryId.toInt()] }), { dialog, position ->
                     mListener?.selectedCountry(countryDataList[position])
                 })
                 .create()

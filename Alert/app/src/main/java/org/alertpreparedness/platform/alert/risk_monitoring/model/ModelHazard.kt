@@ -52,6 +52,8 @@ data class ModelHazard(var id:String?, val hazardScenario:Int, val isActive:Bool
     }
 }
 
+data class ModelHazardCountryContext(val key:String = "countryContext")
+
 //public id: string;
 //
 //public category: number;

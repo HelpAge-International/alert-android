@@ -9,7 +9,7 @@ import android.os.Parcelable
 data class ModelIndicator(val id: String?, var hazardScenario: ModelHazard, val triggerSelected: Int,
                           var name: String, var assignee: String?, var geoLocation: Int,
                           var updatedAt: Long, var dueDate: Long, var source: List<ModelSource>, var trigger: List<ModelTrigger>, val networkId: String?, val agencyId: String?, val countryOfficeId: String?,
-                          var affectedLocation: List<ModelIndicatorLocation>?, var gps: ModelGps?) : Parcelable {
+                          var affectedLocation: List<ModelIndicatorLocation>?, var gps: ModelGps?, val category:Int = 0) : Parcelable {
 
 
     constructor(parcel: Parcel) : this(
@@ -27,7 +27,8 @@ data class ModelIndicator(val id: String?, var hazardScenario: ModelHazard, val 
             parcel.readString(),
             parcel.readString(),
             parcel.createTypedArrayList(ModelIndicatorLocation),
-            parcel.readParcelable(ModelGps::class.java.classLoader)) {
+            parcel.readParcelable(ModelGps::class.java.classLoader),
+            parcel.readInt()) {
     }
 
     constructor() : this(null, ModelHazard(), 0, "", null, -1, 0, 0, listOf(), listOf(), null, null, null, null, null)
@@ -59,6 +60,20 @@ data class ModelIndicator(val id: String?, var hazardScenario: ModelHazard, val 
         }
     }
 
+    fun resetLevels() {
+        affectedLocation?.forEach {
+            when {
+                it.level1 == -1 -> {
+                    it.level1 = null
+                    it.level2 = null
+                }
+                it.level2 == -1 -> it.level2 = null
+                else -> {
+                }
+            }
+        }
+    }
+
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(id)
         parcel.writeParcelable(hazardScenario, flags)
@@ -75,6 +90,7 @@ data class ModelIndicator(val id: String?, var hazardScenario: ModelHazard, val 
         parcel.writeString(countryOfficeId)
         parcel.writeTypedList(affectedLocation)
         parcel.writeParcelable(gps, flags)
+        parcel.writeInt(category)
     }
 
     override fun describeContents(): Int {
@@ -90,6 +106,7 @@ data class ModelIndicator(val id: String?, var hazardScenario: ModelHazard, val 
             return arrayOfNulls(size)
         }
     }
+
 }
 
 /************************************************************************************************************************/
@@ -176,7 +193,7 @@ data class ModelSource(val name: String, val link: String?) : Parcelable {
 
 /************************************************************************************************************************/
 
-data class ModelIndicatorLocation(val country: String = "", val level1: Int? = null, val level2: Int? = null) : Parcelable {
+data class ModelIndicatorLocation(val country: String = "", var level1: Int? = null, var level2: Int? = null) : Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readString(),
             parcel.readValue(Int::class.java.classLoader) as? Int,
@@ -216,8 +233,9 @@ data class ModelIndicatorLocation(val country: String = "", val level1: Int? = n
 
 /************************************************************************************************************************/
 
-data class ModelGps(val city: String? = null, val country: String? = null, val latitude: String = "", val longitude: String = "") : Parcelable {
+data class ModelGps(val city: String? = null, val country: String? = null, var address:String? = null, val latitude: String = "", val longitude: String = "") : Parcelable {
     constructor(parcel: Parcel) : this(
+            parcel.readString(),
             parcel.readString(),
             parcel.readString(),
             parcel.readString(),
@@ -227,6 +245,7 @@ data class ModelGps(val city: String? = null, val country: String? = null, val l
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(city)
         parcel.writeString(country)
+        parcel.writeString(address)
         parcel.writeString(latitude)
         parcel.writeString(longitude)
     }

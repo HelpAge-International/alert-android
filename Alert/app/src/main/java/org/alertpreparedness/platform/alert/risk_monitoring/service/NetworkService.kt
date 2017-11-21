@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.risk_monitoring.service
 
+import com.google.firebase.database.DataSnapshot
 import durdinapps.rxfirebase2.RxFirebaseDatabase
 import io.reactivex.Flowable
 import org.alertpreparedness.platform.alert.AlertApplication
@@ -30,6 +31,14 @@ object NetworkService {
     fun getNetworkDetail(networkId:String) : Flowable<ModelNetwork> {
         val networkDetailRef = FirebaseHelper.getNetworkDetail(mAppStatus, networkId)
         return RxFirebaseDatabase.observeValueEvent(networkDetailRef, ModelNetwork::class.java)
+    }
+
+    fun checkConnectionState(): Flowable<Boolean> {
+        val checkConnectedRef = FirebaseHelper.checkConnectedRef()
+        return RxFirebaseDatabase.observeValueEvent(checkConnectedRef)
+                .map { snap: DataSnapshot ->
+                    snap.value as Boolean
+                }
     }
 
 }

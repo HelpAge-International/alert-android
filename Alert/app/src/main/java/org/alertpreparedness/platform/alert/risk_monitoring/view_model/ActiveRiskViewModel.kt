@@ -47,6 +47,8 @@ class ActiveRiskViewModel : ViewModel() {
                 .map { it.filter { it.hazardScenario == -1 } }
                 .flatMap { Flowable.fromIterable(it) }
                 .flatMap { RiskMonitoringService.getHazardOtherName(it) }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ pair ->
                     mHazardNameMap.put(pair.first, pair.second)
                 })
@@ -164,12 +166,16 @@ class ActiveRiskViewModel : ViewModel() {
                                 .map { it.filter { it.hazardScenario == -1 } }
                                 .flatMap { Flowable.fromIterable(it) }
                                 .flatMap { RiskMonitoringService.getHazardOtherName(it) }
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({ pair ->
                                     mHazardNameMapNetwork.put(pair.first, pair.second)
                                 })
                         )
 
                         mDisposables.add(NetworkService.getNetworkDetail(networkId)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({ network ->
                                     Timber.d(network.toString())
 
