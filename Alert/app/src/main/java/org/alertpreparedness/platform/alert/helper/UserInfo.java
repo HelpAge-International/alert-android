@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 
 import org.alertpreparedness.platform.alert.login.activity.AuthCallback;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.risk_monitoring.NetworkService;
 
 import java.util.ArrayList;
@@ -23,6 +24,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import io.reactivex.disposables.Disposable;
+
+import timber.log.Timber;
 
 /**
  * Created by faizmohideen on 08/11/2017.
@@ -103,15 +106,15 @@ public class UserInfo {
     public static int getUserTypeString(String node){
         switch (node) {
             case "administratorCountry":
-                return 1;
+                return Constants.CountryAdmin;
             case "countryDirector":
-                return 2;
+                return Constants.CountryDirector;
             case "ert":
-                return 3;
+                return  Constants.Ert;
             case "ertLeader":
-                return 4;
+                return Constants.ErtLeader;
             case "partner":
-                return 5;
+                return Constants.PartnerUser;
             default:
                 return -1;
         }

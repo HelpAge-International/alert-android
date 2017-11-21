@@ -23,9 +23,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
+
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import io.reactivex.functions.Consumer;
+import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.User;
 
-import java.util.Observable;
 
 public class LoginScreen extends AppCompatActivity implements View.OnClickListener, AuthCallback {
 
@@ -38,7 +43,6 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     private final static String TAG = "LoginActivity";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,8 +106,8 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithEmail:failed | " + task.getException().getMessage());
-                            Toast.makeText(LoginScreen.this, "The password you entered is incorrect. Please check and try again!" + task.getException().getMessage(),
+                            Log.w(TAG, "signInWithEmail:failed | "+ task.getException().getMessage());
+                            Toast.makeText(LoginScreen.this, "The password you entered is incorrect. Please check and try again!"+ task.getException().getMessage(),
                                     Toast.LENGTH_SHORT).show();
                         }
                     }

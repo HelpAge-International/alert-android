@@ -6,9 +6,7 @@ import android.os.Parcelable
 /**
  * Created by fei on 07/11/2017.
  */
-data class ModelHazard(val id:String, val hazardScenario:Int, val isActive:Boolean, val isSeasonal:Boolean, val risk:Int, val timeCreated:Long, val otherName:String?):Parcelable {
-
-    constructor() : this("", -1, true, false, 10, 0, null)
+data class ModelHazard(var id:String?, val hazardScenario:Int, val isActive:Boolean, val isSeasonal:Boolean, val risk:Int, var timeCreated:Long, val otherName:String?):Parcelable {
 
     constructor(parcel: Parcel) : this(
             parcel.readString(),
@@ -18,6 +16,15 @@ data class ModelHazard(val id:String, val hazardScenario:Int, val isActive:Boole
             parcel.readInt(),
             parcel.readLong(),
             parcel.readString()) {
+    }
+
+    constructor() : this(null, -2, true, false, 10, 0, null)
+
+
+
+    fun validateModel() : String  = when (hazardScenario) {
+        -2 -> "Hazard is not valid"
+        else -> ""
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

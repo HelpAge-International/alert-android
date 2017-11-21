@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.view.View
 import android.widget.EditText
+import es.dmoral.toasty.Toasty
 import org.alertpreparedness.platform.alert.R
 import org.jetbrains.anko.find
 
@@ -29,6 +30,10 @@ class SourceDialogFragment: DialogFragment() {
                     run {
 //                        Timber.d("selected: %s, %s", etName.text, etSource.text)
                         val source = ModelSource(etName.text.toString(), etSource.text.toString())
+                        if (!source.validateModel()) {
+                            Toasty.error(activity, "Source name can not be empty").show()
+                            return@run
+                        }
                         listener?.getCreatedSource(source)
                     }
                 })

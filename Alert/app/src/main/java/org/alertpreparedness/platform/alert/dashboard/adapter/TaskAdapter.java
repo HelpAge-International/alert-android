@@ -27,12 +27,14 @@ import java.util.Locale;
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
     List<Tasks> listArray;
+    Calendar today = Calendar.getInstance();
+    Calendar date = Calendar.getInstance();
+
     public final static long MILLIS_PER_DAY = 24 * 60 * 60 * 1000L;
     public String dateFormat = "dd/MM/yyyy hh:mm:ss.SSS";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
 
     public TaskAdapter(List<Tasks> List) {
-
         this.listArray = List;
     }
 
@@ -44,15 +46,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(TaskAdapter.ViewHolder holder, int position) {
-
         Tasks tasks = listArray.get(position);
-        //holder.img_task.setBackgroundResource(R.drawable.home_task_red);
-        //DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
-        //Date date = new Date();
-        //System.out.println(dateFormat.format(date));
-
-        //System.out.println("Is due today: " + isDueToday(tasks.getDueDate()));
-
         holder.bind(tasks);
     }
 
@@ -61,9 +55,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         Collections.sort(listArray, new Comparator<Tasks>() {
             @Override
             public int compare(Tasks o1, Tasks o2) {
-                System.out.println(o1.getDueDate() + " " + o2.getDueDate());
-                if (o1.getDueDate() > o2.getDueDate()) return -1;
-                if (o1.getDueDate() < o2.getDueDate()) return 1;
+               // System.out.println(o1.getDueDate() + " " + o2.getDueDate());
+                if (o1.getDueDate() > o2.getDueDate()) return 1;
+                if (o1.getDueDate() < o2.getDueDate()) return -1;
                 return 0;
             }
         });
@@ -83,12 +77,27 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         }
 
         public void bind(Tasks tasks){
-            txt_taskName.setText(tasks.getTaskName()); if (tasks.getTaskType().equals("action")) {
-                txt_taskStatus.setText(getTaskStatusString("red", "action"));
-            } else if (tasks.getTaskType().equals("indicator")) {
-                txt_taskStatus.setText(getTaskStatusString("red", "indicator"));
+            txt_taskName.setText(tasks.getTaskName());
+            if (tasks.getTaskType().equals("action") && isDueToday(tasks.getDueDate())) {
+                txt_taskStatus.setText(dueTodayString("red", "action"));
+                img_task.setImageResource(R.drawable.home_task_red);
+            } else if (tasks.getTaskType().equals("indicator") && isDueToday(tasks.getDueDate())) {
+                txt_taskStatus.setText(dueTodayString("red", "indicator"));
+                img_task.setImageResource(R.drawable.home_task_red);
+            } else if (tasks.getTaskType().equals("action") && isDueInWeek(tasks.getDueDate())){
+                txt_taskStatus.setText(dueWeekString("amber", "action"));
+                img_task.setImageResource(R.drawable.home_task_amber);
+            } else if (tasks.getTaskType().equals("indicator") && isDueInWeek(tasks.getDueDate())) {
+                txt_taskStatus.setText(dueTodayString("amber", "indicator"));
+                img_task.setImageResource(R.drawable.home_task_amber);
+            } else if (tasks.getTaskType().equals("action") && isWasDue(tasks.getDueDate())) {
+                txt_taskStatus.setText(dueBeforeString("red", "action", format.format(new Date(tasks.getDueDate()))));
+                img_task.setImageResource(R.drawable.home_task_red);
+            } else if (tasks.getTaskType().equals("indicator") && isWasDue(tasks.getDueDate())) {
+                txt_taskStatus.setText(dueBeforeString("red", "indicator", format.format(new Date(tasks.getDueDate()))));
+                img_task.setImageResource(R.drawable.home_task_red);
             }
-            img_task.setImageResource(isDueToday(tasks.getDueDate()) ? R.drawable.home_task_red : R.drawable.home_task_amber);
+           // img_task.setImageResource(isDueToday(tasks.getDueDate()) ? R.drawable.home_task_red : R.drawable.home_task_amber);
         }
     }
 
@@ -97,25 +106,30 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         return listArray.size();
     }
 
-    public static String getTaskStatusString(String level, String type) {
+    public static String dueTodayString(String level, String type) {
         return "A " + level + " " + type + " needs to be completed today";
     }
 
-    public  boolean isDueToday(long milliSeconds) {
-        Calendar today = Calendar.getInstance();
-        Calendar date = Calendar.getInstance();
-        date.setTimeInMillis(milliSeconds);
-        System.out.println(format.format(new Date(milliSeconds)));
-        return  today.get(Calendar.DAY_OF_YEAR) - 2 == date.get(Calendar.DAY_OF_YEAR);
+    public static String dueWeekString(String level, String type) {
+        return "A " + level + " " + type + " needs to be completed this week";
     }
 
-    public static String getDate(long milliSeconds, String dateFormat) {
-        // Create a DateFormatter object for displaying date in specified format.
-        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.getDefault());
+    public static String dueBeforeString(String level, String type, String date) {
+        return "A " + level + " " + type + " was due on "+date;
+    }
 
-        // Create a calendar object that will convert the date and time value in milliseconds to date.
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(milliSeconds);
-        return formatter.format(calendar.getTime());
+    public  boolean isDueToday(long milliSeconds) {
+        date.setTimeInMillis(milliSeconds);
+        return  today.get(Calendar.DAY_OF_YEAR) == date.get(Calendar.DAY_OF_YEAR);
+    }
+
+    public boolean isDueInWeek(long milliSeconds){
+        date.setTimeInMillis(milliSeconds);
+        return date.get(Calendar.DAY_OF_YEAR) > today.get(Calendar.DAY_OF_YEAR) &&  date.get(Calendar.DAY_OF_YEAR) < (today.get(Calendar.DAY_OF_YEAR)+7);
+    }
+
+    public boolean isWasDue(long milliSeconds){
+        date.setTimeInMillis(milliSeconds);
+        return date.get(Calendar.DAY_OF_YEAR) < (today.get(Calendar.DAY_OF_YEAR));
     }
 }

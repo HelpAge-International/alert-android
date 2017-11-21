@@ -13,8 +13,10 @@ import org.json.JSONObject
  */
 object NetworkService {
 
+    private val mAppStatus = PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS)!!
+
     fun mapNetworksForCountry(agencyId: String, countryId: String) : Flowable<MutableMap<String, String>> {
-        val networkMapRef = FirebaseHelper.getNetworkMapRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), agencyId, countryId)
+        val networkMapRef = FirebaseHelper.getNetworkMapRef(mAppStatus, agencyId, countryId)
         return RxFirebaseDatabase.observeValueEvent(networkMapRef, { snap ->
             val networkMap = mutableMapOf<String, String>()
             snap.children.forEach {
@@ -22,6 +24,11 @@ object NetworkService {
             }
             return@observeValueEvent networkMap
         })
+    }
+
+    fun getNetworkDetail(networkId:String) : Flowable<ModelNetwork> {
+        val networkDetailRef = FirebaseHelper.getNetworkDetail(mAppStatus, networkId)
+        return RxFirebaseDatabase.observeValueEvent(networkDetailRef, ModelNetwork::class.java)
     }
 
 }
