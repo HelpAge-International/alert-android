@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.dashboard.adapter;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +25,7 @@ import java.util.Locale;
  * Created by faizmohideen on 13/11/2017.
  */
 
-public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
+public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> implements Comparable<Tasks> {
 
     List<Tasks> listArray;
     Calendar today = Calendar.getInstance();
@@ -50,14 +51,21 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         holder.bind(tasks);
     }
 
+    @Override
+    public int compareTo(@NonNull Tasks tasks) {
+        int dueDate = (int) tasks.getDueDate();
+        return Integer.compare(dueDate,dueDate);
+    }
+
     public void add(Tasks tasks) {
         listArray.add(tasks);
+
         Collections.sort(listArray, new Comparator<Tasks>() {
             @Override
             public int compare(Tasks o1, Tasks o2) {
                // System.out.println(o1.getDueDate() + " " + o2.getDueDate());
-                if (o1.getDueDate() > o2.getDueDate()) return 1;
                 if (o1.getDueDate() < o2.getDueDate()) return -1;
+                if (o1.getDueDate() > o2.getDueDate()) return 1;
                 return 0;
             }
         });
@@ -79,6 +87,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         public void bind(Tasks tasks){
             txt_taskName.setText(tasks.getTaskName());
             if (tasks.getTaskType().equals("action") && isDueToday(tasks.getDueDate())) {
+
                 txt_taskStatus.setText(dueTodayString("red", "action"));
                 img_task.setImageResource(R.drawable.home_task_red);
             } else if (tasks.getTaskType().equals("indicator") && isDueToday(tasks.getDueDate())) {

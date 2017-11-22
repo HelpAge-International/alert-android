@@ -21,6 +21,7 @@ import java.util.List;
 public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> {
 
     List<Alert> listArray;
+
     public AlertAdapter(List<Alert> List) {
         this.listArray = List;
     }
@@ -47,7 +48,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         return listArray.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView txt_alert_level;
         TextView txt_hazard_name;
@@ -55,10 +56,11 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         ImageView img_alert_colour;
         ImageView img_hazard_icon;
         Alert alert;
+
         public ViewHolder(View itemView) {
             super(itemView);
 
-            txt_alert_level= (TextView) itemView.findViewById(R.id.txt_alert_level);
+            txt_alert_level = (TextView) itemView.findViewById(R.id.txt_alert_level);
             txt_hazard_name = (TextView) itemView.findViewById(R.id.txt_hazard_name);
             txt_num_of_people = (TextView) itemView.findViewById(R.id.txt_num_of_people);
             img_alert_colour = (ImageView) itemView.findViewById(R.id.img_alert_colour);
@@ -66,35 +68,79 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         }
 
         public void bind(Alert alert) {
-            for(int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
-                if(i==alert.getHazardScenario() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
+            for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
+                if (i == alert.getHazardScenario() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
+                    fetchIcon(Constants.HAZARD_SCENARIO_NAME[i]);
                     txt_alert_level.setText(R.string.red_alert_text);
                     img_alert_colour.setImageResource(R.drawable.red_alert_left);
                     txt_hazard_name.setText(Constants.HAZARD_SCENARIO_NAME[i]);
-                    txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(),alert.getNumOfAreas()));
-
-                }else if(i==alert.getHazardScenario() && alert.getAlertLevel() == Constants.TRIGGER_AMBER){
+                    txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(), alert.getNumOfAreas()));
+                } else if (i == alert.getHazardScenario() && alert.getAlertLevel() == Constants.TRIGGER_AMBER) {
+                    fetchIcon(Constants.HAZARD_SCENARIO_NAME[i]);
                     txt_alert_level.setText(R.string.amber_alert_text);
                     img_alert_colour.setImageResource(R.drawable.amber_alert_left);
                     txt_hazard_name.setText(Constants.HAZARD_SCENARIO_NAME[i]);
-                    txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(),alert.getNumOfAreas()));
-                }else if(alert.getOtherName()!= null){
+                    txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(), alert.getNumOfAreas()));
+                } else if (alert.getOtherName() != null) {
+                    img_hazard_icon.setImageResource(R.drawable.other);
                     txt_hazard_name.setText(alert.getOtherName());
-                    txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(),alert.getNumOfAreas()));
+                    txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(), alert.getNumOfAreas()));
                 }
             }
         }
 
-        public void fetchIcon(String hazardName){
-            for(int i = 0; i < Constants.HAZARD_ICON_NAME.length; i++) {
-                if (hazardName == Constants.HAZARD_ICON_NAME[i]) {
-                   //TODO Set icons
-                }
+        public void fetchIcon(String hazardName) {
+            if (hazardName.equals("Cold Wave")) {
+                img_hazard_icon.setImageResource(R.drawable.cold_wave);
+            }else if (hazardName.equals("Cyclone")) {
+                img_hazard_icon.setImageResource(R.drawable.cyclone);
+            }else if (hazardName.equals("Drought")) {
+                img_hazard_icon.setImageResource(R.drawable.drought);
+            }else if (hazardName.equals("Earthquake")) {
+                img_hazard_icon.setImageResource(R.drawable.earthquake);
+            }else if (hazardName.equals("Epidemic")) {
+                img_hazard_icon.setImageResource(R.drawable.epidemic);
+            }else if (hazardName.equals("Fire")) {
+                img_hazard_icon.setImageResource(R.drawable.fire);
+            }else if (hazardName.equals("Flash Flood")) {
+                img_hazard_icon.setImageResource(R.drawable.flash_flood);
+            }else if (hazardName.equals("Heat Wave")) {
+                img_hazard_icon.setImageResource(R.drawable.heat_wave);
+            }else if (hazardName.equals("Humanitarian Access")) {
+                img_hazard_icon.setImageResource(R.drawable.humanitarian_access);
+            }else if (hazardName.equals("Insect Infestation")) {
+                img_hazard_icon.setImageResource(R.drawable.insect_infestation);
+            }else if (hazardName.equals("Landslide") || hazardName.equals("Mudslide") ) {
+                img_hazard_icon.setImageResource(R.drawable.landslide_mudslide);
+            }else if (hazardName.equals("Locust Infestation")) {
+                img_hazard_icon.setImageResource(R.drawable.locust_infestation);
+            }else if (hazardName.equals("Population Displacement")) {
+                img_hazard_icon.setImageResource(R.drawable.population_displacement);
+            }else if (hazardName.equals("Population Return")) {
+                img_hazard_icon.setImageResource(R.drawable.population_return);
+            }else if (hazardName.equals("Snow Avalanche")) {
+                img_hazard_icon.setImageResource(R.drawable.snow_avalanche);
+            }else if (hazardName.equals("Snowfall")) {
+                img_hazard_icon.setImageResource(R.drawable.snowfall);
+            }else if (hazardName.equals("Storm")) {
+                img_hazard_icon.setImageResource(R.drawable.storm);
+            }else if (hazardName.equals("Storm Surge")) {
+                img_hazard_icon.setImageResource(R.drawable.storm_surge);
+            }else if (hazardName.equals("Technological Disaster")) {
+                img_hazard_icon.setImageResource(R.drawable.technological_disaster);
+            }else if (hazardName.equals("Tornado")) {
+                img_hazard_icon.setImageResource(R.drawable.tornado);
+            }else if (hazardName.equals("Tsunami")) {
+                img_hazard_icon.setImageResource(R.drawable.tsunami);
+            }else if (hazardName.equals("Violent Wind")) {
+                img_hazard_icon.setImageResource(R.drawable.violent_wind);
+            }else if (hazardName.equals("Volcano")) {
+                img_hazard_icon.setImageResource(R.drawable.volcano);
             }
         }
     }
 
     private String getNumOfPeopleText(long population, long numOfAreas) {
-        return population+" people affected in "+numOfAreas+" area";
+        return population + " people affected in " + numOfAreas + " area";
     }
 }
