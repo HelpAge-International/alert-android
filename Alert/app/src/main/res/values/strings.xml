@@ -63,6 +63,11 @@
     <string name="assign_to">Assign to</string>
     <string name="title_activity_select_area">SelectAreaActivity</string>
     <string name="no_indicators_have_been_added">No indicators have been added</string>
+    <string name="update">Update</string>
+    <string name="edit">Edit</string>
+    <string name="information_source">Information Source</string>
+    <string name="indicator_log">Indicator Log</string>
+    <string name="attachments">Attachments</string>
 
 
 </resources>

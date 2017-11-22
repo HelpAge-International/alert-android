@@ -17,6 +17,8 @@ import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.R
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.ActiveRiskViewModel
 import org.alertpreparedness.platform.alert.risk_monitoring.adapter.HazardAdapter
+import org.alertpreparedness.platform.alert.risk_monitoring.adapter.OnIndicatorSelectedListener
+import org.alertpreparedness.platform.alert.risk_monitoring.dialog.BottomSheetDialog
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.jetbrains.anko.find
 
@@ -24,7 +26,7 @@ import org.jetbrains.anko.find
 /**
  * A simple [Fragment] subclass.
  */
-class ActiveRiskFragment : Fragment() {
+class ActiveRiskFragment : Fragment(), OnIndicatorSelectedListener {
 
     private lateinit var mViewModel: ActiveRiskViewModel
 
@@ -41,9 +43,13 @@ class ActiveRiskFragment : Fragment() {
         mViewModel.getLiveGroups(true).observe(this, Observer<MutableList<ExpandableGroup<ModelIndicator>>> {
             val size = it?.size ?: 0
             if (size > 0) {pbLoading?.hide()}
-            rvRiskActive?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>)
+            rvRiskActive?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, this)
         })
         return view
+    }
+
+    override fun selectedIndicator(hazardId: String, indicatorId: String) {
+        BottomSheetDialog().show(fragmentManager, "bottom_sheet")
     }
 
 }

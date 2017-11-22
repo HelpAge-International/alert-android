@@ -16,6 +16,8 @@ import kotlinx.android.synthetic.main.fragment_archived_risk.*
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.R
 import org.alertpreparedness.platform.alert.risk_monitoring.adapter.HazardAdapter
+import org.alertpreparedness.platform.alert.risk_monitoring.adapter.OnIndicatorSelectedListener
+import org.alertpreparedness.platform.alert.risk_monitoring.dialog.BottomSheetDialog
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.ActiveRiskViewModel
 import org.jetbrains.anko.find
@@ -24,7 +26,7 @@ import org.jetbrains.anko.find
 /**
  * A simple [Fragment] subclass.
  */
-class ArchivedRiskFragment : Fragment() {
+class ArchivedRiskFragment : Fragment(), OnIndicatorSelectedListener {
 
     private lateinit var mViewModel: ActiveRiskViewModel
 
@@ -41,9 +43,13 @@ class ArchivedRiskFragment : Fragment() {
         mViewModel.getLiveGroups(false).observe(this, Observer<MutableList<ExpandableGroup<ModelIndicator>>> {
             val size = it?.size ?: 0
             if (size > 0) {pbLoadingArchived?.hide()}
-            rvRiskArchived?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>)
+            rvRiskArchived?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, this)
         })
         return view
+    }
+
+    override fun selectedIndicator(hazardId: String, indicatorId: String) {
+        BottomSheetDialog().show(fragmentManager, "bottom_sheet")
     }
 
 }

@@ -79,6 +79,8 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.2'
     //google play location
     compile 'com.google.android.gms:play-services-location:11.6.0'
+    //badge
+    compile 'q.rorbin:badgeview:1.1.3'
 
 }
 

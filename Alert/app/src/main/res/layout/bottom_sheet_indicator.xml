@@ -1,116 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              app:behavior_hideable="true"
-              app:behavior_peekHeight="80dp"
-              app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
         android:padding="10dp"
-        android:orientation="horizontal">
+        android:focusable="true">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_swap_horiz_black_24dp"/>
+            android:layout_margin="5dp"
+            android:src="@drawable/ic_swap_horiz_black_24dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_margin="15dp"
-            android:text="Update" />
+            android:layout_marginLeft="25dp"
+            android:layout_marginStart="25dp"
+            android:text="@string/update" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
         android:padding="10dp"
-        android:orientation="horizontal">
+        android:focusable="true">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_create_black_24dp"/>
+            android:layout_margin="5dp"
+            android:src="@drawable/ic_create_black_24dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_margin="15dp"
-            android:text="Edit" />
+            android:layout_marginLeft="25dp"
+            android:layout_marginStart="25dp"
+            android:text="@string/edit" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
         android:padding="10dp"
-        android:orientation="horizontal">
+        android:focusable="true">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_info_black_24dp"/>
+            android:layout_margin="5dp"
+            android:src="@drawable/ic_info_black_24dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_margin="15dp"
-            android:text="Information Source" />
+            android:layout_marginLeft="25dp"
+            android:layout_marginStart="25dp"
+            android:text="@string/information_source" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
         android:padding="10dp"
-        android:orientation="horizontal">
+        android:focusable="true">
 
-        <ImageView
+        <FrameLayout
+            android:id="@+id/flIndicatorLog"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_chat_bubble_black_24dp"/>
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/ivIndicatorLog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_chat_bubble_black_24dp" />
+
+        </FrameLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_margin="15dp"
-            android:text="Indicator Log" />
+            android:layout_marginLeft="25dp"
+            android:layout_marginStart="25dp"
+            android:text="@string/indicator_log" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
         android:padding="10dp"
-        android:orientation="horizontal">
+        android:focusable="true">
 
-        <ImageView
+        <FrameLayout
+            android:id="@+id/flIndicatorAttach"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_attach_file_black_24dp"/>
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/ivIndicatorAttach"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:src="@drawable/ic_attach_file_black_24dp" />
+        </FrameLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_margin="15dp"
-            android:text="Attachments" />
+            android:layout_marginLeft="25dp"
+            android:layout_marginStart="25dp"
+            android:text="@string/attachments" />
 
     </LinearLayout>
 

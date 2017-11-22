@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.alert.risk_monitoring.adapter
 
 import android.os.Build
+import android.support.v4.app.FragmentManager
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -13,6 +14,7 @@ import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder
 import de.hdodenhof.circleimageview.CircleImageView
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.R
+import org.alertpreparedness.platform.alert.risk_monitoring.dialog.BottomSheetDialog
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.jetbrains.anko.find
@@ -132,7 +134,7 @@ class HazardViewHolder(itemView: View) : GroupViewHolder(itemView) {
 
 }
 
-class IndicatorViewHolder(itemView: View) : ChildViewHolder(itemView) {
+class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener) : ChildViewHolder(itemView) {
 
     private val indicatorTitle: TextView = itemView.findViewById(R.id.tvIndicatorName)
     private val indicatorGeo: TextView = itemView.find(R.id.tvIndicatorGeo)
@@ -141,6 +143,7 @@ class IndicatorViewHolder(itemView: View) : ChildViewHolder(itemView) {
     private val indicatorNextUpdate: TextView = itemView.find(R.id.tvIndicatorNextUpdate)
     private val indicatorLayout: LinearLayout = itemView.find(R.id.llRiskIndicator)
     private val indicatorNetworkId: TextView = itemView.find(R.id.tvIndicatorNetworkName)
+    private val mListener = listener
 
     init {
         indicatorLayout.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -192,14 +195,18 @@ class IndicatorViewHolder(itemView: View) : ChildViewHolder(itemView) {
         }
         indicatorLevel.setOnClickListener {
             Timber.d("hazardId: %s, indicatorId: %s", indicator.hazardScenario.key?:"", indicator.id)
+            indicator.hazardScenario.key?.let { it1 -> indicator.id?.let { it2 -> mListener.selectedIndicator(it1, it2) } }
         }
     }
 }
 
-class HazardAdapter(groups: List<ExpandableGroup<ModelIndicator>>) : ExpandableRecyclerViewAdapter<HazardViewHolder, IndicatorViewHolder>(groups) {
+class HazardAdapter(groups: List<ExpandableGroup<ModelIndicator>>, listener:OnIndicatorSelectedListener) : ExpandableRecyclerViewAdapter<HazardViewHolder, IndicatorViewHolder>(groups) {
+
+    private val mListener = listener
+
     override fun onCreateChildViewHolder(parent: ViewGroup?, viewType: Int): IndicatorViewHolder {
         val view = View.inflate(AlertApplication.getContext(), R.layout.risk_indicator_item_view, null)
-        return IndicatorViewHolder(view)
+        return IndicatorViewHolder(view, mListener)
     }
 
     override fun onBindGroupViewHolder(holder: HazardViewHolder?, flatPosition: Int, group: ExpandableGroup<*>?) {
@@ -217,4 +224,8 @@ class HazardAdapter(groups: List<ExpandableGroup<ModelIndicator>>) : ExpandableR
         return HazardViewHolder(view)
     }
 
+}
+
+interface OnIndicatorSelectedListener {
+    fun selectedIndicator(hazardId: String, indicatorId:String)
 }
