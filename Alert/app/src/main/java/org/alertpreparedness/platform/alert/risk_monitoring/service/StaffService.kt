@@ -17,7 +17,7 @@ object StaffService {
     val gson = Gson()
 
     fun getCountryStaff(countryId: String): Flowable<List<String>> {
-        val staffCountry = FirebaseHelper.getStaffCountry(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), countryId)
+        val staffCountry = FirebaseHelper.getStaffForCountry(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), countryId)
         return RxFirebaseDatabase.observeValueEvent(staffCountry)
                 .map { snap ->
                     snap.children.map { it.key }

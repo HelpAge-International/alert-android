@@ -59,6 +59,8 @@ class RiskActivity : MainDrawer() {
             Timber.d("create alert")
             fabRiskMenu.close(true)
         })
+
+
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {

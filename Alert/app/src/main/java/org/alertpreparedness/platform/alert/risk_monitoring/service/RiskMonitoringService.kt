@@ -7,14 +7,12 @@ import io.reactivex.Flowable
 import io.reactivex.Observable
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.helper.UserInfo
-import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData
-import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelHazard
-import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelHazardCountryContext
-import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
+import org.alertpreparedness.platform.alert.risk_monitoring.model.*
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.alertpreparedness.platform.alert.utils.FirebaseHelper
 import org.alertpreparedness.platform.alert.utils.PreferHelper
 import org.json.JSONObject
+import timber.log.Timber
 import java.io.StringReader
 
 /**
@@ -53,12 +51,16 @@ object RiskMonitoringService {
 
         val hazardsRef = FirebaseHelper.getHazardsRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), countryId)
         return RxFirebaseDatabase.observeValueEvent(hazardsRef, { snap ->
-            snap.children.map {
-                val toJson = gson.toJson(it.value)
-                val reader = JsonReader(StringReader(toJson.trim()))
-                reader.isLenient = true
-                val fromJson = gson.fromJson<ModelHazard>(reader, ModelHazard::class.java)
-                return@map fromJson.copy(id = it.key)
+            if (snap.value != null && snap.children.count() > 0) {
+                snap.children.map {
+                    val toJson = gson.toJson(it.value)
+                    val reader = JsonReader(StringReader(toJson.trim()))
+                    reader.isLenient = true
+                    val fromJson = gson.fromJson<ModelHazard>(reader, ModelHazard::class.java)
+                    return@map fromJson.copy(id = it.key)
+                }
+            } else {
+                return@observeValueEvent listOf<ModelHazard>()
             }
         })
     }
@@ -92,11 +94,15 @@ object RiskMonitoringService {
                 indicatorRef.child(key).child("hazardScenario").setValue(ModelHazardCountryContext())
             }
         } else {
-            indicatorRef.child(key).setValue(indicator)
+            indicatorRef.child(key).setValue(indicator).continueWith {
+                val update = indicator.hazardScenario
+                val updateMap = mutableMapOf("active" to null, "isActive" to update.isActive, "id" to null, "key" to update.id, "seasonal" to null, "isSeasonal" to update.isSeasonal)
+                indicatorRef.child(key).child("hazardScenario").updateChildren(updateMap)
+            }
         }
     }
 
-    fun getIndicatorsForAssignee(hazardId: String, networkId: String?): Flowable<List<ModelIndicator>> {
+    fun getIndicatorsForAssignee(hazardId: String, network: ModelNetwork?): Flowable<List<ModelIndicator>> {
         val indicatorRef = FirebaseHelper.getIndicatorsRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), hazardId).orderByChild("assignee").equalTo(UserInfo.getUser(AlertApplication.getContext()).userID)
         return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
             snap.children.map {
@@ -104,8 +110,9 @@ object RiskMonitoringService {
                 val reader = JsonReader(StringReader(toJson.trim()))
                 reader.isLenient = true
                 val fromJson = gson.fromJson<ModelIndicator>(reader, ModelIndicator::class.java)
-                if (networkId != null) {
-                    return@map fromJson.copy(id = it.key, networkId = networkId)
+                if (network != null) {
+                    Timber.d("network id: %s, name: %s", network.id, network.name)
+                    return@map fromJson.copy(id = it.key, networkId = network.id, networkName = network.name)
                 } else {
                     return@map fromJson.copy(id = it.key)
                 }

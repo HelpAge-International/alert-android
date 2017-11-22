@@ -6,8 +6,8 @@ package org.alertpreparedness.platform.alert.risk_monitoring.model
 data class ModelNetwork(val networkAdminId: String, val name: String, val isActive: Boolean, val logoPath: String?,
                         val addressLine1: String?, val addressLine2: String?, val addressLine3: String?, val countryId: Int?,
                         val city: String?, val postcode: String?, val telephone: String?, val websiteAddress: String?,
-                        val isGlobal: Boolean, val countryCode: String?, val clockSettings: Any?, val responsePlanSettings: Any?,
-                        val id: String, val agencies: Any?, val leadAgencyId: String?) {
+                        val isGlobal: Boolean, val countryCode: Int?, val clockSettings: Any?, val responsePlanSettings: Any?,
+                        var id: String, val agencies: Any?, val leadAgencyId: String?) {
     constructor():this("","",false,null,null,null,null,null,null,null,null,null,true,null,null,null,"",null,null)
 }
 

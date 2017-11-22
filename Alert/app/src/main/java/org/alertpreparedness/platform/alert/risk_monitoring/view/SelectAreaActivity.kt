@@ -1,17 +1,16 @@
 package org.alertpreparedness.platform.alert.risk_monitoring.view
 
 import android.app.Activity
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import com.google.gson.Gson
 import es.dmoral.toasty.Toasty
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_select_area.*
 import kotlinx.android.synthetic.main.content_select_area.*
 import org.alertpreparedness.platform.alert.R
@@ -20,9 +19,8 @@ import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonDat
 import org.alertpreparedness.platform.alert.risk_monitoring.model.LevelOneValuesItem
 import org.alertpreparedness.platform.alert.risk_monitoring.model.LevelTwoValuesItem
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation
-import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService
+import org.alertpreparedness.platform.alert.risk_monitoring.view_model.SelectAreaViewModel
 import org.alertpreparedness.platform.alert.utils.Constants
-import org.json.JSONObject
 import timber.log.Timber
 
 class SelectAreaActivity : AppCompatActivity() {
@@ -40,6 +38,7 @@ class SelectAreaActivity : AppCompatActivity() {
     private lateinit var mSelectCountryDialog: SelectCountryDialog
     private lateinit var mSelectLevel1Dialog: SelectLevel1Dialog
     private lateinit var mSelectLevel2Dialog: SelectLevel2Dialog
+    private lateinit var mViewModel: SelectAreaViewModel
 
     private var mCountrySelected = -1
     private var mLevel1Selected: Int? = null
@@ -58,39 +57,32 @@ class SelectAreaActivity : AppCompatActivity() {
         mDisposables.clear()
     }
 
+
     private fun initData() {
+        mViewModel = ViewModelProviders.of(this).get(SelectAreaViewModel::class.java)
         mCountryDataList = arrayListOf()
         mSelectCountryDialog = SelectCountryDialog()
         mSelectLevel1Dialog = SelectLevel1Dialog()
         mSelectLevel2Dialog = SelectLevel2Dialog()
-        mDisposables.add(
-                RiskMonitoringService.readJsonFile()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({ fileText ->
-                            val jsonObject = JSONObject(fileText)
-                            mDisposables.add(
-                                    RiskMonitoringService.mapJasonToCountryData(jsonObject, Gson())
-                                            .subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe({ countryData: CountryJsonData ->
-                                                Timber.d("Country id is: %s, level 1: %s", countryData.countryId, countryData.levelOneValues?.size)
-                                                mCountryDataList.add(countryData)
-                                                if (mCountryDataList.size > 240 && pbSelectAreaLoading.isShown) {
-                                                    pbSelectAreaLoading.visibility = View.GONE
-                                                }
-                                            })
-                            )
-
-                        })
-        )
-
+        mViewModel.getCountryJsonDataLive().observe(this, Observer { countryDataList ->
+            mCountryDataList = ArrayList(countryDataList)
+            if (mCountryDataList.size > 240 && pbSelectAreaLoading.isShown) {
+                pbSelectAreaLoading.visibility = View.GONE
+            }
+        })
     }
 
     private fun initViews() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "Area"
+
+        mViewModel.getSelectedCountryLive().observe(this, Observer { country ->
+            country?.let {
+                tvSelectCountry.text = Constants.COUNTRIES[it.location]
+                mCountrySelected = it.location
+            }
+        })
     }
 
     private fun initListeners() {
@@ -114,7 +106,7 @@ class SelectAreaActivity : AppCompatActivity() {
                     tvSelectLevel2.hint = "Optional"
                 }
                 mCountrySelected = countryJsonData.countryId
-                tvSelectCountry.text = Constants.COUNTRIES[countryJsonData.countryId.toInt()]
+                tvSelectCountry.text = Constants.COUNTRIES[countryJsonData.countryId]
             }
         })
 

@@ -9,7 +9,7 @@ import android.os.Parcelable
 data class ModelIndicator(val id: String?, var hazardScenario: ModelHazard, val triggerSelected: Int,
                           var name: String, var assignee: String?, var geoLocation: Int,
                           var updatedAt: Long, var dueDate: Long, var source: List<ModelSource>, var trigger: List<ModelTrigger>, val networkId: String?, val agencyId: String?, val countryOfficeId: String?,
-                          var affectedLocation: List<ModelIndicatorLocation>?, var gps: ModelGps?, val category:Int = 0) : Parcelable {
+                          var affectedLocation: List<ModelIndicatorLocation>?, var gps: ModelGps?, val category:Int = 0, val networkName:String? = null) : Parcelable {
 
 
     constructor(parcel: Parcel) : this(
@@ -28,7 +28,8 @@ data class ModelIndicator(val id: String?, var hazardScenario: ModelHazard, val 
             parcel.readString(),
             parcel.createTypedArrayList(ModelIndicatorLocation),
             parcel.readParcelable(ModelGps::class.java.classLoader),
-            parcel.readInt()) {
+            parcel.readInt(),
+            parcel.readString()) {
     }
 
     constructor() : this(null, ModelHazard(), 0, "", null, -1, 0, 0, listOf(), listOf(), null, null, null, null, null)
@@ -91,6 +92,7 @@ data class ModelIndicator(val id: String?, var hazardScenario: ModelHazard, val 
         parcel.writeTypedList(affectedLocation)
         parcel.writeParcelable(gps, flags)
         parcel.writeInt(category)
+        parcel.writeString(networkName)
     }
 
     override fun describeContents(): Int {
@@ -106,6 +108,7 @@ data class ModelIndicator(val id: String?, var hazardScenario: ModelHazard, val 
             return arrayOfNulls(size)
         }
     }
+
 
 }
 

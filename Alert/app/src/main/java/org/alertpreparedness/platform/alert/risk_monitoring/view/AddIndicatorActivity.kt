@@ -511,7 +511,6 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
     }
 
     override fun areaRemovePosition(position: Int) {
-        Timber.d("delete area position: %s", position)
         mAreas.removeAt(position)
         mAreaAdapter.notifyItemRemoved(position)
     }

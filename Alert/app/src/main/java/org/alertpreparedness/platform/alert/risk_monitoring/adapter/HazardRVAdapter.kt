@@ -151,8 +151,8 @@ class IndicatorViewHolder(itemView: View) : ChildViewHolder(itemView) {
         indicatorGeo.text = Constants.INDICATOR_GEO_LOCATION[indicator.geoLocation]
         val dateTime = DateTime(indicator.dueDate)
         indicatorDue.text = String.format("%s %s %s", dateTime.dayOfMonth().asText, dateTime.monthOfYear().asShortText, dateTime.year().asText)
-        if (indicator.networkId != null) {
-            indicatorNetworkId.text = indicator.networkId
+        if (indicator.networkName != null) {
+            indicatorNetworkId.text = indicator.networkName
             indicatorNetworkId.visibility = View.VISIBLE
         } else {
             indicatorNetworkId.visibility = View.GONE
@@ -190,7 +190,9 @@ class IndicatorViewHolder(itemView: View) : ChildViewHolder(itemView) {
                 indicatorDue.textColor = AlertApplication.getContext().resources.getColor(R.color.alertRed)
             }
         }
-        indicatorLevel.setOnClickListener { Timber.d("id: %s", indicator.id) }
+        indicatorLevel.setOnClickListener {
+            Timber.d("hazardId: %s, indicatorId: %s", indicator.hazardScenario.key?:"", indicator.id)
+        }
     }
 }
 

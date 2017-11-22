@@ -28,9 +28,19 @@ object NetworkService {
         })
     }
 
+    fun listLocalNetworksForCountry(agencyId: String, countryId: String): Flowable<List<String>> {
+        val localNetworkRef = FirebaseHelper.getLocalNetworkRef(mAppStatus, agencyId, countryId)
+        return RxFirebaseDatabase.observeValueEvent(localNetworkRef, {snap ->
+            snap.children.map { it.key }
+        })
+    }
+
     fun getNetworkDetail(networkId:String) : Flowable<ModelNetwork> {
         val networkDetailRef = FirebaseHelper.getNetworkDetail(mAppStatus, networkId)
         return RxFirebaseDatabase.observeValueEvent(networkDetailRef, ModelNetwork::class.java)
+                .map {network ->
+                    return@map network.copy(id = networkId)
+                }
     }
 
     fun checkConnectionState(): Flowable<Boolean> {

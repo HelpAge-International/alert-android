@@ -6,7 +6,8 @@ import android.os.Parcelable
 /**
  * Created by fei on 07/11/2017.
  */
-data class ModelHazard(var id:String?, val hazardScenario:Int, val isActive:Boolean, val isSeasonal:Boolean, val risk:Int, var timeCreated:Long, val otherName:String?):Parcelable {
+data class ModelHazard(var id:String?, val hazardScenario:Int, val isActive:Boolean, val isSeasonal:Boolean, val risk:Int, var timeCreated:Long, val otherName:String?, val key:String? = null):Parcelable {
+
 
     constructor(parcel: Parcel) : this(
             parcel.readString(),
@@ -15,6 +16,7 @@ data class ModelHazard(var id:String?, val hazardScenario:Int, val isActive:Bool
             parcel.readByte() != 0.toByte(),
             parcel.readInt(),
             parcel.readLong(),
+            parcel.readString(),
             parcel.readString()) {
     }
 
@@ -35,6 +37,7 @@ data class ModelHazard(var id:String?, val hazardScenario:Int, val isActive:Bool
         parcel.writeInt(risk)
         parcel.writeLong(timeCreated)
         parcel.writeString(otherName)
+        parcel.writeString(key)
     }
 
     override fun describeContents(): Int {
@@ -50,6 +53,7 @@ data class ModelHazard(var id:String?, val hazardScenario:Int, val isActive:Bool
             return arrayOfNulls(size)
         }
     }
+
 }
 
 data class ModelHazardCountryContext(val key:String = "countryContext")
