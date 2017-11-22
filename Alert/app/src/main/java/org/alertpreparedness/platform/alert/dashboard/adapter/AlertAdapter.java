@@ -1,26 +1,48 @@
 package org.alertpreparedness.platform.alert.dashboard.adapter;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity;
 import org.alertpreparedness.platform.alert.model.Alert;
 import org.alertpreparedness.platform.alert.model.Tasks;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by faizmohideen on 20/11/2017.
  */
 
+//TODO complete detail view for alert
+
 public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> {
 
-    List<Alert> listArray;
+    public static List<Alert> listArray;
+    private Context context;
+    private static OnAlertItemClickedListener itemListener;
+    private static AlertAdapter instance = new AlertAdapter();
+
+    public AlertAdapter() {
+
+    }
+
+    public static AlertAdapter getInstance() {
+        return instance;
+    }
+
+    public List<Alert> getAlertList() {
+        return listArray;
+    }
 
     public AlertAdapter(List<Alert> List) {
         this.listArray = List;
@@ -56,6 +78,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         ImageView img_alert_colour;
         ImageView img_hazard_icon;
         Alert alert;
+        AlertAdapter.OnAlertItemClickedListener listener;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -65,6 +88,20 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
             txt_num_of_people = (TextView) itemView.findViewById(R.id.txt_num_of_people);
             img_alert_colour = (ImageView) itemView.findViewById(R.id.img_alert_colour);
             img_hazard_icon = (ImageView) itemView.findViewById(R.id.img_hazard_icon);
+
+            itemView.setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View view) {
+                    int position = getLayoutPosition();
+                    Toast.makeText(view.getContext(), "Clicked item "+position, Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(view.getContext(), AlertDetailActivity.class);
+                    intent.putExtra("ITEM_ID", position);
+                    context.startActivity(intent);
+
+
+                }
+            });
         }
 
         public void bind(Alert alert) {
@@ -76,11 +113,11 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
                     txt_hazard_name.setText(Constants.HAZARD_SCENARIO_NAME[i]);
                     txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(), alert.getNumOfAreas()));
                 } else if (i == alert.getHazardScenario() && alert.getAlertLevel() == Constants.TRIGGER_AMBER) {
-                    fetchIcon(Constants.HAZARD_SCENARIO_NAME[i]);
                     txt_alert_level.setText(R.string.amber_alert_text);
                     img_alert_colour.setImageResource(R.drawable.amber_alert_left);
                     txt_hazard_name.setText(Constants.HAZARD_SCENARIO_NAME[i]);
                     txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(), alert.getNumOfAreas()));
+                    fetchIcon(Constants.HAZARD_SCENARIO_NAME[i]);
                 } else if (alert.getOtherName() != null) {
                     img_hazard_icon.setImageResource(R.drawable.other);
                     txt_hazard_name.setText(alert.getOtherName());
@@ -92,6 +129,8 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         public void fetchIcon(String hazardName) {
             if (hazardName.equals("Cold Wave")) {
                 img_hazard_icon.setImageResource(R.drawable.cold_wave);
+            }else if (hazardName.equals("Conflict")) {
+                img_hazard_icon.setImageResource(R.drawable.conflict);
             }else if (hazardName.equals("Cyclone")) {
                 img_hazard_icon.setImageResource(R.drawable.cyclone);
             }else if (hazardName.equals("Drought")) {
@@ -142,5 +181,9 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
 
     private String getNumOfPeopleText(long population, long numOfAreas) {
         return population + " people affected in " + numOfAreas + " area";
+    }
+
+    public interface OnAlertItemClickedListener {
+        void onAlertItemClicked(View v, int position);
     }
 }

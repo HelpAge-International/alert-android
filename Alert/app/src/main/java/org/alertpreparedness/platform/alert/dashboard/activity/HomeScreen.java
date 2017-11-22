@@ -103,7 +103,6 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener {
         for (String ids : usersID) {
             DataHandler.getTasksFromFirebase(ids);
         }
-
     }
 
 
