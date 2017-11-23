@@ -16,7 +16,7 @@ import com.google.gson.Gson;
 import org.alertpreparedness.platform.alert.login.activity.AuthCallback;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
-import org.alertpreparedness.platform.alert.risk_monitoring.NetworkService;
+import org.alertpreparedness.platform.alert.risk_monitoring.service.NetworkService;
 
 import java.util.ArrayList;
 import java.util.List;

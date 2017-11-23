@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.alertpreparedness.platform.alert.risk_monitoring.RiskActivity">
+    tools:context="org.alertpreparedness.platform.alert.risk_monitoring.view.RiskActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"

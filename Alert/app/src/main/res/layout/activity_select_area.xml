@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.alertpreparedness.platform.alert.risk_monitoring.SelectAreaActivity">
+    tools:context="org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -22,5 +22,11 @@
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_select_area"/>
+
+    <ProgressBar
+        android:id="@+id/pbSelectAreaLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
 
 </android.support.design.widget.CoordinatorLayout>

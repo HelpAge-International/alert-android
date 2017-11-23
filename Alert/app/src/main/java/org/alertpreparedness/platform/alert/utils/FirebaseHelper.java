@@ -29,11 +29,15 @@ public class FirebaseHelper {
         return AppUtils.getDatabase().getReference(appStatus).child("countryOffice").child(agencyId).child(countryId).child("networks");
     }
 
+    public static DatabaseReference getLocalNetworkRef(String appStatus, String agencyId, String countryId) {
+        return AppUtils.getDatabase().getReference(appStatus).child("countryOffice").child(agencyId).child(countryId).child("localNetworks");
+    }
+
     public static DatabaseReference getNetworkDetail(String appStatus, String networkId) {
         return AppUtils.getDatabase().getReference(appStatus).child("network").child(networkId);
     }
 
-    public static DatabaseReference getStaffCountry(String appStatus, String countryId) {
+    public static DatabaseReference getStaffForCountry(String appStatus, String countryId) {
         return AppUtils.getDatabase().getReference(appStatus).child("staff").child(countryId);
     }
 
@@ -41,9 +45,12 @@ public class FirebaseHelper {
         return AppUtils.getDatabase().getReference(appStatus).child("userPublic").child(userId);
     }
 
-    /******employee references*****/
-//    public static DatabaseReference getEmployeePublicRef(String appStatus, String companyKey, String uid) {
-//        return AppUtils.getDatabase().getReference(appStatus).child(Constants.COMPANY_DATA).child(companyKey).child(Constants.EMPLOYEE_PUBLIC_DATA).child(uid);
-//    }
+    public static DatabaseReference checkConnectedRef() {
+        return AppUtils.getDatabase().getReference(".info/connected");
+    }
+
+    public static DatabaseReference getCountryDetail(String appStatus, String agencyId, String countryId) {
+        return AppUtils.getDatabase().getReference(appStatus).child("countryOffice").child(agencyId).child(countryId);
+    }
 
 }

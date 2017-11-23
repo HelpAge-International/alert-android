@@ -1,10 +1,5 @@
 <resources>
     <string name="app_name">Alert</string>
-    <string name="green_text">Green Alert Level</string>
-    <string name="amber_text">Amber Alert Level</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!-- Navigation Drawer menu labels -->
     <string name="nav_home">Home</string>
@@ -68,6 +63,11 @@
     <string name="assign_to">Assign to</string>
     <string name="title_activity_select_area">SelectAreaActivity</string>
     <string name="no_indicators_have_been_added">No indicators have been added</string>
+    <string name="update">Update</string>
+    <string name="edit">Edit</string>
+    <string name="information_source">Information Source</string>
+    <string name="indicator_log">Indicator Log</string>
+    <string name="attachments">Attachments</string>
     <string name="text_create_alert">Create alert</string>
     <string name="email_address">Email Address</string>
     <string name="password">Password</string>
@@ -76,4 +76,5 @@
     <string name="amber_alert_text">Amber Alert</string>
     <string name="amber_alert_level">Amber Alert Level</string>
     <string name="red_alert_level">Red Alert Level</string>
+    <string name="green_alert_level">Green Alert Level</string>
 </resources>

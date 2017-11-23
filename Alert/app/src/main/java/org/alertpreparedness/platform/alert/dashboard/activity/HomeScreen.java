@@ -15,6 +15,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.gson.Gson;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
@@ -26,10 +27,19 @@ import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.Alert;
 import org.alertpreparedness.platform.alert.model.Tasks;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData;
+import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 
 public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAlertItemClickedListener {
@@ -40,6 +50,7 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
     private Toolbar toolbar;
     private String[] usersID;
     private Alert alert;
+    private ArrayList<CountryJsonData> mCountryList;
 
     public static TaskAdapter taskAdapter;
     public static List<Tasks> tasksList;
@@ -48,7 +59,6 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
     public static List<Alert> alertList;
     public static RecyclerView alertRecyclerView;
     public static String countryID, agencyAdminID, systemAdminID, networkCountryID;
-
     public static final String mypreference = "mypref";
     public static final String userKey = "UserType";
     public static final PreferHelper sharedPreferences = new PreferHelper();
@@ -70,6 +80,26 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         networkCountryID = UserInfo.getUser(this).networkCountryID;
 
         usersID = new String[]{networkCountryID, countryID};
+
+        mCountryList = new ArrayList<CountryJsonData>();
+
+        RiskMonitoringService.INSTANCE.readJsonFile()
+                .map(fileText -> {
+                    return new JSONObject(fileText);
+                }).flatMap( jsonObject -> {
+                    return RiskMonitoringService.INSTANCE.mapJasonToCountryData(jsonObject, new Gson());
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(countryJsonData -> {
+                    Timber.d("Country id is: %s, level 1: %s", countryJsonData.getCountryId(), countryJsonData.getLevelOneValues().size());
+                    mCountryList.add(countryJsonData);
+                    //System.out.println("LIST: "+mCountryList.get(1));
+                }
+        );
+
+        for (int i=0; i<mCountryList.size(); i++){
+            System.out.println("LIST: "+mCountryList.get(i).getLevelOneValues());
+        }
 
         appBarTitle = (TextView) findViewById(R.id.custom_bar_title);
         appBarTitle.setOnClickListener(this);
@@ -105,6 +135,8 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         for (String ids : usersID) {
             DataHandler.getTasksFromFirebase(ids);
         }
+
+
     }
 
     @Override

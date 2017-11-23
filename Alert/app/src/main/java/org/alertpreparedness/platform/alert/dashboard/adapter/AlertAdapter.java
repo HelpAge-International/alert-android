@@ -27,7 +27,7 @@ import java.util.List;
  * Created by faizmohideen on 20/11/2017.
  */
 
-public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> {
+public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder>{
 
     private Context context;
     private OnAlertItemClickedListener listener;
@@ -112,7 +112,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         private void bind(Alert alert) {
             for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
                 if (i == alert.getHazardScenario() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
-                    fetchIcon(Constants.HAZARD_SCENARIO_NAME[i]);
+                    fetchIcon(Constants.HAZARD_SCENARIO_NAME[i], img_hazard_icon);
                     txt_alert_level.setText(R.string.red_alert_text);
                     img_alert_colour.setImageResource(R.drawable.red_alert_left);
                     txt_hazard_name.setText(Constants.HAZARD_SCENARIO_NAME[i]);
@@ -122,7 +122,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
                     img_alert_colour.setImageResource(R.drawable.amber_alert_left);
                     txt_hazard_name.setText(Constants.HAZARD_SCENARIO_NAME[i]);
                     txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(), alert.getNumOfAreas()));
-                    fetchIcon(Constants.HAZARD_SCENARIO_NAME[i]);
+                    fetchIcon(Constants.HAZARD_SCENARIO_NAME[i], img_hazard_icon);
                 } else if (alert.getOtherName() != null) {
                     img_hazard_icon.setImageResource(R.drawable.other);
                     txt_hazard_name.setText(alert.getOtherName());
@@ -130,57 +130,57 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
                 }
             }
         }
+    }
 
-        public void fetchIcon(String hazardName) {
-            if (hazardName.equals("Cold Wave")) {
-                img_hazard_icon.setImageResource(R.drawable.cold_wave);
-            }else if (hazardName.equals("Conflict")) {
-                img_hazard_icon.setImageResource(R.drawable.conflict);
-            }else if (hazardName.equals("Cyclone")) {
-                img_hazard_icon.setImageResource(R.drawable.cyclone);
-            }else if (hazardName.equals("Drought")) {
-                img_hazard_icon.setImageResource(R.drawable.drought);
-            }else if (hazardName.equals("Earthquake")) {
-                img_hazard_icon.setImageResource(R.drawable.earthquake);
-            }else if (hazardName.equals("Epidemic")) {
-                img_hazard_icon.setImageResource(R.drawable.epidemic);
-            }else if (hazardName.equals("Fire")) {
-                img_hazard_icon.setImageResource(R.drawable.fire);
-            }else if (hazardName.equals("Flash Flood")) {
-                img_hazard_icon.setImageResource(R.drawable.flash_flood);
-            }else if (hazardName.equals("Heat Wave")) {
-                img_hazard_icon.setImageResource(R.drawable.heat_wave);
-            }else if (hazardName.equals("Humanitarian Access")) {
-                img_hazard_icon.setImageResource(R.drawable.humanitarian_access);
-            }else if (hazardName.equals("Insect Infestation")) {
-                img_hazard_icon.setImageResource(R.drawable.insect_infestation);
-            }else if (hazardName.equals("Landslide") || hazardName.equals("Mudslide") ) {
-                img_hazard_icon.setImageResource(R.drawable.landslide_mudslide);
-            }else if (hazardName.equals("Locust Infestation")) {
-                img_hazard_icon.setImageResource(R.drawable.locust_infestation);
-            }else if (hazardName.equals("Population Displacement")) {
-                img_hazard_icon.setImageResource(R.drawable.population_displacement);
-            }else if (hazardName.equals("Population Return")) {
-                img_hazard_icon.setImageResource(R.drawable.population_return);
-            }else if (hazardName.equals("Snow Avalanche")) {
-                img_hazard_icon.setImageResource(R.drawable.snow_avalanche);
-            }else if (hazardName.equals("Snowfall")) {
-                img_hazard_icon.setImageResource(R.drawable.snowfall);
-            }else if (hazardName.equals("Storm")) {
-                img_hazard_icon.setImageResource(R.drawable.storm);
-            }else if (hazardName.equals("Storm Surge")) {
-                img_hazard_icon.setImageResource(R.drawable.storm_surge);
-            }else if (hazardName.equals("Technological Disaster")) {
-                img_hazard_icon.setImageResource(R.drawable.technological_disaster);
-            }else if (hazardName.equals("Tornado")) {
-                img_hazard_icon.setImageResource(R.drawable.tornado);
-            }else if (hazardName.equals("Tsunami")) {
-                img_hazard_icon.setImageResource(R.drawable.tsunami);
-            }else if (hazardName.equals("Violent Wind")) {
-                img_hazard_icon.setImageResource(R.drawable.violent_wind);
-            }else if (hazardName.equals("Volcano")) {
-                img_hazard_icon.setImageResource(R.drawable.volcano);
-            }
+    public static void fetchIcon(String hazardName, ImageView imageView) {
+        if (hazardName.equals("Cold Wave")) {
+            imageView.setImageResource(R.drawable.cold_wave);
+        }else if (hazardName.equals("Conflict")) {
+            imageView.setImageResource(R.drawable.conflict);
+        }else if (hazardName.equals("Cyclone")) {
+            imageView.setImageResource(R.drawable.cyclone);
+        }else if (hazardName.equals("Drought")) {
+            imageView.setImageResource(R.drawable.drought);
+        }else if (hazardName.equals("Earthquake")) {
+            imageView.setImageResource(R.drawable.earthquake);
+        }else if (hazardName.equals("Epidemic")) {
+            imageView.setImageResource(R.drawable.epidemic);
+        }else if (hazardName.equals("Fire")) {
+            imageView.setImageResource(R.drawable.fire);
+        }else if (hazardName.equals("Flash Flood")) {
+            imageView.setImageResource(R.drawable.flash_flood);
+        }else if (hazardName.equals("Heat Wave")) {
+            imageView.setImageResource(R.drawable.heat_wave);
+        }else if (hazardName.equals("Humanitarian Access")) {
+            imageView.setImageResource(R.drawable.humanitarian_access);
+        }else if (hazardName.equals("Insect Infestation")) {
+            imageView.setImageResource(R.drawable.insect_infestation);
+        }else if (hazardName.equals("Landslide") || hazardName.equals("Mudslide") ) {
+            imageView.setImageResource(R.drawable.landslide_mudslide);
+        }else if (hazardName.equals("Locust Infestation")) {
+            imageView.setImageResource(R.drawable.locust_infestation);
+        }else if (hazardName.equals("Population Displacement")) {
+            imageView.setImageResource(R.drawable.population_displacement);
+        }else if (hazardName.equals("Population Return")) {
+            imageView.setImageResource(R.drawable.population_return);
+        }else if (hazardName.equals("Snow Avalanche")) {
+            imageView.setImageResource(R.drawable.snow_avalanche);
+        }else if (hazardName.equals("Snowfall")) {
+            imageView.setImageResource(R.drawable.snowfall);
+        }else if (hazardName.equals("Storm")) {
+            imageView.setImageResource(R.drawable.storm);
+        }else if (hazardName.equals("Storm Surge")) {
+            imageView.setImageResource(R.drawable.storm_surge);
+        }else if (hazardName.equals("Technological Disaster")) {
+            imageView.setImageResource(R.drawable.technological_disaster);
+        }else if (hazardName.equals("Tornado")) {
+            imageView.setImageResource(R.drawable.tornado);
+        }else if (hazardName.equals("Tsunami")) {
+            imageView.setImageResource(R.drawable.tsunami);
+        }else if (hazardName.equals("Violent Wind")) {
+            imageView.setImageResource(R.drawable.violent_wind);
+        }else if (hazardName.equals("Volcano")) {
+            imageView.setImageResource(R.drawable.volcano);
         }
     }
 

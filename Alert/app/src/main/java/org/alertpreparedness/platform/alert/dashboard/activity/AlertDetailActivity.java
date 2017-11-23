@@ -28,6 +28,9 @@ public class AlertDetailActivity extends AppCompatActivity {
         int itemId = intent.getIntExtra("ITEM_ID", 0);
 
         toolbar = (Toolbar) findViewById(R.id.action_toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         txtHazardName = (TextView) findViewById(R.id.txtHazardName);
         txtPopulation = (TextView) findViewById(R.id.txtPopulationAffected);
@@ -46,10 +49,18 @@ public class AlertDetailActivity extends AppCompatActivity {
     public void fetchDetails(int id) {
         final Alert alert = AlertAdapter.getInstance().getAlertList().get(id);
 
+        if(alert.alertLevel == 1){
+            System.out.println("true "+alert.alertLevel);
+            //toolbar.setBackgroundResource(R.color.alertAmber);
+        }
         for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
             if(i == alert.getHazardScenario()){
+                AlertAdapter.fetchIcon(Constants.HAZARD_SCENARIO_NAME[i], imgHazard);
                 txtHazardName.setText(Constants.HAZARD_SCENARIO_NAME[i]);
                 txtPopulation.setText(getPeopleAsString(alert.getPopulation()));
+                imgPopulation.setImageResource(R.drawable.alert_population);
+                imgAffectedArea.setImageResource(R.drawable.alert_areas);
+                imgInfo.setImageResource(R.drawable.alert_information);
             }
 
         }

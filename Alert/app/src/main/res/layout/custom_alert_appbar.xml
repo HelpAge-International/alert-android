@@ -23,7 +23,7 @@
             android:background="@drawable/alert_green"
             android:fontFamily="@font/alef"
             android:gravity="center"
-            android:text="@string/green_text"
+            android:text="@string/green_alert_level"
             android:textColor="@android:color/white"
             android:textSize="15sp" />
 
