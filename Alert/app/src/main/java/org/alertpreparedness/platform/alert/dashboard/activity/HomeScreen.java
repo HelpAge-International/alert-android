@@ -21,6 +21,7 @@ import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.helper.DataHandler;
+import org.alertpreparedness.platform.alert.helper.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.Alert;
 import org.alertpreparedness.platform.alert.model.Tasks;
@@ -31,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class HomeScreen extends MainDrawer implements View.OnClickListener {
+public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAlertItemClickedListener {
     private User user;
     private RecyclerView myTaskRecyclerView;
     private FirebaseDatabase firebaseDatabase;
@@ -39,6 +40,7 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener {
     private Toolbar toolbar;
     private String[] usersID;
     private Alert alert;
+
 
     public static TaskAdapter taskAdapter;
     public static List<Tasks> tasksList;
@@ -52,10 +54,12 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener {
     public static final String userKey = "UserType";
     public static final PreferHelper sharedPreferences = new PreferHelper();
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.onCreateDrawer(R.layout.activity_home_screen);
+        AlertAdapter.updateActivity(this);
 
         toolbar = (Toolbar) findViewById(R.id.alert_appbar);
         setSupportActionBar(toolbar);
@@ -105,11 +109,17 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener {
         }
     }
 
-
     @Override
     public void onClick(View view) {
         if(view==appBarTitle){
             startActivity(new Intent(getApplicationContext(), CreateAlertActivity.class));
         }
+    }
+
+    @Override
+    public void onAlertItemClicked(int position) {
+        Intent intent = new Intent(HomeScreen.this, AlertDetailActivity.class);
+        intent.putExtra("ITEM_ID", position);
+        startActivity(intent);
     }
 }
