@@ -412,21 +412,21 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
     private fun saveIndicator() {
         mIndicatorModel.source = mSources
         val triggerGreen = ModelTrigger(if (TRIGGER_FREQUENCY_LIST.contains(tvGreenFrequency.text.toString())) TRIGGER_FREQUENCY_LIST.indexOf(tvGreenFrequency.text.toString()).toString() else "",
-                if (etIndicatorGreenValue.text.toString().isNotEmpty()) etIndicatorGreenValue.text.toString().toInt() else -1,
+                if (etIndicatorGreenValue.text.toString().isNotEmpty()) etIndicatorGreenValue.text.toString() else "",
                 tvIndicatorGreenName.text.toString())
         if (!triggerGreen.validateModel()) {
             Toasty.error(this, "Green trigger is not valid, please double check!").show()
             return
         }
         val triggerAmber = ModelTrigger(if (TRIGGER_FREQUENCY_LIST.contains(tvAmberFrequency.text.toString())) TRIGGER_FREQUENCY_LIST.indexOf(tvAmberFrequency.text.toString()).toString() else "",
-                if (etIndicatorAmberValue.text.toString().isNotEmpty()) etIndicatorAmberValue.text.toString().toInt() else -1,
+                if (etIndicatorAmberValue.text.toString().isNotEmpty()) etIndicatorAmberValue.text.toString() else "",
                 tvIndicatorAmberName.text.toString())
         if (!triggerAmber.validateModel()) {
             Toasty.error(this, "Amber trigger is not valid, please double check!").show()
             return
         }
         val triggerRed = ModelTrigger(if (TRIGGER_FREQUENCY_LIST.contains(tvRedFrequency.text.toString())) TRIGGER_FREQUENCY_LIST.indexOf(tvRedFrequency.text.toString()).toString() else "",
-                if (etIndicatorRedValue.text.toString().isNotEmpty()) etIndicatorRedValue.text.toString().toInt() else -1,
+                if (etIndicatorRedValue.text.toString().isNotEmpty()) etIndicatorRedValue.text.toString() else "",
                 tvIndicatorRedName.text.toString())
         if (!triggerRed.validateModel()) {
             Toasty.error(this, "Red trigger is not valid, please double check!").show()
@@ -492,16 +492,16 @@ class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnArea
     private fun getDueDate(modelTrigger: ModelTrigger): Long =
             when (TRIGGER_FREQUENCY_LIST.indexOf(modelTrigger.durationType)) {
                 0 -> {
-                    DateTime.now().plusHours(modelTrigger.frequencyValue).millis
+                    DateTime.now().plusHours(modelTrigger.frequencyValue.toInt()).millis
                 }
                 1 -> {
-                    DateTime.now().plusDays(modelTrigger.frequencyValue).millis
+                    DateTime.now().plusDays(modelTrigger.frequencyValue.toInt()).millis
                 }
                 2 -> {
-                    DateTime.now().plusWeeks(modelTrigger.frequencyValue).millis
+                    DateTime.now().plusWeeks(modelTrigger.frequencyValue.toInt()).millis
                 }
                 else -> {
-                    DateTime.now().plusMonths(modelTrigger.frequencyValue).millis
+                    DateTime.now().plusMonths(modelTrigger.frequencyValue.toInt()).millis
                 }
             }
 

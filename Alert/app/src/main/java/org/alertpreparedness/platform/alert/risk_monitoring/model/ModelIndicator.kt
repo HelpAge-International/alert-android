@@ -9,7 +9,7 @@ import android.os.Parcelable
 data class ModelIndicator(val id: String?, var hazardScenario: ModelHazard, val triggerSelected: Int,
                           var name: String, var assignee: String?, var geoLocation: Int,
                           var updatedAt: Long, var dueDate: Long, var source: List<ModelSource>, var trigger: List<ModelTrigger>, val networkId: String?, val agencyId: String?, val countryOfficeId: String?,
-                          var affectedLocation: List<ModelIndicatorLocation>?, var gps: ModelGps?, val category:Int = 0, val networkName:String? = null) : Parcelable {
+                          var affectedLocation: List<ModelIndicatorLocation>?, var gps: ModelGps?, val category: Int = 0, val networkName: String? = null) : Parcelable {
 
 
     constructor(parcel: Parcel) : this(
@@ -114,19 +114,30 @@ data class ModelIndicator(val id: String?, var hazardScenario: ModelHazard, val 
 
 /************************************************************************************************************************/
 
-data class ModelTrigger(val durationType: String, val frequencyValue: Int, val triggerValue: String) : Parcelable {
-
-    constructor() : this("", -1, "")
+data class ModelTrigger(val durationType: String, val frequencyValue: String, val triggerValue: String) : Parcelable {
 
     constructor(parcel: Parcel) : this(
             parcel.readString(),
-            parcel.readInt(),
+            parcel.readString(),
             parcel.readString()) {
+    }
+
+    constructor() : this("", "", "")
+
+
+    fun validateModel(): Boolean {
+        var validation = true
+        when {
+            durationType.isEmpty() -> validation = false
+            frequencyValue.isEmpty() -> validation = false
+            triggerValue.isEmpty() -> validation = false
+        }
+        return validation
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(durationType)
-        parcel.writeInt(frequencyValue)
+        parcel.writeString(frequencyValue)
         parcel.writeString(triggerValue)
     }
 
@@ -142,16 +153,6 @@ data class ModelTrigger(val durationType: String, val frequencyValue: Int, val t
         override fun newArray(size: Int): Array<ModelTrigger?> {
             return arrayOfNulls(size)
         }
-    }
-
-    fun validateModel(): Boolean {
-        var validation = true
-        when {
-            durationType.isEmpty() -> validation = false
-            frequencyValue == -1 -> validation = false
-            triggerValue.isEmpty() -> validation = false
-        }
-        return validation
     }
 }
 
@@ -236,7 +237,7 @@ data class ModelIndicatorLocation(val country: String = "", var level1: Int? = n
 
 /************************************************************************************************************************/
 
-data class ModelGps(val city: String? = null, val country: String? = null, var address:String? = null, val latitude: String = "", val longitude: String = "") : Parcelable {
+data class ModelGps(val city: String? = null, val country: String? = null, var address: String? = null, val latitude: String = "", val longitude: String = "") : Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readString(),
             parcel.readString(),

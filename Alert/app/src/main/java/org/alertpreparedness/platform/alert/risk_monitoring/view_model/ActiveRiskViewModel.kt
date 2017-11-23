@@ -36,6 +36,7 @@ class ActiveRiskViewModel : ViewModel() {
     private val mAgencyId = UserInfo.getUser(AlertApplication.getContext()).agencyAdminID
     private val mCountryId = UserInfo.getUser(AlertApplication.getContext()).countryID
     private val mCountryModelLive: MutableLiveData<ModelCountry> = MutableLiveData()
+    private val mIndicatorModelLive:MutableLiveData<ModelIndicator> = MutableLiveData()
 
     fun getLiveGroups(isActive: Boolean): LiveData<MutableList<ExpandableGroup<ModelIndicator>>> {
         loadGroups(isActive)
@@ -51,6 +52,18 @@ class ActiveRiskViewModel : ViewModel() {
                 })
         )
         return mCountryModelLive
+    }
+
+    fun getLiveIndicatorModel(hazardId:String, indicatorId:String):MutableLiveData<ModelIndicator> {
+        mDisposables.add(
+                RiskMonitoringService.getIndicatorModel(hazardId, indicatorId)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({indicator ->
+                            mIndicatorModelLive.value = indicator
+                        })
+        )
+        return mIndicatorModelLive
     }
 
     private fun loadGroups(isActive: Boolean) {

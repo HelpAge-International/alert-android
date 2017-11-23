@@ -120,5 +120,10 @@ object RiskMonitoringService {
         })
     }
 
+    fun getIndicatorModel(hazardId: String, indicatorId:String): Flowable<ModelIndicator> {
+        val indicatorRef = FirebaseHelper.getIndicatorRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), hazardId, indicatorId)
+        return RxFirebaseDatabase.observeValueEvent(indicatorRef, ModelIndicator::class.java)
+    }
+
 
 }
