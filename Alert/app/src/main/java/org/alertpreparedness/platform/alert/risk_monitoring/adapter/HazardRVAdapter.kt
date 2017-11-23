@@ -1,7 +1,6 @@
 package org.alertpreparedness.platform.alert.risk_monitoring.adapter
 
 import android.os.Build
-import android.support.v4.app.FragmentManager
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -14,7 +13,8 @@ import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder
 import de.hdodenhof.circleimageview.CircleImageView
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.R
-import org.alertpreparedness.platform.alert.risk_monitoring.dialog.BottomSheetDialog
+import org.alertpreparedness.platform.alert.getCountryImage
+import org.alertpreparedness.platform.alert.getHazardImg
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.jetbrains.anko.find
@@ -28,11 +28,12 @@ import timber.log.Timber
  */
 class Hazard(hazardId: String, indicators: List<ModelIndicator>) : ExpandableGroup<ModelIndicator>(hazardId, indicators)
 
-class HazardViewHolder(itemView: View) : GroupViewHolder(itemView) {
+class HazardViewHolder(itemView: View, location:Int) : GroupViewHolder(itemView) {
     private val hazardTitle: TextView = itemView.findViewById(R.id.tvHazardName)
     private val hazardIcon: CircleImageView = itemView.findViewById(R.id.civHazard)
     private val hazardArrow: ImageView = itemView.findViewById(R.id.ivArrow)
     private val hazardLayout: LinearLayout = itemView.find(R.id.llHazard)
+    private val mCountryLocation = location
 
     init {
         hazardLayout.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -40,97 +41,17 @@ class HazardViewHolder(itemView: View) : GroupViewHolder(itemView) {
 
     fun setHazardTitle(group: ExpandableGroup<ModelIndicator>) {
         hazardTitle.text = group.title
-        hazardIcon.imageResource = getHazardImg(hazardTitle.text.toString())
-//        hazardIcon.background = getHazardImg(hazardTitle.text.toString())
+        when (group.title) {
+            "Country Context" -> {
+                hazardIcon.imageResource = getCountryImage(mCountryLocation)
+            }
+            else -> {
+                hazardIcon.imageResource = getHazardImg(hazardTitle.text.toString())
+            }
+        }
+
     }
 
-    private fun getHazardImg(title: String): Int =
-            when (title) {
-                "Cold Wave" -> {
-                    R.drawable.cold_wave
-                }
-                "Conflict" -> {
-                    R.drawable.conflict
-                }
-                "Cyclone" -> {
-                    R.drawable.cyclone
-                }
-                "Drought" -> {
-                    R.drawable.drought
-                }
-                "Earthquake" -> {
-                    R.drawable.earthquake
-                }
-                "Epidemic" -> {
-                    R.drawable.epidemic
-                }
-                "Fire" -> {
-                    R.drawable.fire
-                }
-                "Flash Flood" -> {
-                    R.drawable.flash_flood
-                }
-                "Flood" -> {
-                    R.drawable.flood
-                }
-                "Heat Wave" -> {
-                    R.drawable.heat_wave
-                }
-                "Heavy Rain" -> {
-                    R.drawable.heavy_rain
-                }
-                "Humanitarian Access" -> {
-                    R.drawable.humanitarian_access
-                }
-                "Insect Infestation" -> {
-                    R.drawable.insect_infestation
-                }
-                "Landslide" -> {
-                    R.drawable.landslide_mudslide
-                }
-                "Locust Infestation" -> {
-                    R.drawable.locust_infestation
-                }
-                "Mudslide" -> {
-                    R.drawable.landslide_mudslide
-                }
-                "Population Displacement" -> {
-                    R.drawable.population_displacement
-                }
-                "Population Return" -> {
-                    R.drawable.population_return
-                }
-                "Snow Avalanche" -> {
-                    R.drawable.snow_avalanche
-                }
-                "Snowfall" -> {
-                    R.drawable.snowfall
-                }
-                "Storm" -> {
-                    R.drawable.storm
-                }
-                "Storm Surge" -> {
-                    R.drawable.storm_surge
-                }
-                "Technological Disaster" -> {
-                    R.drawable.technological_disaster
-                }
-                "Tornado" -> {
-                    R.drawable.tornado
-                }
-                "Tsunami" -> {
-                    R.drawable.tsunami
-                }
-                "Violent Wind" -> {
-                    R.drawable.violent_wind
-                }
-                "Volcano" -> {
-                    R.drawable.volcano
-                }
-                else -> {
-                    R.drawable.other
-                }
-            }
 
 }
 
@@ -200,9 +121,10 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener)
     }
 }
 
-class HazardAdapter(groups: List<ExpandableGroup<ModelIndicator>>, listener:OnIndicatorSelectedListener) : ExpandableRecyclerViewAdapter<HazardViewHolder, IndicatorViewHolder>(groups) {
+class HazardAdapter(groups: List<ExpandableGroup<ModelIndicator>>, countryLocation:Int, listener:OnIndicatorSelectedListener) : ExpandableRecyclerViewAdapter<HazardViewHolder, IndicatorViewHolder>(groups) {
 
     private val mListener = listener
+    private val mLocation = countryLocation
 
     override fun onCreateChildViewHolder(parent: ViewGroup?, viewType: Int): IndicatorViewHolder {
         val view = View.inflate(AlertApplication.getContext(), R.layout.risk_indicator_item_view, null)
@@ -221,7 +143,7 @@ class HazardAdapter(groups: List<ExpandableGroup<ModelIndicator>>, listener:OnIn
 
     override fun onCreateGroupViewHolder(parent: ViewGroup?, viewType: Int): HazardViewHolder {
         val view = View.inflate(AlertApplication.getContext(), R.layout.risk_hazard_item_view, null)
-        return HazardViewHolder(view)
+        return HazardViewHolder(view, mLocation)
     }
 
 }

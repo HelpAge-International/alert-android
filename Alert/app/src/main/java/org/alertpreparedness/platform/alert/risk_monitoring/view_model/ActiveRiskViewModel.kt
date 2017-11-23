@@ -10,8 +10,10 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.helper.UserInfo
+import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelCountry
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelHazard
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
+import org.alertpreparedness.platform.alert.risk_monitoring.service.CountryService
 import org.alertpreparedness.platform.alert.risk_monitoring.service.NetworkService
 import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService
 import org.alertpreparedness.platform.alert.utils.Constants
@@ -33,10 +35,22 @@ class ActiveRiskViewModel : ViewModel() {
     private var mLiveData: MutableLiveData<MutableList<ExpandableGroup<ModelIndicator>>> = MutableLiveData()
     private val mAgencyId = UserInfo.getUser(AlertApplication.getContext()).agencyAdminID
     private val mCountryId = UserInfo.getUser(AlertApplication.getContext()).countryID
+    private val mCountryModelLive: MutableLiveData<ModelCountry> = MutableLiveData()
 
     fun getLiveGroups(isActive: Boolean): LiveData<MutableList<ExpandableGroup<ModelIndicator>>> {
         loadGroups(isActive)
         return mLiveData
+    }
+
+    fun getLiveCountryModel(): MutableLiveData<ModelCountry> {
+        mDisposables.add(CountryService.getCountryModel()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({country ->
+                    mCountryModelLive.value = country
+                })
+        )
+        return mCountryModelLive
     }
 
     private fun loadGroups(isActive: Boolean) {
