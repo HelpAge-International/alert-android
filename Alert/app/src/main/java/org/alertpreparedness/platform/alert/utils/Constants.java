@@ -20,8 +20,6 @@ public final class Constants {
     public static final String HAZARD_ID = "hazard_id";
     public static final String[] HAZARD_SCENARIO_NAME = {"Cold Wave", "Conflict", "Cyclone", "Drought", "Earthquake", "Epidemic", "Fire", "Flash Flood", "Flood", "Heat Wave", "Heavy Rain", "Humanitarian Access",
             "Insect Infestation", "Landslide", "Locust Infestation", "Mudslide", "Population Displacement", "Population Return", "Snow Avalanche", "Snowfall", "Storm", "Storm Surge", "Technological Disaster", "Tornado", "Tsunami", "Violent Wind", "Volcano"};
-    public static final String[] HAZARD_ICON_NAME = {"cold_wave.png", "conflict.png", "cyclone.png", "drought.png", "earthquake.png", "epidemic.png", "fire.png", "flash_flood.png", "flood.png", "heat_wave.png", "heavy_rain.png", "humanitarian_access.png",
-            "insect_infestation.png", "landslide.png", "locust_infestation.png", "landslide_mudslide.png", "population_displacement.png", "population return.png", "snow avalanche.png", "snowfall.png", "storm.png", "storm_surge.png", "technological_disaster.png", "tornado.png", "tsunami.png", "violent_wind.png", "volcano.png"};
     public static final String[] INDICATOR_GEO_LOCATION = {"National", "Subnational", "Use my location"};
     public static final String[] TRIGGER_LEVEL = {"Average or falling", "Potential challenges & risks", "Red alert"};
 

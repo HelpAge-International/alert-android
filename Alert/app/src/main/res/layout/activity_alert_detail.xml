@@ -86,11 +86,13 @@
             android:id="@+id/txtPopulationAffected"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="1dp"
             android:text="100,000 people"
             android:textColor="@android:color/black"
             android:textSize="15sp"
-            app:layout_constraintTop_toBottomOf="@+id/textViewPopulation"
-            tools:layout_editor_absoluteX="58dp" />
+            app:layout_constraintStart_toEndOf="@+id/imgPopulationIcon"
+            app:layout_constraintTop_toBottomOf="@+id/textViewPopulation" />
 
         <ImageView
             android:id="@+id/imgAreaIcon"

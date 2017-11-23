@@ -27,8 +27,6 @@ import java.util.List;
  * Created by faizmohideen on 20/11/2017.
  */
 
-//TODO complete detail view for alert
-
 public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> {
 
     private Context context;
@@ -61,7 +59,6 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         // Required empty public constructor
     }
 
-
     @Override
     public AlertAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_alert, parent, false);
@@ -92,10 +89,6 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         ImageView img_alert_colour;
         ImageView img_hazard_icon;
 
-        Alert alert;
-
-
-
         public ViewHolder(View itemView) {
             super(itemView);
 
@@ -105,24 +98,18 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
             img_alert_colour = (ImageView) itemView.findViewById(R.id.img_alert_colour);
             img_hazard_icon = (ImageView) itemView.findViewById(R.id.img_hazard_icon);
 
-
             itemView.setOnClickListener(new View.OnClickListener(){
-
                 @Override
                 public void onClick(View view) {
                     int position = getLayoutPosition();
-
-                    Toast.makeText(view.getContext(), "Clicked item "+position, Toast.LENGTH_SHORT).show();
                     if (listener != null) {
-                        System.out.println("IN");
                         listener.onAlertItemClicked(position);
                     }
-
                 }
             });
         }
 
-        public void bind(Alert alert) {
+        private void bind(Alert alert) {
             for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
                 if (i == alert.getHazardScenario() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
                     fetchIcon(Constants.HAZARD_SCENARIO_NAME[i]);

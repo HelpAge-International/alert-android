@@ -41,7 +41,6 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
     private String[] usersID;
     private Alert alert;
 
-
     public static TaskAdapter taskAdapter;
     public static List<Tasks> tasksList;
     public static TextView appBarTitle;
@@ -53,7 +52,6 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
     public static final String mypreference = "mypref";
     public static final String userKey = "UserType";
     public static final PreferHelper sharedPreferences = new PreferHelper();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +98,7 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
 
         firebaseDatabase = FirebaseDatabase.getInstance();
 
-        for(String ids : usersID) {
+        for (String ids : usersID) {
             DataHandler.getAlertsFromFirebase(ids);
         }
 
@@ -111,7 +109,7 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
 
     @Override
     public void onClick(View view) {
-        if(view==appBarTitle){
+        if (view == appBarTitle) {
             startActivity(new Intent(getApplicationContext(), CreateAlertActivity.class));
         }
     }
