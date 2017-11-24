@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="org.alertpreparedness.platform.alert.risk_monitoring.view.UpdateIndicatorActivity"
+    tools:showIn="@layout/activity_update_indicator">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvUpdateIndicatorLevelGreen"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/alert_green"
+            android:gravity="center_vertical"
+            android:padding="10dp"
+            android:text="@string/average_of_falling"
+            android:textColor="@android:color/white"
+            tools:text="Average or falling"/>
+
+        <TextView
+            android:id="@+id/tvUpdateIndicatorDescGreen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginStart="15dp"
+            android:textColor="@color/alertGreen"
+            tools:text="Check every 6 months"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider_color"/>
+
+        <TextView
+            android:id="@+id/tvUpdateIndicatorLevelAmber"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/alert_amber"
+            android:gravity="center_vertical"
+            android:padding="10dp"
+            android:text="@string/increasing"
+            android:textColor="@android:color/white"
+            tools:text="Average or falling"/>
+
+        <TextView
+            android:id="@+id/tvUpdateIndicatorDescAmber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginStart="15dp"
+            android:textColor="@color/alertAmber"
+            tools:text="Check every 6 months"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider_color"/>
+
+        <TextView
+            android:id="@+id/tvUpdateIndicatorLevelRed"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/alert_red"
+            android:gravity="center_vertical"
+            android:padding="10dp"
+            android:text="@string/high"
+            android:textColor="@android:color/white"
+            tools:text="Average or falling"/>
+
+        <TextView
+            android:id="@+id/tvUpdateIndicatorDescRed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginStart="15dp"
+            android:textColor="@color/alertRed"
+            tools:text="Check every 6 months"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider_color"/>
+
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>
+

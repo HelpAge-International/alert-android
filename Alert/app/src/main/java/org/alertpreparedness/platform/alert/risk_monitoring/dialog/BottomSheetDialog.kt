@@ -12,13 +12,20 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import es.dmoral.toasty.Toasty
+import io.reactivex.Observable
+import kotlinx.android.synthetic.main.bottom_sheet_indicator.view.*
+import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.R
 import org.alertpreparedness.platform.alert.helper.UserInfo
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.alert.risk_monitoring.view.ActiveRiskFragment
+import org.alertpreparedness.platform.alert.risk_monitoring.view.UpdateIndicatorActivity
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.ActiveRiskViewModel
+import org.alertpreparedness.platform.alert.utils.Constants
 import org.jetbrains.anko.find
 import q.rorbin.badgeview.QBadgeView
+import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by fei on 22/11/2017.
@@ -39,8 +46,17 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
         val INDICATOR_MODEL = "indicator_model"
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    @SuppressLint("RestrictedApi")
+    override fun setupDialog(dialog: Dialog, style: Int) {
+        super.setupDialog(dialog, style)
+        val view = View.inflate(activity, R.layout.bottom_sheet_indicator, null)
+        initData()
+        initView(view)
+        initListeners(view)
+        dialog.setContentView(view)
+    }
+
+    private fun initData() {
         mHazardId = arguments[ActiveRiskFragment.HAZARD_ID] as String
         mIndicatorId = arguments[ActiveRiskFragment.INDICATOR_ID] as String
         mViewModel = ViewModelProviders.of(this).get(ActiveRiskViewModel::class.java)
@@ -50,36 +66,29 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
         })
     }
 
-    @SuppressLint("RestrictedApi")
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
-        val view = View.inflate(activity, R.layout.bottom_sheet_indicator, null)
-        initView(view)
-        initListeners()
-        dialog.setContentView(view)
-    }
-
     private fun initView(view: View) {
         ivIndicatorLog = view.find(R.id.ivIndicatorLog)
-        ivIndicatorAttach = view.find(R.id.ivIndicatorAttach)
+//        ivIndicatorAttach = view.find(R.id.ivIndicatorAttach)
         flIndicatorLog = view.find(R.id.flIndicatorLog)
-        flIndicatorAttach = view.find(R.id.flIndicatorAttach)
+//        flIndicatorAttach = view.find(R.id.flIndicatorAttach)
         llInformationSource = view.find(R.id.llInformationSource)
 
-        //TODO IMPLEMENT THIS WITH DATA
         val logBadge = QBadgeView(activity)
         logBadge.bindTarget(flIndicatorLog).badgeGravity = Gravity.END or Gravity.TOP
-        logBadge.badgeNumber = 3
         logBadge.setBadgeTextSize(7.toFloat(), true)
 
-        val attBadge = QBadgeView(activity)
-        attBadge.bindTarget(flIndicatorAttach).badgeGravity = Gravity.END or Gravity.TOP
-        attBadge.badgeNumber = 1
-        attBadge.setBadgeTextSize(7.toFloat(), true)
+//        val attBadge = QBadgeView(activity)
+//        attBadge.bindTarget(flIndicatorAttach).badgeGravity = Gravity.END or Gravity.TOP
+//        attBadge.badgeNumber = 1
+//        attBadge.setBadgeTextSize(7.toFloat(), true)
+
+        mViewModel.getLiveIndicatorLogs(mIndicatorId).observe(this, Observer { logs ->
+            logBadge.badgeNumber = logs?.size ?: 0
+        })
 
     }
 
-    private fun initListeners() {
+    private fun initListeners(view: View) {
         llInformationSource.setOnClickListener {
             if (mHazardId.isNotEmpty() && mIndicatorId.isNotEmpty()) {
                 val showInfoDialog = ShowInformationSourceDialog()
@@ -91,6 +100,14 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
             } else {
                 Toasty.error(activity, "No hazard id or indicator id!").show()
             }
+        }
+
+        view.llUpdateIndicator.setOnClickListener {
+            Timber.d("update clicked")
+            dismiss()
+            Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).subscribe({
+                UpdateIndicatorActivity.startActivity(AlertApplication.getContext(), mHazardId, mIndicatorId)
+            })
         }
     }
 

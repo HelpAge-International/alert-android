@@ -3,8 +3,6 @@ package org.alertpreparedness.platform.alert.risk_monitoring.dialog
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.view.View
@@ -18,6 +16,7 @@ import org.alertpreparedness.platform.alert.R
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelSource
 import org.jetbrains.anko.find
+import org.jetbrains.anko.support.v4.browse
 import timber.log.Timber
 
 /**
@@ -40,12 +39,8 @@ class ShowInformationSourceDialog : DialogFragment() {
                     Timber.d("position: %s", mSources[position].toString())
                     val clickedSource = mSources[position]
                     if (clickedSource.link != null && android.util.Patterns.WEB_URL.matcher(clickedSource.link).matches()) {
-//                        browse(clickedSource.link, true)
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(clickedSource.link))
-                        val packageManager = activity.packageManager
-                        if (intent.resolveActivity(packageManager) != null) {
-                            startActivity(intent)
-                        } else {
+                        val url = if (clickedSource.link.startsWith("http://") || clickedSource.link.startsWith("https://")) clickedSource.link else "http://" + clickedSource.link
+                        if (!browse(url, true)) {
                             Toasty.warning(activity, "No activity can handle browse web url", Toast.LENGTH_LONG).show()
                         }
                     }
@@ -61,8 +56,8 @@ class InfoSourceAdapter(context: Context, data: List<ModelSource>) : BaseAdapter
     private val mData = data
 
     override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View {
-        var convertView: View? = null
-        var holder: ViewHolder? = null
+        val convertView: View?
+        val holder: ViewHolder?
         if (p1 == null) {
             convertView = View.inflate(mContext, R.layout.show_information_source_item, null)
             holder = ViewHolder(null, null)

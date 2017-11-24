@@ -68,6 +68,12 @@
     <string name="information_source">Information Source</string>
     <string name="indicator_log">Indicator Log</string>
     <string name="attachments">Attachments</string>
+    <string name="title_activity_update_indicator">UpdateIndicatorActivity</string>
+    <string name="average_of_falling">Average of falling</string>
+    <string name="increasing">Increasing</string>
+    <string name="high">High</string>
+    <string name="title_activity_log_indicator">LogIndicatorActivity</string>
+    <string name="action_settings">Settings</string>
 
 
 </resources>
