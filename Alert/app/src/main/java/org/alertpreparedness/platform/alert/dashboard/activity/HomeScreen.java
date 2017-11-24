@@ -28,6 +28,7 @@ import org.alertpreparedness.platform.alert.model.Alert;
 import org.alertpreparedness.platform.alert.model.Tasks;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData;
+import org.alertpreparedness.platform.alert.risk_monitoring.service.NetworkService;
 import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.json.JSONObject;
@@ -35,9 +36,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -51,6 +55,8 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
     private String[] usersID;
     private Alert alert;
     private ArrayList<CountryJsonData> mCountryList;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+   // private DataHandler dataHandler = new DataHandler();
 
     public static TaskAdapter taskAdapter;
     public static List<Tasks> tasksList;
@@ -62,6 +68,9 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
     public static final String mypreference = "mypref";
     public static final String userKey = "UserType";
     public static final PreferHelper sharedPreferences = new PreferHelper();
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,11 +88,12 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         systemAdminID = UserInfo.getUser(this).systemAdminID;
         networkCountryID = UserInfo.getUser(this).networkCountryID;
 
-        usersID = new String[]{networkCountryID, countryID};
-
         mCountryList = new ArrayList<CountryJsonData>();
 
-        RiskMonitoringService.INSTANCE.readJsonFile()
+        System.out.println("Network: "+networkCountryID);
+        usersID = new String[]{networkCountryID, countryID};
+
+        Disposable RMDisposable = RiskMonitoringService.INSTANCE.readJsonFile()
                 .map(fileText -> {
                     return new JSONObject(fileText);
                 }).flatMap( jsonObject -> {
@@ -96,6 +106,7 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
                     //System.out.println("LIST: "+mCountryList.get(1));
                 }
         );
+        compositeDisposable.add(RMDisposable);
 
         for (int i=0; i<mCountryList.size(); i++){
             System.out.println("LIST: "+mCountryList.get(i).getLevelOneValues());
@@ -136,7 +147,14 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
             DataHandler.getTasksFromFirebase(ids);
         }
 
+    }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        compositeDisposable.clear();
+        compositeDisposable.dispose();
     }
 
     @Override

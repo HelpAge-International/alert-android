@@ -18,6 +18,7 @@ import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.model.Alert;
 import org.alertpreparedness.platform.alert.model.Tasks;
+import org.alertpreparedness.platform.alert.utils.DBListener;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -31,9 +32,13 @@ public class DataHandler extends HomeScreen {
     public static DatabaseReference database = FirebaseDatabase.getInstance().getReference();
     public static String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
     static List<Integer> alerts = new ArrayList<Integer>();
+    private static DBListener dbListener = new DBListener();
+    private static ChildEventListener childEventListener;
+    private static ValueEventListener valueEventListener;
 
     public static void getAlertsFromFirebase(String ids) {
-        database.child("sand").child("alert").child(ids).addChildEventListener(new ChildEventListener() {
+        database.child("sand").child("alert").child(ids).addChildEventListener(childEventListener =  new ChildEventListener() {
+
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (dataSnapshot.child("alertLevel").getValue() != null) {
@@ -60,6 +65,7 @@ public class DataHandler extends HomeScreen {
                         }
                     }
                 }
+                //dbListener.add(database, (ChildEventListener) dataSnapshot);
             }
 
             @Override
@@ -83,15 +89,19 @@ public class DataHandler extends HomeScreen {
             }
         });
 
+        dbListener.add(database, childEventListener);
+
     }
 
     private static void setOtherName(String nameId, long alertLevel, long hazardScenario, long numOfAreas, long population) {
-        database.child("sand").child("hazardOther").child(nameId).addValueEventListener(new ValueEventListener() {
+        database.child("sand").child("hazardOther").child(nameId).addValueEventListener(valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String name = (String) dataSnapshot.child("name").getValue();
                 Alert alert = new Alert(alertLevel, hazardScenario, population, numOfAreas, name);
                 alertAdapter.add(alert);
+
+               // dbListener.add(database, (ValueEventListener) dataSnapshot);
             }
 
             @Override
@@ -99,6 +109,7 @@ public class DataHandler extends HomeScreen {
 
             }
         });
+        dbListener.add(database, valueEventListener);
 
     }
 
@@ -108,7 +119,7 @@ public class DataHandler extends HomeScreen {
 
         for (String type : types) {
             if (type.equals("action")) {
-                database.child("sand").child("action").child(node).addChildEventListener(new ChildEventListener() {
+                database.child("sand").child("action").child(node).addChildEventListener(childEventListener = new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         String asignee = (String) dataSnapshot.child("asignee").getValue();
@@ -122,6 +133,8 @@ public class DataHandler extends HomeScreen {
                                 taskAdapter.add(tasks);
                             }
                         }
+
+                      //  dbListener.add(database, (ChildEventListener) dataSnapshot);
                     }
 
                     @Override
@@ -144,8 +157,9 @@ public class DataHandler extends HomeScreen {
 
                     }
                 });
+                dbListener.add(database, childEventListener);
             } else if (type.equals("indicator")) {
-                database.child("sand").child("indicator").child(node).addChildEventListener(new ChildEventListener() {
+                database.child("sand").child("indicator").child(node).addChildEventListener(childEventListener = new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         String asignee = (String) dataSnapshot.child("assignee").getValue();
@@ -161,6 +175,8 @@ public class DataHandler extends HomeScreen {
                                 //myTaskRecyclerView.setAdapter(taskAdapter);
                             }
                         }
+
+                      //  dbListener.add(database, (ChildEventListener) dataSnapshot);
                     }
 
                     @Override
@@ -183,6 +199,7 @@ public class DataHandler extends HomeScreen {
 
                     }
                 });
+                dbListener.add(database, childEventListener);
             }
         }
     }
@@ -194,4 +211,11 @@ public class DataHandler extends HomeScreen {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        dbListener.detatch();
+
+    }
 }

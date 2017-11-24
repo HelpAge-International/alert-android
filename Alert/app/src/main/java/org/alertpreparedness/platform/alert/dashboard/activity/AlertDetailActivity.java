@@ -29,8 +29,8 @@ public class AlertDetailActivity extends AppCompatActivity {
 
         toolbar = (Toolbar) findViewById(R.id.action_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setHomeButtonEnabled(true);
 
         txtHazardName = (TextView) findViewById(R.id.txtHazardName);
         txtPopulation = (TextView) findViewById(R.id.txtPopulationAffected);
