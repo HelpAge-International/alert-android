@@ -6,7 +6,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -14,29 +13,23 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
-import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.login.activity.AuthCallback;
-import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.risk_monitoring.service.NetworkService;
+import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.DBListener;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
-import timber.log.Timber;
-
 /**
  * Created by faizmohideen on 08/11/2017.
  */
 
-public class UserInfo extends LoginScreen{
+public class UserInfo {
     public static String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
     public static DatabaseReference database = FirebaseDatabase.getInstance().getReference();
     public static final String PREFS_USER = "prefs_user";
@@ -47,7 +40,8 @@ public class UserInfo extends LoginScreen{
 
 
     //Cross-check if the logged-in user ID matches the ID under different node.
-    public static void authUser(final AuthCallback authCallback){
+    public static void authUser(final AuthCallback authCallback) {
+        userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         for (String nodeName : users) {
             database.child(DataHandler.mAppStatus)
                     .child(nodeName)
@@ -71,16 +65,16 @@ public class UserInfo extends LoginScreen{
         }
     }
 
-    public static void saveUser(Context context, User user){
+    public static void saveUser(Context context, User user) {
         String serializedUser = new Gson().toJson(user);
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
                 .putString(PREFS_USER, serializedUser)
-        .apply();
+                .apply();
         Log.e("USER", serializedUser);
     }
 
-    public static User getUser(Context context){
+    public static User getUser(Context context) {
         String serializedUser = PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(PREFS_USER, null);
 
@@ -96,14 +90,14 @@ public class UserInfo extends LoginScreen{
 
         Disposable NSDisposable = NetworkService.INSTANCE.mapNetworksForCountry(agencyAdmin, countryId).subscribe(
                 (Map<String, String> stringStringMap) -> {
-                    for(String key: stringStringMap.keySet()) {
+                    for (String key : stringStringMap.keySet()) {
                         //System.out.println("Agency "+ agencyAdmin);
                         String networkID = stringStringMap.get(key);
 
                         User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin, networkID);
                         Toast.makeText(callback.getContext(),
                                 String.format(Locale.getDefault(), "user: %s, type: %s, agency: %s, system: %s, country: %s, network: %s",
-                                        userID, userType, agencyAdmin, systemAdmin, countryId, networkID ),
+                                        userID, userType, agencyAdmin, systemAdmin, countryId, networkID),
                                 Toast.LENGTH_LONG).show();
 
                         saveUser(callback.getContext(), user);
@@ -117,15 +111,14 @@ public class UserInfo extends LoginScreen{
     }
 
 
-
-    public static int getUserTypeString(String node){
+    public static int getUserTypeString(String node) {
         switch (node) {
             case "administratorCountry":
                 return Constants.CountryAdmin;
             case "countryDirector":
                 return Constants.CountryDirector;
             case "ert":
-                return  Constants.Ert;
+                return Constants.Ert;
             case "ertLeader":
                 return Constants.ErtLeader;
             case "partner":
@@ -144,12 +137,17 @@ public class UserInfo extends LoginScreen{
         void callback(Object data, String node);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public static void clearAll() {
         compositeDisposable.clear();
-        compositeDisposable.dispose();
         dbListener.detatch();
     }
+
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        compositeDisposable.clear();
+//        compositeDisposable.dispose();
+//        dbListener.detatch();
+//    }
 }
 

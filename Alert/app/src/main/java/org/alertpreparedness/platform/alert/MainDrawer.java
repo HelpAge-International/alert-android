@@ -14,6 +14,7 @@ import android.widget.FrameLayout;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
+import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.RiskActivity;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -63,8 +64,10 @@ public class MainDrawer extends BaseActivity {
                         });
                         break;
                     case R.id.nav_logout:
-                        startActivity(new Intent(getApplicationContext(), LoginScreen.class));
+//                        PreferHelper.getInstance(getApplicationContext()).edit().remove(UserInfo.PREFS_USER).apply();
+                        UserInfo.clearAll();
                         firebaseAuth.signOut();
+                        startActivity(new Intent(getApplicationContext(), LoginScreen.class));
 //                        PreferHelper.getInstance(MainDrawer.this).edit().remove(UserInfo.PREFS_USER).apply();
 //                        finish();
                 }
