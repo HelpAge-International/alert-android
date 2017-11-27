@@ -13,9 +13,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
@@ -31,17 +28,13 @@ import org.alertpreparedness.platform.alert.model.Alert;
 import org.alertpreparedness.platform.alert.model.Tasks;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData;
-import org.alertpreparedness.platform.alert.risk_monitoring.service.NetworkService;
 import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -91,6 +84,8 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         agencyAdminID = UserInfo.getUser(this).agencyAdminID;
         systemAdminID = UserInfo.getUser(this).systemAdminID;
         networkCountryID = UserInfo.getUser(this).networkCountryID;
+
+        Timber.d("uid: %s", UserInfo.getUser(this).getUserID());
 
         mCountryList = new ArrayList<CountryJsonData>();
 
