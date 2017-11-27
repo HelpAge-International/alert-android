@@ -1,7 +1,10 @@
 package org.alertpreparedness.platform.alert.dashboard.activity;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -47,6 +50,7 @@ import timber.log.Timber;
 
 
 public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAlertItemClickedListener {
+    private static final int STORAGE_RC = 0x0013;
     private User user;
     private RecyclerView myTaskRecyclerView;
     private FirebaseDatabase firebaseDatabase;
@@ -149,8 +153,35 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
 
     }
 
-
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Check for Storage permissions
+        int permCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permCheck != PackageManager.PERMISSION_GRANTED) {
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        STORAGE_RC);
+            }
+        }
+    }
+
+
+
+        @Override
     protected void onDestroy() {
         super.onDestroy();
         compositeDisposable.clear();

@@ -1,6 +1,8 @@
 package org.alertpreparedness.platform.alert.dashboard.activity;
 
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -29,8 +31,12 @@ public class AlertDetailActivity extends AppCompatActivity {
 
         toolbar = (Toolbar) findViewById(R.id.action_toolbar);
         setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // Change the color of the arrow
+        final Drawable upArrow = toolbar.getNavigationIcon();
+        upArrow.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
 
         txtHazardName = (TextView) findViewById(R.id.txtHazardName);
         txtPopulation = (TextView) findViewById(R.id.txtPopulationAffected);

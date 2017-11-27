@@ -61,7 +61,11 @@
             android:name=".dashboard.activity.CreateAlertActivity"
             android:label="@string/title_activity_create_alert"
             android:screenOrientation="portrait" />
-        <activity android:name=".dashboard.activity.AlertDetailActivity"></activity>
+        <activity android:name=".dashboard.activity.AlertDetailActivity"
+            android:parentActivityName=".dashboard.activity.HomeScreen">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                android:value=".dashboard.activity.HomeScreen"/>
+        </activity>
     </application>
 
 </manifest>

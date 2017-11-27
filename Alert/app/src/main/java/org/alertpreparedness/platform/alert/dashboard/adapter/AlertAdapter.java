@@ -2,6 +2,7 @@ package org.alertpreparedness.platform.alert.dashboard.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,7 +22,11 @@ import org.alertpreparedness.platform.alert.utils.Constants;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+
+
 
 /**
  * Created by faizmohideen on 20/11/2017.
@@ -43,7 +48,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder>{
     }
     private final static String _TAG = "Adapter";
 
-    public AlertAdapter(List<Alert> List) {
+    public AlertAdapter(@NonNull List<Alert> List) {
         super();
 
         this.listArray = List;
@@ -73,6 +78,12 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder>{
 
     public void add(Alert alert) {
         listArray.add(alert);
+        Collections.sort(this.listArray, new Comparator<Alert>() {
+            @Override
+            public int compare(Alert o1, Alert o2) {
+                return Long.compare(o2.alertLevel, o1.alertLevel);
+            }
+        });
         notifyDataSetChanged();
     }
 

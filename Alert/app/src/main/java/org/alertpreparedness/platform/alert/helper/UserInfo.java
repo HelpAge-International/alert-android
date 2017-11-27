@@ -114,25 +114,6 @@ public class UserInfo extends LoginScreen{
                 }
         );
         compositeDisposable.add(NSDisposable);
-//
-//        System.out.println("fdgdfg");
-//        database.child("sand").child("countryOffice").child(agencyAdmin).child(countryId).child("networks").addValueEventListener(valueEventListener = new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                //String networkId = dataSnapshot.child("networkCountryId").getValue(String.class);
-//                System.out.println("Snap : "+dataSnapshot.child("networkCountryId").getValue().toString());
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-
-
-
-        //dbListener.add(database, valueEventListener);
     }
 
 
