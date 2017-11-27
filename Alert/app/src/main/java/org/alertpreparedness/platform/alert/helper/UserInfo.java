@@ -13,6 +13,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
+import org.alertpreparedness.platform.alert.BaseActivity;
 import org.alertpreparedness.platform.alert.login.activity.AuthCallback;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.service.NetworkService;
@@ -29,8 +30,8 @@ import io.reactivex.disposables.Disposable;
  * Created by faizmohideen on 08/11/2017.
  */
 
-public class UserInfo {
-    public static String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+public class UserInfo extends BaseActivity{
+   // public static String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
     public static DatabaseReference database = FirebaseDatabase.getInstance().getReference();
     public static final String PREFS_USER = "prefs_user";
     private static CompositeDisposable compositeDisposable = new CompositeDisposable();
@@ -40,16 +41,16 @@ public class UserInfo {
 
 
     //Cross-check if the logged-in user ID matches the ID under different node.
-    public static void authUser(final AuthCallback authCallback) {
-        userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    public void authUser(final AuthCallback authCallback) {
+       // userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         for (String nodeName : users) {
             database.child(DataHandler.mAppStatus)
                     .child(nodeName)
                     .addListenerForSingleValueEvent(valueEventListener = new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            if (dataSnapshot.child(userID).exists()) {
-                                DataSnapshot userNode = dataSnapshot.child(userID);
+                            if (dataSnapshot.child(getUid()).exists()) {
+                                DataSnapshot userNode = dataSnapshot.child(getUid());
                                 populateUser(authCallback, nodeName, userNode);
                             } else {
                                 //System.out.println("False");
@@ -81,8 +82,8 @@ public class UserInfo {
         return new Gson().fromJson(serializedUser, User.class);
     }
 
-    private static void populateUser(AuthCallback callback, String nodeName, DataSnapshot userNode) {
-        String userID = UserInfo.userID;
+    private void populateUser(AuthCallback callback, String nodeName, DataSnapshot userNode) {
+        String userID = getUid();
         int userType = getUserTypeString(nodeName);
         String agencyAdmin = userNode.child("agencyAdmin").getChildren().iterator().next().getKey();
         String systemAdmin = userNode.child("systemAdmin").getChildren().iterator().next().getKey();
@@ -142,12 +143,5 @@ public class UserInfo {
         dbListener.detatch();
     }
 
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        compositeDisposable.clear();
-//        compositeDisposable.dispose();
-//        dbListener.detatch();
-//    }
 }
 

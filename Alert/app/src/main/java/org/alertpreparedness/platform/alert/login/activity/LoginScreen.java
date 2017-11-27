@@ -36,7 +36,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     private ProgressDialog progressDialog;
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-
+    private UserInfo userInfo = new UserInfo();
     private final static String TAG = "LoginActivity";
 
     @Override
@@ -94,7 +94,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 //                        progressDialog.dismiss();
 
                         if (task.isSuccessful()) {
-                            UserInfo.authUser(LoginScreen.this);
+                            userInfo.authUser(LoginScreen.this);
                         }
 
                         // If sign in fails, display a message to the user. If sign in succeeds

@@ -44,7 +44,6 @@ import timber.log.Timber;
 
 public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAlertItemClickedListener {
     private static final int STORAGE_RC = 0x0013;
-    private User user;
     private RecyclerView myTaskRecyclerView;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference database = FirebaseDatabase.getInstance().getReference();
@@ -83,7 +82,11 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         systemAdminID = UserInfo.getUser(this).systemAdminID;
         networkCountryID = UserInfo.getUser(this).networkCountryID;
 
-        Timber.d("uid: %s", UserInfo.getUser(this).getUserID());
+        System.out.println("U-ID: "+ UserInfo.getUser(this).getUserID());
+        System.out.println("C-ID: "+ UserInfo.getUser(this).getCountryID());
+        System.out.println("A-ID: "+ UserInfo.getUser(this).getAgencyAdminID());
+        System.out.println("S-ID: "+ UserInfo.getUser(this).getSystemAdminID());
+        System.out.println("N-ID: "+ UserInfo.getUser(this).getNetworkCountryID());
 
         mCountryList = new ArrayList<CountryJsonData>();
 

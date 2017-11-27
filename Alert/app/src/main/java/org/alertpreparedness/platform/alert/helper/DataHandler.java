@@ -9,6 +9,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.AlertApplication;
+import org.alertpreparedness.platform.alert.BaseActivity;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.model.Alert;
@@ -39,6 +40,7 @@ public class DataHandler extends HomeScreen {
     private static Calendar date = Calendar.getInstance();
     public static String dateFormat = "dd/MM/yyyy";
     private static SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
+
 
     public static void getAlertsFromFirebase(String ids) {
         database.child(mAppStatus).child("alert").child(ids).addChildEventListener(childEventListener =  new ChildEventListener() {
@@ -135,7 +137,7 @@ public class DataHandler extends HomeScreen {
                         String asignee = (String) dataSnapshot.child("asignee").getValue();
                         String task = (String) dataSnapshot.child("task").getValue();
 
-                        if (asignee != null && task != null && asignee.equals(UserInfo.userID)) {
+                        if (asignee != null && task != null && asignee.equals(userID)) {
                             if (dataSnapshot.hasChild("dueDate")) {
                                 long dueDate = (long) dataSnapshot.child("dueDate").getValue();
                                 Tasks tasks = new Tasks("red", "action", task, dueDate);
@@ -176,7 +178,7 @@ public class DataHandler extends HomeScreen {
                         String taskName = (String) dataSnapshot.child("name").getValue();
                         // long dueDate = (long) dataSnapshot.child("dueDate").getValue();
 
-                        if (asignee != null && taskName != null && asignee.equals(UserInfo.userID)) {
+                        if (asignee != null && taskName != null && asignee.equals(userID)) {
                             if (dataSnapshot.hasChild("dueDate")) {
                                 long dueDate = (long) dataSnapshot.child("dueDate").getValue();
                                 Tasks tasks = new Tasks("red", "indicator", taskName, dueDate);
