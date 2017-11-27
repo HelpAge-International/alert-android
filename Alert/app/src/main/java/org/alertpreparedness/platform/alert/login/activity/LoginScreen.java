@@ -16,18 +16,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
-import org.alertpreparedness.platform.alert.helper.UserInfo;
-
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.Observable;
-import io.reactivex.functions.Consumer;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.User;
 
@@ -96,7 +91,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
-                        progressDialog.dismiss();
+//                        progressDialog.dismiss();
 
                         if (task.isSuccessful()) {
                             UserInfo.authUser(LoginScreen.this);
@@ -106,16 +101,23 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithEmail:failed | "+ task.getException().getMessage());
-                            Toast.makeText(LoginScreen.this, "The password you entered is incorrect. Please check and try again!"+ task.getException().getMessage(),
+                            Log.w(TAG, "signInWithEmail:failed | " + task.getException().getMessage());
+                            Toast.makeText(LoginScreen.this, "The password you entered is incorrect. Please check and try again!" + task.getException().getMessage(),
                                     Toast.LENGTH_SHORT).show();
                         }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        progressDialog.dismiss();
                     }
                 });
     }
 
     @Override
     public void onUserAuthorized(User user) {
+        progressDialog.dismiss();
         startActivity(new Intent(getApplicationContext(), HomeScreen.class));
         finish();
     }

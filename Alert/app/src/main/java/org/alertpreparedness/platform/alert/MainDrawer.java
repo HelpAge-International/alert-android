@@ -63,9 +63,10 @@ public class MainDrawer extends BaseActivity {
                         });
                         break;
                     case R.id.nav_logout:
-                        firebaseAuth.signOut();
-                        finish();
                         startActivity(new Intent(getApplicationContext(), LoginScreen.class));
+                        firebaseAuth.signOut();
+//                        PreferHelper.getInstance(MainDrawer.this).edit().remove(UserInfo.PREFS_USER).apply();
+//                        finish();
                 }
                 return false;
             }
