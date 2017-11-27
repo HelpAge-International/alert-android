@@ -18,8 +18,11 @@ import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.DBListener;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by faizmohideen on 20/11/2017.
@@ -33,6 +36,9 @@ public class DataHandler extends HomeScreen {
     private static ChildEventListener childEventListener;
     private static ValueEventListener valueEventListener;
     public static String mAppStatus = PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS);
+    private static Calendar date = Calendar.getInstance();
+    public static String dateFormat = "dd/MM/yyyy";
+    private static SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
 
     public static void getAlertsFromFirebase(String ids) {
         database.child(mAppStatus).child("alert").child(ids).addChildEventListener(childEventListener =  new ChildEventListener() {
@@ -47,19 +53,25 @@ public class DataHandler extends HomeScreen {
                         long hazardScenario = (long) dataSnapshot.child("hazardScenario").getValue();
                         long population = (long) dataSnapshot.child("estimatedPopulation").getValue();
 
-                        if (hazardScenario != -1) {
-                            Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas, null);
+                        if(dataSnapshot.child("timeUpdated").exists()) {
+                            long updated = (long) dataSnapshot.child("timeUpdated").getValue();
+                            date.setTimeInMillis(updated);
+                            String updatedDay = format.format(date.getTime());
 
-                            appBarTitle.setText(R.string.amber_alert_level);
-                            appBarTitle.setBackgroundResource(R.drawable.alert_amber_main);
+                            if (hazardScenario != -1) {
+                                Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas, updatedDay, null);
 
-                            alerts.add((int) alertLevel);
-                            setRedActionBar(alerts.contains(2));
+                                appBarTitle.setText(R.string.amber_alert_level);
+                                appBarTitle.setBackgroundResource(R.drawable.alert_amber_main);
 
-                            alertAdapter.add(alert);
-                        } else if (dataSnapshot.child("otherName").exists()) {
-                            String nameId = (String) dataSnapshot.child("otherName").getValue();
-                            setOtherName(nameId, alertLevel, hazardScenario, numberOfAreas, population);
+                                alerts.add((int) alertLevel);
+                                setRedActionBar(alerts.contains(2));
+
+                                alertAdapter.add(alert);
+                            } else if (dataSnapshot.child("otherName").exists()) {
+                                String nameId = (String) dataSnapshot.child("otherName").getValue();
+                                setOtherName(nameId, alertLevel, hazardScenario, numberOfAreas, population, updatedDay);
+                            }
                         }
                     }
                 }
@@ -91,12 +103,12 @@ public class DataHandler extends HomeScreen {
 
     }
 
-    private static void setOtherName(String nameId, long alertLevel, long hazardScenario, long numOfAreas, long population) {
+    private static void setOtherName(String nameId, long alertLevel, long hazardScenario, long numOfAreas, long population, String updatedDay) {
         database.child(mAppStatus).child("hazardOther").child(nameId).addValueEventListener(valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String name = (String) dataSnapshot.child("name").getValue();
-                Alert alert = new Alert(alertLevel, hazardScenario, population, numOfAreas, name);
+                Alert alert = new Alert(alertLevel, hazardScenario, population, numOfAreas, updatedDay, name);
                 alertAdapter.add(alert);
 
                // dbListener.add(database, (ValueEventListener) dataSnapshot);

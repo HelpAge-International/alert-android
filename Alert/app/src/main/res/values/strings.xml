@@ -83,5 +83,7 @@
     <string name="high">High</string>
     <string name="title_activity_log_indicator">LogIndicatorActivity</string>
     <string name="action_settings">Settings</string>
+    <string name="last_updated">Last updated:</string>
+    <string name="date_format">dd/mm/yyyy</string>
 
 </resources>

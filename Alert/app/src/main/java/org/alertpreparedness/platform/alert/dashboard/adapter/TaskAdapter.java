@@ -64,9 +64,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
             @Override
             public int compare(Tasks o1, Tasks o2) {
                // System.out.println(o1.getDueDate() + " " + o2.getDueDate());
-                if (o1.getDueDate() > o2.getDueDate()) return -1;
-                if (o1.getDueDate() < o2.getDueDate()) return 1;
-                return 0;
+//                if (o1.getDueDate() > o2.getDueDate()) return -1;
+//                if (o1.getDueDate() < o2.getDueDate()) return 1;
+                return Long.compare(o2.getDueDate(), o1.getDueDate());
             }
         });
         notifyDataSetChanged();

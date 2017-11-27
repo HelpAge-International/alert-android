@@ -134,7 +134,15 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder>{
                     txt_hazard_name.setText(Constants.HAZARD_SCENARIO_NAME[i]);
                     txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(), alert.getNumOfAreas()));
                     fetchIcon(Constants.HAZARD_SCENARIO_NAME[i], img_hazard_icon);
-                } else if (alert.getOtherName() != null) {
+                } else if (alert.getOtherName() != null && alert.getAlertLevel() == Constants.TRIGGER_RED) {
+                    txt_alert_level.setText(R.string.red_alert_text);
+                    img_alert_colour.setImageResource(R.drawable.red_alert_left);
+                    img_hazard_icon.setImageResource(R.drawable.other);
+                    txt_hazard_name.setText(alert.getOtherName());
+                    txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(), alert.getNumOfAreas()));
+                } else if (alert.getOtherName() != null && alert.getAlertLevel() == Constants.TRIGGER_AMBER) {
+                    txt_alert_level.setText(R.string.amber_alert_text);
+                    img_alert_colour.setImageResource(R.drawable.amber_alert_left);
                     img_hazard_icon.setImageResource(R.drawable.other);
                     txt_hazard_name.setText(alert.getOtherName());
                     txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(), alert.getNumOfAreas()));

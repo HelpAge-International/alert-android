@@ -12,7 +12,7 @@ import org.alertpreparedness.platform.alert.R;
 
 public class CreateAlertActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private ImageView closeImageView;
+    private ImageView closeImageView, imgRight;
     public TextView mainTextView;
     public Toolbar toolbar;
 
@@ -23,6 +23,7 @@ public class CreateAlertActivity extends AppCompatActivity implements View.OnCli
 
         mainTextView = (TextView) findViewById(R.id.action_bar_title);
         closeImageView = (ImageView) findViewById(R.id.leftImageView);
+        imgRight = (ImageView) findViewById(R.id.rightImageView);
         toolbar = (Toolbar) findViewById(R.id.alert_appbar);
 
         setSupportActionBar(toolbar);
@@ -30,8 +31,8 @@ public class CreateAlertActivity extends AppCompatActivity implements View.OnCli
 
         closeImageView.setImageBitmap(null);
         closeImageView.setBackgroundResource(R.drawable.close);
-
         closeImageView.setOnClickListener(this);
+        imgRight.setVisibility(View.GONE);
 
     }
 

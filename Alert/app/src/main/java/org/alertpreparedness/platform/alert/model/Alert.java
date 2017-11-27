@@ -9,15 +9,25 @@ public class Alert {
     public long numOfAreas;
     public long hazardScenario;
     public long population;
+    public String updated;
     public String otherName;
     public String reason;
 
-    public Alert(long alertLevel, long hazardScenario, long population, long numOfAreas, String otherName) {
+    public Alert(long alertLevel, long hazardScenario, long population, long numOfAreas, String updated, String otherName) {
         this.alertLevel = alertLevel;
         this.hazardScenario = hazardScenario;
         this.population = population;
         this.numOfAreas = numOfAreas;
+        this.updated = updated;
         this.otherName = otherName;
+    }
+
+    public String getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(String updated) {
+        this.updated = updated;
     }
 
     public long getNumOfAreas() {
