@@ -49,7 +49,7 @@ public class UserInfo extends LoginScreen{
     //Cross-check if the logged-in user ID matches the ID under different node.
     public static void authUser(final AuthCallback authCallback){
         for (String nodeName : users) {
-            database.child("sand")
+            database.child(DataHandler.mAppStatus)
                     .child(nodeName)
                     .addListenerForSingleValueEvent(valueEventListener = new ValueEventListener() {
                         @Override

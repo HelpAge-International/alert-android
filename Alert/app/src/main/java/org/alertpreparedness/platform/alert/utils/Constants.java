@@ -21,7 +21,15 @@ public final class Constants {
     public static final String[] HAZARD_SCENARIO_NAME = {"Cold Wave", "Conflict", "Cyclone", "Drought", "Earthquake", "Epidemic", "Fire", "Flash Flood", "Flood", "Heat Wave", "Heavy Rain", "Humanitarian Access",
             "Insect Infestation", "Landslide", "Locust Infestation", "Mudslide", "Population Displacement", "Population Return", "Snow Avalanche", "Snowfall", "Storm", "Storm Surge", "Technological Disaster", "Tornado", "Tsunami", "Violent Wind", "Volcano"};
     public static final String[] INDICATOR_GEO_LOCATION = {"National", "Subnational", "Use my location"};
-    public static final String[] TRIGGER_LEVEL = {"Average or falling", "Potential challenges & risks", "Red alert"};
+    public static final String[] TRIGGER_LEVEL = {"Average or falling", "Potential challenges & risks", "High"};
+    public static final String[] FREQUENCY_NAMES = {"hour(s)", "day(s)", "week(s)", "month(s)", "year(s)"};
+
+    //duration type
+    public static final int HOUR = 0;
+    public static final int DAY = 1;
+    public static final int WEEK = 2;
+    public static final int MONTH = 3;
+    public static final int YEAR = 4;
 
     //indicator-geo-location
     public static final int NATIONAL = 0;

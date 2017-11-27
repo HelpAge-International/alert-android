@@ -5,6 +5,7 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/llUpdateIndicator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -31,6 +32,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/llEditIndicator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -84,6 +86,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/llIndicatorLog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -117,37 +120,38 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:padding="10dp"
-        android:focusable="true">
+    <!--<LinearLayout-->
+        <!--android:id="@+id/llIndicatorAttach"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:background="?attr/selectableItemBackground"-->
+        <!--android:clickable="true"-->
+        <!--android:padding="10dp"-->
+        <!--android:focusable="true">-->
 
-        <FrameLayout
-            android:id="@+id/flIndicatorAttach"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+        <!--<FrameLayout-->
+            <!--android:id="@+id/flIndicatorAttach"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content">-->
 
-            <ImageView
-                android:id="@+id/ivIndicatorAttach"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_margin="5dp"
-                android:src="@drawable/ic_attach_file_black_24dp" />
-        </FrameLayout>
+            <!--<ImageView-->
+                <!--android:id="@+id/ivIndicatorAttach"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--android:layout_margin="5dp"-->
+                <!--android:src="@drawable/ic_attach_file_black_24dp" />-->
+        <!--</FrameLayout>-->
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="25dp"
-            android:layout_marginStart="25dp"
-            android:text="@string/attachments" />
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center_vertical"-->
+            <!--android:layout_marginLeft="25dp"-->
+            <!--android:layout_marginStart="25dp"-->
+            <!--android:text="@string/attachments" />-->
 
-    </LinearLayout>
+    <!--</LinearLayout>-->
 
 </LinearLayout>

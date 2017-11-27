@@ -13,10 +13,12 @@ import org.alertpreparedness.platform.alert.helper.UserInfo
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelCountry
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelHazard
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
+import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelLog
 import org.alertpreparedness.platform.alert.risk_monitoring.service.CountryService
 import org.alertpreparedness.platform.alert.risk_monitoring.service.NetworkService
 import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService
 import org.alertpreparedness.platform.alert.utils.Constants
+import org.joda.time.DateTime
 import timber.log.Timber
 
 /**
@@ -36,6 +38,8 @@ class ActiveRiskViewModel : ViewModel() {
     private val mAgencyId = UserInfo.getUser(AlertApplication.getContext()).agencyAdminID
     private val mCountryId = UserInfo.getUser(AlertApplication.getContext()).countryID
     private val mCountryModelLive: MutableLiveData<ModelCountry> = MutableLiveData()
+    private val mIndicatorModelLive: MutableLiveData<ModelIndicator> = MutableLiveData()
+    private val mLogsLive:MutableLiveData<List<ModelLog>> = MutableLiveData()
 
     fun getLiveGroups(isActive: Boolean): LiveData<MutableList<ExpandableGroup<ModelIndicator>>> {
         loadGroups(isActive)
@@ -46,11 +50,62 @@ class ActiveRiskViewModel : ViewModel() {
         mDisposables.add(CountryService.getCountryModel()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({country ->
+                .subscribe({ country ->
                     mCountryModelLive.value = country
                 })
         )
         return mCountryModelLive
+    }
+
+    fun getLiveIndicatorModel(hazardId: String, indicatorId: String): MutableLiveData<ModelIndicator> {
+        mDisposables.add(
+                RiskMonitoringService.getIndicatorModel(hazardId, indicatorId)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({ indicator ->
+                            mIndicatorModelLive.value = indicator
+                        })
+        )
+        return mIndicatorModelLive
+    }
+
+    fun getLiveIndicatorLogs(indicatorId: String): MutableLiveData<List<ModelLog>> {
+        mDisposables.add(
+                RiskMonitoringService.getLogs(indicatorId)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({logs ->
+                            mLogsLive.value = logs
+                        })
+        )
+        return mLogsLive
+    }
+
+    fun updateIndicatorLevel(hazardId: String, indicatorId: String, indicator: ModelIndicator, selection: Int) {
+        var dueTime = indicator.dueDate
+        val modelTrigger = indicator.trigger[selection]
+        when (modelTrigger.durationType.toInt()) {
+            Constants.HOUR -> {
+                dueTime = DateTime().plusHours(modelTrigger.frequencyValue.toInt()).millis
+            }
+            Constants.DAY -> {
+                dueTime = DateTime().plusDays(modelTrigger.frequencyValue.toInt()).millis
+            }
+            Constants.WEEK -> {
+                dueTime = DateTime().plusWeeks(modelTrigger.frequencyValue.toInt()).millis
+            }
+            Constants.MONTH -> {
+                dueTime = DateTime().plusMonths(modelTrigger.frequencyValue.toInt()).millis
+            }
+            Constants.YEAR -> {
+                dueTime = DateTime().plusYears(modelTrigger.frequencyValue.toInt()).millis
+            }
+            else -> {
+                throw IllegalArgumentException("Duration type is not valid!")
+            }
+        }
+        val updateMap = mutableMapOf<String, Any>("dueDate" to dueTime, "triggerSelected" to selection, "updatedAt" to DateTime().millis)
+        mDisposables.add(RiskMonitoringService.updateIndicatorLevel(hazardId, indicatorId, updateMap).subscribe())
     }
 
     private fun loadGroups(isActive: Boolean) {

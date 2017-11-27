@@ -2,6 +2,7 @@ package org.alertpreparedness.platform.alert;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,7 +17,10 @@ import android.widget.FrameLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
+import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
+import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
 
 public abstract class BaseActivity extends AppCompatActivity implements FirebaseAuth.AuthStateListener {
@@ -37,8 +41,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Firebase
             mAuth.removeAuthStateListener(this);
         }
         AlertApplication.mActivities.remove(this);
-//        int index = AlertApplication.mActivities.indexOf(this);
-//        AlertApplication.mActivities.remove(index);
     }
 
     protected void checkAuth() {
@@ -108,12 +110,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Firebase
         // If Not authenticated again
         if (firebaseAuth.getCurrentUser() == null) {
             // User has logged out
-//            PreferHelper.putString(getApplicationContext(), Constants.UID, "");
-//            PreferHelper.putString(getApplicationContext(), Constants.USER_PASSWORD, "");
-//            Intent i = new Intent(getApplicationContext(), LoginActivity.class);
-//            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//            startActivity(i);
-//            finish();
+            PreferHelper.getInstance(this).edit().remove(UserInfo.PREFS_USER).apply();
+            Intent i = new Intent(getApplicationContext(), HomeScreen.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(i);
+            finish();
         }
     }
 }

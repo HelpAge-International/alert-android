@@ -1,10 +1,5 @@
 package org.alertpreparedness.platform.alert.helper;
 
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -13,14 +8,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
-import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.model.Alert;
 import org.alertpreparedness.platform.alert.model.Tasks;
+import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService;
+import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.DBListener;
+import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,9 +32,10 @@ public class DataHandler extends HomeScreen {
     private static DBListener dbListener = new DBListener();
     private static ChildEventListener childEventListener;
     private static ValueEventListener valueEventListener;
+    public static String mAppStatus = PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS);
 
     public static void getAlertsFromFirebase(String ids) {
-        database.child("sand").child("alert").child(ids).addChildEventListener(childEventListener =  new ChildEventListener() {
+        database.child(mAppStatus).child("alert").child(ids).addChildEventListener(childEventListener =  new ChildEventListener() {
 
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -53,7 +51,7 @@ public class DataHandler extends HomeScreen {
                             Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas, null);
 
                             appBarTitle.setText(R.string.amber_alert_level);
-                            appBarTitle.setBackgroundResource(R.drawable.alert_amber);
+                            appBarTitle.setBackgroundResource(R.drawable.alert_amber_main);
 
                             alerts.add((int) alertLevel);
                             setRedActionBar(alerts.contains(2));
@@ -94,7 +92,7 @@ public class DataHandler extends HomeScreen {
     }
 
     private static void setOtherName(String nameId, long alertLevel, long hazardScenario, long numOfAreas, long population) {
-        database.child("sand").child("hazardOther").child(nameId).addValueEventListener(valueEventListener = new ValueEventListener() {
+        database.child(mAppStatus).child("hazardOther").child(nameId).addValueEventListener(valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String name = (String) dataSnapshot.child("name").getValue();
@@ -119,7 +117,7 @@ public class DataHandler extends HomeScreen {
 
         for (String type : types) {
             if (type.equals("action")) {
-                database.child("sand").child("action").child(node).addChildEventListener(childEventListener = new ChildEventListener() {
+                database.child(mAppStatus).child("action").child(node).addChildEventListener(childEventListener = new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         String asignee = (String) dataSnapshot.child("asignee").getValue();
@@ -159,7 +157,7 @@ public class DataHandler extends HomeScreen {
                 });
                 dbListener.add(database, childEventListener);
             } else if (type.equals("indicator")) {
-                database.child("sand").child("indicator").child(node).addChildEventListener(childEventListener = new ChildEventListener() {
+                database.child(mAppStatus).child("indicator").child(node).addChildEventListener(childEventListener = new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         String asignee = (String) dataSnapshot.child("assignee").getValue();
@@ -207,7 +205,7 @@ public class DataHandler extends HomeScreen {
     public static void setRedActionBar(boolean isRedExists){
         if(isRedExists){
             appBarTitle.setText(R.string.red_alert_level);
-            appBarTitle.setBackgroundResource(R.drawable.alert_red);
+            appBarTitle.setBackgroundResource(R.drawable.alert_red_main);
         }
     }
 

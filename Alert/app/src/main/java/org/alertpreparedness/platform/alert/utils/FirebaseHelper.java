@@ -25,6 +25,14 @@ public class FirebaseHelper {
         return AppUtils.getDatabase().getReference(appStatus).child("indicator").child(hazardId);
     }
 
+    public static DatabaseReference getIndicatorRef(String appStatus, String hazardId, String indicatorId) {
+        return AppUtils.getDatabase().getReference(appStatus).child("indicator").child(hazardId).child(indicatorId);
+    }
+
+    public static DatabaseReference getIndicatorLogRef(String appStatus, String indicatorId) {
+        return AppUtils.getDatabase().getReference(appStatus).child("log").child(indicatorId);
+    }
+
     public static DatabaseReference getNetworkMapRef(String appStatus, String agencyId, String countryId) {
         return AppUtils.getDatabase().getReference(appStatus).child("countryOffice").child(agencyId).child(countryId).child("networks");
     }

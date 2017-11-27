@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.alertpreparedness.platform.alert">
+<manifest package="org.alertpreparedness.platform.alert"
+          xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <!-- Leak canary needs access to External storage to save heap dumps -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -22,36 +22,36 @@
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".login.activity.LoginScreen"
             android:screenOrientation="portrait"
-            android:theme="@style/SplashTheme" />
+            android:theme="@style/SplashTheme"/>
         <activity
             android:name=".dashboard.activity.HomeScreen"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"/>
 
         <meta-data
             android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
+            android:resource="@array/preloaded_fonts"/>
 
-        <activity android:name=".MainDrawer" />
+        <activity android:name=".MainDrawer"/>
         <activity
             android:name=".risk_monitoring.view.RiskActivity"
             android:label="@string/title_activity_risk"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".risk_monitoring.view.AddIndicatorActivity"
             android:label="@string/title_activity_add_indicator"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".risk_monitoring.view.SelectAreaActivity"
             android:label="@string/title_activity_select_area"
@@ -62,9 +62,19 @@
             android:label="@string/title_activity_create_alert"
             android:screenOrientation="portrait" />
         <activity android:name=".dashboard.activity.AlertDetailActivity"
-            android:parentActivityName=".dashboard.activity.HomeScreen">
+            android:parentActivityName=".dashboard.activity.HomeScreen"/>
             <meta-data android:name="android.support.PARENT_ACTIVITY"
-                android:value=".dashboard.activity.HomeScreen"/>
+                android:value=".dashboard.activity.HomeScreen"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".risk_monitoring.view.UpdateIndicatorActivity"
+            android:label="@string/title_activity_update_indicator"
+            android:theme="@style/AppTheme">
+        </activity>
+        <activity
+            android:name=".risk_monitoring.view.LogIndicatorActivity"
+            android:label="@string/title_activity_log_indicator"
+            android:theme="@style/AppTheme">
         </activity>
     </application>
 

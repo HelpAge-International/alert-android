@@ -77,4 +77,11 @@
     <string name="amber_alert_level">Amber Alert Level</string>
     <string name="red_alert_level">Red Alert Level</string>
     <string name="green_alert_level">Green Alert Level</string>
+    <string name="title_activity_update_indicator">UpdateIndicatorActivity</string>
+    <string name="average_of_falling">Average of falling</string>
+    <string name="increasing">Increasing</string>
+    <string name="high">High</string>
+    <string name="title_activity_log_indicator">LogIndicatorActivity</string>
+    <string name="action_settings">Settings</string>
+
 </resources>
