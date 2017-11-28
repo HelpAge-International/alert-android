@@ -15,16 +15,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
 
 public class LoginScreen extends AppCompatActivity implements View.OnClickListener, AuthCallback {
@@ -92,6 +91,9 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 //                        progressDialog.dismiss();
 
                     if (task.isSuccessful()) {
+                        if (firebaseAuth.getCurrentUser()!=null) {
+                            PreferHelper.putString(this, Constants.UID, firebaseAuth.getCurrentUser().getUid());
+                        }
                         userInfo.authUser(LoginScreen.this);
                     }
 
@@ -116,6 +118,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     public void onUserAuthorized(User user) {
         progressDialog.dismiss();
         startActivity(new Intent(LoginScreen.this, HomeScreen.class));
+        UserInfo.clearAll();
         finish();
     }
 

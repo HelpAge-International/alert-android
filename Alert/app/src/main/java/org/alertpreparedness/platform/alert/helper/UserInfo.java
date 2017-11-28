@@ -5,7 +5,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -13,12 +12,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
-import org.alertpreparedness.platform.alert.BaseActivity;
+import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.login.activity.AuthCallback;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.service.NetworkService;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.DBListener;
+import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
 import java.util.Locale;
 import java.util.Map;
@@ -30,27 +30,27 @@ import io.reactivex.disposables.Disposable;
  * Created by faizmohideen on 08/11/2017.
  */
 
-public class UserInfo extends BaseActivity{
+public class UserInfo {
     // public static String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
     public static DatabaseReference database = FirebaseDatabase.getInstance().getReference();
     public static final String PREFS_USER = "prefs_user";
     private static CompositeDisposable compositeDisposable = new CompositeDisposable();
     private static String[] users = {"administratorCountry", "countryDirector", "ert", "ertLeader", "partner"};
     private static DBListener dbListener = new DBListener();
-    private static ValueEventListener valueEventListener;
 
 
     //Cross-check if the logged-in user ID matches the ID under different node.
     public void authUser(final AuthCallback authCallback) {
         // userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         for (String nodeName : users) {
-            database.child(DataHandler.mAppStatus)
-                    .child(nodeName)
-                    .addListenerForSingleValueEvent(valueEventListener = new ValueEventListener() {
+            ValueEventListener valueEventListener;
+            DatabaseReference db = database.child(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS))
+                    .child(nodeName);
+            db.addListenerForSingleValueEvent(valueEventListener = new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            if (dataSnapshot.child(getUid()).exists()) {
-                                DataSnapshot userNode = dataSnapshot.child(getUid());
+                            if (dataSnapshot.child(PreferHelper.getString(AlertApplication.getContext(), Constants.UID)).exists()) {
+                                DataSnapshot userNode = dataSnapshot.child(PreferHelper.getString(AlertApplication.getContext(), Constants.UID));
                                 populateUser(authCallback, nodeName, userNode);
                             } else {
                                 //System.out.println("False");
@@ -61,7 +61,7 @@ public class UserInfo extends BaseActivity{
                         public void onCancelled(DatabaseError databaseError) {
                         }
                     });
-            dbListener.add(database, valueEventListener);
+            dbListener.add(db, valueEventListener);
 
         }
     }
@@ -83,11 +83,16 @@ public class UserInfo extends BaseActivity{
     }
 
     private void populateUser(AuthCallback callback, String nodeName, DataSnapshot userNode) {
-        String userID = getUid();
+        String userID = PreferHelper.getString(AlertApplication.getContext(), Constants.UID);
         int userType = getUserTypeString(nodeName);
         String agencyAdmin = userNode.child("agencyAdmin").getChildren().iterator().next().getKey();
         String systemAdmin = userNode.child("systemAdmin").getChildren().iterator().next().getKey();
         String countryId = userNode.child("countryId").getValue(String.class);
+
+        PreferHelper.putString(AlertApplication.getContext(), Constants.AGENCY_ID, agencyAdmin);
+        PreferHelper.putString(AlertApplication.getContext(), Constants.COUNTRY_ID, countryId);
+        PreferHelper.putString(AlertApplication.getContext(), Constants.SYSTEM_ID, systemAdmin);
+        PreferHelper.putInt(AlertApplication.getContext(), Constants.USER_TYPE, userType);
 
         Disposable NSDisposable = NetworkService.INSTANCE.mapNetworksForCountry(agencyAdmin, countryId).subscribe(
                 (Map<String, String> stringStringMap) -> {
@@ -127,15 +132,6 @@ public class UserInfo extends BaseActivity{
             default:
                 return -1;
         }
-    }
-
-
-    public interface SimpleCallback {
-        void callback(Object data);
-    }
-
-    public interface AdditionalCallback {
-        void callback(Object data, String node);
     }
 
     public static void clearAll() {

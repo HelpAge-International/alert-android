@@ -33,6 +33,7 @@
             android:theme="@style/SplashTheme"/>
         <activity
             android:name=".dashboard.activity.HomeScreen"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"/>
 
         <meta-data
