@@ -33,16 +33,16 @@ import java.util.Locale;
 public class DataHandler {
     public static DatabaseReference database = FirebaseDatabase.getInstance().getReference();
     static List<Integer> alerts = new ArrayList<Integer>();
-    private static DBListener dbListener = new DBListener();
-    private static ChildEventListener childEventListener;
-    private static ValueEventListener valueEventListener;
+    private DBListener dbListener = new DBListener();
+    private ChildEventListener childEventListener;
+    private ValueEventListener valueEventListener;
     public static String mAppStatus = PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS);
     private static Calendar date = Calendar.getInstance();
     public static String dateFormat = "dd/MM/yyyy";
     private static SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
 
 
-    public static void getAlertsFromFirebase(IHomeActivity iHome, String ids) {
+    public void getAlertsFromFirebase(IHomeActivity iHome, String ids) {
         database.child(mAppStatus).child("alert").child(ids)
                 .addChildEventListener(childEventListener =  new ChildEventListener() {
 
@@ -104,7 +104,7 @@ public class DataHandler {
 
     }
 
-    private static void setOtherName(IHomeActivity iHome, String nameId, long alertLevel, long hazardScenario, long numOfAreas, long population, String updatedDay) {
+    private void setOtherName(IHomeActivity iHome, String nameId, long alertLevel, long hazardScenario, long numOfAreas, long population, String updatedDay) {
         database.child(mAppStatus).child("hazardOther").child(nameId).addValueEventListener(valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -124,11 +124,11 @@ public class DataHandler {
 
     }
 
-    public static void detach(){
+    public void detach(){
         dbListener.detatch();
     }
 
-    public static void getTasksFromFirebase(IHomeActivity iHome, String node) {
+    public void getTasksFromFirebase(IHomeActivity iHome, String node) {
 
         String types[] = {"action", "indicator"};
 

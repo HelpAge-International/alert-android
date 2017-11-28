@@ -56,7 +56,7 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
     private Alert alert;
     private ArrayList<CountryJsonData> mCountryList;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
-    // private DataHandler dataHandler = new DataHandler();
+    private DataHandler dataHandler = new DataHandler();
 
     public TaskAdapter taskAdapter;
     public List<Tasks> tasksList;
@@ -147,11 +147,11 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         firebaseDatabase = FirebaseDatabase.getInstance();
 
         for (String ids : usersID) {
-            DataHandler.getAlertsFromFirebase(this, ids);
+            dataHandler.getAlertsFromFirebase(this, ids);
         }
 
         for (String ids : usersID) {
-            DataHandler.getTasksFromFirebase(this, ids);
+            dataHandler.getTasksFromFirebase(this, ids);
         }
 
     }
@@ -189,7 +189,8 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         compositeDisposable.clear();
         compositeDisposable.dispose();
 
-        DataHandler.detach();
+        dataHandler.detach();
+
     }
 
     @Override

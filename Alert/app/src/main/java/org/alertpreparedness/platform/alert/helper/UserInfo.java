@@ -37,7 +37,7 @@ public class UserInfo extends BaseActivity{
     private static CompositeDisposable compositeDisposable = new CompositeDisposable();
     private static String[] users = {"administratorCountry", "countryDirector", "ert", "ertLeader", "partner"};
     private static DBListener dbListener = new DBListener();
-    private static ValueEventListener valueEventListener;
+    private ValueEventListener valueEventListener;
 
 
     //Cross-check if the logged-in user ID matches the ID under different node.
@@ -66,7 +66,7 @@ public class UserInfo extends BaseActivity{
         }
     }
 
-    public static void saveUser(Context context, User user) {
+    public void saveUser(Context context, User user) {
         String serializedUser = new Gson().toJson(user);
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
@@ -127,15 +127,6 @@ public class UserInfo extends BaseActivity{
             default:
                 return -1;
         }
-    }
-
-
-    public interface SimpleCallback {
-        void callback(Object data);
-    }
-
-    public interface AdditionalCallback {
-        void callback(Object data, String node);
     }
 
     public static void clearAll() {
