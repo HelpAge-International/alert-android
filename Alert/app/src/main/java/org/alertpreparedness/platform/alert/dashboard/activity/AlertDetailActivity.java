@@ -24,6 +24,9 @@ public class AlertDetailActivity extends AppCompatActivity {
     private TextView txtHazardName, txtPopulation, txtAffectedArea, txtInfo, txtLastUpdated, txtActionBarTitle;
     private ImageView imgHazard, imgPopulation, imgAffectedArea, imgInfo, imgClose, imgUpdate;
     private Toolbar toolbar;
+    private Alert alert;
+
+    public static final String EXTRA_ALERT = "extra_alert";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +34,7 @@ public class AlertDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_alert_detail);
 
         Intent intent = getIntent();
-        int itemId = intent.getIntExtra("ITEM_ID", 0);
+        alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
 
         toolbar = (Toolbar) findViewById(R.id.action_toolbar);
         setSupportActionBar(toolbar);
@@ -57,11 +60,11 @@ public class AlertDetailActivity extends AppCompatActivity {
         imgUpdate = (ImageView) findViewById(R.id.rightImageView);
 
         imgClose.setVisibility(View.GONE);
-        fetchDetails(itemId);
+        fetchDetails();
     }
 
-    public void fetchDetails(int id) {
-        final Alert alert = AlertAdapter.getInstance().getAlertList().get(id);
+    public void fetchDetails() {
+        //final Alert alert = AlertAdapter.getInstance().getAlertList().get(id);
 
         if(alert.alertLevel == 1){
             toolbar.setBackgroundResource(R.color.alertAmber);

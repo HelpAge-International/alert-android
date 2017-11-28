@@ -1,10 +1,12 @@
 package org.alertpreparedness.platform.alert.model;
 
+import java.io.Serializable;
+
 /**
  * Created by faizmohideen on 20/11/2017.
  */
 
-public class Alert {
+public class Alert implements Serializable{
     public long alertLevel;
     public long numOfAreas;
     public long hazardScenario;

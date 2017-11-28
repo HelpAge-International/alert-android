@@ -63,7 +63,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         Collections.sort(listArray, new Comparator<Tasks>() {
             @Override
             public int compare(Tasks o1, Tasks o2) {
-               // System.out.println(o1.getDueDate() + " " + o2.getDueDate());
+                // System.out.println(o1.getDueDate() + " " + o2.getDueDate());
 //                if (o1.getDueDate() > o2.getDueDate()) return -1;
 //                if (o1.getDueDate() < o2.getDueDate()) return 1;
                 return Long.compare(o2.getDueDate(), o1.getDueDate());
@@ -105,7 +105,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
                 txt_taskStatus.setText(dueBeforeString("red level", "indicator", format.format(new Date(tasks.getDueDate()))));
                 img_task.setImageResource(R.drawable.home_task_red);
             }
-           // img_task.setImageResource(isDueToday(tasks.getDueDate()) ? R.drawable.home_task_red : R.drawable.home_task_amber);
+            // img_task.setImageResource(isDueToday(tasks.getDueDate()) ? R.drawable.home_task_red : R.drawable.home_task_amber);
         }
     }
 

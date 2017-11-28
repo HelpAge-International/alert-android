@@ -68,6 +68,7 @@ public class MainDrawer extends BaseActivity {
                         UserInfo.clearAll();
                         firebaseAuth.signOut();
                         startActivity(new Intent(getApplicationContext(), LoginScreen.class));
+                        finish();
 //                        PreferHelper.getInstance(MainDrawer.this).edit().remove(UserInfo.PREFS_USER).apply();
 //                        finish();
                 }

@@ -87,24 +87,21 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
         progressDialog.show();
 
         firebaseAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
+                .addOnCompleteListener(this, task -> {
+                    Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
 //                        progressDialog.dismiss();
 
-                        if (task.isSuccessful()) {
-                            userInfo.authUser(LoginScreen.this);
-                        }
+                    if (task.isSuccessful()) {
+                        userInfo.authUser(LoginScreen.this);
+                    }
 
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithEmail:failed | " + task.getException().getMessage());
-                            Toast.makeText(LoginScreen.this, "The password you entered is incorrect. Please check and try again!" + task.getException().getMessage(),
-                                    Toast.LENGTH_SHORT).show();
-                        }
+                    // If sign in fails, display a message to the user. If sign in succeeds
+                    // the auth state listener will be notified and logic to handle the
+                    // signed in user can be handled in the listener.
+                    if (!task.isSuccessful()) {
+                        Log.w(TAG, "signInWithEmail:failed | " + task.getException().getMessage());
+                        Toast.makeText(LoginScreen.this, "The password you entered is incorrect. Please check and try again!" + task.getException().getMessage(),
+                                Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -118,7 +115,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onUserAuthorized(User user) {
         progressDialog.dismiss();
-        startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+        startActivity(new Intent(LoginScreen.this, HomeScreen.class));
         finish();
     }
 

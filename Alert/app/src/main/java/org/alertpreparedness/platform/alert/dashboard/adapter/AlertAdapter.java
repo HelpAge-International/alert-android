@@ -40,12 +40,8 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder>{
         return listArray;
     }
 
-    public static List<Alert> listArray;
+    private List<Alert> listArray;
     private static WeakReference<HomeScreen> mActivityRef;
-    private static AlertAdapter instance = new AlertAdapter();
-    public static AlertAdapter getInstance() {
-        return instance;
-    }
     private final static String _TAG = "Adapter";
 
     public AlertAdapter(@NonNull List<Alert> List) {
@@ -112,9 +108,9 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder>{
             itemView.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View view) {
-                    int position = getLayoutPosition();
+                    int position = getAdapterPosition();
                     if (listener != null) {
-                        listener.onAlertItemClicked(position);
+                        listener.onAlertItemClicked(listArray.get(position));
                     }
                 }
             });
@@ -152,54 +148,80 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder>{
     }
 
     public static void fetchIcon(String hazardName, ImageView imageView) {
-        if (hazardName.equals("Cold Wave")) {
-            imageView.setImageResource(R.drawable.cold_wave);
-        }else if (hazardName.equals("Conflict")) {
-            imageView.setImageResource(R.drawable.conflict);
-        }else if (hazardName.equals("Cyclone")) {
-            imageView.setImageResource(R.drawable.cyclone);
-        }else if (hazardName.equals("Drought")) {
-            imageView.setImageResource(R.drawable.drought);
-        }else if (hazardName.equals("Earthquake")) {
-            imageView.setImageResource(R.drawable.earthquake);
-        }else if (hazardName.equals("Epidemic")) {
-            imageView.setImageResource(R.drawable.epidemic);
-        }else if (hazardName.equals("Fire")) {
-            imageView.setImageResource(R.drawable.fire);
-        }else if (hazardName.equals("Flash Flood")) {
-            imageView.setImageResource(R.drawable.flash_flood);
-        }else if (hazardName.equals("Heat Wave")) {
-            imageView.setImageResource(R.drawable.heat_wave);
-        }else if (hazardName.equals("Humanitarian Access")) {
-            imageView.setImageResource(R.drawable.humanitarian_access);
-        }else if (hazardName.equals("Insect Infestation")) {
-            imageView.setImageResource(R.drawable.insect_infestation);
-        }else if (hazardName.equals("Landslide") || hazardName.equals("Mudslide") ) {
-            imageView.setImageResource(R.drawable.landslide_mudslide);
-        }else if (hazardName.equals("Locust Infestation")) {
-            imageView.setImageResource(R.drawable.locust_infestation);
-        }else if (hazardName.equals("Population Displacement")) {
-            imageView.setImageResource(R.drawable.population_displacement);
-        }else if (hazardName.equals("Population Return")) {
-            imageView.setImageResource(R.drawable.population_return);
-        }else if (hazardName.equals("Snow Avalanche")) {
-            imageView.setImageResource(R.drawable.snow_avalanche);
-        }else if (hazardName.equals("Snowfall")) {
-            imageView.setImageResource(R.drawable.snowfall);
-        }else if (hazardName.equals("Storm")) {
-            imageView.setImageResource(R.drawable.storm);
-        }else if (hazardName.equals("Storm Surge")) {
-            imageView.setImageResource(R.drawable.storm_surge);
-        }else if (hazardName.equals("Technological Disaster")) {
-            imageView.setImageResource(R.drawable.technological_disaster);
-        }else if (hazardName.equals("Tornado")) {
-            imageView.setImageResource(R.drawable.tornado);
-        }else if (hazardName.equals("Tsunami")) {
-            imageView.setImageResource(R.drawable.tsunami);
-        }else if (hazardName.equals("Violent Wind")) {
-            imageView.setImageResource(R.drawable.violent_wind);
-        }else if (hazardName.equals("Volcano")) {
-            imageView.setImageResource(R.drawable.volcano);
+        switch (hazardName) {
+            case "Cold Wave":
+                imageView.setImageResource(R.drawable.cold_wave);
+                break;
+            case "Conflict":
+                imageView.setImageResource(R.drawable.conflict);
+                break;
+            case "Cyclone":
+                imageView.setImageResource(R.drawable.cyclone);
+                break;
+            case "Drought":
+                imageView.setImageResource(R.drawable.drought);
+                break;
+            case "Earthquake":
+                imageView.setImageResource(R.drawable.earthquake);
+                break;
+            case "Epidemic":
+                imageView.setImageResource(R.drawable.epidemic);
+                break;
+            case "Fire":
+                imageView.setImageResource(R.drawable.fire);
+                break;
+            case "Flash Flood":
+                imageView.setImageResource(R.drawable.flash_flood);
+                break;
+            case "Heat Wave":
+                imageView.setImageResource(R.drawable.heat_wave);
+                break;
+            case "Humanitarian Access":
+                imageView.setImageResource(R.drawable.humanitarian_access);
+                break;
+            case "Insect Infestation":
+                imageView.setImageResource(R.drawable.insect_infestation);
+                break;
+            case "Landslide":
+            case "Mudslide":
+                imageView.setImageResource(R.drawable.landslide_mudslide);
+                break;
+            case "Locust Infestation":
+                imageView.setImageResource(R.drawable.locust_infestation);
+                break;
+            case "Population Displacement":
+                imageView.setImageResource(R.drawable.population_displacement);
+                break;
+            case "Population Return":
+                imageView.setImageResource(R.drawable.population_return);
+                break;
+            case "Snow Avalanche":
+                imageView.setImageResource(R.drawable.snow_avalanche);
+                break;
+            case "Snowfall":
+                imageView.setImageResource(R.drawable.snowfall);
+                break;
+            case "Storm":
+                imageView.setImageResource(R.drawable.storm);
+                break;
+            case "Storm Surge":
+                imageView.setImageResource(R.drawable.storm_surge);
+                break;
+            case "Technological Disaster":
+                imageView.setImageResource(R.drawable.technological_disaster);
+                break;
+            case "Tornado":
+                imageView.setImageResource(R.drawable.tornado);
+                break;
+            case "Tsunami":
+                imageView.setImageResource(R.drawable.tsunami);
+                break;
+            case "Violent Wind":
+                imageView.setImageResource(R.drawable.violent_wind);
+                break;
+            case "Volcano":
+                imageView.setImageResource(R.drawable.volcano);
+                break;
         }
     }
 

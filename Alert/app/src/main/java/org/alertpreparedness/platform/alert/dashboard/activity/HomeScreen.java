@@ -10,6 +10,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -24,6 +25,7 @@ import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.helper.DataHandler;
 import org.alertpreparedness.platform.alert.helper.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
+import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.model.Alert;
 import org.alertpreparedness.platform.alert.model.Tasks;
 import org.alertpreparedness.platform.alert.model.User;
@@ -41,8 +43,10 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
+import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity.EXTRA_ALERT;
 
-public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAlertItemClickedListener {
+
+public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAlertItemClickedListener, IHomeActivity{
     private static final int STORAGE_RC = 0x0013;
     private RecyclerView myTaskRecyclerView;
     private FirebaseDatabase firebaseDatabase;
@@ -52,15 +56,15 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
     private Alert alert;
     private ArrayList<CountryJsonData> mCountryList;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
-   // private DataHandler dataHandler = new DataHandler();
+    // private DataHandler dataHandler = new DataHandler();
 
-    public static TaskAdapter taskAdapter;
-    public static List<Tasks> tasksList;
-    public static TextView appBarTitle;
-    public static AlertAdapter alertAdapter;
-    public static List<Alert> alertList;
-    public static RecyclerView alertRecyclerView;
-    public static String countryID, agencyAdminID, systemAdminID, networkCountryID;
+    public TaskAdapter taskAdapter;
+    public List<Tasks> tasksList;
+    public TextView appBarTitle;
+    public AlertAdapter alertAdapter;
+    public List<Alert> alertList;
+    public RecyclerView alertRecyclerView;
+    public String countryID, agencyAdminID, systemAdminID, networkCountryID;
     public static final String mypreference = "mypref";
     public static final String userKey = "UserType";
     public static final PreferHelper sharedPreferences = new PreferHelper();
@@ -76,6 +80,8 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+
+        Log.e("tag", UserInfo.getUser(this).toString());
 
         countryID = UserInfo.getUser(this).countryID;
         agencyAdminID = UserInfo.getUser(this).agencyAdminID;
@@ -101,11 +107,12 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(countryJsonData -> {
-                    Timber.d("Country id is: %s, level 1: %s", countryJsonData.getCountryId(), countryJsonData.getLevelOneValues().size());
-                    mCountryList.add(countryJsonData);
-                    //System.out.println("LIST: "+mCountryList.get(1));
-                }
-        );
+                            Timber.d("Country id is: %s, level 1: %s", countryJsonData.getCountryId(), countryJsonData.getLevelOneValues().size());
+                            mCountryList.add(countryJsonData);
+                            //System.out.println("LIST: "+mCountryList.get(1));
+                        }
+                );
+
         compositeDisposable.add(RMDisposable);
 
         for (int i=0; i<mCountryList.size(); i++){
@@ -140,11 +147,11 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         firebaseDatabase = FirebaseDatabase.getInstance();
 
         for (String ids : usersID) {
-            DataHandler.getAlertsFromFirebase(ids);
+            DataHandler.getAlertsFromFirebase(this, ids);
         }
 
         for (String ids : usersID) {
-            DataHandler.getTasksFromFirebase(ids);
+            DataHandler.getTasksFromFirebase(this, ids);
         }
 
     }
@@ -176,12 +183,13 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
     }
 
 
-
-        @Override
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         compositeDisposable.clear();
         compositeDisposable.dispose();
+
+        DataHandler.detach();
     }
 
     @Override
@@ -192,9 +200,25 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
     }
 
     @Override
-    public void onAlertItemClicked(int position) {
+    public void onAlertItemClicked(Alert alert) {
         Intent intent = new Intent(HomeScreen.this, AlertDetailActivity.class);
-        intent.putExtra("ITEM_ID", position);
+        intent.putExtra(EXTRA_ALERT, alert);
         startActivity(intent);
+    }
+
+    @Override
+    public void addAlert(Alert alert) {
+        alertAdapter.add(alert);
+    }
+
+    @Override
+    public void addTask(Tasks tasks) {
+        taskAdapter.add(tasks);
+    }
+
+    @Override
+    public void updateTitle(int stringResource, int backgroundResource) {
+        appBarTitle.setText(stringResource);
+        appBarTitle.setBackgroundResource(backgroundResource);
     }
 }

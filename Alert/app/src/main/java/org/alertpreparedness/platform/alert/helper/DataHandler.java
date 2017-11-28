@@ -12,6 +12,7 @@ import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.BaseActivity;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
+import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.model.Alert;
 import org.alertpreparedness.platform.alert.model.Tasks;
 import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService;
@@ -29,9 +30,8 @@ import java.util.Locale;
  * Created by faizmohideen on 20/11/2017.
  */
 
-public class DataHandler extends HomeScreen {
+public class DataHandler {
     public static DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-    public static String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
     static List<Integer> alerts = new ArrayList<Integer>();
     private static DBListener dbListener = new DBListener();
     private static ChildEventListener childEventListener;
@@ -42,78 +42,77 @@ public class DataHandler extends HomeScreen {
     private static SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
 
 
-    public static void getAlertsFromFirebase(String ids) {
-        database.child(mAppStatus).child("alert").child(ids).addChildEventListener(childEventListener =  new ChildEventListener() {
+    public static void getAlertsFromFirebase(IHomeActivity iHome, String ids) {
+        database.child(mAppStatus).child("alert").child(ids)
+                .addChildEventListener(childEventListener =  new ChildEventListener() {
 
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if (dataSnapshot.child("alertLevel").getValue() != null) {
-                    long alertLevel = (long) dataSnapshot.child("alertLevel").getValue();
-                    long numberOfAreas = dataSnapshot.child("affectedAreas").getChildrenCount();
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        if (dataSnapshot.child("alertLevel").getValue() != null) {
+                            long alertLevel = (long) dataSnapshot.child("alertLevel").getValue();
+                            long numberOfAreas = dataSnapshot.child("affectedAreas").getChildrenCount();
 
-                    if (alertLevel != 0) {
-                        long hazardScenario = (long) dataSnapshot.child("hazardScenario").getValue();
-                        long population = (long) dataSnapshot.child("estimatedPopulation").getValue();
+                            if (alertLevel != 0) {
+                                long hazardScenario = (long) dataSnapshot.child("hazardScenario").getValue();
+                                long population = (long) dataSnapshot.child("estimatedPopulation").getValue();
 
-                        if(dataSnapshot.child("timeUpdated").exists()) {
-                            long updated = (long) dataSnapshot.child("timeUpdated").getValue();
-                            date.setTimeInMillis(updated);
-                            String updatedDay = format.format(date.getTime());
+                                if(dataSnapshot.child("timeUpdated").exists()) {
+                                    long updated = (long) dataSnapshot.child("timeUpdated").getValue();
+                                    date.setTimeInMillis(updated);
+                                    String updatedDay = format.format(date.getTime());
 
-                            if (hazardScenario != -1) {
-                                Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas, updatedDay, null);
+                                    if (hazardScenario != -1) {
+                                        Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas, updatedDay, null);
 
-                                appBarTitle.setText(R.string.amber_alert_level);
-                                appBarTitle.setBackgroundResource(R.drawable.alert_amber_main);
+                                        iHome.updateTitle(R.string.amber_alert_level,R.drawable.alert_amber_main);
 
-                                alerts.add((int) alertLevel);
-                                setRedActionBar(alerts.contains(2));
+                                        alerts.add((int) alertLevel);
+                                        setRedActionBar(iHome, alerts.contains(2));
 
-                                alertAdapter.add(alert);
-                            } else if (dataSnapshot.child("otherName").exists()) {
-                                String nameId = (String) dataSnapshot.child("otherName").getValue();
-                                setOtherName(nameId, alertLevel, hazardScenario, numberOfAreas, population, updatedDay);
+                                        iHome.addAlert(alert);
+                                    } else if (dataSnapshot.child("otherName").exists()) {
+                                        String nameId = (String) dataSnapshot.child("otherName").getValue();
+                                        setOtherName(iHome ,nameId, alertLevel, hazardScenario, numberOfAreas, population, updatedDay);
+                                    }
+                                }
                             }
                         }
+                        //dbListener.add(database, (ChildEventListener) dataSnapshot);
                     }
-                }
-                //dbListener.add(database, (ChildEventListener) dataSnapshot);
-            }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-            }
+                    }
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-            }
+                    }
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-            }
+                    }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-            }
-        });
-
+                    }
+                });
         dbListener.add(database, childEventListener);
 
     }
 
-    private static void setOtherName(String nameId, long alertLevel, long hazardScenario, long numOfAreas, long population, String updatedDay) {
+    private static void setOtherName(IHomeActivity iHome, String nameId, long alertLevel, long hazardScenario, long numOfAreas, long population, String updatedDay) {
         database.child(mAppStatus).child("hazardOther").child(nameId).addValueEventListener(valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String name = (String) dataSnapshot.child("name").getValue();
                 Alert alert = new Alert(alertLevel, hazardScenario, population, numOfAreas, updatedDay, name);
-                alertAdapter.add(alert);
+                iHome.addAlert(alert);
 
-               // dbListener.add(database, (ValueEventListener) dataSnapshot);
+                // dbListener.add(database, (ValueEventListener) dataSnapshot);
             }
 
             @Override
@@ -125,7 +124,11 @@ public class DataHandler extends HomeScreen {
 
     }
 
-    public static void getTasksFromFirebase(String node) {
+    public static void detach(){
+        dbListener.detatch();
+    }
+
+    public static void getTasksFromFirebase(IHomeActivity iHome, String node) {
 
         String types[] = {"action", "indicator"};
 
@@ -136,17 +139,16 @@ public class DataHandler extends HomeScreen {
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         String asignee = (String) dataSnapshot.child("asignee").getValue();
                         String task = (String) dataSnapshot.child("task").getValue();
-
-                        if (asignee != null && task != null && asignee.equals(userID)) {
+                        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        if (asignee != null && task != null && asignee.equals(uid)) {
                             if (dataSnapshot.hasChild("dueDate")) {
                                 long dueDate = (long) dataSnapshot.child("dueDate").getValue();
                                 Tasks tasks = new Tasks("red", "action", task, dueDate);
-
-                                taskAdapter.add(tasks);
+                                iHome.addTask(tasks);
                             }
                         }
 
-                      //  dbListener.add(database, (ChildEventListener) dataSnapshot);
+                        //  dbListener.add(database, (ChildEventListener) dataSnapshot);
                     }
 
                     @Override
@@ -178,17 +180,18 @@ public class DataHandler extends HomeScreen {
                         String taskName = (String) dataSnapshot.child("name").getValue();
                         // long dueDate = (long) dataSnapshot.child("dueDate").getValue();
 
-                        if (asignee != null && taskName != null && asignee.equals(userID)) {
+                        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        if (asignee != null && taskName != null && asignee.equals(uid)) {
                             if (dataSnapshot.hasChild("dueDate")) {
                                 long dueDate = (long) dataSnapshot.child("dueDate").getValue();
                                 Tasks tasks = new Tasks("red", "indicator", taskName, dueDate);
 
-                                tasksList.add(tasks);
+                                iHome.addTask(tasks);
                                 //myTaskRecyclerView.setAdapter(taskAdapter);
                             }
                         }
 
-                      //  dbListener.add(database, (ChildEventListener) dataSnapshot);
+                        //  dbListener.add(database, (ChildEventListener) dataSnapshot);
                     }
 
                     @Override
@@ -216,18 +219,9 @@ public class DataHandler extends HomeScreen {
         }
     }
 
-    public static void setRedActionBar(boolean isRedExists){
+    public static void setRedActionBar(IHomeActivity iHome, boolean isRedExists){
         if(isRedExists){
-            appBarTitle.setText(R.string.red_alert_level);
-            appBarTitle.setBackgroundResource(R.drawable.alert_red_main);
+            iHome.updateTitle(R.string.red_alert_level, R.drawable.alert_red_main);
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        dbListener.detatch();
-
     }
 }

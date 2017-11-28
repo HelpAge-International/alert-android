@@ -31,7 +31,7 @@ import io.reactivex.disposables.Disposable;
  */
 
 public class UserInfo extends BaseActivity{
-   // public static String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    // public static String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
     public static DatabaseReference database = FirebaseDatabase.getInstance().getReference();
     public static final String PREFS_USER = "prefs_user";
     private static CompositeDisposable compositeDisposable = new CompositeDisposable();
@@ -42,7 +42,7 @@ public class UserInfo extends BaseActivity{
 
     //Cross-check if the logged-in user ID matches the ID under different node.
     public void authUser(final AuthCallback authCallback) {
-       // userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        // userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         for (String nodeName : users) {
             database.child(DataHandler.mAppStatus)
                     .child(nodeName)
