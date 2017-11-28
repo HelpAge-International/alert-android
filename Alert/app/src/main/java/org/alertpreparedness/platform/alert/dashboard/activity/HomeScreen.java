@@ -93,7 +93,7 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         System.out.println("S-ID: "+ UserInfo.getUser(this).getSystemAdminID());
         System.out.println("N-ID: "+ UserInfo.getUser(this).getNetworkCountryID());
 
-        mCountryList = new ArrayList<CountryJsonData>();
+       // mCountryList = new ArrayList<CountryJsonData>();
 
         System.out.println("Network: "+networkCountryID);
         usersID = new String[]{networkCountryID, countryID};

@@ -29,10 +29,10 @@ import java.util.Locale;
 
 public class DataHandler {
     public DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-    static List<Integer> alerts = new ArrayList<Integer>();
+    private List<Integer> alerts = new ArrayList<Integer>();
     private DBListener dbListener = new DBListener();
 //    private ChildEventListener childEventListener;
-    private ValueEventListener valueEventListener;
+//    private ValueEventListener valueEventListener;
     public String mAppStatus = PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS);
     private Calendar date = Calendar.getInstance();
     public String dateFormat = "dd/MM/yyyy";
@@ -103,6 +103,7 @@ public class DataHandler {
     }
 
     private void setOtherName(IHomeActivity iHome, String nameId, long alertLevel, long hazardScenario, long numOfAreas, long population, String updatedDay) {
+        ValueEventListener valueEventListener;
         database.child(mAppStatus).child("hazardOther").child(nameId).addValueEventListener(valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

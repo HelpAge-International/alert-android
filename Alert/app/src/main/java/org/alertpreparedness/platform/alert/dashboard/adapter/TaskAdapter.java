@@ -64,9 +64,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
             @Override
             public int compare(Tasks o1, Tasks o2) {
                 // System.out.println(o1.getDueDate() + " " + o2.getDueDate());
-                if (o1.getDueDate() > o2.getDueDate()) return -1;
-                if (o1.getDueDate() < o2.getDueDate()) return 1;
-                return 0;
+//                if (o1.getDueDate() > o2.getDueDate()) return -1;
+//                if (o1.getDueDate() < o2.getDueDate()) return 1;
+                return Long.compare(o1.dueDate, o2.dueDate);
             }
         });
         notifyDataSetChanged();
@@ -86,23 +86,23 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
 
         public void bind(Tasks tasks){
             txt_taskName.setText(tasks.getTaskName());
-            if (tasks.getTaskType().equals("action") && isDueToday(tasks.getDueDate())) {
+            if (tasks.getTaskType().equals("action") && isDueToday(tasks.dueDate)) {
                 txt_taskStatus.setText(dueTodayString("red level", "preparedness action"));
                 img_task.setImageResource(R.drawable.home_task_red);
-            } else if (tasks.getTaskType().equals("indicator") && isDueToday(tasks.getDueDate())) {
+            } else if (tasks.getTaskType().equals("indicator") && isDueToday(tasks.dueDate)) {
                 txt_taskStatus.setText(dueTodayString("red level", "indicator"));
                 img_task.setImageResource(R.drawable.home_task_red);
-            } else if (tasks.getTaskType().equals("action") && isDueInWeek(tasks.getDueDate())){
+            } else if (tasks.getTaskType().equals("action") && isDueInWeek(tasks.dueDate)){
                 txt_taskStatus.setText(dueWeekString("amber level", "preparedness action"));
                 img_task.setImageResource(R.drawable.home_task_amber);
-            } else if (tasks.getTaskType().equals("indicator") && isDueInWeek(tasks.getDueDate())) {
+            } else if (tasks.getTaskType().equals("indicator") && isDueInWeek(tasks.dueDate)) {
                 txt_taskStatus.setText(dueTodayString("amber level", "indicator"));
                 img_task.setImageResource(R.drawable.home_task_amber);
-            } else if (tasks.getTaskType().equals("action") && itWasDue(tasks.getDueDate())) {
-                txt_taskStatus.setText(dueBeforeString("red level", "preparedness action", format.format(new Date(tasks.getDueDate()))));
+            } else if (tasks.getTaskType().equals("action") && itWasDue(tasks.dueDate)) {
+                txt_taskStatus.setText(dueBeforeString("red level", "preparedness action", format.format(new Date(tasks.dueDate))));
                 img_task.setImageResource(R.drawable.home_task_red);
-            } else if (tasks.getTaskType().equals("indicator") && itWasDue(tasks.getDueDate())) {
-                txt_taskStatus.setText(dueBeforeString("red level", "indicator", format.format(new Date(tasks.getDueDate()))));
+            } else if (tasks.getTaskType().equals("indicator") && itWasDue(tasks.dueDate)) {
+                txt_taskStatus.setText(dueBeforeString("red level", "indicator", format.format(new Date(tasks.dueDate))));
                 img_task.setImageResource(R.drawable.home_task_red);
             }
             // img_task.setImageResource(isDueToday(tasks.getDueDate()) ? R.drawable.home_task_red : R.drawable.home_task_amber);
