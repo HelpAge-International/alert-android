@@ -116,6 +116,7 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener)
         }
         indicatorLevel.setOnClickListener {
             Timber.d("hazardId: %s, indicatorId: %s", indicator.hazardScenario.key?:"", indicator.id)
+            Timber.d("hazard: %s", indicator)
             indicator.hazardScenario.key?.let { it1 -> indicator.id?.let { it2 -> mListener.selectedIndicator(it1, it2) } }
         }
     }

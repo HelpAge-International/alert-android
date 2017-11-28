@@ -5,7 +5,6 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -13,6 +12,7 @@ import es.dmoral.toasty.Toasty
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_select_area.*
 import kotlinx.android.synthetic.main.content_select_area.*
+import org.alertpreparedness.platform.alert.BaseActivity
 import org.alertpreparedness.platform.alert.R
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.*
 import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData
@@ -23,7 +23,7 @@ import org.alertpreparedness.platform.alert.risk_monitoring.view_model.SelectAre
 import org.alertpreparedness.platform.alert.utils.Constants
 import timber.log.Timber
 
-class SelectAreaActivity : AppCompatActivity() {
+class SelectAreaActivity : BaseActivity() {
 
     private val mDisposables = CompositeDisposable()
 

@@ -16,12 +16,12 @@ import io.reactivex.Observable
 import kotlinx.android.synthetic.main.bottom_sheet_indicator.view.*
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.R
-import org.alertpreparedness.platform.alert.helper.UserInfo
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.alert.risk_monitoring.view.ActiveRiskFragment
 import org.alertpreparedness.platform.alert.risk_monitoring.view.UpdateIndicatorActivity
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.ActiveRiskViewModel
 import org.alertpreparedness.platform.alert.utils.Constants
+import org.alertpreparedness.platform.alert.utils.PreferHelper
 import org.jetbrains.anko.find
 import q.rorbin.badgeview.QBadgeView
 import timber.log.Timber
@@ -39,6 +39,7 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
     private lateinit var llInformationSource: LinearLayout
     private lateinit var mViewModel: ActiveRiskViewModel
     private lateinit var mIndicatorModel: ModelIndicator
+    private val mCountryId = PreferHelper.getString(AlertApplication.getContext(), Constants.COUNTRY_ID)
     private var mHazardId = ""
     private var mIndicatorId = ""
 
@@ -57,10 +58,12 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun initData() {
+        Timber.d("country id: %s", mCountryId)
         mHazardId = arguments[ActiveRiskFragment.HAZARD_ID] as String
         mIndicatorId = arguments[ActiveRiskFragment.INDICATOR_ID] as String
+        Timber.d("hazardId: %s, indicatorId: %s", mHazardId, mIndicatorId)
         mViewModel = ViewModelProviders.of(this).get(ActiveRiskViewModel::class.java)
-        mHazardId = if (mHazardId == "Country Context") UserInfo.getUser(activity).countryID else mHazardId
+        mHazardId = if (mHazardId == "countryContext") mCountryId else mHazardId
         mViewModel.getLiveIndicatorModel(mHazardId, mIndicatorId).observe(this, Observer { indicator ->
             indicator?.let { mIndicatorModel = indicator }
         })

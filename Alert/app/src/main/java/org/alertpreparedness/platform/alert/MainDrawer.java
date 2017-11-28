@@ -31,9 +31,11 @@ public class MainDrawer extends BaseActivity {
     private NavigationView navigationView;
     private FirebaseAuth firebaseAuth;
     protected FrameLayout content;
+    private UserInfo mUserInfo;
 
     protected void onCreateDrawer(final int layoutResID) {
         setContentView(R.layout.activity_main_drawer);
+        mUserInfo = new UserInfo();
 
         content = (FrameLayout) findViewById(R.id.content_frame);
         getLayoutInflater().inflate(layoutResID, content, true);
@@ -66,10 +68,11 @@ public class MainDrawer extends BaseActivity {
                         break;
                     case R.id.nav_logout:
                         PreferHelper.getInstance(getApplicationContext()).edit().remove(UserInfo.PREFS_USER).apply();
-                        UserInfo.clearAll();
+                        mUserInfo.clearAll();
                         firebaseAuth.signOut();
                         startActivity(new Intent(getApplicationContext(), LoginScreen.class));
                         finish();
+                        clearAllActivities();
 //                        PreferHelper.getInstance(MainDrawer.this).edit().remove(UserInfo.PREFS_USER).apply();
 //                        finish();
                 }

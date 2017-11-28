@@ -13,13 +13,14 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.toObservable
 import io.reactivex.schedulers.Schedulers
 import org.alertpreparedness.platform.alert.AlertApplication
-import org.alertpreparedness.platform.alert.helper.UserInfo
 import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelHazard
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelUserPublic
 import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService
 import org.alertpreparedness.platform.alert.risk_monitoring.service.StaffService
+import org.alertpreparedness.platform.alert.utils.Constants
+import org.alertpreparedness.platform.alert.utils.PreferHelper
 import org.json.JSONObject
 import timber.log.Timber
 import java.util.*
@@ -30,8 +31,8 @@ import java.util.*
 class AddIndicatorViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
 
     private val mDisposables: CompositeDisposable = CompositeDisposable()
-    private val agencyId = UserInfo.getUser(AlertApplication.getContext()).agencyAdminID
-    private val countryId = UserInfo.getUser(AlertApplication.getContext()).countryID
+    private val agencyId = PreferHelper.getString(AlertApplication.getContext(), Constants.AGENCY_ID)
+    private val countryId = PreferHelper.getString(AlertApplication.getContext(), Constants.COUNTRY_ID)
     private val mHazards: MutableLiveData<List<ModelHazard>> = MutableLiveData()
     private val mStaff: MutableLiveData<List<ModelUserPublic>> = MutableLiveData()
     private val mOtherNamesLive: MutableLiveData<Pair<String, String>> = MutableLiveData()

@@ -99,8 +99,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             activity.finish();
         }
     }
-
-//    @Override
+    //    @Override
 //    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
 //        // If Not authenticated again
 //        if (firebaseAuth.getCurrentUser() == null) {

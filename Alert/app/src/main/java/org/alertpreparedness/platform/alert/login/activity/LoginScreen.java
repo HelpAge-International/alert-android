@@ -118,7 +118,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     public void onUserAuthorized(User user) {
         progressDialog.dismiss();
         startActivity(new Intent(LoginScreen.this, HomeScreen.class));
-        UserInfo.clearAll();
+        userInfo.clearAll();
         finish();
     }
 

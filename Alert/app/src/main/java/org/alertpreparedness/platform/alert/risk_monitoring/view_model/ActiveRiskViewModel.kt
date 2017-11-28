@@ -3,12 +3,12 @@ package org.alertpreparedness.platform.alert.risk_monitoring.view_model
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
+import es.dmoral.toasty.Toasty
 import io.reactivex.Flowable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelCountry
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelHazard
@@ -57,8 +57,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
 
     fun getLiveCountryModel(): MutableLiveData<ModelCountry> {
         mDisposables.add(CountryService.getCountryModel(mAgencyId, mCountryId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ country ->
                     mCountryModelLive.value = country
                 })
@@ -69,10 +69,13 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
     fun getLiveIndicatorModel(hazardId: String, indicatorId: String): MutableLiveData<ModelIndicator> {
         mDisposables.add(
                 RiskMonitoringService.getIndicatorModel(hazardId, indicatorId)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({ indicator ->
                             mIndicatorModelLive.value = indicator
+                        }, {
+                            error -> Timber.d(error.message)
+                            Toasty.warning(AlertApplication.getContext(), "These functions are still in progress!!", Toast.LENGTH_LONG).show()
                         })
         )
         return mIndicatorModelLive
@@ -81,8 +84,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
     fun getLiveIndicatorLogs(indicatorId: String): MutableLiveData<List<ModelLog>> {
         mDisposables.add(
                 RiskMonitoringService.getLogs(indicatorId)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({logs ->
                             mLogsLive.value = logs
                         })
@@ -127,8 +130,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                 .map { it.filter { it.hazardScenario == -1 } }
                 .flatMap { Flowable.fromIterable(it) }
                 .flatMap { RiskMonitoringService.getHazardOtherName(it) }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ pair ->
                     mHazardNameMap.put(pair.first, pair.second)
                 })
@@ -137,8 +140,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
         //country context
         if (isActive) {
             val disposableCountryContext = RiskMonitoringService.getIndicators(mCountryId)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ indicators ->
                         //                        Timber.d("country context indicators: %s", indicators.size)
                         val group = ExpandableGroup("Country Context", indicators)
@@ -171,8 +174,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
 
         //normal country hazard and indicators
         val disposableHazard = RiskMonitoringService.getHazards(mCountryId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ hazards: List<ModelHazard>? ->
                     hazards?.forEach {
                         if (it.id != null) {
@@ -190,8 +193,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                                 }
 
                                 val disposableIndicator = RiskMonitoringService.getIndicators(it.id!!)
-                                        .subscribeOn(Schedulers.io())
-                                        .observeOn(AndroidSchedulers.mainThread())
+//                                        .subscribeOn(Schedulers.io())
+//                                        .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe({ indicators ->
                                             mIndicatorMap.put(it.id!!, indicators)
                                             val group = ExpandableGroup(mHazardNameMap[it.id!!], indicators)
@@ -236,8 +239,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
 
         //network hazard and indicators
         val disposableNetwork = NetworkService.mapNetworksForCountry(mAgencyId, mCountryId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ networkMap ->
                     networkMap.forEach { (networkId, networkCountryId) ->
                         //                        Timber.d("networkId: %s, networkCountryId: %s", networkId, networkCountryId)
@@ -247,22 +250,22 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                                 .map { it.filter { it.hazardScenario == -1 } }
                                 .flatMap { Flowable.fromIterable(it) }
                                 .flatMap { RiskMonitoringService.getHazardOtherName(it) }
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
+//                                .subscribeOn(Schedulers.io())
+//                                .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({ pair ->
                                     mHazardNameMapNetwork.put(pair.first, pair.second)
                                 })
                         )
 
                         mDisposables.add(NetworkService.getNetworkDetail(networkId)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
+//                                .subscribeOn(Schedulers.io())
+//                                .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({ network ->
                                     //                                    Timber.d(network.toString())
 
                                     mDisposables.add(RiskMonitoringService.getHazards(networkCountryId)
-                                            .subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
+//                                            .subscribeOn(Schedulers.io())
+//                                            .observeOn(AndroidSchedulers.mainThread())
                                             .subscribe({ hazards: List<ModelHazard>? ->
                                                 hazards?.forEach {
                                                     //get network indicators for hazard
@@ -280,8 +283,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                                                             }
 
                                                             mDisposables.add(RiskMonitoringService.getIndicatorsForAssignee(it.id!!, network)
-                                                                    .subscribeOn(Schedulers.io())
-                                                                    .observeOn(AndroidSchedulers.mainThread())
+//                                                                    .subscribeOn(Schedulers.io())
+//                                                                    .observeOn(AndroidSchedulers.mainThread())
                                                                     .subscribe({ indicators ->
                                                                         mIndicatorMapNetwork.put(it.id!!, indicators)
                                                                         val group = ExpandableGroup(mHazardNameMapNetwork[it.id!!], indicators)
@@ -322,8 +325,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                                                     //get network country context indicators
                                                     if (isActive) {
                                                         mDisposables.add(RiskMonitoringService.getIndicatorsForAssignee(networkCountryId, network)
-                                                                .subscribeOn(Schedulers.io())
-                                                                .observeOn(AndroidSchedulers.mainThread())
+//                                                                .subscribeOn(Schedulers.io())
+//                                                                .observeOn(AndroidSchedulers.mainThread())
                                                                 .subscribe({ indicators ->
                                                                     val group = ExpandableGroup("Country Context", indicators)
                                                                     val groupIndex = getGroupIndex(group.title, mGroups)
@@ -364,8 +367,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
         //local network hazard and indicators
         mDisposables.add(
                 NetworkService.listLocalNetworksForCountry(mAgencyId, mCountryId)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({ localNetworkList ->
                             Timber.d("local networks: %s", localNetworkList.size)
                             localNetworkList.forEach { localNetworkId ->
@@ -376,22 +379,22 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                                         .map { it.filter { it.hazardScenario == -1 } }
                                         .flatMap { Flowable.fromIterable(it) }
                                         .flatMap { RiskMonitoringService.getHazardOtherName(it) }
-                                        .subscribeOn(Schedulers.io())
-                                        .observeOn(AndroidSchedulers.mainThread())
+//                                        .subscribeOn(Schedulers.io())
+//                                        .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe({ pair ->
                                             mHazardNameMapNetworkLocal.put(pair.first, pair.second)
                                         })
                                 )
 
                                 mDisposables.add(NetworkService.getNetworkDetail(localNetworkId)
-                                        .subscribeOn(Schedulers.io())
-                                        .observeOn(AndroidSchedulers.mainThread())
+//                                        .subscribeOn(Schedulers.io())
+//                                        .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe({ network ->
                                             Timber.d(network.toString())
 
                                             mDisposables.add(RiskMonitoringService.getHazards(localNetworkId)
-                                                    .subscribeOn(Schedulers.io())
-                                                    .observeOn(AndroidSchedulers.mainThread())
+//                                                    .subscribeOn(Schedulers.io())
+//                                                    .observeOn(AndroidSchedulers.mainThread())
                                                     .subscribe({ hazards: List<ModelHazard>? ->
                                                         Timber.d("local network hazards: %s", hazards?.size ?: 0)
                                                         hazards?.forEach {
@@ -410,8 +413,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                                                                     }
 
                                                                     mDisposables.add(RiskMonitoringService.getIndicatorsForAssignee(it.id!!, network)
-                                                                            .subscribeOn(Schedulers.io())
-                                                                            .observeOn(AndroidSchedulers.mainThread())
+//                                                                            .subscribeOn(Schedulers.io())
+//                                                                            .observeOn(AndroidSchedulers.mainThread())
                                                                             .subscribe({ indicators ->
                                                                                 Timber.d("local network indicator size: %s", indicators.size)
                                                                                 mIndicatorMapNetworkLocal.put(it.id!!, indicators)
@@ -453,8 +456,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                                                             //get network country context indicators
                                                             if (isActive) {
                                                                 mDisposables.add(RiskMonitoringService.getIndicatorsForAssignee(localNetworkId, network)
-                                                                        .subscribeOn(Schedulers.io())
-                                                                        .observeOn(AndroidSchedulers.mainThread())
+//                                                                        .subscribeOn(Schedulers.io())
+//                                                                        .observeOn(AndroidSchedulers.mainThread())
                                                                         .subscribe({ indicators ->
                                                                             Timber.d("local netowrk country context: %s", indicators.size)
                                                                             val group = ExpandableGroup("Country Context", indicators)
@@ -505,11 +508,12 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
     override fun onCleared() {
         super.onCleared()
         Timber.d("view model clearing**********************************************")
-        mDisposables.clear()
         FirebaseAuth.getInstance().removeAuthStateListener(this)
+        mDisposables.clear()
     }
 
     override fun onAuthStateChanged(auth: FirebaseAuth) {
+        Timber.d("auth state change*******")
         if (auth.currentUser == null) {
             mDisposables.clear()
         }

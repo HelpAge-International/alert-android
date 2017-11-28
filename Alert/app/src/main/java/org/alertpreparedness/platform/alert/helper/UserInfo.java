@@ -32,35 +32,35 @@ import io.reactivex.disposables.Disposable;
 
 public class UserInfo {
     // public static String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-    public static DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+    public  DatabaseReference database = FirebaseDatabase.getInstance().getReference();
     public static final String PREFS_USER = "prefs_user";
-    private static CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private  CompositeDisposable compositeDisposable = new CompositeDisposable();
     private static String[] users = {"administratorCountry", "countryDirector", "ert", "ertLeader", "partner"};
-    private static DBListener dbListener = new DBListener();
+    private  DBListener dbListener = new DBListener();
 
 
     //Cross-check if the logged-in user ID matches the ID under different node.
     public void authUser(final AuthCallback authCallback) {
         // userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         for (String nodeName : users) {
-            ValueEventListener valueEventListener;
+            ValueEventListener valueEventListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.child(PreferHelper.getString(AlertApplication.getContext(), Constants.UID)).exists()) {
+                        DataSnapshot userNode = dataSnapshot.child(PreferHelper.getString(AlertApplication.getContext(), Constants.UID));
+                        populateUser(authCallback, nodeName, userNode);
+                    } else {
+                        //System.out.println("False");
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            };
             DatabaseReference db = database.child(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS))
                     .child(nodeName);
-            db.addListenerForSingleValueEvent(valueEventListener = new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if (dataSnapshot.child(PreferHelper.getString(AlertApplication.getContext(), Constants.UID)).exists()) {
-                                DataSnapshot userNode = dataSnapshot.child(PreferHelper.getString(AlertApplication.getContext(), Constants.UID));
-                                populateUser(authCallback, nodeName, userNode);
-                            } else {
-                                //System.out.println("False");
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                        }
-                    });
+            db.addListenerForSingleValueEvent(valueEventListener);
             dbListener.add(db, valueEventListener);
 
         }
@@ -134,7 +134,7 @@ public class UserInfo {
         }
     }
 
-    public static void clearAll() {
+    public void clearAll() {
         compositeDisposable.clear();
         dbListener.detatch();
     }
