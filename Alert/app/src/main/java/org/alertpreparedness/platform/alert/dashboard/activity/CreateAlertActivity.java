@@ -28,6 +28,7 @@ public class CreateAlertActivity extends AppCompatActivity implements View.OnCli
 
         setSupportActionBar(toolbar);
         mainTextView.setText(R.string.text_create_alert);
+        mainTextView.setPadding(50,0,0, 0);
 
         closeImageView.setImageBitmap(null);
         closeImageView.setBackgroundResource(R.drawable.close);

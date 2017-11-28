@@ -3,13 +3,13 @@ package org.alertpreparedness.platform.alert.risk_monitoring.view_model
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import org.alertpreparedness.platform.alert.AlertApplication
-import org.alertpreparedness.platform.alert.helper.UserInfo
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelCountry
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelHazard
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
@@ -18,13 +18,14 @@ import org.alertpreparedness.platform.alert.risk_monitoring.service.CountryServi
 import org.alertpreparedness.platform.alert.risk_monitoring.service.NetworkService
 import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService
 import org.alertpreparedness.platform.alert.utils.Constants
+import org.alertpreparedness.platform.alert.utils.PreferHelper
 import org.joda.time.DateTime
 import timber.log.Timber
 
 /**
  * Created by fei on 14/11/2017.
  */
-class ActiveRiskViewModel : ViewModel() {
+class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
 
     private val mDisposables: CompositeDisposable = CompositeDisposable()
     private var mIndicatorMap = mutableMapOf<String, List<ModelIndicator>>()
@@ -35,11 +36,19 @@ class ActiveRiskViewModel : ViewModel() {
     private var mHazardNameMapNetworkLocal = mutableMapOf<String, String>()
     private var mGroups = mutableListOf<ExpandableGroup<ModelIndicator>>()
     private var mLiveData: MutableLiveData<MutableList<ExpandableGroup<ModelIndicator>>> = MutableLiveData()
-    private val mAgencyId = UserInfo.getUser(AlertApplication.getContext()).agencyAdminID
-    private val mCountryId = UserInfo.getUser(AlertApplication.getContext()).countryID
+//    private val mAgencyId = UserInfo.getUser(AlertApplication.getContext()).agencyAdminID
+//    private val mCountryId = UserInfo.getUser(AlertApplication.getContext()).countryID
     private val mCountryModelLive: MutableLiveData<ModelCountry> = MutableLiveData()
     private val mIndicatorModelLive: MutableLiveData<ModelIndicator> = MutableLiveData()
     private val mLogsLive:MutableLiveData<List<ModelLog>> = MutableLiveData()
+
+    private val mAgencyId = PreferHelper.getString(AlertApplication.getContext(), Constants.AGENCY_ID)
+    private val mCountryId = PreferHelper.getString(AlertApplication.getContext(), Constants.COUNTRY_ID)
+
+
+    init {
+        FirebaseAuth.getInstance().addAuthStateListener(this)
+    }
 
     fun getLiveGroups(isActive: Boolean): LiveData<MutableList<ExpandableGroup<ModelIndicator>>> {
         loadGroups(isActive)
@@ -47,7 +56,7 @@ class ActiveRiskViewModel : ViewModel() {
     }
 
     fun getLiveCountryModel(): MutableLiveData<ModelCountry> {
-        mDisposables.add(CountryService.getCountryModel()
+        mDisposables.add(CountryService.getCountryModel(mAgencyId, mCountryId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ country ->
@@ -495,7 +504,15 @@ class ActiveRiskViewModel : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
+        Timber.d("view model clearing**********************************************")
         mDisposables.clear()
+        FirebaseAuth.getInstance().removeAuthStateListener(this)
+    }
+
+    override fun onAuthStateChanged(auth: FirebaseAuth) {
+        if (auth.currentUser == null) {
+            mDisposables.clear()
+        }
     }
 
     private fun getGroupIndex(id: String, list: List<ExpandableGroup<ModelIndicator>>): Int = list.map { it.title }.indexOf(id)

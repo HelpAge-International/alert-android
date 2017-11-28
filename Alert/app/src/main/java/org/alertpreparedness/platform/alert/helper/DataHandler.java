@@ -9,13 +9,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.AlertApplication;
-import org.alertpreparedness.platform.alert.BaseActivity;
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.model.Alert;
 import org.alertpreparedness.platform.alert.model.Tasks;
-import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.DBListener;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
@@ -31,76 +28,77 @@ import java.util.Locale;
  */
 
 public class DataHandler {
-    public static DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+    public DatabaseReference database = FirebaseDatabase.getInstance().getReference();
     static List<Integer> alerts = new ArrayList<Integer>();
     private DBListener dbListener = new DBListener();
-    private ChildEventListener childEventListener;
+//    private ChildEventListener childEventListener;
     private ValueEventListener valueEventListener;
-    public static String mAppStatus = PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS);
-    private static Calendar date = Calendar.getInstance();
-    public static String dateFormat = "dd/MM/yyyy";
-    private static SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
+    public String mAppStatus = PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS);
+    private Calendar date = Calendar.getInstance();
+    public String dateFormat = "dd/MM/yyyy";
+    private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
 
 
     public void getAlertsFromFirebase(IHomeActivity iHome, String ids) {
-        database.child(mAppStatus).child("alert").child(ids)
-                .addChildEventListener(childEventListener =  new ChildEventListener() {
+        DatabaseReference db = database.child(mAppStatus).child("alert").child(ids);
+        ChildEventListener childEventListener;
+        db.addChildEventListener(childEventListener = new ChildEventListener() {
 
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        if (dataSnapshot.child("alertLevel").getValue() != null) {
-                            long alertLevel = (long) dataSnapshot.child("alertLevel").getValue();
-                            long numberOfAreas = dataSnapshot.child("affectedAreas").getChildrenCount();
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (dataSnapshot.child("alertLevel").getValue() != null) {
+                    long alertLevel = (long) dataSnapshot.child("alertLevel").getValue();
+                    long numberOfAreas = dataSnapshot.child("affectedAreas").getChildrenCount();
 
-                            if (alertLevel != 0) {
-                                long hazardScenario = (long) dataSnapshot.child("hazardScenario").getValue();
-                                long population = (long) dataSnapshot.child("estimatedPopulation").getValue();
+                    if (alertLevel != 0) {
+                        long hazardScenario = (long) dataSnapshot.child("hazardScenario").getValue();
+                        long population = (long) dataSnapshot.child("estimatedPopulation").getValue();
 
-                                if(dataSnapshot.child("timeUpdated").exists()) {
-                                    long updated = (long) dataSnapshot.child("timeUpdated").getValue();
-                                    date.setTimeInMillis(updated);
-                                    String updatedDay = format.format(date.getTime());
+                        if (dataSnapshot.child("timeUpdated").exists()) {
+                            long updated = (long) dataSnapshot.child("timeUpdated").getValue();
+                            date.setTimeInMillis(updated);
+                            String updatedDay = format.format(date.getTime());
 
-                                    if (hazardScenario != -1) {
-                                        Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas, updatedDay, null);
+                            if (hazardScenario != -1) {
+                                Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas, updatedDay, null);
 
-                                        iHome.updateTitle(R.string.amber_alert_level,R.drawable.alert_amber_main);
+                                iHome.updateTitle(R.string.amber_alert_level, R.drawable.alert_amber_main);
 
-                                        alerts.add((int) alertLevel);
-                                        setRedActionBar(iHome, alerts.contains(2));
+                                alerts.add((int) alertLevel);
+                                setRedActionBar(iHome, alerts.contains(2));
 
-                                        iHome.addAlert(alert);
-                                    } else if (dataSnapshot.child("otherName").exists()) {
-                                        String nameId = (String) dataSnapshot.child("otherName").getValue();
-                                        setOtherName(iHome ,nameId, alertLevel, hazardScenario, numberOfAreas, population, updatedDay);
-                                    }
-                                }
+                                iHome.addAlert(alert);
+                            } else if (dataSnapshot.child("otherName").exists()) {
+                                String nameId = (String) dataSnapshot.child("otherName").getValue();
+                                setOtherName(iHome, nameId, alertLevel, hazardScenario, numberOfAreas, population, updatedDay);
                             }
                         }
-                        //dbListener.add(database, (ChildEventListener) dataSnapshot);
                     }
+                }
+                //dbListener.add(database, (ChildEventListener) dataSnapshot);
+            }
 
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-                    }
+            }
 
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-                    }
+            }
 
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-                    }
+            }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
-        dbListener.add(database, childEventListener);
+            }
+        });
+        dbListener.add(db, childEventListener);
 
     }
 
@@ -124,7 +122,7 @@ public class DataHandler {
 
     }
 
-    public void detach(){
+    public void detach() {
         dbListener.detatch();
     }
 
@@ -134,7 +132,9 @@ public class DataHandler {
 
         for (String type : types) {
             if (type.equals("action")) {
-                database.child(mAppStatus).child("action").child(node).addChildEventListener(childEventListener = new ChildEventListener() {
+                ChildEventListener childEventListener;
+                DatabaseReference db = database.child(mAppStatus).child("action").child(node);
+                db.addChildEventListener(childEventListener = new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         String asignee = (String) dataSnapshot.child("asignee").getValue();
@@ -171,9 +171,11 @@ public class DataHandler {
 
                     }
                 });
-                dbListener.add(database, childEventListener);
+                dbListener.add(db, childEventListener);
             } else if (type.equals("indicator")) {
-                database.child(mAppStatus).child("indicator").child(node).addChildEventListener(childEventListener = new ChildEventListener() {
+                ChildEventListener childEventListener;
+                DatabaseReference db = database.child(mAppStatus).child("indicator").child(node);
+                db.addChildEventListener(childEventListener = new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         String asignee = (String) dataSnapshot.child("assignee").getValue();
@@ -214,13 +216,13 @@ public class DataHandler {
 
                     }
                 });
-                dbListener.add(database, childEventListener);
+                dbListener.add(db, childEventListener);
             }
         }
     }
 
-    public static void setRedActionBar(IHomeActivity iHome, boolean isRedExists){
-        if(isRedExists){
+    public static void setRedActionBar(IHomeActivity iHome, boolean isRedExists) {
+        if (isRedExists) {
             iHome.updateTitle(R.string.red_alert_level, R.drawable.alert_red_main);
         }
     }

@@ -3,6 +3,7 @@ package org.alertpreparedness.platform.alert.dashboard.activity;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -11,6 +12,7 @@ import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -59,19 +61,29 @@ public class AlertDetailActivity extends AppCompatActivity {
         imgClose = (ImageView) findViewById(R.id.leftImageView);
         imgUpdate = (ImageView) findViewById(R.id.rightImageView);
 
+        imgUpdate.setImageResource(R.drawable.ic_create_white_24dp);
         imgClose.setVisibility(View.GONE);
         fetchDetails();
     }
 
     public void fetchDetails() {
         //final Alert alert = AlertAdapter.getInstance().getAlertList().get(id);
-
+        Window window = getWindow();
         if(alert.alertLevel == 1){
             toolbar.setBackgroundResource(R.color.alertAmber);
             txtActionBarTitle.setText(R.string.amber_alert_text);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                window.setStatusBarColor(getResources().getColor(R.color.alertAmber));
+            }
+
         }else if(alert.alertLevel == 2){
             toolbar.setBackgroundResource(R.color.alertRed);
             txtActionBarTitle.setText(R.string.red_alert_text);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                window.setStatusBarColor(getResources().getColor(R.color.alertRed));
+            }
         }
 
         for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {

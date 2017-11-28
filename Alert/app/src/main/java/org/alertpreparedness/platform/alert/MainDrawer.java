@@ -18,6 +18,7 @@ import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.RiskActivity;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
 import java.util.concurrent.TimeUnit;
 
@@ -64,7 +65,7 @@ public class MainDrawer extends BaseActivity {
                         });
                         break;
                     case R.id.nav_logout:
-//                        PreferHelper.getInstance(getApplicationContext()).edit().remove(UserInfo.PREFS_USER).apply();
+                        PreferHelper.getInstance(getApplicationContext()).edit().remove(UserInfo.PREFS_USER).apply();
                         UserInfo.clearAll();
                         firebaseAuth.signOut();
                         startActivity(new Intent(getApplicationContext(), LoginScreen.class));

@@ -4,6 +4,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.location.Geocoder
 import android.location.Location
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import es.dmoral.toasty.Toasty
 import io.reactivex.Flowable
@@ -26,7 +27,7 @@ import java.util.*
 /**
  * Created by fei on 16/11/2017.
  */
-class AddIndicatorViewModel : ViewModel() {
+class AddIndicatorViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
 
     private val mDisposables: CompositeDisposable = CompositeDisposable()
     private val agencyId = UserInfo.getUser(AlertApplication.getContext()).agencyAdminID
@@ -37,6 +38,10 @@ class AddIndicatorViewModel : ViewModel() {
     private val mCountryJsonDtaLive: MutableLiveData<List<CountryJsonData>> = MutableLiveData()
     private val mCountryDataList: ArrayList<CountryJsonData> = arrayListOf()
     private val mAddressLive: MutableLiveData<String> = MutableLiveData()
+
+    init {
+        FirebaseAuth.getInstance().addAuthStateListener(this)
+    }
 
     fun getHazardsLive(): MutableLiveData<List<ModelHazard>> {
         getHazards(countryId)
@@ -149,6 +154,13 @@ class AddIndicatorViewModel : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         mDisposables.clear()
+        FirebaseAuth.getInstance().removeAuthStateListener(this)
+    }
+
+    override fun onAuthStateChanged(auth: FirebaseAuth) {
+        if (auth.currentUser == null) {
+            mDisposables.clear()
+        }
     }
 
 }

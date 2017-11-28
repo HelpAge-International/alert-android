@@ -10,11 +10,15 @@ public final class Constants {
     public static final String APP_STATUS_UAT = "uat";
     public static final String APP_STATUS_LIVE = "live";
 
-    //firebase related
-    public static final String UID = "live";
-
     //animation delay
     public static final long MENU_CLOSING_DURATION = 250;
+
+    //important ids
+    public static final String UID = "uid";
+    public static final String COUNTRY_ID = "country_id";
+    public static final String AGENCY_ID = "agency_id";
+    public static final String SYSTEM_ID = "system_id";
+    public static final String USER_TYPE = "user_type";
 
     //hazard
     public static final String HAZARD_ID = "hazard_id";

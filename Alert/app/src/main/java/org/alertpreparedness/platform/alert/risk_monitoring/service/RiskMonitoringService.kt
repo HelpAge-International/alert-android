@@ -7,7 +7,6 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import org.alertpreparedness.platform.alert.AlertApplication
-import org.alertpreparedness.platform.alert.helper.UserInfo
 import org.alertpreparedness.platform.alert.risk_monitoring.model.*
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.alertpreparedness.platform.alert.utils.FirebaseHelper
@@ -89,7 +88,7 @@ object RiskMonitoringService {
     }
 
     fun addIndicatorToHazard(indicator: ModelIndicator, countryContext: Boolean) {
-        val indicatorRef = FirebaseHelper.getIndicatorsRef(mAppStatus, if (countryContext) UserInfo.getUser(AlertApplication.getContext()).countryID else indicator.hazardScenario.id)
+        val indicatorRef = FirebaseHelper.getIndicatorsRef(mAppStatus, if (countryContext) PreferHelper.getString(AlertApplication.getContext(), Constants.COUNTRY_ID) else indicator.hazardScenario.id)
         val key = indicatorRef.push().key
         if (countryContext) {
             indicatorRef.child(key).setValue(indicator).continueWith {
@@ -105,7 +104,7 @@ object RiskMonitoringService {
     }
 
     fun getIndicatorsForAssignee(hazardId: String, network: ModelNetwork?): Flowable<List<ModelIndicator>> {
-        val indicatorRef = FirebaseHelper.getIndicatorsRef(mAppStatus, hazardId).orderByChild("assignee").equalTo(UserInfo.getUser(AlertApplication.getContext()).userID)
+        val indicatorRef = FirebaseHelper.getIndicatorsRef(mAppStatus, hazardId).orderByChild("assignee").equalTo(PreferHelper.getString(AlertApplication.getContext(), Constants.UID))
         return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
             snap.children.map {
                 val toJson = gson.toJson(it.value)

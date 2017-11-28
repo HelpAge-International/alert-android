@@ -31,6 +31,7 @@
             android:textColor="@color/colorPrimaryDark"
             android:textColorHint="@color/hintGray"
             android:textSize="15sp"
-            android:drawableLeft="@drawable/alert_hazard"/>
+            android:drawableLeft="@drawable/alert_hazard"
+            android:drawablePadding="15dip"/>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

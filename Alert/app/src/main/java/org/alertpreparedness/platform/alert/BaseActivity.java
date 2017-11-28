@@ -2,10 +2,8 @@ package org.alertpreparedness.platform.alert;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -17,15 +15,10 @@ import android.widget.FrameLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import org.alertpreparedness.platform.alert.helper.UserInfo;
-import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
-import org.alertpreparedness.platform.alert.utils.PreferHelper;
-
-import timber.log.Timber;
 
 
-public abstract class BaseActivity extends AppCompatActivity implements FirebaseAuth.AuthStateListener {
+public abstract class BaseActivity extends AppCompatActivity {
 
     public ProgressDialog mProgressDialog;
     private FirebaseAuth mAuth;
@@ -39,15 +32,15 @@ public abstract class BaseActivity extends AppCompatActivity implements Firebase
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mAuth != null) {
-            mAuth.removeAuthStateListener(this);
-        }
+//        if (mAuth != null) {
+//            mAuth.removeAuthStateListener(this);
+//        }
         AlertApplication.mActivities.remove(this);
     }
 
     protected void checkAuth() {
         mAuth = FirebaseAuth.getInstance();
-        mAuth.addAuthStateListener(this);
+//        mAuth.addAuthStateListener(this);
     }
 
     public String getUid() {
@@ -107,17 +100,17 @@ public abstract class BaseActivity extends AppCompatActivity implements Firebase
         }
     }
 
-    @Override
-    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-        // If Not authenticated again
-        if (firebaseAuth.getCurrentUser() == null) {
-            // User has logged out
-            Timber.d("user logged out");
-            PreferHelper.getInstance(this).edit().remove(UserInfo.PREFS_USER).apply();
-            Intent i = new Intent(getApplicationContext(), LoginScreen.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(i);
-            finish();
-        }
-    }
+//    @Override
+//    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+//        // If Not authenticated again
+//        if (firebaseAuth.getCurrentUser() == null) {
+//            // User has logged out
+////            Timber.d("user logged out");
+////            PreferHelper.getInstance(this).edit().remove(UserInfo.PREFS_USER).apply();
+////            Intent i = new Intent(getApplicationContext(), LoginScreen.class);
+////            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+////            startActivity(i);
+////            finish();
+//        }
+//    }
 }
