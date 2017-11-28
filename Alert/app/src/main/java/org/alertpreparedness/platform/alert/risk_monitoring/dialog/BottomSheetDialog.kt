@@ -59,8 +59,12 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
 
     private fun initData() {
         Timber.d("country id: %s", mCountryId)
-        mHazardId = arguments[ActiveRiskFragment.HAZARD_ID] as String
-        mIndicatorId = arguments[ActiveRiskFragment.INDICATOR_ID] as String
+        if (arguments.containsKey(ActiveRiskFragment.HAZARD_ID)) {
+            mHazardId = arguments.get(ActiveRiskFragment.HAZARD_ID) as String
+        }
+        if (arguments.containsKey(ActiveRiskFragment.INDICATOR_ID)) {
+            mIndicatorId = arguments.get(ActiveRiskFragment.INDICATOR_ID )as String
+        }
         Timber.d("hazardId: %s, indicatorId: %s", mHazardId, mIndicatorId)
         mViewModel = ViewModelProviders.of(this).get(ActiveRiskViewModel::class.java)
         mHazardId = if (mHazardId == "countryContext") mCountryId else mHazardId

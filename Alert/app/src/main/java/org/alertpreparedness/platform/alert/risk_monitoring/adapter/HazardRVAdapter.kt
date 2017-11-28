@@ -21,7 +21,6 @@ import org.jetbrains.anko.find
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.textColor
 import org.joda.time.DateTime
-import timber.log.Timber
 
 /**
  * Created by fei on 08/11/2017.
@@ -55,7 +54,7 @@ class HazardViewHolder(itemView: View, location:Int) : GroupViewHolder(itemView)
 
 }
 
-class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener) : ChildViewHolder(itemView) {
+class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener, networkCountryMap:Map<String,String>?) : ChildViewHolder(itemView) {
 
     private val indicatorTitle: TextView = itemView.findViewById(R.id.tvIndicatorName)
     private val indicatorGeo: TextView = itemView.find(R.id.tvIndicatorGeo)
@@ -65,6 +64,7 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener)
     private val indicatorLayout: LinearLayout = itemView.find(R.id.llRiskIndicator)
     private val indicatorNetworkId: TextView = itemView.find(R.id.tvIndicatorNetworkName)
     private val mListener = listener
+    private val mNetworkMap = networkCountryMap
 
     init {
         indicatorLayout.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -115,21 +115,23 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener)
             }
         }
         indicatorLevel.setOnClickListener {
-            Timber.d("hazardId: %s, indicatorId: %s", indicator.hazardScenario.key?:"", indicator.id)
-            Timber.d("hazard: %s", indicator)
-            indicator.hazardScenario.key?.let { it1 -> indicator.id?.let { it2 -> mListener.selectedIndicator(it1, it2) } }
+//            Timber.d("hazardId: %s, indicatorId: %s", indicator.hazardScenario.key?:"", indicator.id)
+//            Timber.d("indicator model: %s", indicator)
+//            Timber.d("map: %s", mNetworkMap.toString())
+            indicator.hazardScenario.key?.let { it1 -> indicator.id?.let { it2 -> mListener.selectedIndicator(if (it1 == "countryContext" && indicator.networkId != null && mNetworkMap != null) mNetworkMap[indicator.networkId]!! else it1, it2) } }
         }
     }
 }
 
-class HazardAdapter(groups: List<ExpandableGroup<ModelIndicator>>, countryLocation:Int, listener:OnIndicatorSelectedListener) : ExpandableRecyclerViewAdapter<HazardViewHolder, IndicatorViewHolder>(groups) {
+class HazardAdapter(groups: List<ExpandableGroup<ModelIndicator>>, countryLocation:Int, listener:OnIndicatorSelectedListener, networkCountryMap:Map<String,String>?) : ExpandableRecyclerViewAdapter<HazardViewHolder, IndicatorViewHolder>(groups) {
 
     private val mListener = listener
     private val mLocation = countryLocation
+    private val mMap = networkCountryMap
 
     override fun onCreateChildViewHolder(parent: ViewGroup?, viewType: Int): IndicatorViewHolder {
         val view = View.inflate(AlertApplication.getContext(), R.layout.risk_indicator_item_view, null)
-        return IndicatorViewHolder(view, mListener)
+        return IndicatorViewHolder(view, mListener, mMap)
     }
 
     override fun onBindGroupViewHolder(holder: HazardViewHolder?, flatPosition: Int, group: ExpandableGroup<*>?) {

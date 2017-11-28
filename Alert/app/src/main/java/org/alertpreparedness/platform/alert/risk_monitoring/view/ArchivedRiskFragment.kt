@@ -52,13 +52,18 @@ class ArchivedRiskFragment : Fragment(), OnIndicatorSelectedListener {
             if (size > 0) {
                 pbLoadingArchived?.hide()
             }
-            rvRiskArchived?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, mCountryLocation, this)
+            rvRiskArchived?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, mCountryLocation, this, mapOf())
         })
         return view
     }
 
     override fun selectedIndicator(hazardId: String, indicatorId: String) {
-        BottomSheetDialog().show(fragmentManager, "bottom_sheet")
+        val bsDialog = BottomSheetDialog()
+        val bundle = Bundle()
+        bundle.putString(ActiveRiskFragment.HAZARD_ID, hazardId)
+        bundle.putString(ActiveRiskFragment.INDICATOR_ID, indicatorId)
+        bsDialog.arguments = bundle
+        bsDialog.show(fragmentManager, "bottom_sheet")
     }
 
 }

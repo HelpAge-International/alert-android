@@ -41,6 +41,7 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
     private val mCountryModelLive: MutableLiveData<ModelCountry> = MutableLiveData()
     private val mIndicatorModelLive: MutableLiveData<ModelIndicator> = MutableLiveData()
     private val mLogsLive:MutableLiveData<List<ModelLog>> = MutableLiveData()
+    private val mNetworkMapLive:MutableLiveData<Map<String,String>> = MutableLiveData()
 
     private val mAgencyId = PreferHelper.getString(AlertApplication.getContext(), Constants.AGENCY_ID)
     private val mCountryId = PreferHelper.getString(AlertApplication.getContext(), Constants.COUNTRY_ID)
@@ -118,6 +119,16 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
         }
         val updateMap = mutableMapOf<String, Any>("dueDate" to dueTime, "triggerSelected" to selection, "updatedAt" to DateTime().millis)
         mDisposables.add(RiskMonitoringService.updateIndicatorLevel(hazardId, indicatorId, updateMap).subscribe())
+    }
+
+    fun getLiveNetworkMap(): MutableLiveData<Map<String, String>> {
+        mDisposables.add(
+                NetworkService.mapNetworksForCountry(mAgencyId, mCountryId)
+                        .subscribe({map ->
+                            mNetworkMapLive.value = map
+                        })
+        )
+        return mNetworkMapLive
     }
 
     private fun loadGroups(isActive: Boolean) {
