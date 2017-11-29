@@ -3,10 +3,8 @@ package org.alertpreparedness.platform.alert.risk_monitoring.view_model
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
-import es.dmoral.toasty.Toasty
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import org.alertpreparedness.platform.alert.AlertApplication
@@ -17,6 +15,7 @@ import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelLog
 import org.alertpreparedness.platform.alert.risk_monitoring.service.CountryService
 import org.alertpreparedness.platform.alert.risk_monitoring.service.NetworkService
 import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService
+import org.alertpreparedness.platform.alert.risk_monitoring.service.StaffService
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.alertpreparedness.platform.alert.utils.PreferHelper
 import org.joda.time.DateTime
@@ -36,12 +35,12 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
     private var mHazardNameMapNetworkLocal = mutableMapOf<String, String>()
     private var mGroups = mutableListOf<ExpandableGroup<ModelIndicator>>()
     private var mLiveData: MutableLiveData<MutableList<ExpandableGroup<ModelIndicator>>> = MutableLiveData()
-//    private val mAgencyId = UserInfo.getUser(AlertApplication.getContext()).agencyAdminID
+    //    private val mAgencyId = UserInfo.getUser(AlertApplication.getContext()).agencyAdminID
 //    private val mCountryId = UserInfo.getUser(AlertApplication.getContext()).countryID
     private val mCountryModelLive: MutableLiveData<ModelCountry> = MutableLiveData()
     private val mIndicatorModelLive: MutableLiveData<ModelIndicator> = MutableLiveData()
-    private val mLogsLive:MutableLiveData<List<ModelLog>> = MutableLiveData()
-    private val mNetworkMapLive:MutableLiveData<Map<String,String>> = MutableLiveData()
+    private val mLogsLive: MutableLiveData<List<ModelLog>> = MutableLiveData()
+    private val mNetworkMapLive: MutableLiveData<Map<String, String>> = MutableLiveData()
 
     private val mAgencyId = PreferHelper.getString(AlertApplication.getContext(), Constants.AGENCY_ID)
     private val mCountryId = PreferHelper.getString(AlertApplication.getContext(), Constants.COUNTRY_ID)
@@ -62,6 +61,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
 //                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ country ->
                     mCountryModelLive.value = country
+                }, { error ->
+                    Timber.d(error.message)
                 })
         )
         return mCountryModelLive
@@ -74,9 +75,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
 //                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({ indicator ->
                             mIndicatorModelLive.value = indicator
-                        }, {
-                            error -> Timber.d(error.message)
-                            Toasty.warning(AlertApplication.getContext(), "These functions are still in progress!!", Toast.LENGTH_LONG).show()
+                        }, { error ->
+                            Timber.d(error.message)
                         })
         )
         return mIndicatorModelLive
@@ -87,8 +87,21 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                 RiskMonitoringService.getLogs(indicatorId)
 //                        .subscribeOn(Schedulers.io())
 //                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({logs ->
+                        .subscribe({ logs ->
+
+                            logs.forEach { model ->
+                                mDisposables.add(
+                                        StaffService.getUserDetail(model.addedBy)
+                                                .subscribe({ user ->
+                                                    model.addedByName = String.format("%s %s", user.firstName, user.lastName)
+                                                    mLogsLive.value = logs
+                                                })
+                                )
+                            }
+
                             mLogsLive.value = logs
+                        }, { error ->
+                            Timber.d(error.message)
                         })
         )
         return mLogsLive
@@ -124,8 +137,10 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
     fun getLiveNetworkMap(): MutableLiveData<Map<String, String>> {
         mDisposables.add(
                 NetworkService.mapNetworksForCountry(mAgencyId, mCountryId)
-                        .subscribe({map ->
+                        .subscribe({ map ->
                             mNetworkMapLive.value = map
+                        }, { error ->
+                            Timber.d(error.message)
                         })
         )
         return mNetworkMapLive
@@ -145,6 +160,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
 //                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ pair ->
                     mHazardNameMap.put(pair.first, pair.second)
+                }, { error ->
+                    Timber.d(error.message)
                 })
         )
 
@@ -178,6 +195,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                         }
                         mLiveData.value = mGroups
 
+                    }, { error ->
+                        Timber.d(error.message)
                     })
             mDisposables.add(disposableCountryContext)
         }
@@ -240,11 +259,15 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                                                 }
                                             }
                                             mLiveData.value = mGroups
+                                        }, { error ->
+                                            Timber.d(error.message)
                                         })
                                 mDisposables.add(disposableIndicator)
                             }
                         }
                     }
+                }, { error ->
+                    Timber.d(error.message)
                 })
         mDisposables.add(disposableHazard)
 
@@ -372,6 +395,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                                 })
                         )
                     }
+                }, { error ->
+                    Timber.d(error.message)
                 })
         mDisposables.add(disposableNetwork)
 
@@ -394,6 +419,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
 //                                        .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe({ pair ->
                                             mHazardNameMapNetworkLocal.put(pair.first, pair.second)
+                                        }, { error ->
+                                            Timber.d(error.message)
                                         })
                                 )
 
@@ -460,6 +487,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                                                                                     }
                                                                                 }
                                                                                 mLiveData.value = mGroups
+                                                                            }, { error ->
+                                                                                Timber.d(error.message)
                                                                             }))
                                                                 }
                                                             }
@@ -496,17 +525,27 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                                                                                 }
                                                                             }
                                                                             mLiveData.value = mGroups
+                                                                        }, { error ->
+                                                                            Timber.d(error.message)
                                                                         }))
                                                             }
                                                         }
                                                     })
                                             )
 
+                                        }, { error ->
+                                            Timber.d(error.message)
                                         })
                                 )
                             }
+                        }, { error ->
+                            Timber.d(error.message)
                         })
         )
+    }
+
+    fun addLogToIndicator(log:ModelLog, indicatorId: String) {
+        RiskMonitoringService.addLogToIndicator(log, indicatorId)
     }
 
     private fun removeListFromList(existItems: List<ModelIndicator>, indicators: List<ModelIndicator>): MutableList<ModelIndicator> {

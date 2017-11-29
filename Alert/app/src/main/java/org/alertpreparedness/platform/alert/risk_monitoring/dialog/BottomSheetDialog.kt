@@ -18,6 +18,7 @@ import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.R
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.alert.risk_monitoring.view.ActiveRiskFragment
+import org.alertpreparedness.platform.alert.risk_monitoring.view.IndicatorLogActivity
 import org.alertpreparedness.platform.alert.risk_monitoring.view.UpdateIndicatorActivity
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.ActiveRiskViewModel
 import org.alertpreparedness.platform.alert.utils.Constants
@@ -114,6 +115,14 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
             dismiss()
             Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).subscribe({
                 UpdateIndicatorActivity.startActivity(AlertApplication.getContext(), mHazardId, mIndicatorId)
+            })
+        }
+
+        view.llIndicatorLog.setOnClickListener {
+            Timber.d("start log activity with id: %s", mIndicatorId)
+            dismiss()
+            Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).subscribe({
+                IndicatorLogActivity.startActivity(AlertApplication.getContext(), mIndicatorId, mIndicatorModel.triggerSelected)
             })
         }
     }
