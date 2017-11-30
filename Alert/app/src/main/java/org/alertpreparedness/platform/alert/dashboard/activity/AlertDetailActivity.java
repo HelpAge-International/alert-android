@@ -15,11 +15,23 @@ import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.google.gson.Gson;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.model.Alert;
+import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData;
+import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class AlertDetailActivity extends AppCompatActivity {
 
@@ -27,6 +39,7 @@ public class AlertDetailActivity extends AppCompatActivity {
     private ImageView imgHazard, imgPopulation, imgAffectedArea, imgInfo, imgClose, imgUpdate;
     private Toolbar toolbar;
     private Alert alert;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public static final String EXTRA_ALERT = "extra_alert";
 
@@ -67,9 +80,9 @@ public class AlertDetailActivity extends AppCompatActivity {
     }
 
     public void fetchDetails() {
-        //final Alert alert = AlertAdapter.getInstance().getAlertList().get(id);
         Window window = getWindow();
-        if(alert.alertLevel == 1){
+        //getNetwork();
+        if(alert.getAlertLevel() == 1){
             toolbar.setBackgroundResource(R.color.alertAmber);
             txtActionBarTitle.setText(R.string.amber_alert_text);
 
@@ -77,12 +90,18 @@ public class AlertDetailActivity extends AppCompatActivity {
                 window.setStatusBarColor(getResources().getColor(R.color.alertAmber));
             }
 
-        }else if(alert.alertLevel == 2){
+        }else if(alert.getAlertLevel() == 2){
             toolbar.setBackgroundResource(R.color.alertRed);
             txtActionBarTitle.setText(R.string.red_alert_text);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setStatusBarColor(getResources().getColor(R.color.alertRed));
+            }
+        }
+
+        for(int i = 0; i < Constants.COUNTRIES.length; i++){
+            if(alert.getCountry() == i){
+                txtAffectedArea.setText(Constants.COUNTRIES[i]);
             }
         }
 
@@ -94,8 +113,8 @@ public class AlertDetailActivity extends AppCompatActivity {
                 imgPopulation.setImageResource(R.drawable.alert_population);
                 imgAffectedArea.setImageResource(R.drawable.alert_areas);
                 imgInfo.setImageResource(R.drawable.alert_information);
-                txtLastUpdated.setText(getUpdatedAsString(alert.updated));
-                System.out.println("Date: "+ alert.updated);
+                txtLastUpdated.setText(getUpdatedAsString(alert.getUpdated()));
+                txtInfo.setText((CharSequence) alert.getInfo());
             }else if(alert.getOtherName() != null ){
                 imgHazard.setImageResource(R.drawable.other);
                 txtHazardName.setText(alert.getOtherName());
@@ -103,7 +122,8 @@ public class AlertDetailActivity extends AppCompatActivity {
                 imgPopulation.setImageResource(R.drawable.alert_population);
                 imgAffectedArea.setImageResource(R.drawable.alert_areas);
                 imgInfo.setImageResource(R.drawable.alert_information);
-                txtLastUpdated.setText(getUpdatedAsString(alert.updated));
+                txtLastUpdated.setText(getUpdatedAsString(alert.getUpdated()));
+                txtInfo.setText((CharSequence) alert.getInfo());
             }
 
         }
@@ -121,5 +141,31 @@ public class AlertDetailActivity extends AppCompatActivity {
         return sb;
     }
 
+    private void getNetwork(){
 
+       // List mCountryList = new ArrayList<CountryJsonData>();
+        //List mL1List = new ArrayList<CountryJsonData>();
+
+        Disposable RMDisposable = RiskMonitoringService.INSTANCE.readJsonFile()
+                .map(JSONObject::new).flatMap(jsonObject -> {
+                    return RiskMonitoringService.INSTANCE.mapJasonToCountryData(jsonObject, new Gson());
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(countryJsonData -> {
+                            //Timber.d("Country id is: %s, level 1: %s", countryJsonData.getCountryId(), countryJsonData.getLevelOneValues().toString());
+                          //  mCountryList.add(countryJsonData.getCountryId());
+                           // mL1List.add(countryJsonData.getLevelOneValues().get(2));
+
+                          //  System.out.println("LIST: "+countryJsonData.getLevelOneValues().get(2));
+                        }
+                );
+
+        compositeDisposable.add(RMDisposable);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        compositeDisposable.clear();
+    }
 }

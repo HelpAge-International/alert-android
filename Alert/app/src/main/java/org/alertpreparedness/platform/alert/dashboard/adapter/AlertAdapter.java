@@ -1,7 +1,6 @@
 package org.alertpreparedness.platform.alert.dashboard.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,18 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
-import org.alertpreparedness.platform.alert.helper.OnAlertItemClickedListener;
+import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.alert.model.Alert;
-import org.alertpreparedness.platform.alert.model.Tasks;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -49,7 +44,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder>{
 
         this.listArray = List;
         this.context  = mActivityRef.get();
-        if (context instanceof OnAlertItemClickedListener) {
+        if (context != null) {
             listener = (OnAlertItemClickedListener) context;
         } else {
             Log.e(_TAG, "Activity does not support OnAlertListListener interface");
@@ -77,7 +72,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder>{
         Collections.sort(this.listArray, new Comparator<Alert>() {
             @Override
             public int compare(Alert o1, Alert o2) {
-                return Long.compare(o2.alertLevel, o1.alertLevel);
+                return Long.compare(o2.getAlertLevel(), o1.getAlertLevel());
             }
         });
         notifyDataSetChanged();
@@ -96,7 +91,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder>{
         ImageView img_alert_colour;
         ImageView img_hazard_icon;
 
-        public ViewHolder(View itemView) {
+        private ViewHolder(View itemView) {
             super(itemView);
 
             txt_alert_level = (TextView) itemView.findViewById(R.id.txt_alert_level);

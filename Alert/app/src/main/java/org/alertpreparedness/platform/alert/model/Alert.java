@@ -8,20 +8,41 @@ import java.io.Serializable;
 
 public class Alert implements Serializable{
     public long alertLevel;
-    public long numOfAreas;
-    public long hazardScenario;
-    public long population;
-    public String updated;
-    public String otherName;
-    public String reason;
+    private long numOfAreas;
+    private long hazardScenario;
+    private long country;
+    private long level1;
+    private long level2;
+    private long population;
+    private String info;
+    private String updated;
+    private String otherName;
+    private String reason;
 
-    public Alert(long alertLevel, long hazardScenario, long population, long numOfAreas, String updated, String otherName) {
+    public Alert(long alertLevel, long hazardScenario, long population, long numOfAreas, String info, String updated, String otherName) {
         this.alertLevel = alertLevel;
         this.hazardScenario = hazardScenario;
         this.population = population;
         this.numOfAreas = numOfAreas;
+        this.country = country;
+        this.level1 = level1;
+        this.level2 = level2;
+        this.info = info;
         this.updated = updated;
         this.otherName = otherName;
+    }
+
+    public Alert(long country, long level1, long level2) {
+        this.country = country;
+        this.level1 = level1;
+        this.level2 = level2;
+    }
+
+    public Alert(long country) {
+        this.country = country;
+    }
+
+    public Alert() {
     }
 
     public String getUpdated() {
@@ -78,6 +99,38 @@ public class Alert implements Serializable{
 
     public void setOtherName(String otherName) {
         this.otherName = otherName;
+    }
+
+    public long getCountry() {
+        return country;
+    }
+
+    public void setCountry(long country) {
+        this.country = country;
+    }
+
+    public long getLevel1() {
+        return level1;
+    }
+
+    public void setLevel1(long level1) {
+        this.level1 = level1;
+    }
+
+    public long getLevel2() {
+        return level2;
+    }
+
+    public void setLevel2(long level2) {
+        this.level2 = level2;
+    }
+
+    public String getInfo() {
+        return info;
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
     }
 
 

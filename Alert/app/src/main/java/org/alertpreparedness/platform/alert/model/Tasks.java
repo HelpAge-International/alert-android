@@ -6,9 +6,9 @@ package org.alertpreparedness.platform.alert.model;
 
 public class Tasks {
 
-    public String alertLevel;
-    public String taskType;
-    public String taskName;
+    private String alertLevel;
+    private String taskType;
+    private String taskName;
     public long dueDate;
 
     public Tasks(String alertLevel, String taskType, String taskName, long dueDate) {

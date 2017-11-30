@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.login.activity;
+package org.alertpreparedness.platform.alert.interfaces;
 
 import android.content.Context;
 
