@@ -2,11 +2,11 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android"
     android:opacity="opaque">
     <item android:drawable="@color/colorPrimary" />
-    <!--<item>-->
-        <!--<bitmap-->
-            <!--android:gravity="center"-->
-            <!--android:src="@drawable/alert" />-->
-        <item android:drawable="@drawable/alert"
-            android:gravity="center"/>
-    <!--</item>-->
+    <item>
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/alert_logo" />
+        <!--<item android:drawable="@drawable/alert"-->
+            <!--android:gravity="center"/>-->
+    </item>
 </layer-list>
