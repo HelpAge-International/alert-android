@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
@@ -21,6 +20,7 @@ import es.dmoral.toasty.Toasty
 import kotlinx.android.synthetic.main.activity_add_indicator.*
 import kotlinx.android.synthetic.main.content_add_indicator.*
 import org.alertpreparedness.platform.alert.AlertApplication
+import org.alertpreparedness.platform.alert.BaseActivity
 import org.alertpreparedness.platform.alert.R
 import org.alertpreparedness.platform.alert.risk_monitoring.adapter.AreaRVAdapter
 import org.alertpreparedness.platform.alert.risk_monitoring.adapter.OnAreaDeleteListener
@@ -35,7 +35,7 @@ import org.joda.time.DateTime
 import timber.log.Timber
 import java.util.*
 
-class AddIndicatorActivity : AppCompatActivity(), OnSourceDeleteListener, OnAreaDeleteListener {
+class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDeleteListener {
 
     private lateinit var mPopupMenu: PopupMenu
     private lateinit var mPopupMenuFrequencyGreen: PopupMenu

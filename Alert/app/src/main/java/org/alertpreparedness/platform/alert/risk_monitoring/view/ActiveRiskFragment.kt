@@ -22,6 +22,7 @@ import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelCountry
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.ActiveRiskViewModel
 import org.jetbrains.anko.find
+import timber.log.Timber
 
 
 /**
@@ -31,12 +32,13 @@ class ActiveRiskFragment : Fragment(), OnIndicatorSelectedListener {
 
     private lateinit var mViewModel: ActiveRiskViewModel
     private var mCountryLocation = -1
+    private var mNetworkCountryMap: Map<String, String>? = null
 
     companion object {
         val HAZARD_ID = "hazard_id"
         val INDICATOR_ID = "indicator_id"
+        val NETWORK_ID = "network_id"
     }
-
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -45,6 +47,9 @@ class ActiveRiskFragment : Fragment(), OnIndicatorSelectedListener {
             country?.location?.let {
                 mCountryLocation = it
             }
+        })
+        mViewModel.getLiveNetworkMap().observe(this, Observer { map ->
+            mNetworkCountryMap = map
         })
         // Inflate the layout for this fragment
         val view = inflater?.inflate(R.layout.fragment_active_risk, container, false)
@@ -57,12 +62,13 @@ class ActiveRiskFragment : Fragment(), OnIndicatorSelectedListener {
             if (size > 0) {
                 pbLoading?.hide()
             }
-            rvRiskActive?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, mCountryLocation, this)
+            rvRiskActive?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, mCountryLocation, this, mNetworkCountryMap)
         })
         return view
     }
 
     override fun selectedIndicator(hazardId: String, indicatorId: String) {
+        Timber.d("ids: %s, %s", hazardId, indicatorId)
         val bsDialog = BottomSheetDialog()
         val bundle = Bundle()
         bundle.putString(HAZARD_ID, hazardId)

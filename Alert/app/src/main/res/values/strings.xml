@@ -85,5 +85,7 @@
     <string name="action_settings">Settings</string>
     <string name="last_updated">Last updated:</string>
     <string name="date_format">dd/mm/yyyy</string>
+    <string name="title_activity_indicator_log">IndicatorLogActivity</string>
+    <string name="status">Status:</string>
 
 </resources>

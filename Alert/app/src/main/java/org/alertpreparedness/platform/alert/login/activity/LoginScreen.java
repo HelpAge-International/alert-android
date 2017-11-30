@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.login.activity;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -8,7 +9,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,6 +25,7 @@ import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.BaseActivity;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
+import org.alertpreparedness.platform.alert.helper.RightDrawableOnTouchListener;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.interfaces.AuthCallback;
 import org.alertpreparedness.platform.alert.model.User;
@@ -40,10 +44,9 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     private FirebaseAuth.AuthStateListener mAuthListener;
     private UserInfo userInfo = new UserInfo();
     private final static String TAG = "LoginActivity";
-    private String userID, countryID, agencyAdminID, systemAdminID, networkCountryID;
-    private int userType;
-    private String mAppStatus = PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS);
+    private boolean isPasswordShowing = false;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +62,19 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
         btn_login.setOnClickListener(this);
         txt_forgotPasword.setOnClickListener(this);
+        et_password.setOnTouchListener(new RightDrawableOnTouchListener(et_password) {
+            @Override
+            public boolean onDrawableTouch(final MotionEvent event) {
+                if(isPasswordShowing) {
+                    et_password.setTransformationMethod(new PasswordTransformationMethod());
+                }
+                else {
+                    et_password.setTransformationMethod(null);
+                }
+                isPasswordShowing= !isPasswordShowing;
+                return true;
+            }
+        });
 
     }
 
@@ -124,8 +140,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     public void onUserAuthorized(User user) {
         progressDialog.dismiss();
         startActivity(new Intent(LoginScreen.this, HomeScreen.class));
-
-        UserInfo.clearAll();
+        userInfo.clearAll();
         finish();
     }
 
