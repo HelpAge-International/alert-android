@@ -90,5 +90,6 @@
     <string name="edit_message">Edit message</string>
     <string name="delete">Delete</string>
     <string name="edit_indicator">Edit indicator</string>
+    <string name="country_context">Country Context</string>
 
 </resources>

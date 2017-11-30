@@ -124,10 +124,14 @@ object RiskMonitoringService {
     fun getIndicatorModel(hazardId: String, indicatorId: String): Flowable<ModelIndicator> {
         Timber.d("actual ids: %s, %s", hazardId, indicatorId)
         val indicatorRef = FirebaseHelper.getIndicatorRef(mAppStatus, hazardId, indicatorId)
-        return RxFirebaseDatabase.observeValueEvent(indicatorRef, ModelIndicator::class.java)
-                .map { model ->
-                    return@map model.copy(id = indicatorId)
-                }
+        return RxFirebaseDatabase.observeValueEvent(indicatorRef, {snap ->
+            Timber.d(snap.value.toString())
+            val toJson = gson.toJson(snap.value)
+            val jsonReader = JsonReader(StringReader(toJson))
+            jsonReader.isLenient = true
+            val model = gson.fromJson<ModelIndicator>(jsonReader, ModelIndicator::class.java)
+            return@observeValueEvent model.copy(id = indicatorId)
+        })
     }
 
     fun updateIndicatorLevel(hazardId: String, indicatorId: String, updateData: Map<String, Any>): Completable {

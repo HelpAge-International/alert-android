@@ -173,7 +173,7 @@ class SelectAreaActivity : BaseActivity() {
             }
             R.id.menuSave -> {
                 Timber.d("check values: %s, %s, %s", mCountrySelected, mLevel1Selected, mLevel2Selected)
-                val modelArea = ModelIndicatorLocation(mCountrySelected.toString(), mLevel1Selected, mLevel2Selected)
+                val modelArea = ModelIndicatorLocation(mCountrySelected, mLevel1Selected, mLevel2Selected)
                 if (modelArea.validate().isNotEmpty()) {
                     Toasty.error(this, modelArea.validate()).show()
                 } else {

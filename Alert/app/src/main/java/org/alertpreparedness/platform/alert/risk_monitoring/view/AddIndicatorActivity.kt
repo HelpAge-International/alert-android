@@ -208,6 +208,17 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
     }
 
     private fun loadDataBack(model: ModelIndicator) {
+        when {
+            model.hazardScenario.key == "countryContext" && model.hazardScenario.hazardScenario == -2 -> {
+                tvSelectHazard.text = getString(R.string.country_context)
+            }
+            model.hazardScenario.hazardScenario != -1 -> {
+                tvSelectHazard.text = Constants.HAZARD_SCENARIO_NAME[model.hazardScenario.hazardScenario]
+            }
+            else -> {
+                tvSelectHazard.text = mHazardOtherNamesMap[model.hazardScenario.otherName]
+            }
+        }
         tvAddIndicatorName.setText(model.name)
         mSources.addAll(model.source)
         val green = model.trigger[Constants.TRIGGER_GREEN]
@@ -234,7 +245,26 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
             }
         })
         tvIndicatorLocation.text = LOCATION_LIST[model.geoLocation]
-
+        mSelectedLocation = model.geoLocation
+        when (model.geoLocation) {
+            NATIONAL -> {
+                rvLocationSubNational.visibility = View.GONE
+                tvIndicatorSelectSubNational.visibility = View.GONE
+                tvIndicatorMyLocation.visibility = View.GONE
+            }
+            SUBNATIONAL -> {
+                rvLocationSubNational.visibility = View.VISIBLE
+                tvIndicatorSelectSubNational.visibility = View.VISIBLE
+                tvIndicatorMyLocation.visibility = View.GONE
+                model.affectedLocation?.apply { mAreas = this.toMutableList() }
+            }
+            else -> {
+                rvLocationSubNational.visibility = View.GONE
+                tvIndicatorSelectSubNational.visibility = View.GONE
+                tvIndicatorMyLocation.visibility = View.VISIBLE
+                tvIndicatorMyLocation.text = String.format("%s\n(%s, %s)", model.gps?.address, model.gps?.latitude, model.gps?.longitude)
+            }
+        }
     }
 
     private fun initListeners() {
