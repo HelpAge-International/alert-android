@@ -28,6 +28,7 @@ import org.alertpreparedness.platform.alert.risk_monitoring.adapter.OnSourceDele
 import org.alertpreparedness.platform.alert.risk_monitoring.adapter.SourceRVAdapter
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.*
 import org.alertpreparedness.platform.alert.risk_monitoring.model.*
+import org.alertpreparedness.platform.alert.risk_monitoring.view_model.ActiveRiskViewModel
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.AddIndicatorViewModel
 import org.alertpreparedness.platform.alert.utils.AppUtils
 import org.alertpreparedness.platform.alert.utils.Constants
@@ -51,7 +52,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
     private var mSelectedAssignPosition = 0
     private var mSelectedLocation = 0
 
-    private val mIndicatorModel = ModelIndicator()
+    private var mIndicatorModel = ModelIndicator()
     private lateinit var mViewModel: AddIndicatorViewModel
     private var mHazards: List<ModelHazard>? = null
     private var mIsCountryContext = false
@@ -63,9 +64,22 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
     private val mHazardOtherNamesMap = mutableMapOf<String, String>()
     private var mCountryJsonList: List<CountryJsonData> = listOf()
 
+    //edit
+    private var mHazardId: String? = null
+    private var mIndicatorId: String? = null
+    private lateinit var mRiskViewModel: ActiveRiskViewModel
+
     companion object {
         fun startActivity(context: Context) {
             val intent = Intent(context, AddIndicatorActivity::class.java)
+            context.startActivity(intent)
+        }
+
+        fun startActivityWithValues(context: Context, hazardId: String, indicatorId: String) {
+            val intent = Intent(context, AddIndicatorActivity::class.java)
+            intent.putExtra(HAZARD_ID, hazardId)
+            intent.putExtra(INDICATOR_ID, indicatorId)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
         }
 
@@ -77,12 +91,15 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         val SUBNATIONAL = 1
         val TRIGGER_FREQUENCY_LIST = listOf("Hours", "Days", "Weeks", "Months")
         val AREA_REQUEST_CODE = 100
+        val HAZARD_ID = "hazard_id"
+        val INDICATOR_ID = "indicator_id"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_indicator)
         mViewModel = ViewModelProviders.of(this).get(AddIndicatorViewModel::class.java)
+        mRiskViewModel = ViewModelProviders.of(this).get(ActiveRiskViewModel::class.java)
         initData()
         initViews()
         initListeners()
@@ -105,6 +122,8 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
 
 
     private fun initData() {
+        mHazardId = intent.getStringExtra(HAZARD_ID)
+        mIndicatorId = intent.getStringExtra(INDICATOR_ID)
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         mSources = mutableListOf()
         mAreas = mutableListOf()
@@ -127,7 +146,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         setSupportActionBar(toolbar)
         val supportActionBar = supportActionBar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = getString(R.string.add_indicator)
+        supportActionBar?.title = if (mHazardId != null && mIndicatorId != null) getString(R.string.edit_indicator) else getString(R.string.add_indicator)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_close_white_24dp)
 
         rvSources.hasFixedSize()
@@ -175,6 +194,47 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         mDialogSource = SourceDialogFragment()
         mDialogAssign = AssignToDialogFragment()
         mDialogLocation = LocationSelectionDialogFragment()
+
+        //edit load data back
+        if (mHazardId != null && mIndicatorId != null) {
+            mRiskViewModel.getLiveIndicatorModel(mHazardId as String, mIndicatorId as String).observe(this, Observer { model ->
+                model?.apply {
+                    mIndicatorModel = model
+                    loadDataBack(model)
+                    Timber.d(mIndicatorModel.toString())
+                }
+            })
+        }
+    }
+
+    private fun loadDataBack(model: ModelIndicator) {
+        tvAddIndicatorName.setText(model.name)
+        mSources.addAll(model.source)
+        val green = model.trigger[Constants.TRIGGER_GREEN]
+        tvIndicatorGreenName.setText(green.triggerValue)
+        etIndicatorGreenValue.setText(green.frequencyValue)
+        tvGreenFrequency.text = TRIGGER_FREQUENCY_LIST[green.durationType.toInt()]
+        val amber = model.trigger[Constants.TRIGGER_AMBER]
+        tvIndicatorAmberName.setText(amber.triggerValue)
+        etIndicatorAmberValue.setText(amber.frequencyValue)
+        tvAmberFrequency.text = TRIGGER_FREQUENCY_LIST[amber.durationType.toInt()]
+        val red = model.trigger[Constants.TRIGGER_RED]
+        tvIndicatorRedName.setText(red.triggerValue)
+        etIndicatorRedValue.setText(red.frequencyValue)
+        tvRedFrequency.text = TRIGGER_FREQUENCY_LIST[red.durationType.toInt()]
+        mViewModel.getStaffLive().observe(this, Observer { staffs ->
+            model.assignee?.apply {
+                staffs?.find {
+                    it.id == model.assignee
+                }?.let {
+                    tvAssignTo.text = String.format("%s %s", it.firstName, it.lastName)
+                    //need to +1 cause position 0 will be unassigned
+                    mSelectedAssignPosition = staffs.indexOfFirst { staff -> staff.id == model.assignee } + 1
+                }
+            }
+        })
+        tvIndicatorLocation.text = LOCATION_LIST[model.geoLocation]
+
     }
 
     private fun initListeners() {

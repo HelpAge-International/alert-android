@@ -26,8 +26,8 @@ class AreaRVAdapter(private val areas: MutableList<ModelIndicatorLocation>, priv
     override fun onBindViewHolder(holder: AreaViewHolder?, position: Int) {
         with(areas[position]) {
             holder?.tvAreaName?.text = String.format("%s %s %s", this.country,
-                    if (this.level1 != -1) this.level1?.let { ", "+countryDataList[this.country.toInt()].levelOneValues?.get(it)?.value } else "",
-                    if (this.level2 != -1) this.level2?.let { this.level1?.let { it1 -> ", "+countryDataList[this.country.toInt()].levelOneValues?.get(it1)?.levelTwoValues?.get(it)?.value } } else "")
+                    if (this.level1 != -1) this.level1?.let { ", "+countryDataList[this.country as Int].levelOneValues?.get(it)?.value } else "",
+                    if (this.level2 != -1) this.level2?.let { this.level1?.let { it1 -> ", "+countryDataList[this.country as Int].levelOneValues?.get(it1)?.levelTwoValues?.get(it)?.value } } else "")
         }
     }
 
