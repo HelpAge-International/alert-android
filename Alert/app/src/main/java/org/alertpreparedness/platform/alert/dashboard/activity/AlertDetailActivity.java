@@ -33,7 +33,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class AlertDetailActivity extends AppCompatActivity {
+public class AlertDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
     private TextView txtHazardName, txtPopulation, txtAffectedArea, txtInfo, txtLastUpdated, txtActionBarTitle;
     private ImageView imgHazard, imgPopulation, imgAffectedArea, imgInfo, imgClose, imgUpdate;
@@ -42,6 +42,7 @@ public class AlertDetailActivity extends AppCompatActivity {
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public static final String EXTRA_ALERT = "extra_alert";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +76,7 @@ public class AlertDetailActivity extends AppCompatActivity {
         imgUpdate = (ImageView) findViewById(R.id.rightImageView);
 
         imgUpdate.setImageResource(R.drawable.ic_create_white_24dp);
+        imgUpdate.setOnClickListener(this);
         imgClose.setVisibility(View.GONE);
         fetchDetails();
     }
@@ -167,5 +169,16 @@ public class AlertDetailActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         compositeDisposable.clear();
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view==imgUpdate){
+            Intent intent = new Intent(AlertDetailActivity.this, UpdateAlertActivity.class);
+            intent.putExtra("alert_name", alert.getHazardScenario());
+            intent.putExtra("alert_population", alert.getPopulation());
+            intent.putExtra("alert_info", alert.getInfo());
+            startActivity(intent);
+        }
     }
 }

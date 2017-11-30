@@ -87,5 +87,6 @@
     <string name="date_format">dd/mm/yyyy</string>
     <string name="title_activity_indicator_log">IndicatorLogActivity</string>
     <string name="status">Status:</string>
+    <string name="text_update_alert">Update Alert</string>
 
 </resources>

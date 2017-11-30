@@ -6,7 +6,7 @@
     <color name="btnColor">#006ea0</color>
     <color name="white">#ffffff</color>
     <color name="alertGreen">#46AA31</color>
-    <color name="alertAmber">#F3A500</color>
+    <color name="alertAmber">#f3a500</color>
     <color name="alertRed">#E10514</color>
     <color name="home_text">#686868</color>
     <color name="home_g">#64000000</color>
@@ -20,4 +20,5 @@
     <color name="remove_button">#E10514</color>
     <color name="hazard_tab_color">#F3F3F3</color>
     <color name="log_content">#aa000000</color>
+    <color name="light_blue">#006EA0</color>
 </resources>
