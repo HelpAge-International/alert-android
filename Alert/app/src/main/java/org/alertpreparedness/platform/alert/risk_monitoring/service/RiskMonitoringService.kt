@@ -159,5 +159,9 @@ object RiskMonitoringService {
         logRef.child(key).setValue(log)
     }
 
+    fun updateLogContent(indicatorId:String, logId:String, content:String) {
+        val logRef = FirebaseHelper.getIndicatorLogRef(mAppStatus, indicatorId)
+        logRef.child(logId).child("content").setValue(content)
+    }
 
 }

@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.alert.risk_monitoring.adapter
 
 import android.content.Context
+import android.os.Bundle
 import android.support.v4.app.FragmentManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
@@ -87,6 +88,11 @@ class LogViewHolder(itemView: View, private val logs: List<ModelLog>, private va
                     "Edit" -> {
                         Timber.d("edit")
                         val editDialog = EditLogDialog()
+                        val bundle = Bundle()
+                        bundle.putString(EditLogDialog.LOG_CONTENT, logs[adapterPosition].content)
+                        bundle.putString(EditLogDialog.LOG_ID, logs[adapterPosition].id)
+                        bundle.putString(EditLogDialog.INDICATOR_ID, indicatorId)
+                        editDialog.arguments = bundle
                         editDialog.show(fm, "edit_log_dialog")
                     }
                     else -> {

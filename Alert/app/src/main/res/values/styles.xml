@@ -29,6 +29,12 @@
         <item name="color">#FFFFFF</item>
     </style>
 
+    <!--edit log custom theme-->
+    <style name="EditDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+        <!--<item name="android:background">#B0BEC5</item>-->
+    </style>
 
 </resources>
 
