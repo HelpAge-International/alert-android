@@ -97,15 +97,9 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 //                        progressDialog.dismiss();
 
                     if (task.isSuccessful()) {
-                        Log.e("Tag", firebaseAuth.getCurrentUser().getUid());
-                        Log.e("Tag", " "+mAppStatus);
                         if (firebaseAuth.getCurrentUser()!=null) {
                             PreferHelper.putString(this, Constants.UID, firebaseAuth.getCurrentUser().getUid());
                         }
-//                        Log.e("Tag", countryID);
-//                        Log.e("Tag", userID);
-//                        Log.e("Tag", " "+userType);
-//
                         userInfo.authUser(LoginScreen.this);
                     }
 
@@ -130,9 +124,6 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     public void onUserAuthorized(User user) {
         progressDialog.dismiss();
         startActivity(new Intent(LoginScreen.this, HomeScreen.class));
-        countryID = UserInfo.getUser(LoginScreen.this).countryID;
-        userType = UserInfo.getUser(LoginScreen.this).userType;
-        userID = UserInfo.getUser(LoginScreen.this).userID;
 
         UserInfo.clearAll();
         finish();
