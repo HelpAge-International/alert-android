@@ -2,6 +2,7 @@ package org.alertpreparedness.platform.alert.dashboard.adapter;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,8 +32,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
     Calendar today = Calendar.getInstance();
     Calendar date = Calendar.getInstance();
 
-    public final static long MILLIS_PER_DAY = 24 * 60 * 60 * 1000L;
-    public String dateFormat = "dd/MM/yyyy hh:mm:ss.SSS";
+    private String dateFormat = "dd/MM/yyyy hh:mm:ss.SSS";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
 
     public TaskAdapter(List<Tasks> List) {
@@ -63,10 +63,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         Collections.sort(listArray, new Comparator<Tasks>() {
             @Override
             public int compare(Tasks o1, Tasks o2) {
-                // System.out.println(o1.getDueDate() + " " + o2.getDueDate());
-//                if (o1.getDueDate() > o2.getDueDate()) return -1;
-//                if (o1.getDueDate() < o2.getDueDate()) return 1;
-                return Long.compare(o1.dueDate, o2.dueDate);
+                return Long.compare(o1.getDueDate(), o2.getDueDate());
             }
         });
         notifyDataSetChanged();
@@ -77,33 +74,41 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         TextView txt_taskName;
         ImageView img_task;
 
-        public ViewHolder(View itemView) {
+        private ViewHolder(View itemView) {
             super(itemView);
             img_task = (ImageView) itemView.findViewById(R.id.img_task);
             txt_taskStatus = (TextView) itemView.findViewById(R.id.task_status);
             txt_taskName = (TextView) itemView.findViewById(R.id.task_name);
         }
 
-        public void bind(Tasks tasks){
-            txt_taskName.setText(tasks.getTaskName());
+        private void bind(Tasks tasks){
+
             if (tasks.getTaskType().equals("action") && isDueToday(tasks.dueDate)) {
+                txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueTodayString("red level", "preparedness action"));
                 img_task.setImageResource(R.drawable.home_task_red);
             } else if (tasks.getTaskType().equals("indicator") && isDueToday(tasks.dueDate)) {
+                txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueTodayString("red level", "indicator"));
                 img_task.setImageResource(R.drawable.home_task_red);
             } else if (tasks.getTaskType().equals("action") && isDueInWeek(tasks.dueDate)){
+                txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueWeekString("amber level", "preparedness action"));
                 img_task.setImageResource(R.drawable.home_task_amber);
             } else if (tasks.getTaskType().equals("indicator") && isDueInWeek(tasks.dueDate)) {
+                txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueTodayString("amber level", "indicator"));
                 img_task.setImageResource(R.drawable.home_task_amber);
             } else if (tasks.getTaskType().equals("action") && itWasDue(tasks.dueDate)) {
+                txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueBeforeString("red level", "preparedness action", format.format(new Date(tasks.dueDate))));
                 img_task.setImageResource(R.drawable.home_task_red);
-            } else if (tasks.getTaskType().equals("indicator") && itWasDue(tasks.dueDate)) {
+            } else if (tasks.getTaskType().equals("indicator") && itWasDue(tasks.getDueDate())) {
+                txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueBeforeString("red level", "indicator", format.format(new Date(tasks.dueDate))));
                 img_task.setImageResource(R.drawable.home_task_red);
+            }else{
+                Log.e("Tag", "FALSE");
             }
             // img_task.setImageResource(isDueToday(tasks.getDueDate()) ? R.drawable.home_task_red : R.drawable.home_task_amber);
         }
@@ -114,29 +119,29 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         return listArray.size();
     }
 
-    public static String dueTodayString(String level, String type) {
+    private String dueTodayString(String level, String type) {
         return "A " + level + " " + type + "\n needs to be completed today";
     }
 
-    public static String dueWeekString(String level, String type) {
+    private String dueWeekString(String level, String type) {
         return "A " + level + " " + type + "\n needs to be completed this week";
     }
 
-    public static String dueBeforeString(String level, String type, String date) {
+    private String dueBeforeString(String level, String type, String date) {
         return "A " + level + " " + type + " was due on \n"+date;
     }
 
-    public  boolean isDueToday(long milliSeconds) {
+    private boolean isDueToday(long milliSeconds) {
         date.setTimeInMillis(milliSeconds);
         return  today.get(Calendar.DAY_OF_YEAR) == date.get(Calendar.DAY_OF_YEAR);
     }
 
-    public boolean isDueInWeek(long milliSeconds){
+    private boolean isDueInWeek(long milliSeconds){
         date.setTimeInMillis(milliSeconds);
         return date.get(Calendar.DAY_OF_YEAR) > today.get(Calendar.DAY_OF_YEAR) &&  date.get(Calendar.DAY_OF_YEAR) < (today.get(Calendar.DAY_OF_YEAR)+7);
     }
 
-    public boolean itWasDue(long milliSeconds){
+    private boolean itWasDue(long milliSeconds){
         date.setTimeInMillis(milliSeconds);
         return date.get(Calendar.DAY_OF_YEAR) < (today.get(Calendar.DAY_OF_YEAR));
     }

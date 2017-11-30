@@ -17,19 +17,19 @@ public class User implements Serializable {
     public String agencyAdminID;
     public String countryID;
     public String systemAdminID;
-    public String networkCountryID;
+    //public String networkCountryID;
 
     //public static User sharedInstance = new User();
 
     // Default constructor required for calls to
     // DataSnapshot.getValue(User.class)
-    public User(String userID, int userType, String agencyAdminID, String countryID, String systemAdminID, String networkCountryID) {
+    public User(String userID, int userType, String agencyAdminID, String countryID, String systemAdminID) {
         this.userID = userID;
         this.userType = userType;
         this.agencyAdminID = agencyAdminID;
         this.countryID = countryID;
         this.systemAdminID = systemAdminID;
-        this.networkCountryID = networkCountryID;
+        //this.networkCountryID = networkCountryID;
     }
 
     public User() {
@@ -56,23 +56,23 @@ public class User implements Serializable {
         return systemAdminID;
     }
 
-    public String getNetworkCountryID() {
-        return networkCountryID;
-    }
+  //  public String getNetworkCountryID() {
+    //    return networkCountryID;
+   // }
 
     public void saveToPreferences(SharedPreferences prefs){
 
     }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "userID='" + userID + '\'' +
-                ", userType=" + userType +
-                ", agencyAdminID='" + agencyAdminID + '\'' +
-                ", countryID='" + countryID + '\'' +
-                ", systemAdminID='" + systemAdminID + '\'' +
-                ", networkCountryID='" + networkCountryID + '\'' +
-                '}';
-    }
+//
+//    @Override
+//    public String toString() {
+//        return "User{" +
+//                "userID='" + userID + '\'' +
+//                ", userType=" + userType +
+//                ", agencyAdminID='" + agencyAdminID + '\'' +
+//                ", countryID='" + countryID + '\'' +
+//                ", systemAdminID='" + systemAdminID + '\'' +
+//                ", networkCountryID='" + networkCountryID + '\'' +
+//                '}';
+//    }
 }

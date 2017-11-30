@@ -18,9 +18,12 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
 
+import org.alertpreparedness.platform.alert.AlertApplication;
+import org.alertpreparedness.platform.alert.BaseActivity;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
+import org.alertpreparedness.platform.alert.interfaces.AuthCallback;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
@@ -37,6 +40,9 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     private FirebaseAuth.AuthStateListener mAuthListener;
     private UserInfo userInfo = new UserInfo();
     private final static String TAG = "LoginActivity";
+    private String userID, countryID, agencyAdminID, systemAdminID, networkCountryID;
+    private int userType;
+    private String mAppStatus = PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,9 +97,15 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 //                        progressDialog.dismiss();
 
                     if (task.isSuccessful()) {
+                        Log.e("Tag", firebaseAuth.getCurrentUser().getUid());
+                        Log.e("Tag", " "+mAppStatus);
                         if (firebaseAuth.getCurrentUser()!=null) {
                             PreferHelper.putString(this, Constants.UID, firebaseAuth.getCurrentUser().getUid());
                         }
+//                        Log.e("Tag", countryID);
+//                        Log.e("Tag", userID);
+//                        Log.e("Tag", " "+userType);
+//
                         userInfo.authUser(LoginScreen.this);
                     }
 
@@ -118,6 +130,10 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     public void onUserAuthorized(User user) {
         progressDialog.dismiss();
         startActivity(new Intent(LoginScreen.this, HomeScreen.class));
+        countryID = UserInfo.getUser(LoginScreen.this).countryID;
+        userType = UserInfo.getUser(LoginScreen.this).userType;
+        userID = UserInfo.getUser(LoginScreen.this).userID;
+
         UserInfo.clearAll();
         finish();
     }

@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.helper;
+package org.alertpreparedness.platform.alert.interfaces;
 
 import org.alertpreparedness.platform.alert.model.Alert;
 

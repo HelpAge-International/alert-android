@@ -11,7 +11,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -24,7 +23,7 @@ import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.helper.DataHandler;
-import org.alertpreparedness.platform.alert.helper.OnAlertItemClickedListener;
+import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.model.Alert;
@@ -46,7 +45,6 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference database = FirebaseDatabase.getInstance().getReference();
     private Toolbar toolbar;
-    private String[] usersID;
     private Alert alert;
     private ArrayList<CountryJsonData> mCountryList;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
@@ -58,13 +56,12 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
     public AlertAdapter alertAdapter;
     public List<Alert> alertList;
     public RecyclerView alertRecyclerView;
-    public String countryID, agencyAdminID, systemAdminID, networkCountryID;
+
     public static final String mypreference = "mypref";
     public static final String userKey = "UserType";
     public static final PreferHelper sharedPreferences = new PreferHelper();
 
     private List<DataHandler> mHandlerList = new ArrayList<>();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,51 +69,12 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         super.onCreateDrawer(R.layout.activity_home_screen);
 
         FirebaseAuth.getInstance().addAuthStateListener(this);
-
         AlertAdapter.updateActivity(this);
 
         toolbar = (Toolbar) findViewById(R.id.alert_appbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-
-        Log.e("tag", UserInfo.getUser(this).toString());
-
-        countryID = UserInfo.getUser(this).countryID;
-        agencyAdminID = UserInfo.getUser(this).agencyAdminID;
-        systemAdminID = UserInfo.getUser(this).systemAdminID;
-        networkCountryID = UserInfo.getUser(this).networkCountryID;
-
-        System.out.println("U-ID: "+ UserInfo.getUser(this).getUserID());
-        System.out.println("C-ID: "+ UserInfo.getUser(this).getCountryID());
-        System.out.println("A-ID: "+ UserInfo.getUser(this).getAgencyAdminID());
-        System.out.println("S-ID: "+ UserInfo.getUser(this).getSystemAdminID());
-        System.out.println("N-ID: "+ UserInfo.getUser(this).getNetworkCountryID());
-
-       // mCountryList = new ArrayList<CountryJsonData>();
-
-        System.out.println("Network: "+networkCountryID);
-        usersID = new String[]{networkCountryID, countryID};
-
-//        Disposable RMDisposable = RiskMonitoringService.INSTANCE.readJsonFile()
-//                .map(fileText -> {
-//                    return new JSONObject(fileText);
-//                }).flatMap( jsonObject -> {
-//                    return RiskMonitoringService.INSTANCE.mapJasonToCountryData(jsonObject, new Gson());
-//                }).subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(countryJsonData -> {
-//                            Timber.d("Country id is: %s, level 1: %s", countryJsonData.getCountryId(), countryJsonData.getLevelOneValues().size());
-//                            mCountryList.add(countryJsonData);
-//                            //System.out.println("LIST: "+mCountryList.get(1));
-//                        }
-//                );
-//
-//        compositeDisposable.add(RMDisposable);
-
-//        for (int i=0; i<mCountryList.size(); i++){
-//            System.out.println("LIST: "+mCountryList.get(i).getLevelOneValues());
-//        }
 
         appBarTitle = (TextView) findViewById(R.id.custom_bar_title);
         appBarTitle.setOnClickListener(this);
@@ -143,19 +101,10 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         taskAdapter = new TaskAdapter(tasksList);
         myTaskRecyclerView.setAdapter(taskAdapter);
 
-
-        for (String ids : usersID) {
-            DataHandler obj = new DataHandler();
-            obj.getAlertsFromFirebase(this, ids);
-            mHandlerList.add(obj);
-        }
-
-        for (String ids : usersID) {
-            DataHandler obj = new DataHandler();
-            obj.getTasksFromFirebase(this, ids);
-            mHandlerList.add(obj);
-        }
-
+        DataHandler obj = new DataHandler();
+        obj.getAlertsFromFirebase(this, HomeScreen.this);
+        obj.getTasksFromFirebase(this, HomeScreen.this);
+        mHandlerList.add(obj);
     }
 
     @Override
@@ -235,4 +184,8 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
             }
         }
     }
+
+
+
+
 }

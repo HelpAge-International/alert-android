@@ -13,7 +13,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import org.alertpreparedness.platform.alert.AlertApplication;
-import org.alertpreparedness.platform.alert.login.activity.AuthCallback;
+import org.alertpreparedness.platform.alert.interfaces.AuthCallback;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.service.NetworkService;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -31,17 +31,14 @@ import io.reactivex.disposables.Disposable;
  */
 
 public class UserInfo {
-    // public static String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-    public static DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+    public DatabaseReference database = FirebaseDatabase.getInstance().getReference();
     public static final String PREFS_USER = "prefs_user";
     private static CompositeDisposable compositeDisposable = new CompositeDisposable();
     private static String[] users = {"administratorCountry", "countryDirector", "ert", "ertLeader", "partner"};
     private static DBListener dbListener = new DBListener();
 
 
-    //Cross-check if the logged-in user ID matches the ID under different node.
     public void authUser(final AuthCallback authCallback) {
-        // userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         for (String nodeName : users) {
             ValueEventListener valueEventListener;
             DatabaseReference db = database.child(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS))
@@ -50,10 +47,13 @@ public class UserInfo {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if (dataSnapshot.child(PreferHelper.getString(AlertApplication.getContext(), Constants.UID)).exists()) {
+                                Log.e("Tag", "TRUE"+nodeName);
                                 DataSnapshot userNode = dataSnapshot.child(PreferHelper.getString(AlertApplication.getContext(), Constants.UID));
+                                Log.e("Tag", "UID"+userNode);
                                 populateUser(authCallback, nodeName, userNode);
                             } else {
-                                //System.out.println("False");
+                                //Log.e("Tag", "FALSE");
+                               // Log.e("Tag", "FALSE"+nodeName);
                             }
                         }
 
@@ -66,7 +66,7 @@ public class UserInfo {
         }
     }
 
-    public static void saveUser(Context context, User user) {
+    private static void saveUser(Context context, User user) {
         String serializedUser = new Gson().toJson(user);
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
@@ -93,31 +93,40 @@ public class UserInfo {
         PreferHelper.putString(AlertApplication.getContext(), Constants.COUNTRY_ID, countryId);
         PreferHelper.putString(AlertApplication.getContext(), Constants.SYSTEM_ID, systemAdmin);
         PreferHelper.putInt(AlertApplication.getContext(), Constants.USER_TYPE, userType);
-
-        Disposable NSDisposable = NetworkService.INSTANCE.mapNetworksForCountry(agencyAdmin, countryId).subscribe(
-                (Map<String, String> stringStringMap) -> {
-                    for (String key : stringStringMap.keySet()) {
-                        //System.out.println("Agency "+ agencyAdmin);
-                        String networkID = stringStringMap.get(key);
-
-                        User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin, networkID);
-                        Toast.makeText(callback.getContext(),
-                                String.format(Locale.getDefault(), "user: %s, type: %s, agency: %s, system: %s, country: %s, network: %s",
-                                        userID, userType, agencyAdmin, systemAdmin, countryId, networkID),
-                                Toast.LENGTH_LONG).show();
+        User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin);
+                      //  Toast.makeText(callback.getContext(),
+//                                String.format(Locale.getDefault(), "user: %s, type: %s, agency: %s, system: %s, country: %s, network: %s",
+//                                        userID, userType, agencyAdmin, systemAdmin, countryId),
+//                                Toast.LENGTH_LONG).show();
 
                         saveUser(callback.getContext(), user);
                         callback.onUserAuthorized(user);
 
-                        //TODO get all network id from networks
-                    }
-                }
-        );
-        compositeDisposable.add(NSDisposable);
+
+//        Disposable NSDisposable = NetworkService.INSTANCE.mapNetworksForCountry(agencyAdmin, countryId).subscribe(
+//                (Map<String, String> stringStringMap) -> {
+//                    for (String key : stringStringMap.keySet()) {
+//                        //System.out.println("Agency "+ agencyAdmin);
+//                        String networkID = stringStringMap.get(key);
+//
+//                        User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin, networkID);
+//                        Toast.makeText(callback.getContext(),
+//                                String.format(Locale.getDefault(), "user: %s, type: %s, agency: %s, system: %s, country: %s, network: %s",
+//                                        userID, userType, agencyAdmin, systemAdmin, countryId, networkID),
+//                                Toast.LENGTH_LONG).show();
+//
+//                        saveUser(callback.getContext(), user);
+//                        callback.onUserAuthorized(user);
+//
+//                        //TODO get all network id from networks
+//                    }
+//                }
+//        );
+//        compositeDisposable.add(NSDisposable);
     }
 
 
-    public static int getUserTypeString(String node) {
+    private int getUserTypeString(String node) {
         switch (node) {
             case "administratorCountry":
                 return Constants.CountryAdmin;
@@ -138,6 +147,8 @@ public class UserInfo {
         compositeDisposable.clear();
         dbListener.detatch();
     }
+
+
 
 }
 
