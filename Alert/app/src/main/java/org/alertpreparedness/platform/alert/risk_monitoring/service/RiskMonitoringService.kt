@@ -124,7 +124,7 @@ object RiskMonitoringService {
     fun getIndicatorModel(hazardId: String, indicatorId: String): Flowable<ModelIndicator> {
         Timber.d("actual ids: %s, %s", hazardId, indicatorId)
         val indicatorRef = FirebaseHelper.getIndicatorRef(mAppStatus, hazardId, indicatorId)
-        return RxFirebaseDatabase.observeValueEvent(indicatorRef, {snap ->
+        return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
             Timber.d(snap.value.toString())
             val toJson = gson.toJson(snap.value)
             val jsonReader = JsonReader(StringReader(toJson))
@@ -134,9 +134,19 @@ object RiskMonitoringService {
         })
     }
 
-    fun updateIndicatorLevel(hazardId: String, indicatorId: String, updateData: Map<String, Any>): Completable {
+    fun updateIndicator(hazardId: String, indicatorId: String, updateData: Map<String, Any>): Completable {
         val indicatorRef = FirebaseHelper.getIndicatorRef(mAppStatus, hazardId, indicatorId)
         return RxFirebaseDatabase.updateChildren(indicatorRef, updateData)
+    }
+
+    fun updateIndicatorModel(hazardId: String, indicatorId: String, indicator: ModelIndicator): Completable {
+        val indicatorRef = FirebaseHelper.getIndicatorRef(mAppStatus, hazardId, indicatorId)
+        return RxFirebaseDatabase.setValue(indicatorRef, indicator)
+    }
+
+    fun updateIndicatorModelFirebaseFix(hazardId: String, indicatorId: String, fixData:Map<String, Any>): Completable {
+        val indicatorRef = FirebaseHelper.getIndicatorRef(mAppStatus, hazardId, indicatorId)
+        return RxFirebaseDatabase.updateChildren(indicatorRef.child("hazardScenario"), fixData)
     }
 
     fun getLogs(id: String): Flowable<List<ModelLog>> {

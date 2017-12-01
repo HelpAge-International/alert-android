@@ -44,6 +44,8 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
     private val mCountryId = PreferHelper.getString(AlertApplication.getContext(), Constants.COUNTRY_ID)
     private var mHazardId = ""
     private var mIndicatorId = ""
+    private var mNetworkId:String? = null
+    private var mNetworkCountryId:String? = null
 
     companion object {
         val INDICATOR_MODEL = "indicator_model"
@@ -66,6 +68,12 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
         }
         if (arguments.containsKey(ActiveRiskFragment.INDICATOR_ID)) {
             mIndicatorId = arguments.get(ActiveRiskFragment.INDICATOR_ID) as String
+        }
+        if (arguments.containsKey(ActiveRiskFragment.NETWORK_ID)) {
+            mNetworkId = arguments.get(ActiveRiskFragment.NETWORK_ID) as String
+        }
+        if (arguments.containsKey(ActiveRiskFragment.NETWORK_COUNTRY_ID)) {
+            mNetworkCountryId = arguments.get(ActiveRiskFragment.NETWORK_COUNTRY_ID) as String
         }
         Timber.d("hazardId: %s, indicatorId: %s", mHazardId, mIndicatorId)
         mViewModel = ViewModelProviders.of(this).get(ActiveRiskViewModel::class.java)
@@ -130,7 +138,7 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
         view.llEditIndicator.setOnClickListener {
             dismiss()
             Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).subscribe({
-                AddIndicatorActivity.startActivityWithValues(AlertApplication.getContext(), mHazardId, mIndicatorId)
+                AddIndicatorActivity.startActivityWithValues(AlertApplication.getContext(), mHazardId, mIndicatorId, mNetworkId, mNetworkCountryId)
             })
         }
     }

@@ -34,6 +34,7 @@ import org.alertpreparedness.platform.alert.utils.AppUtils
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.joda.time.DateTime
 import timber.log.Timber
+import java.lang.IllegalArgumentException
 import java.util.*
 
 class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDeleteListener {
@@ -67,7 +68,11 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
     //edit
     private var mHazardId: String? = null
     private var mIndicatorId: String? = null
+    private var mNetworkId: String? = null
+    private var mNetworkCountryId: String? = null
     private lateinit var mRiskViewModel: ActiveRiskViewModel
+    private var mEditStatus = EDIT_NO_HAZARD_CHANGE
+    private lateinit var mLoadedHazardForIndicator: ModelHazard
 
     companion object {
         fun startActivity(context: Context) {
@@ -75,10 +80,12 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
             context.startActivity(intent)
         }
 
-        fun startActivityWithValues(context: Context, hazardId: String, indicatorId: String) {
+        fun startActivityWithValues(context: Context, hazardId: String, indicatorId: String, networkId: String?, networkCountryId: String?) {
             val intent = Intent(context, AddIndicatorActivity::class.java)
             intent.putExtra(HAZARD_ID, hazardId)
             intent.putExtra(INDICATOR_ID, indicatorId)
+            networkId?.apply { intent.putExtra(NETWORK_ID, networkId) }
+            networkCountryId?.apply { intent.putExtra(NETWORK_COUNTRY_ID, networkCountryId) }
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
         }
@@ -93,6 +100,12 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         val AREA_REQUEST_CODE = 100
         val HAZARD_ID = "hazard_id"
         val INDICATOR_ID = "indicator_id"
+        val NETWORK_ID = "network_id"
+        val NETWORK_COUNTRY_ID = "network_country_id"
+
+        val EDIT_NO_HAZARD_CHANGE = 0
+        val EDIT_FROM_COUNTRY_WITH_HAZARD_CHANGE = 1
+        val EDIT_FROM_NETWORK_WITH_HAZARD_CHANGE = 2
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -124,6 +137,8 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
     private fun initData() {
         mHazardId = intent.getStringExtra(HAZARD_ID)
         mIndicatorId = intent.getStringExtra(INDICATOR_ID)
+        mNetworkId = intent.getStringExtra(NETWORK_ID)
+        mNetworkCountryId = intent.getStringExtra(NETWORK_COUNTRY_ID)
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         mSources = mutableListOf()
         mAreas = mutableListOf()
@@ -137,6 +152,9 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
                     mAreaAdapter = AreaRVAdapter(mAreas, countryList)
                     rvLocationSubNational.adapter = mAreaAdapter
                     mAreaAdapter.setOnAreaDeleteListener(this)
+                    if (pbAddIndicator.isShown) {
+                        pbAddIndicator.visibility = View.GONE
+                    }
                 }
             }
         })
@@ -200,6 +218,10 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
             mRiskViewModel.getLiveIndicatorModel(mHazardId as String, mIndicatorId as String).observe(this, Observer { model ->
                 model?.apply {
                     mIndicatorModel = model
+                    mLoadedHazardForIndicator = model.hazardScenario
+                    if (model.geoLocation == SUBNATIONAL) {
+                        pbAddIndicator.visibility = View.VISIBLE
+                    }
                     loadDataBack(model)
                     Timber.d(mIndicatorModel.toString())
                 }
@@ -291,7 +313,35 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
                     mIndicatorModel.hazardScenario = customHazards?.map { mHazardOtherNamesMap[it.id] }?.indexOf(p0?.title)?.let { customHazards[it] } ?: ModelHazard()
                 }
             }
-            Timber.d(mIndicatorModel.toString())
+
+            //check edit status
+            if (mHazardId != null && mIndicatorId != null) {
+                val loadedHazardName = when {
+                    mLoadedHazardForIndicator.key == "countryContext" -> {
+                        getString(R.string.country_context)
+                    }
+                    mLoadedHazardForIndicator.hazardScenario == -1 -> {
+                        mHazardOtherNamesMap[mLoadedHazardForIndicator.otherName]
+                    }
+                    else -> {
+                        Constants.HAZARD_SCENARIO_NAME[mLoadedHazardForIndicator.hazardScenario]
+                    }
+                }
+                mEditStatus = when {
+                    loadedHazardName == tvSelectHazard.text -> {
+                        EDIT_NO_HAZARD_CHANGE
+                    }
+                    loadedHazardName != tvSelectHazard.text && mNetworkId == null -> {
+                        EDIT_FROM_COUNTRY_WITH_HAZARD_CHANGE
+                    }
+                    loadedHazardName != tvSelectHazard.text && mNetworkId != null -> {
+                        EDIT_FROM_NETWORK_WITH_HAZARD_CHANGE
+                    }
+                    else -> {
+                        throw IllegalArgumentException("Loaded hazard name not matching anything!")
+                    }
+                }
+            }
             true
         }
 
@@ -569,8 +619,42 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
             }
         }
 
-        Timber.d(mIndicatorModel.toString())
-        pushToDatabase(mIndicatorModel)
+        //actual add or edit indicator
+        when (mIndicatorModel.id) {
+            null -> {
+                pushToDatabase(mIndicatorModel)
+            }
+            else -> {
+                if (mHazardId != null && mIndicatorId != null) {
+                    Timber.d(mIndicatorModel.toString())
+                    //three more conditions to do update based on edit status
+                    when (mEditStatus) {
+                        EDIT_NO_HAZARD_CHANGE -> {
+                            Timber.d("EDIT_NO_HAZARD_CHANGE")
+                            mRiskViewModel.updateIndicatorModel(mHazardId as String, mIndicatorId as String, mIndicatorModel.copy(id = null))
+                            finish()
+                        }
+                        EDIT_FROM_COUNTRY_WITH_HAZARD_CHANGE -> {
+                            Timber.d("EDIT_FROM_COUNTRY_WITH_HAZARD_CHANGE")
+                            when (mIsCountryContext) {
+                                true -> {
+                                }
+                                else -> {
+                                }
+                            }
+                        }
+                        EDIT_FROM_NETWORK_WITH_HAZARD_CHANGE -> {
+                            Timber.d("EDIT_FROM_NETWORK_WITH_HAZARD_CHANGE")
+                        }
+                        else -> {
+                            throw IllegalArgumentException("No matching edit condition!")
+                        }
+                    }
+                }
+
+            }
+        }
+
     }
 
     private fun pushToDatabase(mIndicatorModel: ModelIndicator) {

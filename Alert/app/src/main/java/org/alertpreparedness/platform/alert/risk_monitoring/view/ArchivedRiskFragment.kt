@@ -57,11 +57,13 @@ class ArchivedRiskFragment : Fragment(), OnIndicatorSelectedListener {
         return view
     }
 
-    override fun selectedIndicator(hazardId: String, indicatorId: String) {
+    override fun selectedIndicator(hazardId: String, indicatorId: String, networkId:String?, networkCountryId:String?) {
         val bsDialog = BottomSheetDialog()
         val bundle = Bundle()
         bundle.putString(ActiveRiskFragment.HAZARD_ID, hazardId)
         bundle.putString(ActiveRiskFragment.INDICATOR_ID, indicatorId)
+        networkId?.apply {bundle.putString(ActiveRiskFragment.NETWORK_ID, networkId)}
+        networkCountryId?.apply { bundle.putString(ActiveRiskFragment.NETWORK_COUNTRY_ID, networkCountryId)  }
         bsDialog.arguments = bundle
         bsDialog.show(fragmentManager, "bottom_sheet")
     }
