@@ -17,7 +17,6 @@ import org.alertpreparedness.platform.alert.risk_monitoring.service.NetworkServi
 import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService
 import org.alertpreparedness.platform.alert.risk_monitoring.service.StaffService
 import org.alertpreparedness.platform.alert.utils.Constants
-import org.alertpreparedness.platform.alert.utils.FirebaseHelper
 import org.alertpreparedness.platform.alert.utils.PreferHelper
 import org.joda.time.DateTime
 import timber.log.Timber
@@ -42,6 +41,7 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
     private val mIndicatorModelLive: MutableLiveData<ModelIndicator> = MutableLiveData()
     private val mLogsLive: MutableLiveData<List<ModelLog>> = MutableLiveData()
     private val mNetworkMapLive: MutableLiveData<Map<String, String>> = MutableLiveData()
+    private val mOtherHazardNameLive:MutableLiveData<String> = MutableLiveData()
 
     private val mAgencyId = PreferHelper.getString(AlertApplication.getContext(), Constants.AGENCY_ID)
     private val mCountryId = PreferHelper.getString(AlertApplication.getContext(), Constants.COUNTRY_ID)
@@ -81,6 +81,16 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                         })
         )
         return mIndicatorModelLive
+    }
+
+    fun getLiveOtherHazardName(id:String): MutableLiveData<String> {
+        mDisposables.add(
+                RiskMonitoringService.getHazardOtherNameString(id)
+                        .subscribe({name ->
+                            mOtherHazardNameLive.value = name
+                        })
+        )
+        return mOtherHazardNameLive
     }
 
     fun getLiveIndicatorLogs(indicatorId: String): MutableLiveData<List<ModelLog>> {
@@ -133,20 +143,6 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
         }
         val updateMap = mutableMapOf<String, Any>("dueDate" to dueTime, "triggerSelected" to selection, "updatedAt" to DateTime().millis)
         mDisposables.add(RiskMonitoringService.updateIndicator(hazardId, indicatorId, updateMap).subscribe())
-    }
-
-    fun updateIndicatorModel(hazardId: String, indicatorId: String, indicator: ModelIndicator) {
-        val fixData = mutableMapOf<String, Any>("isActive" to indicator.hazardScenario.isActive, "isSeasonal" to indicator.hazardScenario.isSeasonal)
-        mDisposables.add(RiskMonitoringService.updateIndicatorModel(hazardId, indicatorId, indicator).subscribe({
-            mDisposables.add(
-                    RiskMonitoringService.updateIndicatorModelFirebaseFix(hazardId, indicatorId, fixData).subscribe({
-                        val ref = FirebaseHelper.getIndicatorRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), hazardId, indicatorId).child("hazardScenario")
-                        ref.child("active").removeValue()
-                        ref.child("seasonal").removeValue()
-                    })
-            )
-        }
-        ))
     }
 
     fun getLiveNetworkMap(): MutableLiveData<Map<String, String>> {

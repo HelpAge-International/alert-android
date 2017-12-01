@@ -8,6 +8,7 @@ import io.reactivex.Flowable
 import io.reactivex.Observable
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.risk_monitoring.model.*
+import org.alertpreparedness.platform.alert.utils.AppUtils
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.alertpreparedness.platform.alert.utils.FirebaseHelper
 import org.alertpreparedness.platform.alert.utils.PreferHelper
@@ -139,16 +140,6 @@ object RiskMonitoringService {
         return RxFirebaseDatabase.updateChildren(indicatorRef, updateData)
     }
 
-    fun updateIndicatorModel(hazardId: String, indicatorId: String, indicator: ModelIndicator): Completable {
-        val indicatorRef = FirebaseHelper.getIndicatorRef(mAppStatus, hazardId, indicatorId)
-        return RxFirebaseDatabase.setValue(indicatorRef, indicator)
-    }
-
-    fun updateIndicatorModelFirebaseFix(hazardId: String, indicatorId: String, fixData:Map<String, Any>): Completable {
-        val indicatorRef = FirebaseHelper.getIndicatorRef(mAppStatus, hazardId, indicatorId)
-        return RxFirebaseDatabase.updateChildren(indicatorRef.child("hazardScenario"), fixData)
-    }
-
     fun getLogs(id: String): Flowable<List<ModelLog>> {
         val logRef = FirebaseHelper.getIndicatorLogRef(mAppStatus, id)
         return RxFirebaseDatabase.observeValueEvent(logRef, { snap ->
@@ -175,6 +166,11 @@ object RiskMonitoringService {
     fun updateLogContent(indicatorId: String, logId: String, content: String) {
         val logRef = FirebaseHelper.getIndicatorLogRef(mAppStatus, indicatorId)
         logRef.child(logId).child("content").setValue(content)
+    }
+
+    fun getHazardOtherNameString(id: String): Flowable<String> {
+        val otherNameRef = AppUtils.getDatabase().getReference(mAppStatus).child("hazardOther").child(id).child("name")
+        return RxFirebaseDatabase.observeValueEvent(otherNameRef, String::class.java)
     }
 
 }

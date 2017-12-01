@@ -15,6 +15,7 @@ import android.widget.PopupMenu
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.*
+import com.google.firebase.database.DatabaseReference
 import com.tbruyelle.rxpermissions2.RxPermissions
 import es.dmoral.toasty.Toasty
 import kotlinx.android.synthetic.main.activity_add_indicator.*
@@ -32,6 +33,8 @@ import org.alertpreparedness.platform.alert.risk_monitoring.view_model.ActiveRis
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.AddIndicatorViewModel
 import org.alertpreparedness.platform.alert.utils.AppUtils
 import org.alertpreparedness.platform.alert.utils.Constants
+import org.alertpreparedness.platform.alert.utils.FirebaseHelper
+import org.alertpreparedness.platform.alert.utils.PreferHelper
 import org.joda.time.DateTime
 import timber.log.Timber
 import java.lang.IllegalArgumentException
@@ -188,7 +191,10 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
                 when (it.hazardScenario) {
                     -1 -> {
                         mViewModel.getHazardOtherNameMapLive(it).observe(this, Observer { pair ->
-                            pair?.first?.let { mHazardOtherNamesMap[pair.first] = pair.second }
+                            pair?.first?.let {
+                                mHazardOtherNamesMap[pair.first] = pair.second
+                                Timber.d("other map: %s", mHazardOtherNamesMap.toString())
+                            }
                             mPopupMenu.menu.add(pair?.second)
                         })
                     }
@@ -233,12 +239,20 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         when {
             model.hazardScenario.key == "countryContext" && model.hazardScenario.hazardScenario == -2 -> {
                 tvSelectHazard.text = getString(R.string.country_context)
+                mIsCountryContext = true
             }
             model.hazardScenario.hazardScenario != -1 -> {
                 tvSelectHazard.text = Constants.HAZARD_SCENARIO_NAME[model.hazardScenario.hazardScenario]
+                mIsCountryContext = false
             }
             else -> {
-                tvSelectHazard.text = mHazardOtherNamesMap[model.hazardScenario.otherName]
+                Timber.d("other name id: %s", model.hazardScenario.otherName)
+                model.hazardScenario.otherName?.apply {
+                    mRiskViewModel.getLiveOtherHazardName(model.hazardScenario.otherName as String).observe(this@AddIndicatorActivity, Observer { name ->
+                        tvSelectHazard.text = name
+                        mIsCountryContext = false
+                    })
+                }
             }
         }
         tvAddIndicatorName.setText(model.name)
@@ -631,30 +645,139 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
                     when (mEditStatus) {
                         EDIT_NO_HAZARD_CHANGE -> {
                             Timber.d("EDIT_NO_HAZARD_CHANGE")
-                            mRiskViewModel.updateIndicatorModel(mHazardId as String, mIndicatorId as String, mIndicatorModel.copy(id = null))
-                            finish()
+//                            mRiskViewModel.updateIndicatorModel(mHazardId as String, mIndicatorId as String, mIndicatorModel.copy(id = null))
+                            val indicatorRef = FirebaseHelper.getIndicatorRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), mHazardId, mIndicatorId)
+                            when (mIsCountryContext) {
+                                true -> {
+                                    val context = ModelHazardCountryContext()
+                                    indicatorRef.setValue(mIndicatorModel.copy(id = null)).continueWith {
+                                        indicatorRef.child("hazardScenario").setValue(context)
+                                    }
+                                }
+                                else -> {
+                                    val fixData = mutableMapOf<String, Any>("isActive" to mIndicatorModel.hazardScenario.isActive, "isSeasonal" to mIndicatorModel.hazardScenario.isSeasonal)
+                                    indicatorRef.setValue(mIndicatorModel.copy(id = null)).continueWith {
+                                        indicatorRef.child("hazardScenario").updateChildren(fixData)
+                                        indicatorRef.child("hazardScenario").child("active").removeValue()
+                                        indicatorRef.child("hazardScenario").child("seasonal").removeValue()
+                                    }
+                                }
+                            }
                         }
                         EDIT_FROM_COUNTRY_WITH_HAZARD_CHANGE -> {
                             Timber.d("EDIT_FROM_COUNTRY_WITH_HAZARD_CHANGE")
                             when (mIsCountryContext) {
                                 true -> {
+                                    val refCountryContext = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this, Constants.APP_STATUS), PreferHelper.getString(this, Constants.COUNTRY_ID), mIndicatorId)
+                                    updateAndClearOldForContext(refCountryContext, mIndicatorModel)
                                 }
                                 else -> {
+                                    when (mIndicatorModel.hazardScenario.hazardScenario) {
+                                        -1 -> {
+                                            Timber.d("edit to custom hazard")
+                                            val find = mHazards?.filter { it.hazardScenario == -1 }?.find { it.otherName == mIndicatorModel.hazardScenario.otherName }
+                                            Timber.d(find.toString())
+                                            find?.id?.apply {
+                                                val refNewHazard = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this@AddIndicatorActivity, Constants.APP_STATUS), find.id, mIndicatorId)
+                                                updateAndClearOld(refNewHazard, mIndicatorModel)
+                                            }
+                                        }
+                                        else -> {
+                                            Timber.d("edit to standard hazard")
+                                            val find = mHazards?.filter { it.hazardScenario != -1 }?.find { it.hazardScenario == mIndicatorModel.hazardScenario.hazardScenario }
+                                            Timber.d("found hazard id: %s", find?.id)
+                                            find?.id?.apply {
+                                                val refNewHazard = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this@AddIndicatorActivity, Constants.APP_STATUS), find.id, mIndicatorId)
+                                                updateAndClearOld(refNewHazard, mIndicatorModel)
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                         EDIT_FROM_NETWORK_WITH_HAZARD_CHANGE -> {
                             Timber.d("EDIT_FROM_NETWORK_WITH_HAZARD_CHANGE")
+                            Timber.d("check this, %s", mIndicatorModel.hazardScenario)
+                            when (mIsCountryContext) {
+                                true -> {
+                                    val indicatorRef = FirebaseHelper.getIndicatorRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), PreferHelper.getString(this, Constants.COUNTRY_ID), mIndicatorId)
+                                    updateAndClearOldForContextNetwork(indicatorRef, mIndicatorModel)
+                                }
+                                else -> {
+                                    when {
+                                        mIndicatorModel.hazardScenario.hazardScenario == -1 -> {
+                                            Timber.d("edit to custom hazard")
+                                            val find = mHazards?.filter { it.hazardScenario == -1 }?.find { it.otherName == mIndicatorModel.hazardScenario.otherName }
+                                            Timber.d(find.toString())
+                                            find?.id?.apply {
+                                                val refNewHazard = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this@AddIndicatorActivity, Constants.APP_STATUS), find.id, mIndicatorId)
+                                                updateAndClearOldNetwork(refNewHazard, mIndicatorModel)
+                                            }
+                                        }
+                                        else -> {
+                                            Timber.d("edit to standard hazard")
+                                            val find = mHazards?.filter { it.hazardScenario != -1 }?.find { it.hazardScenario == mIndicatorModel.hazardScenario.hazardScenario }
+                                            Timber.d("found hazard id: %s", find?.id)
+                                            find?.id?.apply {
+                                                val refNewHazard = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this@AddIndicatorActivity, Constants.APP_STATUS), find.id, mIndicatorId)
+                                                updateAndClearOldNetwork(refNewHazard, mIndicatorModel)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
                         }
                         else -> {
                             throw IllegalArgumentException("No matching edit condition!")
                         }
                     }
+                    finish()
                 }
 
             }
         }
 
+    }
+
+    private fun updateAndClearOld(refCountryContext: DatabaseReference?, mIndicatorModel: ModelIndicator) {
+        refCountryContext?.setValue(mIndicatorModel.copy(id = null))?.continueWith {
+            refCountryContext.child("hazardScenario").child("isActive").setValue(mIndicatorModel.hazardScenario.isActive)
+            refCountryContext.child("hazardScenario").child("isSeasonal").setValue(mIndicatorModel.hazardScenario.isSeasonal)
+            refCountryContext.child("hazardScenario").child("key").setValue(mIndicatorModel.hazardScenario.id)
+            refCountryContext.child("hazardScenario").child("active").removeValue()
+            refCountryContext.child("hazardScenario").child("seasonal").removeValue()
+            refCountryContext.child("hazardScenario").child("id").removeValue()
+            val refToDelete = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this, Constants.APP_STATUS), mHazardId, mIndicatorId)
+            refToDelete.removeValue()
+        }
+    }
+
+    private fun updateAndClearOldNetwork(refCountryContext: DatabaseReference?, mIndicatorModel: ModelIndicator) {
+        refCountryContext?.setValue(mIndicatorModel.copy(id = null))?.continueWith {
+            refCountryContext.child("hazardScenario").child("isActive").setValue(mIndicatorModel.hazardScenario.isActive)
+            refCountryContext.child("hazardScenario").child("isSeasonal").setValue(mIndicatorModel.hazardScenario.isSeasonal)
+            refCountryContext.child("hazardScenario").child("key").setValue(mIndicatorModel.hazardScenario.id)
+            refCountryContext.child("hazardScenario").child("active").removeValue()
+            refCountryContext.child("hazardScenario").child("seasonal").removeValue()
+            refCountryContext.child("hazardScenario").child("id").removeValue()
+        }
+    }
+
+    private fun updateAndClearOldForContext(refCountryContext: DatabaseReference?, mIndicatorModel: ModelIndicator) {
+        refCountryContext?.setValue(mIndicatorModel.copy(id = null))?.continueWith {
+            val hazardContext = ModelHazardCountryContext()
+            refCountryContext.child("hazardScenario").setValue(hazardContext)
+            val refToDelete = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this, Constants.APP_STATUS), mHazardId, mIndicatorId)
+            refToDelete.removeValue()
+        }
+    }
+
+    private fun updateAndClearOldForContextNetwork(refCountryContext: DatabaseReference?, mIndicatorModel: ModelIndicator) {
+        refCountryContext?.setValue(mIndicatorModel.copy(id = null))?.continueWith {
+            val hazardContext = ModelHazardCountryContext()
+            refCountryContext.child("hazardScenario").setValue(hazardContext)
+        }
     }
 
     private fun pushToDatabase(mIndicatorModel: ModelIndicator) {
