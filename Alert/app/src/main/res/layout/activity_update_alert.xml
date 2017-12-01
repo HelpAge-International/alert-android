@@ -25,14 +25,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/action_toolbar">
 
-        <ImageView
-            android:id="@+id/imgUpdateHazardIcon"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_marginStart="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/alert_hazard" />
 
         <TextView
             android:id="@+id/textViewHazardName"
@@ -40,32 +32,34 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="2dp"
+            android:drawableLeft="@drawable/alert_hazard"
+            android:drawablePadding="16dp"
             android:text="Typhoon"
             android:textColor="@android:color/black"
             android:textSize="15sp"
-            app:layout_constraintStart_toEndOf="@+id/imgUpdateHazardIcon"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/imgAlertColourIcon"
+            android:id="@+id/imgAlertColour"
             android:layout_width="26dp"
             android:layout_height="26dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="33dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imgUpdateHazardIcon"
-            app:srcCompat="@drawable/amber_dot" />
+            app:layout_constraintTop_toBottomOf="@+id/textViewHazardName"
+            app:srcCompat="@drawable/amber_dot_26dp" />
 
         <TextView
             android:id="@+id/textViewAlertColour"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="290dp"
+            android:layout_height="26dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="33dp"
             android:text="Amber"
             android:textColor="@android:color/black"
             android:textSize="15sp"
-            app:layout_constraintStart_toEndOf="@+id/imgAlertColourIcon"
+            app:layout_constraintStart_toEndOf="@+id/imgAlertColour"
             app:layout_constraintTop_toBottomOf="@+id/textViewHazardName" />
 
         <ImageView
@@ -75,15 +69,15 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="33dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imgAlertColourIcon"
+            app:layout_constraintTop_toBottomOf="@+id/textViewAlertColour"
             app:srcCompat="@drawable/alert_population" />
 
         <EditText
             android:id="@+id/editTextPopulation"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="26dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="33dp"
             android:background="@null"
             android:ems="10"
             android:inputType="number"
@@ -102,22 +96,12 @@
             app:layout_constraintTop_toBottomOf="@+id/imgPopulationIcon"
             app:srcCompat="@drawable/alert_areas" />
 
-        <ImageView
-            android:id="@+id/imgLocationIcon2"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="66dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imgLocationIcon"
-            app:srcCompat="@drawable/alert_information" />
-
         <TextView
             android:id="@+id/textViewLocation"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="26dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="33dp"
             android:text="Philippines, Leyte"
             android:textColor="@android:color/black"
             app:layout_constraintStart_toEndOf="@+id/imgLocationIcon"
@@ -128,22 +112,33 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="8dp"
             android:text="Add another affected area"
             app:layout_constraintStart_toEndOf="@+id/imgLocationIcon"
             app:layout_constraintTop_toBottomOf="@+id/textViewLocation" />
 
+        <ImageView
+            android:id="@+id/imgLocationIcon2"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="66dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imgLocationIcon"
+            app:srcCompat="@drawable/alert_information" />
+
+
         <EditText
-            android:id="@+id/editText4"
+            android:id="@+id/editTextInfo"
             android:layout_width="285dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="33dp"
             android:background="@null"
             android:ems="10"
             android:inputType="textMultiLine"
             android:singleLine="false"
-            android:text="Cras quis nulla commodo, aliquam lectus sed, blandit augue. Cras ullamcorper bibendum bibendum. Duis tincidunt urna non pretium porta"
+            android:text="@string/text_info"
             android:textSize="15sp"
             app:layout_constraintStart_toEndOf="@+id/imgLocationIcon2"
             app:layout_constraintTop_toBottomOf="@+id/textViewAddMoreArea" />
@@ -152,7 +147,7 @@
     </android.support.constraint.ConstraintLayout>
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/btnSaveChanges"
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

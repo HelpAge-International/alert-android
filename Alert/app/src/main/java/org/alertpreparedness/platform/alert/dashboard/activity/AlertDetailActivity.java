@@ -43,7 +43,6 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
     public static final String EXTRA_ALERT = "extra_alert";
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,26 +80,10 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         fetchDetails();
     }
 
-    public void fetchDetails() {
-        Window window = getWindow();
+    private void fetchDetails() {
+
         //getNetwork();
-        if(alert.getAlertLevel() == 1){
-            toolbar.setBackgroundResource(R.color.alertAmber);
-            txtActionBarTitle.setText(R.string.amber_alert_text);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                window.setStatusBarColor(getResources().getColor(R.color.alertAmber));
-            }
-
-        }else if(alert.getAlertLevel() == 2){
-            toolbar.setBackgroundResource(R.color.alertRed);
-            txtActionBarTitle.setText(R.string.red_alert_text);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                window.setStatusBarColor(getResources().getColor(R.color.alertRed));
-            }
-        }
-
+        setUpActionBarColour();
         for(int i = 0; i < Constants.COUNTRIES.length; i++){
             if(alert.getCountry() == i){
                 txtAffectedArea.setText(Constants.COUNTRIES[i]);
@@ -165,6 +148,26 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         compositeDisposable.add(RMDisposable);
     }
 
+    private void setUpActionBarColour(){
+        Window window = getWindow();
+        if(alert.getAlertLevel() == 1){
+            toolbar.setBackgroundResource(R.color.alertAmber);
+            txtActionBarTitle.setText(R.string.amber_alert_text);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                window.setStatusBarColor(getResources().getColor(R.color.alertAmber));
+            }
+
+        }else if(alert.getAlertLevel() == 2){
+            toolbar.setBackgroundResource(R.color.alertRed);
+            txtActionBarTitle.setText(R.string.red_alert_text);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                window.setStatusBarColor(getResources().getColor(R.color.alertRed));
+            }
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -175,10 +178,9 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     public void onClick(View view) {
         if(view==imgUpdate){
             Intent intent = new Intent(AlertDetailActivity.this, UpdateAlertActivity.class);
-            intent.putExtra("alert_name", alert.getHazardScenario());
-            intent.putExtra("alert_population", alert.getPopulation());
-            intent.putExtra("alert_info", alert.getInfo());
+            intent.putExtra(EXTRA_ALERT, alert);
             startActivity(intent);
         }
     }
+
 }

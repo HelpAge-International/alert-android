@@ -133,7 +133,6 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         }
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
