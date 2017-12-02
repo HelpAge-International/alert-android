@@ -14,11 +14,13 @@ import kotlinx.android.synthetic.main.content_update_indicator.*
 import org.alertpreparedness.platform.alert.BaseActivity
 import org.alertpreparedness.platform.alert.R
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
+import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelLog
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.ActiveRiskViewModel
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.yesButton
+import org.joda.time.DateTime
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -121,6 +123,18 @@ class UpdateIndicatorActivity : BaseActivity() {
         if (mHazardId != null && mIndicatorId != null) {
             Timber.d("update level")
             mViewModel.updateIndicatorLevel(mHazardId as String, mIndicatorId as String, mIndicatorModel, level)
+            val log = ModelLog(null, uid, when (level) {
+                GREEN_TRIGGER_POSITION-> {
+                    "Indicator level was updated to GREEN"
+                }
+                AMBER_TRIGGER_POSITION -> {
+                    "Indicator level was updated to AMBER"
+                }
+                else -> {
+                    "Indicator level was updated to RED"
+                }
+            }, DateTime.now().millis, level, null)
+            mViewModel.addLogToIndicator(log, mIndicatorId as String)
             Toasty.success(this, "Indicator level was updated successfully").show()
             Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe({
                 onBackPressed()
