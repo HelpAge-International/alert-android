@@ -43,7 +43,7 @@ public class UpdateAlertActivity extends AppCompatActivity implements View.OnCli
         toolbar = (Toolbar) findViewById(R.id.action_toolbar);
         setSupportActionBar(toolbar);
        // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        //getSupportActionBar().setHomeButtonEnabled(true);
 
         mainTextView.setText(R.string.text_update_alert);
         mainTextView.setPadding(72,0,0, 0);
@@ -64,16 +64,16 @@ public class UpdateAlertActivity extends AppCompatActivity implements View.OnCli
 
         txtHazardColour.setOnClickListener(this);
         txtAddMoreArea.setOnClickListener(this);
+        txtAffectedArea.setOnClickListener(this);
         btnSaveChanges.setOnClickListener(this);
 
         fetchDetails();
-       // setUpActionBarColour();
+        setUpActionBarColour();
 
     }
 
     private void fetchDetails() {
 
-        System.out.println("Name: "+alert.getHazardScenario());
         for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
             if(i == alert.getHazardScenario()) {
                 txtHazardName.setText(Constants.HAZARD_SCENARIO_NAME[i]);
@@ -119,7 +119,22 @@ public class UpdateAlertActivity extends AppCompatActivity implements View.OnCli
 
         if(txtHazardColour==view){
             Intent intent = new Intent(UpdateAlertActivity.this, AlertTypesActivity.class);
+            intent.putExtra(EXTRA_ALERT, alert);
+            startActivityForResult(intent, 1);
+        }
+
+        if(txtAddMoreArea==view){
+            Intent intent = new Intent(UpdateAlertActivity.this, AffectedAreaActivity.class);
+            //intent.putExtra("country", alert.getCountry());
             startActivity(intent);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 1){
+
         }
     }
 }

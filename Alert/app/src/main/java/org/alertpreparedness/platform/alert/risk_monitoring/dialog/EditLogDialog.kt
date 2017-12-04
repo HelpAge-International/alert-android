@@ -34,10 +34,10 @@ class EditLogDialog : DialogFragment() {
         val view = View.inflate(activity, R.layout.dialog_edit_log, null)
         view.etEditLog.setText(content)
         return AlertDialog.Builder(activity, R.style.EditDialogTheme)
-                .setTitle("Edit note")
+                .setTitle(getString(R.string.edit_message))
                 .setView(view)
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("SAVE", { _, _ ->
+                .setNegativeButton(getString(R.string.cancel), null)
+                .setPositiveButton(getString(R.string.save), { _, _ ->
                     if (indicatorId.isNotEmpty() && logId.isNotEmpty() && content.isNotEmpty()) {
                         Timber.d("start updating log content*****************")
                         RiskMonitoringService.updateLogContent(indicatorId, logId, view.etEditLog.text.toString())

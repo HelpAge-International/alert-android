@@ -38,6 +38,7 @@ class ActiveRiskFragment : Fragment(), OnIndicatorSelectedListener {
         val HAZARD_ID = "hazard_id"
         val INDICATOR_ID = "indicator_id"
         val NETWORK_ID = "network_id"
+        val NETWORK_COUNTRY_ID = "network_country_id"
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
@@ -67,12 +68,14 @@ class ActiveRiskFragment : Fragment(), OnIndicatorSelectedListener {
         return view
     }
 
-    override fun selectedIndicator(hazardId: String, indicatorId: String) {
+    override fun selectedIndicator(hazardId: String, indicatorId: String, networkId:String?, networkCountryId:String?) {
         Timber.d("ids: %s, %s", hazardId, indicatorId)
         val bsDialog = BottomSheetDialog()
         val bundle = Bundle()
         bundle.putString(HAZARD_ID, hazardId)
         bundle.putString(INDICATOR_ID, indicatorId)
+        networkId?.apply {bundle.putString(NETWORK_ID, networkId)}
+        networkCountryId?.apply { bundle.putString(NETWORK_COUNTRY_ID, networkCountryId)  }
         bsDialog.arguments = bundle
         bsDialog.show(fragmentManager, "bottom_sheet")
     }

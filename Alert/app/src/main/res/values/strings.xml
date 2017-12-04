@@ -87,6 +87,10 @@
     <string name="date_format">dd/mm/yyyy</string>
     <string name="title_activity_indicator_log">IndicatorLogActivity</string>
     <string name="status">Status:</string>
+    <string name="edit_message">Edit message</string>
+    <string name="delete">Delete</string>
+    <string name="edit_indicator">Edit indicator</string>
+    <string name="country_context">Country Context</string>
     <string name="text_update_alert">Update Alert</string>
 
     <!-- TODO: Remove or change this placeholder text -->
@@ -96,5 +100,12 @@
     <string name="text_red">Red</string>
     <string name="text_info">Cras quis nulla commodo, aliquam lectus sed, blandit augue. Cras ullamcorper bibendum bibendum. Duis tincidunt urna non pretium porta</string>
     <string name="txt_alert_level">Alert Level</string>
+    <string name="txt_affected_area">Affected area</string>
+    <string name="txt_save">SAVE</string>
+    <string name="txt_country">Country</string>
+    <string name="txt_level_1">Level 1</string>
+    <string name="txt_optional">Optional</string>
+    <string name="txt_level_2">Level 2</string>
+    <string name="txt_select_level_1">Please select level 1</string>
 
 </resources>

@@ -49,8 +49,7 @@ public class DataHandler {
 
         for (String ids : usersID) {
             DatabaseReference db = database.child(mAppStatus).child("alert").child(ids);
-            ChildEventListener childEventListener;
-            db.addChildEventListener(childEventListener = new ChildEventListener() {
+            ChildEventListener childEventListener = new ChildEventListener() {
 
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -65,7 +64,7 @@ public class DataHandler {
                             String info = (String) dataSnapshot.child("infoNotes").getValue();
 
                             if (dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("level1").getValue() != null) {
-                                if(country >= 0) {
+                                if (country >= 0) {
                                     long level1 = (long) dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("level1").getValue();
 
                                     if (level1 != -1) {
@@ -73,7 +72,7 @@ public class DataHandler {
                                         Alert alert = new Alert(country, level1, level2);
                                     }
                                 }
-                            }else{
+                            } else {
                                 Alert alert = new Alert(country);
                             }
 
@@ -91,7 +90,7 @@ public class DataHandler {
                                     setRedActionBar(iHome, alerts.contains(2));
 
                                     iHome.addAlert(alert);
-                                }   else if(dataSnapshot.child("otherName").exists()){
+                                } else if (dataSnapshot.child("otherName").exists()) {
                                     String nameId = (String) dataSnapshot.child("otherName").getValue();
                                     long level1 = alert.getLevel1();
                                     long level2 = alert.getLevel2();
@@ -99,14 +98,13 @@ public class DataHandler {
                                     setOtherName(iHome, nameId, alertLevel, hazardScenario, numberOfAreas, population, country, level1, level2, info, updatedDay);
                                 }
 
-
-                            }else if(dataSnapshot.child("timeCreated").exists()){
+                            } else if (dataSnapshot.child("timeCreated").exists()) {
                                 long updated = (long) dataSnapshot.child("timeCreated").getValue();
                                 date.setTimeInMillis(updated);
                                 String updatedDay = format.format(date.getTime());
 
                                 if (hazardScenario != -1) {
-                                    Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas, info,  updatedDay, null);
+                                    Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas, info, updatedDay, null);
 
                                     iHome.updateTitle(R.string.amber_alert_level, R.drawable.alert_amber_main);
 
@@ -114,7 +112,7 @@ public class DataHandler {
                                     setRedActionBar(iHome, alerts.contains(2));
 
                                     iHome.addAlert(alert);
-                                }   else if(dataSnapshot.child("otherName").exists()){
+                                } else if (dataSnapshot.child("otherName").exists()) {
                                     String nameId = (String) dataSnapshot.child("otherName").getValue();
                                     long level1 = alert.getLevel1();
                                     long level2 = alert.getLevel2();
@@ -147,14 +145,15 @@ public class DataHandler {
                 public void onCancelled(DatabaseError databaseError) {
 
                 }
-            });
+            };
+            db.addChildEventListener(childEventListener);
             dbListener.add(db, childEventListener);
+
         }
     }
 
     private void setOtherName(IHomeActivity iHome, String nameId, long alertLevel, long hazardScenario, long numOfAreas, long population, long country, long level1, long level2, String info, String updatedDay) {
-        ValueEventListener valueEventListener;
-        database.child(mAppStatus).child("hazardOther").child(nameId).addValueEventListener(valueEventListener = new ValueEventListener() {
+        ValueEventListener valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String name = (String) dataSnapshot.child("name").getValue();
@@ -167,8 +166,25 @@ public class DataHandler {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
-        dbListener.add(database, valueEventListener);
+        };
+        DatabaseReference ref = database.child(mAppStatus).child("hazardOther").child(nameId);
+        ref.addValueEventListener(valueEventListener);
+        dbListener.add(ref, valueEventListener);
+//        database.child(mAppStatus).child("hazardOther").child(nameId).addValueEventListener(valueEventListener = new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                String name = (String) dataSnapshot.child("name").getValue();
+//                Alert alert = new Alert(alertLevel, hazardScenario, population, numOfAreas, updatedDay, info, name);
+//                Alert alert1 = new Alert(country, level1, level2);
+//                iHome.addAlert(alert);
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+
     }
 
     public void detach() {

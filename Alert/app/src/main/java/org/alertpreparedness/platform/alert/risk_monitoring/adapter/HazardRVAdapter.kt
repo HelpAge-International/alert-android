@@ -21,6 +21,7 @@ import org.jetbrains.anko.find
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.textColor
 import org.joda.time.DateTime
+import timber.log.Timber
 
 /**
  * Created by fei on 08/11/2017.
@@ -116,9 +117,9 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener,
         }
         indicatorLevel.setOnClickListener {
 //            Timber.d("hazardId: %s, indicatorId: %s", indicator.hazardScenario.key?:"", indicator.id)
-//            Timber.d("indicator model: %s", indicator)
+            Timber.d("indicator model: %s", indicator)
 //            Timber.d("map: %s", mNetworkMap.toString())
-            indicator.hazardScenario.key?.let { it1 -> indicator.id?.let { it2 -> mListener.selectedIndicator(if (it1 == "countryContext" && indicator.networkId != null && mNetworkMap != null) mNetworkMap[indicator.networkId]!! else it1, it2) } }
+            indicator.hazardScenario.key?.let { it1 -> indicator.id?.let { it2 -> mListener.selectedIndicator(if (it1 == "countryContext" && indicator.networkId != null && mNetworkMap != null) mNetworkMap[indicator.networkId]!! else it1, it2, if (indicator.networkId != null) indicator.networkId else null, if (indicator.networkId != null && mNetworkMap != null && mNetworkMap.containsKey(indicator.networkId)) mNetworkMap[indicator.networkId] else null) } }
         }
     }
 }
@@ -152,5 +153,5 @@ class HazardAdapter(groups: List<ExpandableGroup<ModelIndicator>>, countryLocati
 }
 
 interface OnIndicatorSelectedListener {
-    fun selectedIndicator(hazardId: String, indicatorId:String)
+    fun selectedIndicator(hazardId: String, indicatorId:String, networkId:String?, networkCountryId:String?)
 }

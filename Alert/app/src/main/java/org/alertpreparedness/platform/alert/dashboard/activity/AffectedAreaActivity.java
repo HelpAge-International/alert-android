@@ -15,25 +15,23 @@ import org.alertpreparedness.platform.alert.model.Alert;
 
 import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity.EXTRA_ALERT;
 
-public class AlertTypesActivity extends AppCompatActivity implements View.OnClickListener {
+public class AffectedAreaActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ImageView imgLeft, imgRight;
-    private TextView mainTextView, txtGreen, txtAmber, txtRed;
+    private TextView mainTextView, textViewCountry;
     private Toolbar toolbar;
     private Alert alert;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_alert_types);
+        setContentView(R.layout.activity_affected_area);
 
-        Intent intent = getIntent();
-        alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
+//        Intent intent = getIntent();
+//        alert = (Alert) intent.getSerializableExtra("country");
 
         mainTextView = (TextView) findViewById(R.id.action_bar_title);
-        txtGreen = (TextView) findViewById(R.id.textViewGreen);
-        txtAmber = (TextView) findViewById(R.id.textViewAmber);
-        txtRed = (TextView) findViewById(R.id.textViewRed);
+        textViewCountry = (TextView) findViewById(R.id.txtCountry);
         imgLeft = (ImageView) findViewById(R.id.leftImageView);
         imgRight = (ImageView) findViewById(R.id.rightImageView);
 
@@ -42,37 +40,22 @@ public class AlertTypesActivity extends AppCompatActivity implements View.OnClic
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        mainTextView.setText(R.string.txt_alert_level);
-
+        mainTextView.setText(R.string.txt_affected_area);
+        // mainTextView.setPadding(72,0,0, 0);
         imgRight.setVisibility(View.GONE);
         imgLeft.setVisibility(View.GONE);
-        txtGreen.setOnClickListener(this);
-        txtAmber.setOnClickListener(this);
-        txtRed.setOnClickListener(this);
 
+        textViewCountry.setOnClickListener(this);
         // Change the color of the arrow
         final Drawable upArrow = toolbar.getNavigationIcon();
         upArrow.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-
     }
 
     @Override
     public void onClick(View view) {
-        //if(view==closeImageView){finish();}
-
-        if(view==txtGreen){
-            Intent intent = new Intent(AlertTypesActivity.this, UpdateAlertActivity.class);
-            intent.putExtra("alert_type", "green");
+        if(view == textViewCountry){
+            Intent intent = new Intent(AffectedAreaActivity.this, CountryListActivity.class);
             startActivity(intent);
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_ALERT, alert);
-        setResult(RESULT_OK, intent);
     }
 }

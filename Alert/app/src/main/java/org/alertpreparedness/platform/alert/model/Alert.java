@@ -24,9 +24,6 @@ public class Alert implements Serializable{
         this.hazardScenario = hazardScenario;
         this.population = population;
         this.numOfAreas = numOfAreas;
-        this.country = country;
-        this.level1 = level1;
-        this.level2 = level2;
         this.info = info;
         this.updated = updated;
         this.otherName = otherName;

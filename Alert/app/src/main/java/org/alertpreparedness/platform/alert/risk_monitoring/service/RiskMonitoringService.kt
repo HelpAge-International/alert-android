@@ -8,6 +8,7 @@ import io.reactivex.Flowable
 import io.reactivex.Observable
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.risk_monitoring.model.*
+import org.alertpreparedness.platform.alert.utils.AppUtils
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.alertpreparedness.platform.alert.utils.FirebaseHelper
 import org.alertpreparedness.platform.alert.utils.PreferHelper
@@ -121,24 +122,27 @@ object RiskMonitoringService {
         })
     }
 
-    fun getIndicatorModel(hazardId: String, indicatorId:String): Flowable<ModelIndicator> {
+    fun getIndicatorModel(hazardId: String, indicatorId: String): Flowable<ModelIndicator> {
         Timber.d("actual ids: %s, %s", hazardId, indicatorId)
         val indicatorRef = FirebaseHelper.getIndicatorRef(mAppStatus, hazardId, indicatorId)
-        return RxFirebaseDatabase.observeValueEvent(indicatorRef, ModelIndicator::class.java)
-//                .map {model ->
-//                    val copyHazard = model.hazardScenario.copy(id = hazardId)
-//                    return@map model.copy(hazardScenario = copyHazard)
-//                }
+        return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
+            Timber.d(snap.value.toString())
+            val toJson = gson.toJson(snap.value)
+            val jsonReader = JsonReader(StringReader(toJson))
+            jsonReader.isLenient = true
+            val model = gson.fromJson<ModelIndicator>(jsonReader, ModelIndicator::class.java)
+            return@observeValueEvent model.copy(id = indicatorId)
+        })
     }
 
-    fun updateIndicatorLevel(hazardId: String, indicatorId:String, updateData:Map<String, Any>): Completable {
+    fun updateIndicator(hazardId: String, indicatorId: String, updateData: Map<String, Any>): Completable {
         val indicatorRef = FirebaseHelper.getIndicatorRef(mAppStatus, hazardId, indicatorId)
         return RxFirebaseDatabase.updateChildren(indicatorRef, updateData)
     }
 
     fun getLogs(id: String): Flowable<List<ModelLog>> {
         val logRef = FirebaseHelper.getIndicatorLogRef(mAppStatus, id)
-        return RxFirebaseDatabase.observeValueEvent(logRef, {snap ->
+        return RxFirebaseDatabase.observeValueEvent(logRef, { snap ->
             snap.children.map {
                 val toJson = gson.toJson(it.value)
                 val jsonReader = JsonReader(StringReader(toJson))
@@ -148,20 +152,25 @@ object RiskMonitoringService {
         })
     }
 
-    fun deleteLog(id:String, logId:String) {
+    fun deleteLog(id: String, logId: String) {
         val logRef = FirebaseHelper.getIndicatorLogRef(mAppStatus, id)
         logRef.child(logId).removeValue()
     }
 
-    fun addLogToIndicator(log:ModelLog, indicatorId:String) {
+    fun addLogToIndicator(log: ModelLog, indicatorId: String) {
         val logRef = FirebaseHelper.getIndicatorLogRef(mAppStatus, indicatorId)
         val key = logRef.push().key
         logRef.child(key).setValue(log)
     }
 
-    fun updateLogContent(indicatorId:String, logId:String, content:String) {
+    fun updateLogContent(indicatorId: String, logId: String, content: String) {
         val logRef = FirebaseHelper.getIndicatorLogRef(mAppStatus, indicatorId)
         logRef.child(logId).child("content").setValue(content)
+    }
+
+    fun getHazardOtherNameString(id: String): Flowable<String> {
+        val otherNameRef = AppUtils.getDatabase().getReference(mAppStatus).child("hazardOther").child(id).child("name")
+        return RxFirebaseDatabase.observeValueEvent(otherNameRef, String::class.java)
     }
 
 }

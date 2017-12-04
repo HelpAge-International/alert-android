@@ -197,15 +197,26 @@ data class ModelSource(val name: String, val link: String?) : Parcelable {
 
 /************************************************************************************************************************/
 
-data class ModelIndicatorLocation(val country: String = "", var level1: Int? = null, var level2: Int? = null) : Parcelable {
+data class ModelIndicatorLocation(val country: Int = -1, var level1: Int? = null, var level2: Int? = null) : Parcelable {
+
+
     constructor(parcel: Parcel) : this(
-            parcel.readString(),
+            parcel.readInt(),
             parcel.readValue(Int::class.java.classLoader) as? Int,
             parcel.readValue(Int::class.java.classLoader) as? Int) {
     }
 
+    fun validate(): String = when {
+        country == -1 -> {
+            "Country can not be empty, please select!"
+        }
+        else -> {
+            ""
+        }
+    }
+
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(country)
+        parcel.writeInt(country)
         parcel.writeValue(level1)
         parcel.writeValue(level2)
     }
@@ -221,15 +232,6 @@ data class ModelIndicatorLocation(val country: String = "", var level1: Int? = n
 
         override fun newArray(size: Int): Array<ModelIndicatorLocation?> {
             return arrayOfNulls(size)
-        }
-    }
-
-    fun validate(): String = when {
-        country.toInt() == -1 || country.isEmpty() -> {
-            "Country can not be empty, please select!"
-        }
-        else -> {
-            ""
         }
     }
 

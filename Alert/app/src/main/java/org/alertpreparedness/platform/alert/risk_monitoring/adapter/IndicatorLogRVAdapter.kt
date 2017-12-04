@@ -14,16 +14,18 @@ import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelLog
 import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.alertpreparedness.platform.alert.utils.PreferHelper
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.noButton
+import org.jetbrains.anko.yesButton
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import timber.log.Timber
 
 
-
 /**
  * Created by fei on 29/11/2017.
  */
-class IndicatorLogRVAdapter(private val logs:List<ModelLog>, private val context:Context, private val indicatorId:String, private val fm: FragmentManager) : RecyclerView.Adapter<LogViewHolder>() {
+class IndicatorLogRVAdapter(private val logs: List<ModelLog>, private val context: Context, private val indicatorId: String, private val fm: FragmentManager) : RecyclerView.Adapter<LogViewHolder>() {
 
     private val mUid = PreferHelper.getString(AlertApplication.getContext(), Constants.UID)
 
@@ -35,20 +37,20 @@ class IndicatorLogRVAdapter(private val logs:List<ModelLog>, private val context
         val logModel = logs[position]
         Timber.d(logModel.toString())
         logModel.apply {
-            holder?.tvLogWriterName?.text = logModel.addedByName?:""
+            holder?.tvLogWriterName?.text = logModel.addedByName ?: ""
             holder?.tvLogContent?.text = logModel.content
             val dateTime = DateTime(logModel.timeStamp)
             val fmt = DateTimeFormat.forPattern("d MMMM yyyy")
             holder?.tvLogDate?.text = dateTime.toString(fmt)
             when (logModel.triggerAtCreation) {
                 Constants.TRIGGER_GREEN -> {
-                    holder?.tvLogStatus?.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.green_dot,0)
+                    holder?.tvLogStatus?.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.green_dot, 0)
                 }
                 Constants.TRIGGER_AMBER -> {
-                    holder?.tvLogStatus?.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.amber_dot,0)
+                    holder?.tvLogStatus?.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.amber_dot, 0)
                 }
                 else -> {
-                    holder?.tvLogStatus?.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.red_dot,0)
+                    holder?.tvLogStatus?.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.red_dot, 0)
                 }
             }
             Timber.d("addBy: %s, uid: %s", logModel.addedBy, mUid)
@@ -64,21 +66,21 @@ class IndicatorLogRVAdapter(private val logs:List<ModelLog>, private val context
 }
 
 
-class LogViewHolder(itemView: View, private val logs: List<ModelLog>, private val context:Context, private val indicatorId:String, private val fm:FragmentManager) : RecyclerView.ViewHolder(itemView) {
+class LogViewHolder(itemView: View, private val logs: List<ModelLog>, private val context: Context, private val indicatorId: String, private val fm: FragmentManager) : RecyclerView.ViewHolder(itemView) {
     val tvLogWriterName: TextView = itemView.findViewById(R.id.tvLogWriterName)
     val tvLogContent: TextView = itemView.findViewById(R.id.tvLogContent)
     val tvLogDate: TextView = itemView.findViewById(R.id.tvLogDate)
     val tvLogStatus: TextView = itemView.findViewById(R.id.tvLogStatus)
-    val ivLogMenu:ImageView = itemView.findViewById(R.id.ivLogMenu)
-    val flMenu:FrameLayout = itemView.findViewById(R.id.flMenu)
-    val llLogItem:LinearLayout = itemView.findViewById(R.id.llLogItem)
+    val ivLogMenu: ImageView = itemView.findViewById(R.id.ivLogMenu)
+    val flMenu: FrameLayout = itemView.findViewById(R.id.flMenu)
+    val llLogItem: LinearLayout = itemView.findViewById(R.id.llLogItem)
 
     init {
         llLogItem.layoutParams = RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT)
         flMenu.setOnClickListener {
             val popMenu = PopupMenu(context, ivLogMenu)
-            popMenu.menu.add("Edit")
-            popMenu.menu.add("Delete")
+            popMenu.menu.add(context.getString(R.string.edit))
+            popMenu.menu.add(context.getString(R.string.delete))
             popMenu.menuInflater.inflate(R.menu.popup_template_menu, popMenu.menu)
             popMenu.show()
 
@@ -97,7 +99,10 @@ class LogViewHolder(itemView: View, private val logs: List<ModelLog>, private va
                     }
                     else -> {
                         Timber.d("delete")
-                        logs[adapterPosition].id?.let { RiskMonitoringService.deleteLog(indicatorId, it) }
+                        context.alert("Deleting this entry will remove it from this indicator log, this action cannot be undone. Are you sure you want to continue?", "Delete entry") {
+                            yesButton { logs[adapterPosition].id?.let { RiskMonitoringService.deleteLog(indicatorId, it) } }
+                            noButton {}
+                        }.show()
                     }
                 }
                 true

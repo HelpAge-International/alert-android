@@ -90,23 +90,21 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             }
         }
 
+        imgPopulation.setImageResource(R.drawable.alert_population);
+        imgAffectedArea.setImageResource(R.drawable.alert_areas);
+        imgInfo.setImageResource(R.drawable.alert_information);
+
         for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
             if(i == alert.getHazardScenario()){
                 AlertAdapter.fetchIcon(Constants.HAZARD_SCENARIO_NAME[i], imgHazard);
                 txtHazardName.setText(Constants.HAZARD_SCENARIO_NAME[i]);
                 txtPopulation.setText(getPeopleAsString(alert.getPopulation()));
-                imgPopulation.setImageResource(R.drawable.alert_population);
-                imgAffectedArea.setImageResource(R.drawable.alert_areas);
-                imgInfo.setImageResource(R.drawable.alert_information);
                 txtLastUpdated.setText(getUpdatedAsString(alert.getUpdated()));
                 txtInfo.setText((CharSequence) alert.getInfo());
             }else if(alert.getOtherName() != null ){
                 imgHazard.setImageResource(R.drawable.other);
                 txtHazardName.setText(alert.getOtherName());
                 txtPopulation.setText(getPeopleAsString(alert.getPopulation()));
-                imgPopulation.setImageResource(R.drawable.alert_population);
-                imgAffectedArea.setImageResource(R.drawable.alert_areas);
-                imgInfo.setImageResource(R.drawable.alert_information);
                 txtLastUpdated.setText(getUpdatedAsString(alert.getUpdated()));
                 txtInfo.setText((CharSequence) alert.getInfo());
             }

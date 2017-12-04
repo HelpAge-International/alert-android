@@ -17,22 +17,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".login.activity.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".login.activity.LoginScreen"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme" />
-
         <activity
             android:name=".dashboard.activity.HomeScreen"
             android:launchMode="singleTask"
@@ -43,31 +41,26 @@
             android:resource="@array/preloaded_fonts" />
 
         <activity android:name=".MainDrawer" />
-
         <activity
             android:name=".risk_monitoring.view.RiskActivity"
             android:label="@string/title_activity_risk"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".risk_monitoring.view.AddIndicatorActivity"
             android:label="@string/title_activity_add_indicator"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".risk_monitoring.view.SelectAreaActivity"
             android:label="@string/title_activity_select_area"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".dashboard.activity.CreateAlertActivity"
             android:label="@string/title_activity_create_alert"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".dashboard.activity.AlertDetailActivity"
             android:parentActivityName=".dashboard.activity.HomeScreen"
@@ -84,26 +77,28 @@
             android:label="@string/title_activity_update_indicator"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
-
         <activity
             android:name=".risk_monitoring.view.LogIndicatorActivity"
             android:label="@string/title_activity_log_indicator"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
-
         <activity
             android:name=".risk_monitoring.view.IndicatorLogActivity"
             android:label="@string/title_activity_indicator_log"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
-
-        <activity android:name=".dashboard.activity.UpdateAlertActivity"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".dashboard.activity.AlertTypesActivity"
+        <activity
+            android:name=".dashboard.activity.UpdateAlertActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".dashboard.activity.AlertTypesActivity"
             android:parentActivityName=".dashboard.activity.UpdateAlertActivity"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".dashboard.activity.AffectedAreaActivity"
+            android:parentActivityName=".dashboard.activity.UpdateAlertActivity" />
+        <activity android:name=".dashboard.activity.CountryListActivity"
+            android:parentActivityName=".dashboard.activity.AffectedAreaActivity"/>
     </application>
 
 </manifest>

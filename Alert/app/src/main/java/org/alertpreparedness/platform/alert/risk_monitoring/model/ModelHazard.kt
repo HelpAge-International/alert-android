@@ -20,8 +20,8 @@ data class ModelHazard(var id:String? = null, val hazardScenario:Int = -2, val i
             parcel.readString()) {
     }
 
-    fun validateModel() : String  = when (hazardScenario) {
-        -2 -> "Hazard is not valid"
+    fun validateModel() : String  = when {
+        hazardScenario == -2 && key == null -> "Hazard is not valid"
         else -> ""
     }
 

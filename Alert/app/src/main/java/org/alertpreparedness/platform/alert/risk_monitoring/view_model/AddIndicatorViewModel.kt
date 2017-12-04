@@ -92,20 +92,15 @@ class AddIndicatorViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
     private fun getCountryJson() {
         mDisposables.add(
                 RiskMonitoringService.readJsonFile()
+                        .flatMap { fileText ->
+                            val jsonObject = JSONObject(fileText)
+                            return@flatMap RiskMonitoringService.mapJasonToCountryData(jsonObject, Gson())
+                        }
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({ fileText ->
-                            val jsonObject = JSONObject(fileText)
-                            mDisposables.add(
-                                    RiskMonitoringService.mapJasonToCountryData(jsonObject, Gson())
-                                            .subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe({ countryData: CountryJsonData ->
-                                                mCountryDataList.add(countryData)
-                                                mCountryJsonDtaLive.value = mCountryDataList
-                                            })
-                            )
-
+                        .subscribe({ countryData: CountryJsonData ->
+                            mCountryDataList.add(countryData)
+                            mCountryJsonDtaLive.value = mCountryDataList
                         })
         )
     }

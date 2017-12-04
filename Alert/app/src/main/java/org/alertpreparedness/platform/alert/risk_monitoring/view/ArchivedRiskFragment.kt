@@ -22,6 +22,7 @@ import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelCountry
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.ActiveRiskViewModel
 import org.jetbrains.anko.find
+import timber.log.Timber
 
 
 /**
@@ -57,11 +58,14 @@ class ArchivedRiskFragment : Fragment(), OnIndicatorSelectedListener {
         return view
     }
 
-    override fun selectedIndicator(hazardId: String, indicatorId: String) {
+    override fun selectedIndicator(hazardId: String, indicatorId: String, networkId:String?, networkCountryId:String?) {
+        Timber.d("received: %s, %s", hazardId, indicatorId)
         val bsDialog = BottomSheetDialog()
         val bundle = Bundle()
         bundle.putString(ActiveRiskFragment.HAZARD_ID, hazardId)
         bundle.putString(ActiveRiskFragment.INDICATOR_ID, indicatorId)
+        networkId?.apply {bundle.putString(ActiveRiskFragment.NETWORK_ID, networkId)}
+        networkCountryId?.apply { bundle.putString(ActiveRiskFragment.NETWORK_COUNTRY_ID, networkCountryId)  }
         bsDialog.arguments = bundle
         bsDialog.show(fragmentManager, "bottom_sheet")
     }

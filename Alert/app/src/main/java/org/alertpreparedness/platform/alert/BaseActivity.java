@@ -21,7 +21,6 @@ import org.alertpreparedness.platform.alert.utils.AppUtils;
 public abstract class BaseActivity extends AppCompatActivity {
 
     public ProgressDialog mProgressDialog;
-    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -32,15 +31,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        if (mAuth != null) {
-//            mAuth.removeAuthStateListener(this);
-//        }
         AlertApplication.mActivities.remove(this);
-    }
-
-    protected void checkAuth() {
-        mAuth = FirebaseAuth.getInstance();
-//        mAuth.addAuthStateListener(this);
     }
 
     public String getUid() {
@@ -99,17 +90,4 @@ public abstract class BaseActivity extends AppCompatActivity {
             activity.finish();
         }
     }
-    //    @Override
-//    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-//        // If Not authenticated again
-//        if (firebaseAuth.getCurrentUser() == null) {
-//            // User has logged out
-////            Timber.d("user logged out");
-////            PreferHelper.getInstance(this).edit().remove(UserInfo.PREFS_USER).apply();
-////            Intent i = new Intent(getApplicationContext(), LoginScreen.class);
-////            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-////            startActivity(i);
-////            finish();
-//        }
-//    }
 }

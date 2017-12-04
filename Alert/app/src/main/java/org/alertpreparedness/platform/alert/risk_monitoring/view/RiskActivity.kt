@@ -24,7 +24,6 @@ class RiskActivity : MainDrawer() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        setContentView(R.layout.activity_risk)
         onCreateDrawer(R.layout.activity_risk)
         initView()
         initListeners()
@@ -51,13 +50,16 @@ class RiskActivity : MainDrawer() {
         fabRiskIndicator.setOnClickListener({
             Timber.d("create indicator")
             fabRiskMenu.close(true)
-            Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe {
+            Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).subscribe {
                 AddIndicatorActivity.startActivity(this@RiskActivity)
             }
         })
         fabRiskAlert.setOnClickListener({
             Timber.d("create alert")
             fabRiskMenu.close(true)
+            Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).subscribe {
+                //TODO START CREATE ALERT ACTIVITY FROM HERE
+            }
         })
 
 
