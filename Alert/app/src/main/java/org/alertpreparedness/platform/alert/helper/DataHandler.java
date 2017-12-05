@@ -55,6 +55,7 @@ public class DataHandler {
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     if (dataSnapshot.child("alertLevel").getValue() != null) {
                         long alertLevel = (long) dataSnapshot.child("alertLevel").getValue();
+                        Alert a = new Alert(db);
 
                         if (alertLevel != 0) {
                             long numberOfAreas = dataSnapshot.child("affectedAreas").getChildrenCount();

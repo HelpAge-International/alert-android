@@ -1,6 +1,11 @@
 package org.alertpreparedness.platform.alert.model;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
+
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by faizmohideen on 20/11/2017.
@@ -18,6 +23,11 @@ public class Alert implements Serializable{
     private String updated;
     private String otherName;
     private String reason;
+    private DatabaseReference dbRef;
+
+    public Alert(DatabaseReference dbRef) {
+        this.dbRef = dbRef;
+    }
 
     public Alert(long alertLevel, long hazardScenario, long population, long numOfAreas, String info, String updated, String otherName) {
         this.alertLevel = alertLevel;
@@ -130,5 +140,30 @@ public class Alert implements Serializable{
         this.info = info;
     }
 
+    public DatabaseReference getDbRef() {
+        return dbRef;
+    }
+
+    public void setDbRef(DatabaseReference dbRef) {
+        this.dbRef = dbRef;
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("alertLevel", alertLevel);
+        result.put("numOfAreas", numOfAreas);
+        result.put("hazard", hazardScenario);
+        result.put("country", country);
+        result.put("level1", level1);
+        result.put("level2", level2);
+        result.put("population", population);
+        result.put("info", info);
+        result.put("updated", updated);
+        result.put("otherName", otherName);
+        result.put("reason", reason);
+
+        return result;
+    }
 
 }

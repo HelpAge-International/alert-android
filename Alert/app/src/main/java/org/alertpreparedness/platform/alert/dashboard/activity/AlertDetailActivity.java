@@ -48,8 +48,10 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alert_detail);
 
-        Intent intent = getIntent();
-        alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
+        if (alert == null) {
+            Intent intent = getIntent();
+            alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
+        }
 
         toolbar = (Toolbar) findViewById(R.id.action_toolbar);
         setSupportActionBar(toolbar);
@@ -105,8 +107,8 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                 imgHazard.setImageResource(R.drawable.other);
                 txtHazardName.setText(alert.getOtherName());
                 txtPopulation.setText(getPeopleAsString(alert.getPopulation()));
-                txtLastUpdated.setText(getUpdatedAsString(alert.getUpdated()));
                 txtInfo.setText((CharSequence) alert.getInfo());
+                txtLastUpdated.setText(getUpdatedAsString(alert.getUpdated()));
             }
 
         }
@@ -181,4 +183,9 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fetchDetails();
+    }
 }

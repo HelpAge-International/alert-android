@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,6 +31,8 @@ public class AlertTypesActivity extends AppCompatActivity implements View.OnClic
         Intent intent = getIntent();
         alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
 
+        //  Intent data = new Intent();// data.putExtra(EXTRA_ALERT, alert);
+        //  setResult(RESULT_OK, data);
         mainTextView = (TextView) findViewById(R.id.action_bar_title);
         txtGreen = (TextView) findViewById(R.id.textViewGreen);
         txtAmber = (TextView) findViewById(R.id.textViewAmber);
@@ -62,17 +65,15 @@ public class AlertTypesActivity extends AppCompatActivity implements View.OnClic
 
         if(view==txtGreen){
             Intent intent = new Intent(AlertTypesActivity.this, UpdateAlertActivity.class);
+            intent.putExtra(EXTRA_ALERT, alert);
             intent.putExtra("alert_type", "green");
             startActivity(intent);
         }
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_ALERT, alert);
-        setResult(RESULT_OK, intent);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) onBackPressed();
+        return super.onOptionsItemSelected(item);
     }
 }

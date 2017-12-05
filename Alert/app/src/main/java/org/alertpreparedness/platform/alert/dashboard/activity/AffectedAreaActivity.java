@@ -18,7 +18,7 @@ import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetai
 public class AffectedAreaActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ImageView imgLeft, imgRight;
-    private TextView mainTextView, textViewCountry;
+    private TextView mainTextView, textViewCountry, textViewSave;
     private Toolbar toolbar;
     private Alert alert;
 
@@ -32,6 +32,7 @@ public class AffectedAreaActivity extends AppCompatActivity implements View.OnCl
 
         mainTextView = (TextView) findViewById(R.id.action_bar_title);
         textViewCountry = (TextView) findViewById(R.id.txtCountry);
+        textViewSave = (TextView) findViewById(R.id.textViewSave);
         imgLeft = (ImageView) findViewById(R.id.leftImageView);
         imgRight = (ImageView) findViewById(R.id.rightImageView);
 
@@ -46,6 +47,7 @@ public class AffectedAreaActivity extends AppCompatActivity implements View.OnCl
         imgLeft.setVisibility(View.GONE);
 
         textViewCountry.setOnClickListener(this);
+        textViewSave.setOnClickListener(this);
         // Change the color of the arrow
         final Drawable upArrow = toolbar.getNavigationIcon();
         upArrow.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
@@ -57,5 +59,16 @@ public class AffectedAreaActivity extends AppCompatActivity implements View.OnCl
             Intent intent = new Intent(AffectedAreaActivity.this, CountryListActivity.class);
             startActivity(intent);
         }
+
+        if(view == textViewSave) {
+            Intent intent = new Intent(AffectedAreaActivity.this, UpdateAlertActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 }
