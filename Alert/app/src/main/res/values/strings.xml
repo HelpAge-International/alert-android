@@ -85,5 +85,7 @@
     <string name="action_settings">Settings</string>
     <string name="last_updated">Last updated:</string>
     <string name="date_format">dd/mm/yyyy</string>
+    <string name="enter_password_error">Please enter your password.</string>
+    <string name="enter_email_error">Please enter your email.</string>
 
 </resources>
