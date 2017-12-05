@@ -91,5 +91,7 @@
     <string name="delete">Delete</string>
     <string name="edit_indicator">Edit indicator</string>
     <string name="country_context">Country Context</string>
+    <string name="enter_password_error">Please enter your password.</string>
+    <string name="enter_email_error">Please enter your email.</string>
 
 </resources>
