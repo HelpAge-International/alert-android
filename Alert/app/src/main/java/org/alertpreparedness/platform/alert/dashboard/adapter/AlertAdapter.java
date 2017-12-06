@@ -90,6 +90,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder>{
         TextView txt_num_of_people;
         ImageView img_alert_colour;
         ImageView img_hazard_icon;
+        ImageView img_alert_req;
 
         private ViewHolder(View itemView) {
             super(itemView);
@@ -99,6 +100,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder>{
             txt_num_of_people = (TextView) itemView.findViewById(R.id.txt_num_of_people);
             img_alert_colour = (ImageView) itemView.findViewById(R.id.img_alert_colour);
             img_hazard_icon = (ImageView) itemView.findViewById(R.id.img_hazard_icon);
+            img_alert_req = (ImageView) itemView.findViewById(R.id.imgRedReq);
 
             itemView.setOnClickListener(new View.OnClickListener(){
                 @Override
@@ -112,6 +114,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder>{
         }
 
         private void bind(Alert alert) {
+            img_alert_req.setVisibility(View.GONE);
             for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
                 if (i == alert.getHazardScenario() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
                     fetchIcon(Constants.HAZARD_SCENARIO_NAME[i], img_hazard_icon);

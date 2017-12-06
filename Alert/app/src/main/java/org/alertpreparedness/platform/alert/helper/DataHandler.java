@@ -55,6 +55,7 @@ public class DataHandler {
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     if (dataSnapshot.child("alertLevel").getValue() != null) {
                         long alertLevel = (long) dataSnapshot.child("alertLevel").getValue();
+                        Alert a = new Alert(db);
 
                         if (alertLevel != 0) {
                             long numberOfAreas = dataSnapshot.child("affectedAreas").getChildrenCount();
@@ -97,7 +98,6 @@ public class DataHandler {
                                     System.out.println("L1: " + level1 + " L2: " + level2 + " Country: " + country);
                                     setOtherName(iHome, nameId, alertLevel, hazardScenario, numberOfAreas, population, country, level1, level2, info, updatedDay);
                                 }
-
 
                             } else if (dataSnapshot.child("timeCreated").exists()) {
                                 long updated = (long) dataSnapshot.child("timeCreated").getValue();
@@ -149,104 +149,7 @@ public class DataHandler {
             };
             db.addChildEventListener(childEventListener);
             dbListener.add(db, childEventListener);
-//            db.addChildEventListener(childEventListener = new ChildEventListener() {
-//
-//                @Override
-//                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                    if (dataSnapshot.child("alertLevel").getValue() != null) {
-//                        long alertLevel = (long) dataSnapshot.child("alertLevel").getValue();
-//
-//                        if (alertLevel != 0) {
-//                            long numberOfAreas = dataSnapshot.child("affectedAreas").getChildrenCount();
-//                            long country = (long) dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("country").getValue();
-//                            long hazardScenario = (long) dataSnapshot.child("hazardScenario").getValue();
-//                            long population = (long) dataSnapshot.child("estimatedPopulation").getValue();
-//                            String info = (String) dataSnapshot.child("infoNotes").getValue();
-//
-//                            if (dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("level1").getValue() != null) {
-//                                if(country >= 0) {
-//                                    long level1 = (long) dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("level1").getValue();
-//
-//                                    if (level1 != -1) {
-//                                        long level2 = (long) dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("level2").getValue();
-//                                        Alert alert = new Alert(country, level1, level2);
-//                                    }
-//                                }
-//                            }else{
-//                                Alert alert = new Alert(country);
-//                            }
-//
-//                            if (dataSnapshot.child("timeUpdated").exists()) {
-//                                long updated = (long) dataSnapshot.child("timeUpdated").getValue();
-//                                date.setTimeInMillis(updated);
-//                                String updatedDay = format.format(date.getTime());
-//
-//                                if (hazardScenario != -1) {
-//                                    Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas, info, updatedDay, null);
-//
-//                                    iHome.updateTitle(R.string.amber_alert_level, R.drawable.alert_amber_main);
-//
-//                                    alerts.add((int) alertLevel);
-//                                    setRedActionBar(iHome, alerts.contains(2));
-//
-//                                    iHome.addAlert(alert);
-//                                }   else if(dataSnapshot.child("otherName").exists()){
-//                                    String nameId = (String) dataSnapshot.child("otherName").getValue();
-//                                    long level1 = alert.getLevel1();
-//                                    long level2 = alert.getLevel2();
-//                                    System.out.println("L1: " + level1 + " L2: " + level2 + " Country: " + country);
-//                                    setOtherName(iHome, nameId, alertLevel, hazardScenario, numberOfAreas, population, country, level1, level2, info, updatedDay);
-//                                }
-//
-//
-//                            }else if(dataSnapshot.child("timeCreated").exists()){
-//                                long updated = (long) dataSnapshot.child("timeCreated").getValue();
-//                                date.setTimeInMillis(updated);
-//                                String updatedDay = format.format(date.getTime());
-//
-//                                if (hazardScenario != -1) {
-//                                    Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas, info,  updatedDay, null);
-//
-//                                    iHome.updateTitle(R.string.amber_alert_level, R.drawable.alert_amber_main);
-//
-//                                    alerts.add((int) alertLevel);
-//                                    setRedActionBar(iHome, alerts.contains(2));
-//
-//                                    iHome.addAlert(alert);
-//                                }   else if(dataSnapshot.child("otherName").exists()){
-//                                    String nameId = (String) dataSnapshot.child("otherName").getValue();
-//                                    long level1 = alert.getLevel1();
-//                                    long level2 = alert.getLevel2();
-//
-//                                    setOtherName(iHome, nameId, alertLevel, hazardScenario, numberOfAreas, population, country, level1, level2, info, updatedDay);
-//                                }
-//                            }
-//
-//                        }
-//                    }
-//
-//                }
-//
-//                @Override
-//                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//
-//                }
-//
-//                @Override
-//                public void onChildRemoved(DataSnapshot dataSnapshot) {
-//
-//                }
-//
-//                @Override
-//                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
+
         }
     }
 

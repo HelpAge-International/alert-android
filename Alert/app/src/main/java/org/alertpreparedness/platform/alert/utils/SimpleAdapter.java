@@ -33,12 +33,24 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.MyViewHold
     }
 
 
-    public SimpleAdapter(List<String> moviesList) {
-        this.strings = moviesList;
+    public SimpleAdapter(List<String> lit) {
+        this.strings = lit;
+        System.out.println("YOLO - SimpleAdapter.SimpleAdapter");
+        System.out.println("YOLO - lit = " + lit);
+    }
+
+    public SimpleAdapter() {}
+
+    public void setData(List<String> strings) {
+        this.strings = strings;
+        notifyDataSetChanged();
     }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+        System.out.println("YOLO - SimpleAdapter.onCreateViewHolder");
+        System.out.println("YOLO - parent = [" + parent + "], viewType = [" + viewType + "]");
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_text, parent, false);
 
@@ -47,6 +59,8 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.MyViewHold
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
+        System.out.println("YOLO - SimpleAdapter.onBindViewHolder");
+        System.out.println("YOLO - holder = [" + holder + "], position = [" + position + "]");
         holder.view.setText(strings.get(position));
     }
 

@@ -13,7 +13,7 @@ data class ModelUserPublic(var id: String = "", val firstName: String = "", val 
 //firstName: string;
 //lastName: string;
 //phone: string;
-//title: number;
+//initialTitle: number;
 //email: string;
 //addressLine1: string;
 //addressLine2: string;

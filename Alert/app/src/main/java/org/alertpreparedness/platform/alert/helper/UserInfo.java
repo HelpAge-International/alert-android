@@ -31,7 +31,6 @@ public class UserInfo {
     private static String[] users = {"administratorCountry", "countryDirector", "ert", "ertLeader", "partner"};
     private static DBListener dbListener = new DBListener();
 
-
     public void authUser(final AuthCallback authCallback) {
         for (String nodeName : users) {
             ValueEventListener valueEventListener;
@@ -141,8 +140,6 @@ public class UserInfo {
         compositeDisposable.clear();
         dbListener.detatch();
     }
-
-
 
 }
 

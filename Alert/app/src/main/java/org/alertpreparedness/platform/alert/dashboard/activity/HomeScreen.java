@@ -42,13 +42,8 @@ import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetai
 public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAlertItemClickedListener, IHomeActivity, FirebaseAuth.AuthStateListener {
     private static final int STORAGE_RC = 0x0013;
     private RecyclerView myTaskRecyclerView;
-    private FirebaseDatabase firebaseDatabase;
-    private DatabaseReference database = FirebaseDatabase.getInstance().getReference();
     private Toolbar toolbar;
-    private Alert alert;
-    private ArrayList<CountryJsonData> mCountryList;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
-    private DataHandler dataHandler = new DataHandler();
 
     public TaskAdapter taskAdapter;
     public List<Tasks> tasksList;
@@ -56,10 +51,6 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
     public AlertAdapter alertAdapter;
     public List<Alert> alertList;
     public RecyclerView alertRecyclerView;
-
-    public static final String mypreference = "mypref";
-    public static final String userKey = "UserType";
-    public static final PreferHelper sharedPreferences = new PreferHelper();
 
     private List<DataHandler> mHandlerList = new ArrayList<>();
 
@@ -107,6 +98,7 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         mHandlerList.add(obj);
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -133,16 +125,16 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         }
     }
 
-
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         compositeDisposable.clear();
         compositeDisposable.dispose();
         FirebaseAuth.getInstance().removeAuthStateListener(this);
         for (DataHandler dataHandler : mHandlerList) {
             dataHandler.detach();
         }
+
+        super.onDestroy();
     }
 
     @Override
@@ -184,7 +176,6 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
             }
         }
     }
-
 
 
 

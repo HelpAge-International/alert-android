@@ -33,7 +33,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class AlertDetailActivity extends AppCompatActivity {
+public class AlertDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
     private TextView txtHazardName, txtPopulation, txtAffectedArea, txtInfo, txtLastUpdated, txtActionBarTitle;
     private ImageView imgHazard, imgPopulation, imgAffectedArea, imgInfo, imgClose, imgUpdate;
@@ -48,8 +48,10 @@ public class AlertDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alert_detail);
 
-        Intent intent = getIntent();
-        alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
+        if (alert == null) {
+            Intent intent = getIntent();
+            alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
+        }
 
         toolbar = (Toolbar) findViewById(R.id.action_toolbar);
         setSupportActionBar(toolbar);
@@ -75,55 +77,38 @@ public class AlertDetailActivity extends AppCompatActivity {
         imgUpdate = (ImageView) findViewById(R.id.rightImageView);
 
         imgUpdate.setImageResource(R.drawable.ic_create_white_24dp);
+        imgUpdate.setOnClickListener(this);
         imgClose.setVisibility(View.GONE);
         fetchDetails();
     }
 
-    public void fetchDetails() {
-        Window window = getWindow();
+    private void fetchDetails() {
+
         //getNetwork();
-        if(alert.getAlertLevel() == 1){
-            toolbar.setBackgroundResource(R.color.alertAmber);
-            txtActionBarTitle.setText(R.string.amber_alert_text);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                window.setStatusBarColor(getResources().getColor(R.color.alertAmber));
-            }
-
-        }else if(alert.getAlertLevel() == 2){
-            toolbar.setBackgroundResource(R.color.alertRed);
-            txtActionBarTitle.setText(R.string.red_alert_text);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                window.setStatusBarColor(getResources().getColor(R.color.alertRed));
-            }
-        }
-
+        setUpActionBarColour();
         for(int i = 0; i < Constants.COUNTRIES.length; i++){
             if(alert.getCountry() == i){
                 txtAffectedArea.setText(Constants.COUNTRIES[i]);
             }
         }
 
+        imgPopulation.setImageResource(R.drawable.alert_population);
+        imgAffectedArea.setImageResource(R.drawable.alert_areas);
+        imgInfo.setImageResource(R.drawable.alert_information);
+
         for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
             if(i == alert.getHazardScenario()){
                 AlertAdapter.fetchIcon(Constants.HAZARD_SCENARIO_NAME[i], imgHazard);
                 txtHazardName.setText(Constants.HAZARD_SCENARIO_NAME[i]);
                 txtPopulation.setText(getPeopleAsString(alert.getPopulation()));
-                imgPopulation.setImageResource(R.drawable.alert_population);
-                imgAffectedArea.setImageResource(R.drawable.alert_areas);
-                imgInfo.setImageResource(R.drawable.alert_information);
                 txtLastUpdated.setText(getUpdatedAsString(alert.getUpdated()));
                 txtInfo.setText((CharSequence) alert.getInfo());
             }else if(alert.getOtherName() != null ){
                 imgHazard.setImageResource(R.drawable.other);
                 txtHazardName.setText(alert.getOtherName());
                 txtPopulation.setText(getPeopleAsString(alert.getPopulation()));
-                imgPopulation.setImageResource(R.drawable.alert_population);
-                imgAffectedArea.setImageResource(R.drawable.alert_areas);
-                imgInfo.setImageResource(R.drawable.alert_information);
-                txtLastUpdated.setText(getUpdatedAsString(alert.getUpdated()));
                 txtInfo.setText((CharSequence) alert.getInfo());
+                txtLastUpdated.setText(getUpdatedAsString(alert.getUpdated()));
             }
 
         }
@@ -163,9 +148,44 @@ public class AlertDetailActivity extends AppCompatActivity {
         compositeDisposable.add(RMDisposable);
     }
 
+    private void setUpActionBarColour(){
+        Window window = getWindow();
+        if(alert.getAlertLevel() == 1){
+            toolbar.setBackgroundResource(R.color.alertAmber);
+            txtActionBarTitle.setText(R.string.amber_alert_text);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                window.setStatusBarColor(getResources().getColor(R.color.alertAmber));
+            }
+
+        }else if(alert.getAlertLevel() == 2){
+            toolbar.setBackgroundResource(R.color.alertRed);
+            txtActionBarTitle.setText(R.string.red_alert_text);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                window.setStatusBarColor(getResources().getColor(R.color.alertRed));
+            }
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         compositeDisposable.clear();
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view==imgUpdate){
+            Intent intent = new Intent(AlertDetailActivity.this, UpdateAlertActivity.class);
+            intent.putExtra(EXTRA_ALERT, alert);
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fetchDetails();
     }
 }
