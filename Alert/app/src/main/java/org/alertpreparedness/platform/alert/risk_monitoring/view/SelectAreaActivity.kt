@@ -32,6 +32,8 @@ class SelectAreaActivity : BaseActivity() {
         val SELECT_LEVEL1_DIALOG_ARGS = "select_level1_args"
         val SELECT_LEVEL2_DIALOG_ARGS = "select_level2_args"
         val SELECTED_AREA = "selected_area"
+        val SELECTED_AREA_TEXT: String = "selected_area_text"
+
     }
 
     private lateinit var mCountryDataList: ArrayList<CountryJsonData>
@@ -166,6 +168,7 @@ class SelectAreaActivity : BaseActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> {
@@ -178,8 +181,14 @@ class SelectAreaActivity : BaseActivity() {
                     Toasty.error(this, modelArea.validate()).show()
                 } else {
                     Timber.d(modelArea.toString())
+
+                    val sb = StringBuilder()
+                    sb.append(tvSelectCountry.text).append(", ").append(tvSelectLevel1.text).append(", ").append(tvSelectLevel2.text)
+                    val res = sb.toString()
+
                     val intent = Intent()
                     intent.putExtra(SELECTED_AREA, modelArea)
+                    intent.putExtra(SELECTED_AREA_TEXT,  res)
                     setResult(Activity.RESULT_OK, intent)
                     finish()
                 }

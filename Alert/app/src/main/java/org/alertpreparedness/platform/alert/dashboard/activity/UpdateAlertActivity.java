@@ -134,18 +134,6 @@ public class UpdateAlertActivity extends AppCompatActivity implements View.OnCli
     public void onClick(View view) {
         if(closeImageView == view){finish();}
 
-        if(txtHazardColour == view){
-            Intent intent = new Intent(UpdateAlertActivity.this, AlertTypesActivity.class);
-            intent.putExtra(EXTRA_ALERT, alert);
-            startActivity(intent);//ForResult(intent, 1);
-        }
-
-        if(txtAddMoreArea == view){
-            Intent intent = new Intent(UpdateAlertActivity.this, AffectedAreaActivity.class);
-            intent.putExtra(EXTRA_ALERT, alert);
-            startActivity(intent);
-        }
-
         if(btnSaveChanges == view){
             String hName = txtHazardName.getText().toString();
             String hType = txtHazardColour.getText().toString();

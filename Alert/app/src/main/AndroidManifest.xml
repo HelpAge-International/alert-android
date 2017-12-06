@@ -58,8 +58,13 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:windowSoftInputMode="adjustPan"
             android:name=".dashboard.activity.CreateAlertActivity"
             android:label="@string/title_activity_create_alert"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".dashboard.activity.HazardSelectionActivity"
+            android:label="@string/select_hazard_title"
             android:screenOrientation="portrait" />
         <activity
             android:name=".dashboard.activity.AlertDetailActivity"
@@ -76,28 +81,20 @@
             android:name=".risk_monitoring.view.UpdateIndicatorActivity"
             android:label="@string/title_activity_update_indicator"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"/>
         <activity
             android:name=".risk_monitoring.view.LogIndicatorActivity"
             android:label="@string/title_activity_log_indicator"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"/>
         <activity
             android:name=".risk_monitoring.view.IndicatorLogActivity"
             android:label="@string/title_activity_indicator_log"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"/>
         <activity
             android:name=".dashboard.activity.UpdateAlertActivity"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".dashboard.activity.AlertTypesActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".dashboard.activity.AffectedAreaActivity"
-            android:parentActivityName=".dashboard.activity.UpdateAlertActivity" />
-        <activity android:name=".dashboard.activity.CountryListActivity"
-            android:parentActivityName=".dashboard.activity.AffectedAreaActivity"/>
     </application>
 
 </manifest>

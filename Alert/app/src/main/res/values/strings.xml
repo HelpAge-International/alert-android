@@ -91,6 +91,14 @@
     <string name="delete">Delete</string>
     <string name="edit_indicator">Edit indicator</string>
     <string name="country_context">Country Context</string>
+    <string name="enter_password_error">Please enter your password.</string>
+    <string name="enter_email_error">Please enter your email.</string>
+    <string name="select_hazard_title">Select Hazard</string>
+    <string name="alert_level">Alert Level</string>
+    <string name="estimated_peeps">Estimated population effected</string>
+    <string name="effected_area">Add affected area</string>
+    <string name="info_sources">Information sources and notes</string>
+    <string name="add_another_area">Add another affected area</string>
     <string name="text_update_alert">Update Alert</string>
 
     <!-- TODO: Remove or change this placeholder text -->
@@ -107,6 +115,9 @@
     <string name="txt_optional">Optional</string>
     <string name="txt_level_2">Level 2</string>
     <string name="txt_select_level_1">Please select level 1</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="request_red_alert">Request red alert</string>
+    <string name="confirm_alert_level">Confirm alert level</string>
     <string name="info_and_notes">Information sources and notes:</string>
     <string name="txt_approve">Approve</string>
     <string name="txt_reject">Reject</string>
