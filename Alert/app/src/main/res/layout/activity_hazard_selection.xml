@@ -7,8 +7,6 @@
     tools:context="org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity">
 
     <LinearLayout
-        android:descendantFocusability="beforeDescendants"
-        android:focusableInTouchMode="true"
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -22,12 +20,6 @@
             layout="@layout/actionbar_layout"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/actionBarSize" />
-
-        <android.support.v7.widget.RecyclerView
-            android:paddingTop="@dimen/activity_vertical_margin_half"
-            android:id="@+id/rvFields"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 
