@@ -18,7 +18,6 @@ public class Tasks {
         this.dueDate = dueDate;
     }
 
-
     public String getAlertLevel() {
         return alertLevel;
     }

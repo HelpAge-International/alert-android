@@ -19,10 +19,12 @@ public class Alert implements Serializable{
     private long level1;
     private long level2;
     private long population;
-    private String info;
+    private long timeUpdated;
     private String updated;
+    private String info;
     private String otherName;
     private String reason;
+    private String updatedBy;
     private DatabaseReference dbRef;
 
     public Alert(DatabaseReference dbRef) {
@@ -44,7 +46,7 @@ public class Alert implements Serializable{
         this.level1 = level1;
         this.level2 = level2;
     }
-
+    
     public Alert(long country) {
         this.country = country;
     }
@@ -148,20 +150,37 @@ public class Alert implements Serializable{
         this.dbRef = dbRef;
     }
 
+    public long getTimeUpdated() {
+        return timeUpdated;
+    }
+
+    public void setTimeUpdated(long timeUpdated) {
+        this.timeUpdated = timeUpdated;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("alertLevel", alertLevel);
-        result.put("numOfAreas", numOfAreas);
-        result.put("hazard", hazardScenario);
+        result.put("hazardScenario", hazardScenario);
         result.put("country", country);
         result.put("level1", level1);
         result.put("level2", level2);
-        result.put("population", population);
-        result.put("info", info);
-        result.put("updated", updated);
+        result.put("estimatedPopulation", population);
+        result.put("infoNotes", info);
+        result.put("timeUpdated", updated);
         result.put("otherName", otherName);
-        result.put("reason", reason);
+        result.put("reasonForRedAlert", reason);
+        result.put("timeUpdated", timeUpdated);
+        result.put("updatedBy", updatedBy);
 
         return result;
     }

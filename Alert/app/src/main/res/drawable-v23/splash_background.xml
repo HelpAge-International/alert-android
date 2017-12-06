@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="opaque">
+    <item android:drawable="@color/colorPrimary" />
+    <!--<item>-->
+        <!--<bitmap-->
+            <!--android:gravity="center"-->
+            <!--android:src="@drawable/alert_logo" />-->
+        <item android:drawable="@drawable/alert"
+            android:gravity="center"
+            android:width="184dp"
+            android:height="39dp"/>
+    <!--</item>-->
+</layer-list>

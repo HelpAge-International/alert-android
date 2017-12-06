@@ -11,6 +11,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
@@ -40,11 +41,11 @@ public class UpdateAlertActivity extends AppCompatActivity implements View.OnCli
     private TextView mainTextView, txtHazardName, txtHazardColour, txtAffectedArea, txtAddMoreArea, txtInfo;
     private EditText etPopulation;
     private Button btnSaveChanges;
-    public Toolbar toolbar;
     private Alert alert;
     private DBListener dbListener = new DBListener();
-
     private DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+
+    public Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

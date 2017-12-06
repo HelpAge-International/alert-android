@@ -107,5 +107,9 @@
     <string name="txt_optional">Optional</string>
     <string name="txt_level_2">Level 2</string>
     <string name="txt_select_level_1">Please select level 1</string>
+    <string name="info_and_notes">Information sources and notes:</string>
+    <string name="txt_approve">Approve</string>
+    <string name="txt_reject">Reject</string>
+    <string name="txt_req_red_alert">Red alert requested</string>
 
 </resources>

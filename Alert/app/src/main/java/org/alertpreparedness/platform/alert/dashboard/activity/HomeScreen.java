@@ -44,6 +44,7 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
     private RecyclerView myTaskRecyclerView;
     private Toolbar toolbar;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private List<DataHandler> mHandlerList = new ArrayList<>();
 
     public TaskAdapter taskAdapter;
     public List<Tasks> tasksList;
@@ -51,8 +52,6 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
     public AlertAdapter alertAdapter;
     public List<Alert> alertList;
     public RecyclerView alertRecyclerView;
-
-    private List<DataHandler> mHandlerList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +65,9 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+
+        boolean cdornot = UserInfo.getUser(this).isCountryDirector();
+        System.out.println("CD or Not: " + cdornot);
 
         appBarTitle = (TextView) findViewById(R.id.custom_bar_title);
         appBarTitle.setOnClickListener(this);
@@ -176,7 +178,5 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
             }
         }
     }
-
-
 
 }

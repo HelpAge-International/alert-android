@@ -14,11 +14,14 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.google.gson.Gson;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
+import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.Alert;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData;
 import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService;
@@ -39,6 +42,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     private ImageView imgHazard, imgPopulation, imgAffectedArea, imgInfo, imgClose, imgUpdate;
     private Toolbar toolbar;
     private Alert alert;
+    private LinearLayout llRequested;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public static final String EXTRA_ALERT = "extra_alert";
@@ -47,6 +51,10 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alert_detail);
+
+        if (UserInfo.getUser(this).isCountryDirector()) {
+            System.out.println("CD or Not: " + UserInfo.getUser(this).isCountryDirector());
+        }
 
         if (alert == null) {
             Intent intent = getIntent();
@@ -62,6 +70,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         final Drawable upArrow = toolbar.getNavigationIcon();
         upArrow.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
 
+        llRequested = (LinearLayout) findViewById(R.id.llRedRequested);
         txtHazardName = (TextView) findViewById(R.id.txtHazardName);
         txtPopulation = (TextView) findViewById(R.id.txtPopulationAffected);
         txtAffectedArea = (TextView) findViewById(R.id.txtArea);
@@ -79,15 +88,15 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         imgUpdate.setImageResource(R.drawable.ic_create_white_24dp);
         imgUpdate.setOnClickListener(this);
         imgClose.setVisibility(View.GONE);
+        llRequested.setVisibility(View.GONE);
+
         fetchDetails();
     }
 
     private void fetchDetails() {
-
-        //getNetwork();
         setUpActionBarColour();
-        for(int i = 0; i < Constants.COUNTRIES.length; i++){
-            if(alert.getCountry() == i){
+        for (int i = 0; i < Constants.COUNTRIES.length; i++) {
+            if (alert.getCountry() == i) {
                 txtAffectedArea.setText(Constants.COUNTRIES[i]);
             }
         }
@@ -97,13 +106,13 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         imgInfo.setImageResource(R.drawable.alert_information);
 
         for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
-            if(i == alert.getHazardScenario()){
+            if (i == alert.getHazardScenario()) {
                 AlertAdapter.fetchIcon(Constants.HAZARD_SCENARIO_NAME[i], imgHazard);
                 txtHazardName.setText(Constants.HAZARD_SCENARIO_NAME[i]);
                 txtPopulation.setText(getPeopleAsString(alert.getPopulation()));
                 txtLastUpdated.setText(getUpdatedAsString(alert.getUpdated()));
                 txtInfo.setText((CharSequence) alert.getInfo());
-            }else if(alert.getOtherName() != null ){
+            } else if (alert.getOtherName() != null) {
                 imgHazard.setImageResource(R.drawable.other);
                 txtHazardName.setText(alert.getOtherName());
                 txtPopulation.setText(getPeopleAsString(alert.getPopulation()));
@@ -116,19 +125,19 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     }
 
     private String getPeopleAsString(long population) {
-        return population+" people";
+        return population + " people";
     }
 
     private SpannableStringBuilder getUpdatedAsString(String updateDate) {
-        SpannableStringBuilder sb = new SpannableStringBuilder("Last updated: "+updateDate);
+        SpannableStringBuilder sb = new SpannableStringBuilder("Last updated: " + updateDate);
         StyleSpan b = new StyleSpan(android.graphics.Typeface.BOLD);
-        sb.setSpan(b,14, 14 + updateDate.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        sb.setSpan(b, 14, 14 + updateDate.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         return sb;
     }
 
-    private void getNetwork(){
-
-       // List mCountryList = new ArrayList<CountryJsonData>();
+    private void getNetwork() {
+        //TODO: need to add level 1 area
+        // List mCountryList = new ArrayList<CountryJsonData>();
         //List mL1List = new ArrayList<CountryJsonData>();
 
         Disposable RMDisposable = RiskMonitoringService.INSTANCE.readJsonFile()
@@ -138,19 +147,19 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(countryJsonData -> {
                             //Timber.d("Country id is: %s, level 1: %s", countryJsonData.getCountryId(), countryJsonData.getLevelOneValues().toString());
-                          //  mCountryList.add(countryJsonData.getCountryId());
-                           // mL1List.add(countryJsonData.getLevelOneValues().get(2));
+                            //  mCountryList.add(countryJsonData.getCountryId());
+                            // mL1List.add(countryJsonData.getLevelOneValues().get(2));
 
-                          //  System.out.println("LIST: "+countryJsonData.getLevelOneValues().get(2));
+                            //  System.out.println("LIST: "+countryJsonData.getLevelOneValues().get(2));
                         }
                 );
 
         compositeDisposable.add(RMDisposable);
     }
 
-    private void setUpActionBarColour(){
+    private void setUpActionBarColour() {
         Window window = getWindow();
-        if(alert.getAlertLevel() == 1){
+        if (alert.getAlertLevel() == 1) {
             toolbar.setBackgroundResource(R.color.alertAmber);
             txtActionBarTitle.setText(R.string.amber_alert_text);
 
@@ -158,7 +167,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                 window.setStatusBarColor(getResources().getColor(R.color.alertAmber));
             }
 
-        }else if(alert.getAlertLevel() == 2){
+        } else if (alert.getAlertLevel() == 2) {
             toolbar.setBackgroundResource(R.color.alertRed);
             txtActionBarTitle.setText(R.string.red_alert_text);
 
@@ -176,7 +185,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     public void onClick(View view) {
-        if(view==imgUpdate){
+        if (view == imgUpdate) {
             Intent intent = new Intent(AlertDetailActivity.this, UpdateAlertActivity.class);
             intent.putExtra(EXTRA_ALERT, alert);
             startActivity(intent);

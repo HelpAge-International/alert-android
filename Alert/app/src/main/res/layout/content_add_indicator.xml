@@ -436,6 +436,7 @@
                 tools:text="city, country, 2342342342342,234234234234"/>
 
         </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

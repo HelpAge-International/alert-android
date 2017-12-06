@@ -12,23 +12,25 @@ import java.io.Serializable;
 @IgnoreExtraProperties
 public class User implements Serializable {
 
-    public String userID;
-    public int userType;
+    private String userID;
+    private int userType;
     public String agencyAdminID;
     public String countryID;
-    public String systemAdminID;
+    private String systemAdminID;
+    private boolean isCountryDirector;
     //public String networkCountryID;
 
     //public static User sharedInstance = new User();
 
     // Default constructor required for calls to
     // DataSnapshot.getValue(User.class)
-    public User(String userID, int userType, String agencyAdminID, String countryID, String systemAdminID) {
+    public User(String userID, int userType, String agencyAdminID, String countryID, String systemAdminID, boolean isCountryDirector) {
         this.userID = userID;
         this.userType = userType;
         this.agencyAdminID = agencyAdminID;
         this.countryID = countryID;
         this.systemAdminID = systemAdminID;
+        this.isCountryDirector = isCountryDirector;
         //this.networkCountryID = networkCountryID;
     }
 
@@ -63,6 +65,15 @@ public class User implements Serializable {
     public void saveToPreferences(SharedPreferences prefs){
 
     }
+
+    public boolean isCountryDirector() {
+        return isCountryDirector;
+    }
+
+    public void setCountryDirector(boolean countryDirector) {
+        isCountryDirector = countryDirector;
+    }
+
 //
 //    @Override
 //    public String toString() {
