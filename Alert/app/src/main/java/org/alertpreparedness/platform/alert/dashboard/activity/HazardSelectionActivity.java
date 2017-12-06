@@ -15,6 +15,8 @@ import butterknife.OnClick;
 
 public class HazardSelectionActivity extends AppCompatActivity {
 
+    public static final String HAZARD_TYPE = "hazard_type";
+
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 

@@ -183,7 +183,7 @@ class SelectAreaActivity : BaseActivity() {
                     Timber.d(modelArea.toString())
 
                     val sb = StringBuilder()
-                    sb.append(tvSelectCountry.text).append(tvSelectLevel1.text).append(tvSelectLevel2.text)
+                    sb.append(tvSelectCountry.text).append(", ").append(tvSelectLevel1.text).append(", ").append(tvSelectLevel2.text)
                     val res = sb.toString()
 
                     val intent = Intent()
