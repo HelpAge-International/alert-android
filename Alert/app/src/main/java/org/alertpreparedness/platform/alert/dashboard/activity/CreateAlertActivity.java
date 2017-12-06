@@ -32,6 +32,7 @@ import org.alertpreparedness.platform.alert.helper.AlertLevelDialog;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity;
 import org.alertpreparedness.platform.alert.utils.SimpleAdapter;
+import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,14 +115,52 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
     @CallSuper
     @OnClick(R.id.btnSaveChanges)
     public void onSaveClicked(View v) {
-        if(mFieldsAdapter.isRedAlert()) {
 
+        if(!hasErrors(mFieldsAdapter.isRedAlert())) {
+            saveData(mFieldsAdapter.isRedAlert());
+        }
+
+    }
+
+    protected void saveData(boolean isRedAlert) {
+//        mFieldsAdapter.getModel(2).resultTitle);
+//        mFieldsAdapter.getModel((isRedAlert ? 4 : 3)).strings;
+    }
+
+    protected boolean hasErrors(boolean isRedAlert) {
+        boolean hasError = false;
+
+        if(mFieldsAdapter.getModel(0).resultTitle == null) {
+            SnackbarHelper.show(this, getString(R.string.specify_hazar));
+            hasError = true;
+        }
+        else if(mFieldsAdapter.getModel(1).resultTitle == null) {
+            SnackbarHelper.show(this, getString(R.string.specify_alert_level));
+            hasError = true;
+        }
+        else if(mFieldsAdapter.getModel(2).resultTitle == null) {
+            SnackbarHelper.show(this, getString(R.string.specify_peeps));
+            hasError = true;
+        }
+        else if(isRedAlert && mFieldsAdapter.getModel(3).resultTitle == null) {
+            SnackbarHelper.show(this, getString(R.string.red_alert_specify));
+            hasError = true;
         }
         else {
-
+            if(mFieldsAdapter.getModel(getIndex(isRedAlert, 3)).strings == null || mFieldsAdapter.getModel(getIndex(isRedAlert, 3)).strings.size() == 0) {
+                SnackbarHelper.show(this, getString(R.string.specify_areas));
+                hasError = true;
+            }
+            else if(mFieldsAdapter.getModel(getIndex(isRedAlert, 3)).resultTitle == null) {
+                SnackbarHelper.show(this, getString(R.string.specify_info));
+                hasError = true;
+            }
         }
+        return hasError;
+    }
 
-//        Log.d("result123", mFieldsAdapter.getModel(2).resultTitle);
+    protected static int getIndex(boolean isRedAlert, int base) {
+        return (isRedAlert ? base + 1 : base);
     }
 
     @Override
