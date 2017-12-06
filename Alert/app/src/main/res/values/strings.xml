@@ -116,5 +116,7 @@
     <string name="txt_level_2">Level 2</string>
     <string name="txt_select_level_1">Please select level 1</string>
     <string name="save_changes">Save Changes</string>
+    <string name="request_red_alert">Request red alert</string>
+    <string name="confirm_alert_level">Confirm alert level</string>
 
 </resources>

@@ -16,15 +16,25 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.MyViewHolder> {
 
+    private int positionInParent;
     private List<String> strings;
+    private RemoveListener listener;
+
+    public int getPositionInParent() {
+        return positionInParent;
+    }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.textview)
         public TextView view;
+
+        @BindView(R.id.remove)
+        TextView remove;
 
         public MyViewHolder(View view) {
             super(view);
@@ -33,24 +43,14 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.MyViewHold
     }
 
 
-    public SimpleAdapter(List<String> lit) {
+    public SimpleAdapter(int positionInParent, List<String> lit, RemoveListener listener) {
+        this.positionInParent = positionInParent;
         this.strings = lit;
-        System.out.println("YOLO - SimpleAdapter.SimpleAdapter");
-        System.out.println("YOLO - lit = " + lit);
-    }
-
-    public SimpleAdapter() {}
-
-    public void setData(List<String> strings) {
-        this.strings = strings;
-        notifyDataSetChanged();
+        this.listener = listener;
     }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-        System.out.println("YOLO - SimpleAdapter.onCreateViewHolder");
-        System.out.println("YOLO - parent = [" + parent + "], viewType = [" + viewType + "]");
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_text, parent, false);
 
@@ -59,13 +59,16 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.MyViewHold
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        System.out.println("YOLO - SimpleAdapter.onBindViewHolder");
-        System.out.println("YOLO - holder = [" + holder + "], position = [" + position + "]");
         holder.view.setText(strings.get(position));
+        holder.remove.setOnClickListener(view -> listener.onItemRemove(positionInParent,position));
     }
 
     @Override
     public int getItemCount() {
         return strings.size();
+    }
+
+    public interface RemoveListener {
+        void onItemRemove(int positionInParent, int position);
     }
 }

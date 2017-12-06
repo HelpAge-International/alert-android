@@ -95,6 +95,7 @@ public class CreateAlertActivity extends AppCompatActivity implements ClickListe
 
     @Override
     public void onItemClicked(int position) {
+        System.out.println("position = [" + position + "]");
         switch (position) {
             case 0:
                 startActivity(new Intent(this, HazardSelectionActivity.class));
@@ -110,6 +111,13 @@ public class CreateAlertActivity extends AppCompatActivity implements ClickListe
 
     @OnClick(R.id.btnSaveChanges)
     public void onSaveClicked(View v) {
+        if(mFieldsAdapter.isRedAlert()) {
+
+        }
+        else {
+
+        }
+
 //        Log.d("result123", mFieldsAdapter.getModel(2).resultTitle);
     }
 
@@ -118,10 +126,11 @@ public class CreateAlertActivity extends AppCompatActivity implements ClickListe
         if (requestCode == EFFECTED_AREA_REQUEST) {
             if (resultCode == RESULT_OK) {
                 ModelIndicatorLocation area = data.getParcelableExtra("selected_area");
+                String displayable = data.getStringExtra("selected_area_text");
 
                 mFieldsAdapter.addSubListValue(
                         3,
-                        area.getCountry() + ", " + area.getLevel1() + ", " + area.getLevel2()
+                        displayable
                 );
             }
         }
@@ -150,11 +159,15 @@ public class CreateAlertActivity extends AppCompatActivity implements ClickListe
         mFieldsAdapter.setTextFieldValue(1, icon, title);
         if(type == 2) {
             mFieldsAdapter.addRedAlertReason();
+            saveButton.setText(R.string.request_red_alert);
+        }
+        else {
+            saveButton.setText(R.string.confirm_alert_level);
         }
     }
 }
 
-class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements SimpleAdapter.RemoveListener {
 
     private Context context;
     private final List<AlertFieldModel> items;
@@ -171,9 +184,6 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         @BindView(R.id.ivIcon)
         public ImageView image;
-
-//        @BindView(R.id.areas)
-//        public TextView areas;
 
         @BindView(R.id.recyclerCon)
         LinearLayout recylclerCon;
@@ -230,6 +240,10 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         AlertFieldModel m = items.get(position);
 
+        if(m.originalPosition == -1) {
+            m.originalPosition = position;
+        }
+
         switch (getItemViewType(position)) {
             case TEXT_FIELD:
                 ViewHolder h = (ViewHolder)holder;
@@ -241,7 +255,7 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     h.field.setText(m.initialTitle);
                 }
                 h.image.setImageDrawable(ContextCompat.getDrawable(context, m.drawable));
-                h.field.setOnClickListener(view -> listener.onItemClicked(position));
+                h.field.setOnClickListener(view -> listener.onItemClicked(m.originalPosition));
                 h.recylclerCon.setVisibility(View.GONE);
                 break;
             case EDIT_TEXT:
@@ -284,33 +298,34 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 h2.recylclerCon.setVisibility(View.VISIBLE);
 
                 if(m.strings == null || m.strings.size() == 0) {
-//                    h2.recylclerCon.setVisibility(View.GONE);
+                    h2.recyclerView.setVisibility(View.GONE);
                 }
                 else {
-                    h2.recyclerView.setAdapter(new SimpleAdapter(m.strings));
+                    h2.recyclerView.setVisibility(View.VISIBLE);
+                    h2.recyclerView.setAdapter(new SimpleAdapter(m.originalPosition, m.strings, this));
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context.getApplicationContext());
                     h2.recyclerView.setLayoutManager(mLayoutManager);
                     h2.recyclerView.setHasFixedSize(true);
                     h2.recyclerView.setNestedScrollingEnabled(false);
 
-//                    h2.areas.setText("" + m.strings.size());
 
-//                    StringBuilder res = new StringBuilder();
-//
-//                    for(String s : m.strings) {
-//                        res.append(s).append("\n");
-//                    }
-//                    h2.areas.setText(res);
                     h2.textView.setText(R.string.add_another_area);
 
                 }
                 h2.image.setImageDrawable(
                         ContextCompat.getDrawable(context, m.drawable)
                 );
-                h2.textView.setOnClickListener(view -> listener.onItemClicked(position));
+                h2.textView.setOnClickListener(view -> listener.onItemClicked(m.originalPosition));
                 break;
         }
 
+    }
+
+    @Override
+    public void onItemRemove(int positionInParent, int position) {
+        positionInParent = (isRedAlert && positionInParent >= 2? positionInParent + 1 : positionInParent);
+        items.get(positionInParent).strings.remove(position);
+        notifyItemChanged(positionInParent);
     }
 
     @Override
@@ -331,28 +346,36 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
+    public String getRedAlertReason() {
+        if(isRedAlert()) {
+           return items.get(2).resultTitle;
+        }
+        return null;
+    }
+
     public void removeRedReason() {
         if(isRedAlert) {
             items.remove(2);
             isRedAlert = false;
             notifyItemRemoved(2);
+
         }
     }
 
     public void setTextFieldValue(int index, String string) {
-        index = (isRedAlert && index < 2? index + 1 : index);
+        index = (isRedAlert && index >= 2? index + 1 : index);
         items.get(index).resultTitle = string;
         notifyItemChanged(index);
     }
     public void setTextFieldValue(int index, @DrawableRes int icon, String string) {
-        index = (isRedAlert && index < 2? index + 1 : index);
+        index = (isRedAlert && index >= 2? index + 1 : index);
         items.get(index).resultTitle = string;
         items.get(index).drawable = icon;
         notifyItemChanged(index);
     }
 
     public void addSubListValue(int index, String string) {
-//        index = (isRedAlert && index < 2? index + 1 : index);
+        index = (isRedAlert && index >= 2? index + 1 : index);
         AlertFieldModel m = items.get(index);
         if(m.strings != null) {
             m.strings.add(string);
@@ -364,10 +387,15 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public AlertFieldModel getModel(int i) {
         return items.get(i);
     }
+
+    public boolean isRedAlert() {
+        return isRedAlert;
+    }
 }
 
 class AlertFieldModel {
 
+    public int originalPosition = -1;
     public int viewType;
     @DrawableRes public int drawable;
     @StringRes public int initialTitle;
