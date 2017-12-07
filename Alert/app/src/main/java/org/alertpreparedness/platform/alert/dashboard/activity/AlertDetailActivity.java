@@ -119,9 +119,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                 txtInfo.setText((CharSequence) alert.getInfo());
                 txtLastUpdated.setText(getUpdatedAsString(alert.getUpdated()));
             }
-
         }
-
     }
 
     private String getPeopleAsString(long population) {
@@ -164,7 +162,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             txtActionBarTitle.setText(R.string.amber_alert_text);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                window.setStatusBarColor(getResources().getColor(R.color.alertAmber));
+                window.setStatusBarColor(getResources().getColor(R.color.sBar_Amber));
             }
 
         } else if (alert.getAlertLevel() == 2) {
@@ -172,7 +170,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             txtActionBarTitle.setText(R.string.red_alert_text);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                window.setStatusBarColor(getResources().getColor(R.color.alertRed));
+                window.setStatusBarColor(getResources().getColor(R.color.sBar_Red));
             }
         }
     }

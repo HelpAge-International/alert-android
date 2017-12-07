@@ -19,8 +19,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".login.activity.SplashActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/SplashTheme">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -29,8 +28,7 @@
         </activity>
         <activity
             android:name=".login.activity.LoginScreen"
-            android:screenOrientation="portrait"
-            android:theme="@style/SplashTheme" />
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".dashboard.activity.HomeScreen"
             android:launchMode="singleTask"

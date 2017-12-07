@@ -52,10 +52,10 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
     RecyclerView fields;
 
     @BindView(R.id.toolbar)
-    Toolbar mToolbar;
+    public Toolbar mToolbar;
 
-    private AlertLevelDialog mAlertLevelFragment;
-    private AlertFieldsAdapter mFieldsAdapter;
+    public AlertLevelDialog mAlertLevelFragment;
+    public AlertFieldsAdapter mFieldsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

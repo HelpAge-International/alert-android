@@ -106,6 +106,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
                 txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueBeforeString("red level", "indicator", format.format(new Date(tasks.dueDate))));
                 img_task.setImageResource(R.drawable.home_task_red);
+            }else{
+                txt_taskName.setVisibility(View.GONE);
+                txt_taskStatus.setVisibility(View.GONE);
+                img_task.setVisibility(View.GONE);
             }
         }
     }
