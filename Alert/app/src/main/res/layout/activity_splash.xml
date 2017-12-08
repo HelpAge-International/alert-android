@@ -8,7 +8,7 @@
     tools:context="org.alertpreparedness.platform.alert.login.activity.SplashActivity">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/imageViewAlert"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"

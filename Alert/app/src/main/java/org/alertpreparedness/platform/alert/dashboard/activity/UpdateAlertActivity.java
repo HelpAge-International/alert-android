@@ -30,11 +30,14 @@ import org.alertpreparedness.platform.alert.dashboard.adapter.AlertFieldsAdapter
 import org.alertpreparedness.platform.alert.dashboard.model.AlertFieldModel;
 import org.alertpreparedness.platform.alert.helper.AlertLevelDialog;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
+import org.alertpreparedness.platform.alert.interfaces.iRedAlertRequest;
 import org.alertpreparedness.platform.alert.model.Alert;
+import org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.DBListener;
 import org.alertpreparedness.platform.alert.utils.FirebaseHelper;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
+import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,11 +52,11 @@ public class UpdateAlertActivity extends CreateAlertActivity {
     private DBListener dbListener = new DBListener();
     private DatabaseReference database = FirebaseDatabase.getInstance().getReference();
 
-    public Toolbar toolbar;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mToolbar.setTitle(R.string.update_alert);
 
         if (alert == null){
             Intent intent = getIntent();
@@ -63,6 +66,21 @@ public class UpdateAlertActivity extends CreateAlertActivity {
         fetchDetails();
         setUpActionBarColour();
 
+    }
+
+    @Override
+    public void onItemClicked(int position) {
+        switch (position) {
+            case 0:
+                SnackbarHelper.show(this, getString(R.string.txt_cannot_change_hazard));
+                break;
+            case 1:
+                mAlertLevelFragment.show(getSupportFragmentManager(), "alert_level");
+                break;
+            case 3:
+                startActivityForResult(new Intent(this, SelectAreaActivity.class), EFFECTED_AREA_REQUEST);
+                break;
+        }
     }
 
     private void fetchDetails() {
@@ -90,7 +108,6 @@ public class UpdateAlertActivity extends CreateAlertActivity {
     }
 
     private void setUpActionBarColour() {
-        mToolbar.setTitle(R.string.update_alert);
         Window window = getWindow();
         if(alert.getAlertLevel() == 1){
             mToolbar.setBackgroundResource(R.color.alertAmber);
@@ -153,6 +170,26 @@ public class UpdateAlertActivity extends CreateAlertActivity {
             db.addValueEventListener(valueEventListener);
             dbListener.add(db, valueEventListener);
         }
+
+        backToDetailView();
+    }
+
+    public void backToDetailView() {
+
+        Intent intent = new Intent(UpdateAlertActivity.this, AlertDetailActivity.class);
+        intent.putExtra(EXTRA_ALERT, alert);
+
+        if (mFieldsAdapter.isRedAlert()) {
+            if (mFieldsAdapter.getModel(2).resultTitle != null) {
+                intent.putExtra("IS_RED_REQUEST", "true");
+                startActivity(intent);
+            } else {
+                SnackbarHelper.show(this, getString(R.string.txt_reason_for_red));
+            }
+
+        }else{
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -169,4 +206,5 @@ public class UpdateAlertActivity extends CreateAlertActivity {
             alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
         }
     }
+
 }

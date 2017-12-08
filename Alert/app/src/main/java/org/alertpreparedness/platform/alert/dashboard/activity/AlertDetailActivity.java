@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
+import org.alertpreparedness.platform.alert.interfaces.iRedAlertRequest;
 import org.alertpreparedness.platform.alert.model.Alert;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData;
 import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService;
@@ -36,14 +37,16 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class AlertDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class AlertDetailActivity extends AppCompatActivity implements View.OnClickListener, iRedAlertRequest {
 
     private TextView txtHazardName, txtPopulation, txtAffectedArea, txtInfo, txtLastUpdated, txtActionBarTitle;
     private ImageView imgHazard, imgPopulation, imgAffectedArea, imgInfo, imgClose, imgUpdate;
     private Toolbar toolbar;
     private Alert alert;
+    private String isRequestSent;
     private LinearLayout llRequested;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private UpdateAlertActivity updateAlertActivity = new UpdateAlertActivity();
 
     public static final String EXTRA_ALERT = "extra_alert";
 
@@ -58,6 +61,11 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
         if (alert == null) {
             Intent intent = getIntent();
+            Bundle bd = intent.getExtras();
+            if (bd != null) {
+                isRequestSent = (String) bd.get("IS_RED_REQUEST");
+                System.out.println("REQ: " + isRequestSent);
+            }
             alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
         }
 
@@ -89,12 +97,11 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         imgUpdate.setOnClickListener(this);
         imgClose.setVisibility(View.GONE);
         llRequested.setVisibility(View.GONE);
-
-        fetchDetails();
     }
 
     private void fetchDetails() {
         setUpActionBarColour();
+
         for (int i = 0; i < Constants.COUNTRIES.length; i++) {
             if (alert.getCountry() == i) {
                 txtAffectedArea.setText(Constants.COUNTRIES[i]);
@@ -173,6 +180,17 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                 window.setStatusBarColor(getResources().getColor(R.color.sBar_Red));
             }
         }
+        if (isRequestSent != null) {
+            toolbar.setBackgroundResource(R.color.alertGray);
+            txtActionBarTitle.setText(R.string.amber_alert_text);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                window.setStatusBarColor(getResources().getColor(R.color.sBar_Gray));
+            }
+
+            llRequested.setVisibility(View.VISIBLE);
+        }
+
     }
 
     @Override
@@ -191,8 +209,15 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
         fetchDetails();
+        super.onStart();
+    }
+
+    @Override
+    public void isRedAlertRequest(boolean isRedReq) {
+        if (isRedReq) {
+
+        }
     }
 }

@@ -8,6 +8,8 @@
     <color name="alertGreen">#46AA31</color>
     <color name="alertAmber">#f3a500</color>
     <color name="sBar_Amber">#e29a01</color>
+    <color name="alertGray">#9D9D9D</color>
+    <color name="sBar_Gray">#898888</color>
     <color name="alertRed">#e10514</color>
     <color name="sBar_Red">#ce0512</color>
     <color name="home_text">#686868</color>

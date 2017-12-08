@@ -42,7 +42,7 @@ import butterknife.OnClick;
 
 public class CreateAlertActivity extends AppCompatActivity implements AlertFieldsAdapter.ClickListener, AlertLevelDialog.TypeSelectedListener {
 
-    private static final int EFFECTED_AREA_REQUEST = 9002;
+    public static final int EFFECTED_AREA_REQUEST = 9002;
     private static final int HAZARD_RESULT = 9003;
 
     @BindView(R.id.btnSaveChanges)
