@@ -4,30 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.alertpreparedness.platform.alert.dashboard.activity.CountryListActivity">
+    android:background="@color/colorPrimaryDark"
+    tools:context="org.alertpreparedness.platform.alert.login.activity.SplashActivity">
 
-    <include
-        android:id="@+id/action_toolbar"
-        layout="@layout/action_bar"
-        android:layout_width="0dp"
+    <ImageView
+        android:id="@+id/imageViewAlert"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerViewCountryList"
-        android:layout_width="368dp"
-        android:layout_height="495dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/action_toolbar" />
-
-
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/alert" />
 </android.support.constraint.ConstraintLayout>

@@ -25,11 +25,12 @@ import io.reactivex.disposables.CompositeDisposable;
  */
 
 public class UserInfo {
-    public DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-    public static final String PREFS_USER = "prefs_user";
     private static CompositeDisposable compositeDisposable = new CompositeDisposable();
     private static String[] users = {"administratorCountry", "countryDirector", "ert", "ertLeader", "partner"};
     private static DBListener dbListener = new DBListener();
+
+    public DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+    public static final String PREFS_USER = "prefs_user";
 
     public void authUser(final AuthCallback authCallback) {
         for (String nodeName : users) {
@@ -44,9 +45,6 @@ public class UserInfo {
                                 DataSnapshot userNode = dataSnapshot.child(PreferHelper.getString(AlertApplication.getContext(), Constants.UID));
                                 Log.e("Tag", "UID"+userNode);
                                 populateUser(authCallback, nodeName, userNode);
-                            } else {
-                                //Log.e("Tag", "FALSE");
-                               // Log.e("Tag", "FALSE"+nodeName);
                             }
                         }
 
@@ -78,6 +76,7 @@ public class UserInfo {
     private void populateUser(AuthCallback callback, String nodeName, DataSnapshot userNode) {
         String userID = PreferHelper.getString(AlertApplication.getContext(), Constants.UID);
         int userType = getUserTypeString(nodeName);
+        boolean isCountryDirector = false;
         String agencyAdmin = userNode.child("agencyAdmin").getChildren().iterator().next().getKey();
         String systemAdmin = userNode.child("systemAdmin").getChildren().iterator().next().getKey();
         String countryId = userNode.child("countryId").getValue(String.class);
@@ -86,36 +85,17 @@ public class UserInfo {
         PreferHelper.putString(AlertApplication.getContext(), Constants.COUNTRY_ID, countryId);
         PreferHelper.putString(AlertApplication.getContext(), Constants.SYSTEM_ID, systemAdmin);
         PreferHelper.putInt(AlertApplication.getContext(), Constants.USER_TYPE, userType);
-        User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin);
-                      //  Toast.makeText(callback.getContext(),
-//                                String.format(Locale.getDefault(), "user: %s, type: %s, agency: %s, system: %s, country: %s, network: %s",
-//                                        userID, userType, agencyAdmin, systemAdmin, countryId),
-//                                Toast.LENGTH_LONG).show();
 
-                        saveUser(callback.getContext(), user);
-                        callback.onUserAuthorized(user);
-
-
-//        Disposable NSDisposable = NetworkService.INSTANCE.mapNetworksForCountry(agencyAdmin, countryId).subscribe(
-//                (Map<String, String> stringStringMap) -> {
-//                    for (String key : stringStringMap.keySet()) {
-//                        //System.out.println("Agency "+ agencyAdmin);
-//                        String networkID = stringStringMap.get(key);
-//
-//                        User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin, networkID);
-//                        Toast.makeText(callback.getContext(),
-//                                String.format(Locale.getDefault(), "user: %s, type: %s, agency: %s, system: %s, country: %s, network: %s",
-//                                        userID, userType, agencyAdmin, systemAdmin, countryId, networkID),
-//                                Toast.LENGTH_LONG).show();
-//
-//                        saveUser(callback.getContext(), user);
-//                        callback.onUserAuthorized(user);
-//
-//                        //TODO get all network id from networks
-//                    }
-//                }
-//        );
-//        compositeDisposable.add(NSDisposable);
+        if(nodeName.equals("countryDirector")){
+            isCountryDirector = true;
+            User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin, isCountryDirector);
+            saveUser(callback.getContext(), user);
+            callback.onUserAuthorized(user);
+        }else{
+            User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin, isCountryDirector);
+            saveUser(callback.getContext(), user);
+            callback.onUserAuthorized(user);
+        }
     }
 
 

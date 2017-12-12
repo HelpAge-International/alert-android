@@ -43,7 +43,7 @@ import butterknife.OnClick;
 
 public class CreateAlertActivity extends AppCompatActivity implements AlertFieldsAdapter.ClickListener, AlertLevelDialog.TypeSelectedListener {
 
-    private static final int EFFECTED_AREA_REQUEST = 9002;
+    public static final int EFFECTED_AREA_REQUEST = 9002;
     private static final int HAZARD_RESULT = 9003;
 
     @BindView(R.id.btnSaveChanges)
@@ -53,10 +53,10 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
     RecyclerView fields;
 
     @BindView(R.id.toolbar)
-    Toolbar mToolbar;
+    public Toolbar mToolbar;
 
-    private AlertLevelDialog mAlertLevelFragment;
-    private AlertFieldsAdapter mFieldsAdapter;
+    public AlertLevelDialog mAlertLevelFragment;
+    public AlertFieldsAdapter mFieldsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +70,6 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
         assert getSupportActionBar() != null;
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 
         ArrayList<AlertFieldModel> list = new ArrayList<>();
         list.add(new AlertFieldModel(AlertFieldsAdapter.TEXT_FIELD, R.drawable.alert_hazard, R.string.select_hazard));

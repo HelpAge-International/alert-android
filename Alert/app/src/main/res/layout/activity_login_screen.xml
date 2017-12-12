@@ -11,10 +11,9 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="495dp"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:layout_marginLeft="@dimen/activity_horizontal_margin_one_and_a_half"
         android:layout_marginRight="@dimen/activity_horizontal_margin_one_and_a_half"
+        android:layout_marginTop="16dp"
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -23,8 +22,8 @@
 
         <ImageView
             android:id="@+id/login_logo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="146dp"
+            android:layout_height="31dp"
             android:layout_marginEnd="107dp"
             android:layout_marginLeft="108dp"
             android:layout_marginRight="107dp"
@@ -33,54 +32,54 @@
             app:srcCompat="@drawable/alert" />
 
         <EditText
-            android:layout_marginTop="52dp"
             android:id="@+id/email_address"
             android:layout_width="match_parent"
             android:layout_height="44dp"
+            android:layout_marginTop="52dp"
             android:background="@drawable/rounded_edittext"
             android:drawableLeft="@drawable/login_person"
             android:drawablePadding="15dip"
             android:ems="10"
             android:hint="@string/email_address"
-            android:textColorHint="@color/hintGray"
             android:inputType="textEmailAddress"
             android:paddingLeft="15dp"
             android:textColor="@color/colorPrimaryDark"
+            android:textColorHint="@color/hintGray"
             android:textSize="15sp"
             tools:layout_editor_absoluteX="8dp"
             tools:layout_editor_absoluteY="0dp" />
 
 
         <EditText
-            android:layout_marginTop="10dp"
             android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="44dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
+            android:layout_marginTop="10dp"
             android:background="@drawable/rounded_edittext"
             android:drawableLeft="@drawable/login_lock"
             android:drawablePadding="15dip"
             android:drawableRight="@drawable/login_eye"
             android:ems="10"
             android:hint="Password"
-            android:textColorHint="@color/hintGray"
             android:inputType="textPassword"
             android:paddingLeft="15dp"
             android:paddingRight="12dp"
             android:textColor="@color/colorPrimaryDark"
+            android:textColorHint="@color/hintGray"
             android:textSize="15dp"
             tools:layout_editor_absoluteX="8dp"
             tools:layout_editor_absoluteY="0dp" />
 
         <Button
             android:id="@+id/btnLogin"
-            android:text="Login"
             android:layout_width="match_parent"
             android:layout_height="44dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/rounded_loginbtn"
+            android:text="Login"
             android:textColor="@android:color/background_light"
             tools:layout_editor_absoluteX="8dp"
             tools:layout_editor_absoluteY="0dp" />

@@ -165,7 +165,6 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
                 progressDialog.dismiss();
                 userInfo.authUser(this);
             }
-
         }
         else {
             Timber.tag("signInWithEmail").w("Eher");

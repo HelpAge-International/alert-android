@@ -4,13 +4,17 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
@@ -22,153 +26,137 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dashboard.adapter.AlertFieldsAdapter;
+import org.alertpreparedness.platform.alert.dashboard.model.AlertFieldModel;
+import org.alertpreparedness.platform.alert.helper.AlertLevelDialog;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
+import org.alertpreparedness.platform.alert.interfaces.iRedAlertRequest;
 import org.alertpreparedness.platform.alert.model.Alert;
+import org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.DBListener;
 import org.alertpreparedness.platform.alert.utils.FirebaseHelper;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
+import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity.EXTRA_ALERT;
 
-public class UpdateAlertActivity extends AppCompatActivity implements View.OnClickListener {
+public class UpdateAlertActivity extends CreateAlertActivity {
 
-    private ImageView closeImageView, imgRight, imgAlertColour;
-    private TextView mainTextView, txtHazardName, txtHazardColour, txtAffectedArea, txtAddMoreArea, txtInfo;
-    private EditText etPopulation;
-    private Button btnSaveChanges;
-    public Toolbar toolbar;
     private Alert alert;
     private DBListener dbListener = new DBListener();
-
     private DatabaseReference database = FirebaseDatabase.getInstance().getReference();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_update_alert);
+
+        mToolbar.setTitle(R.string.update_alert);
 
         if (alert == null){
             Intent intent = getIntent();
             alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
         }
 
-        mainTextView = (TextView) findViewById(R.id.action_bar_title);
-        closeImageView = (ImageView) findViewById(R.id.leftImageView);
-        imgRight = (ImageView) findViewById(R.id.rightImageView);
-
-        toolbar = (Toolbar) findViewById(R.id.action_toolbar);
-        setSupportActionBar(toolbar);
-
-        mainTextView.setText(R.string.text_update_alert);
-        mainTextView.setPadding(72,0,0, 0);
-
-        closeImageView.setImageBitmap(null);
-        closeImageView.setBackgroundResource(R.drawable.close);
-        closeImageView.setOnClickListener(this);
-        imgRight.setVisibility(View.GONE);
-
-        txtHazardName = (TextView) findViewById(R.id.textViewHazardName);
-        txtHazardColour = (TextView) findViewById(R.id.textViewAlertColour);
-        etPopulation = (EditText) findViewById(R.id.editTextPopulation);
-        imgAlertColour = (ImageView) findViewById(R.id.imgAlertColour);
-        txtAffectedArea = (TextView) findViewById(R.id.textViewLocation);
-        txtAddMoreArea = (TextView) findViewById(R.id.textViewAddMoreArea);
-        txtInfo = (TextView) findViewById(R.id.editTextInfo);
-        btnSaveChanges = (Button) findViewById(R.id.btnSaveChanges);
-
-        txtHazardColour.setOnClickListener(this);
-        txtAddMoreArea.setOnClickListener(this);
-        txtAffectedArea.setOnClickListener(this);
-        btnSaveChanges.setOnClickListener(this);
-
         fetchDetails();
         setUpActionBarColour();
 
     }
 
-    private void fetchDetails() {
+    @Override
+    public void onItemClicked(int position) {
+        switch (position) {
+            case 0:
+                SnackbarHelper.show(this, getString(R.string.txt_cannot_change_hazard));
+                break;
+            case 1:
+                mAlertLevelFragment.show(getSupportFragmentManager(), "alert_level");
+                break;
+            case 3:
+                startActivityForResult(new Intent(this, SelectAreaActivity.class), EFFECTED_AREA_REQUEST);
+                break;
+        }
+    }
 
+    private void fetchDetails() {
         for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
             if(i == alert.getHazardScenario()) {
-                txtHazardName.setText(Constants.HAZARD_SCENARIO_NAME[i]);
+                mFieldsAdapter.setTextFieldValue(0, Constants.HAZARD_SCENARIO_NAME[i]);
             }
         }
 
         if(alert.getAlertLevel() == 1){
-            imgAlertColour.setImageResource(R.drawable.amber_dot_26dp);
+            mFieldsAdapter.setTextFieldValue(1, R.drawable.amber_dot_26dp, "Amber Alert" );
         }else if (alert.getAlertLevel() == 2){
-            imgAlertColour.setImageResource(R.drawable.red_dot_26dp);
+            mFieldsAdapter.setTextFieldValue(1, R.drawable.red_dot_26dp, "Red Alert" );
         }
+
+        mFieldsAdapter.setTextFieldValue(2, alert.getPopulation()+"");
 
         for(int i = 0; i < Constants.COUNTRIES.length; i++){
             if(alert.getCountry() == i){
-                txtAffectedArea.setText(Constants.COUNTRIES[i]);
+                mFieldsAdapter.addSubListValue(3,Constants.COUNTRIES[i] );
             }
         }
+
+        mFieldsAdapter.setTextFieldValue(4, alert.getInfo());
     }
 
     private void setUpActionBarColour() {
         Window window = getWindow();
         if(alert.getAlertLevel() == 1){
-            toolbar.setBackgroundResource(R.color.alertAmber);
+            mToolbar.setBackgroundResource(R.color.alertAmber);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                window.setStatusBarColor(getResources().getColor(R.color.alertAmber));
+                window.setStatusBarColor(getResources().getColor(R.color.sBar_Amber));
             }
 
         }else if(alert.getAlertLevel() == 2){
-            toolbar.setBackgroundResource(R.color.alertRed);
+            mToolbar.setBackgroundResource(R.color.alertRed);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                window.setStatusBarColor(getResources().getColor(R.color.alertRed));
+                window.setStatusBarColor(getResources().getColor(R.color.sBar_Red));
             }
         }
     }
 
     @Override
-    public void onClick(View view) {
-        if(closeImageView == view){finish();}
+    public void onSaveClicked(View v) {
 
-        if(txtHazardColour == view){
-            Intent intent = new Intent(UpdateAlertActivity.this, AlertTypesActivity.class);
-            intent.putExtra(EXTRA_ALERT, alert);
-            startActivity(intent);//ForResult(intent, 1);
-        }
+        String hName = mFieldsAdapter.getModel(0).resultTitle;
+        String hType = mFieldsAdapter.getModel(1).resultTitle;
+        String population = mFieldsAdapter.getModel(2).resultTitle;
+        List<String> areas = mFieldsAdapter.getModel(3).strings;
+        String info = mFieldsAdapter.getModel(4).resultTitle;
 
-        if(txtAddMoreArea == view){
-            Intent intent = new Intent(UpdateAlertActivity.this, AffectedAreaActivity.class);
-            intent.putExtra(EXTRA_ALERT, alert);
-            startActivity(intent);
-        }
+        update(hName, hType, population, areas, info);
+        super.onSaveClicked(v);
 
-        if(btnSaveChanges == view){
-            String hName = txtHazardName.getText().toString();
-            String hType = txtHazardColour.getText().toString();
-            String population = etPopulation.getText().toString();
-            String areas = txtAffectedArea.getText().toString();
-            String info = txtInfo.getText().toString();
-
-            update(hName, hType, population, areas, info);
-        }
     }
 
-    private void update(String hName, String hType, String population, String areas, String info) {
+    private void update(String hName, String hType, String population, List<String> areas, String info) {
         String countryID = UserInfo.getUser(UpdateAlertActivity.this).countryID;
         String[] usersID = new String[]{countryID};
         String mAppStatus = PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS);
         ValueEventListener valueEventListener;
 
+//        for (String ids : usersID) {
+//            String key = database.child(mAppStatus).child("alert").child(ids).push().getKey();
+//
+//            System.out.println("KEY: " + key);
+//        }
         for (String ids : usersID) {
             DatabaseReference db = database.child(mAppStatus).child("alert").child(ids);
             db.addListenerForSingleValueEvent(valueEventListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     try {
-
+                        //dataSnapshot.child()
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -181,6 +169,26 @@ public class UpdateAlertActivity extends AppCompatActivity implements View.OnCli
             });
             db.addValueEventListener(valueEventListener);
             dbListener.add(db, valueEventListener);
+        }
+
+        backToDetailView();
+    }
+
+    public void backToDetailView() {
+
+        Intent intent = new Intent(UpdateAlertActivity.this, AlertDetailActivity.class);
+        intent.putExtra(EXTRA_ALERT, alert);
+
+        if (mFieldsAdapter.isRedAlert()) {
+            if (mFieldsAdapter.getModel(2).resultTitle != null) {
+                intent.putExtra("IS_RED_REQUEST", "true");
+                startActivity(intent);
+            } else {
+                SnackbarHelper.show(this, getString(R.string.txt_reason_for_red));
+            }
+
+        }else{
+            startActivity(intent);
         }
     }
 
@@ -198,4 +206,5 @@ public class UpdateAlertActivity extends AppCompatActivity implements View.OnCli
             alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
         }
     }
+
 }

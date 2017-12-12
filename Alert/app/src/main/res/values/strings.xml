@@ -64,6 +64,7 @@
     <string name="title_activity_select_area">SelectAreaActivity</string>
     <string name="no_indicators_have_been_added">No indicators have been added</string>
     <string name="update">Update</string>
+    <string name="update_alert">Update Alert</string>
     <string name="edit">Edit</string>
     <string name="information_source">Information Source</string>
     <string name="indicator_log">Indicator Log</string>
@@ -124,5 +125,11 @@
     <string name="red_alert_specify">Please state reason for red alert.</string>
     <string name="specify_areas">Please specify affected area(s)</string>
     <string name="specify_info">Please state information sources</string>
+    <string name="info_and_notes">Information sources and notes:</string>
+    <string name="txt_approve">Approve</string>
+    <string name="txt_reject">Reject</string>
+    <string name="txt_req_red_alert">Red alert requested</string>
+    <string name="txt_reason_for_red">A reason for red alert is required to request a red alert, please enter and try again</string>
+    <string name="txt_cannot_change_hazard">You cannot change the hazard when updating alerts</string>
 
 </resources>

@@ -22,28 +22,27 @@ import java.util.Comparator;
 import java.util.List;
 
 
-
 /**
  * Created by faizmohideen on 20/11/2017.
  */
 
-public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder>{
+public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> {
 
     private Context context;
     private OnAlertItemClickedListener listener;
-    public List<Alert> getAlertList() {
-        return listArray;
-    }
-
     private List<Alert> listArray;
     private static WeakReference<HomeScreen> mActivityRef;
     private final static String _TAG = "Adapter";
+
+    public List<Alert> getAlertList() {
+        return listArray;
+    }
 
     public AlertAdapter(@NonNull List<Alert> List) {
         super();
 
         this.listArray = List;
-        this.context  = mActivityRef.get();
+        this.context = mActivityRef.get();
         if (context != null) {
             listener = (OnAlertItemClickedListener) context;
         } else {
@@ -102,7 +101,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder>{
             img_hazard_icon = (ImageView) itemView.findViewById(R.id.img_hazard_icon);
             img_alert_req = (ImageView) itemView.findViewById(R.id.imgRedReq);
 
-            itemView.setOnClickListener(new View.OnClickListener(){
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     int position = getAdapterPosition();

@@ -15,169 +15,42 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/constraintLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+    <LinearLayout
+        android:id="@+id/llRedRequested"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        android:orientation="vertical"
+        android:background="@color/alertRed"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/action_toolbar">
 
-        <ImageView
-            android:id="@+id/imgHazardIcon"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="31dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/bg_circle" />
-
         <TextView
-            android:id="@+id/textViewRisk"
+            android:id="@+id/tvRedRequested"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="Risk:"
-            android:textColor="@color/gray_title"
-            android:textSize="13sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@+id/imgHazardIcon" />
+            android:layout_marginBottom="12dp"
+            android:layout_marginEnd="18dp"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="11dp"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/txt_req_red_alert"
+            android:textColor="@color/white" />
 
-        <TextView
-            android:id="@+id/txtHazardName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="1dp"
-            android:text="Hazard Name"
-            android:textColor="@android:color/black"
-            android:textSize="15sp"
-            app:layout_constraintStart_toEndOf="@+id/imgHazardIcon"
-            app:layout_constraintTop_toBottomOf="@+id/textViewRisk" />
-
-        <ImageView
-            android:id="@+id/imgPopulationIcon"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="40dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imgHazardIcon"
-            app:srcCompat="@drawable/bg_circle" />
-
-        <TextView
-            android:id="@+id/textViewPopulation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="28dp"
-            android:text="Population affected:"
-            android:textColor="@color/gray_title"
-            android:textSize="13sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@+id/imgPopulationIcon"
-            app:layout_constraintTop_toBottomOf="@+id/txtHazardName" />
-
-        <TextView
-            android:id="@+id/txtPopulationAffected"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="1dp"
-            android:text="100,000 people"
-            android:textColor="@android:color/black"
-            android:textSize="15sp"
-            app:layout_constraintStart_toEndOf="@+id/imgPopulationIcon"
-            app:layout_constraintTop_toBottomOf="@+id/textViewPopulation" />
-
-        <ImageView
-            android:id="@+id/imgAreaIcon"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="40dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imgPopulationIcon"
-            app:srcCompat="@drawable/bg_circle" />
-
-        <TextView
-            android:id="@+id/textViewAreas"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="28dp"
-            android:text="Affected areas:"
-            android:textColor="@color/gray_title"
-            android:textSize="13sp"
-            app:layout_constraintStart_toEndOf="@+id/imgAreaIcon"
-            app:layout_constraintTop_toBottomOf="@+id/txtPopulationAffected" />
-
-        <TextView
-            android:id="@+id/txtArea"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="1dp"
-            android:text="Philippines, Leyte"
-            android:textColor="@android:color/black"
-            android:textSize="15sp"
-            app:layout_constraintStart_toEndOf="@+id/imgAreaIcon"
-            app:layout_constraintTop_toBottomOf="@+id/textViewAreas" />
-
-        <ImageView
-            android:id="@+id/imgInfo"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="40dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imgAreaIcon"
-            app:srcCompat="@drawable/bg_circle" />
-
-        <TextView
-            android:id="@+id/textViewInfo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="28dp"
-            android:text="Information sources and notes:"
-            android:textColor="@color/gray_title"
-            android:textSize="13sp"
-            app:layout_constraintStart_toEndOf="@+id/imgInfo"
-            app:layout_constraintTop_toBottomOf="@+id/txtArea" />
-
-        <TextView
-            android:id="@+id/txtInfo"
-            android:layout_width="275dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="1dp"
-            android:text="Cras quis nulla commodo, aliquam lectus sed, blandit augue. Cras ullamcorper bibendum bibendum. Duis tincidunt urna non pretium porta"
-            android:textColor="@android:color/black"
-            android:textSize="15sp"
-            app:layout_constraintStart_toEndOf="@+id/imgInfo"
-            app:layout_constraintTop_toBottomOf="@+id/textViewInfo" />
+    </LinearLayout>
 
 
-    </android.support.constraint.ConstraintLayout>
-
-    <TextView
-        android:id="@+id/txtLastUpdated"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:gravity="center"
-        android:text="@string/last_updated"
-        android:textColor="@android:color/black"
+    <include
+        android:id="@+id/detail_view"
+        layout="@layout/content_alert_detail"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintTop_toBottomOf="@+id/llRedRequested"
+        app:layout_constraintVertical_bias="1.0" />
 
 </android.support.constraint.ConstraintLayout>

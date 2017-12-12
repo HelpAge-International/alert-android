@@ -31,7 +31,6 @@ import java.util.Locale;
  */
 
 public class DataHandler {
-    public DatabaseReference database = FirebaseDatabase.getInstance().getReference();
     private List<Integer> alerts = new ArrayList<Integer>();
     private DBListener dbListener = new DBListener();
     private String mAppStatus = PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS);
@@ -41,6 +40,8 @@ public class DataHandler {
     private String countryID, agencyAdminID, systemAdminID, networkCountryID;
     private String[] usersID;
     private Alert alert = new Alert();
+
+    public DatabaseReference database = FirebaseDatabase.getInstance().getReference();
 
     public void getAlertsFromFirebase(IHomeActivity iHome, Context context) {
         countryID = UserInfo.getUser(context).countryID;
@@ -171,20 +172,6 @@ public class DataHandler {
         DatabaseReference ref = database.child(mAppStatus).child("hazardOther").child(nameId);
         ref.addValueEventListener(valueEventListener);
         dbListener.add(ref, valueEventListener);
-//        database.child(mAppStatus).child("hazardOther").child(nameId).addValueEventListener(valueEventListener = new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                String name = (String) dataSnapshot.child("name").getValue();
-//                Alert alert = new Alert(alertLevel, hazardScenario, population, numOfAreas, updatedDay, info, name);
-//                Alert alert1 = new Alert(country, level1, level2);
-//                iHome.addAlert(alert);
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
 
     }
 
