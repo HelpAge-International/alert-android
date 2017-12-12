@@ -16,7 +16,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
+import org.alertpreparedness.platform.alert.responseplan.ResponsePlanFragment;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.RiskActivity;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
@@ -75,6 +77,11 @@ public class MainDrawer extends BaseActivity {
                         clearAllActivities();
 //                        PreferHelper.getInstance(MainDrawer.this).edit().remove(UserInfo.PREFS_USER).apply();
 //                        finish();
+                        break;
+                    case R.id.nav_response:
+                        AppUtils.setFragment(MainDrawer.this, R.id.content_frame, new ResponsePlanFragment());
+                        break;
+
                 }
                 return false;
             }

@@ -5,6 +5,10 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.support.annotation.IdRes;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -46,6 +50,21 @@ public class AppUtils {
             result = context.getResources().getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+
+    // Set the fragments for a page
+    public static void setFragment(AppCompatActivity activity, @IdRes int containerId, Fragment fragment) {
+        setFragment(activity, containerId, fragment, null);
+    }
+    public static void setFragment(AppCompatActivity activity, @IdRes int containerId, Fragment fragment, String tag) {
+        FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
+        if (tag != null) {
+            transaction.replace(containerId, fragment, tag);
+        }
+        else {
+            transaction.replace(containerId, fragment);
+        }
+        transaction.commit();
     }
 
     public static void setTaskBarCol(Activity context, int statusBarColor) {
