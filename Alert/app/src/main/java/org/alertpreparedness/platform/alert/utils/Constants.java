@@ -54,6 +54,12 @@ public final class Constants {
     public static final int Ert = 4;
     public static final int PartnerUser = 5;
 
+    //Red alert request
+    public static final int REQ_PENDING = 0;
+    public static final int REQ_APPROVED = 1;
+    public static final int REQ_REJECTED = 2;
+
+
     //copy over from portal
 //    public static final int HazardScenario0 = 0;
 //    public static final int HazardScenario1 = 1;

@@ -11,14 +11,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
+import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
+import org.alertpreparedness.platform.alert.interfaces.iRedAlertRequest;
 import org.alertpreparedness.platform.alert.model.Alert;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
-import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -30,19 +32,18 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
 
     private Context context;
     private OnAlertItemClickedListener listener;
-    private List<Alert> listArray;
-    private static WeakReference<HomeScreen> mActivityRef;
+    private HashMap<String, Alert> alertsMap;
+    private List<Alert> alertsList = new ArrayList<>();
     private final static String _TAG = "Adapter";
+    private boolean isCountryDirector;
 
-    public List<Alert> getAlertList() {
-        return listArray;
-    }
 
-    public AlertAdapter(@NonNull List<Alert> List) {
+    public AlertAdapter(@NonNull HashMap<String, Alert> alertsMap, Context context) {
         super();
 
-        this.listArray = List;
-        this.context = mActivityRef.get();
+        this.isCountryDirector = UserInfo.getUser(context).isCountryDirector();
+        this.alertsMap = alertsMap;
+        this.context = context;
         if (context != null) {
             listener = (OnAlertItemClickedListener) context;
         } else {
@@ -62,24 +63,49 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(AlertAdapter.ViewHolder holder, int position) {
-        Alert alert = listArray.get(position);
+        Alert alert = alertsList.get(position);
         holder.bind(alert);
     }
 
-    public void add(Alert alert) {
-        listArray.add(alert);
-        Collections.sort(this.listArray, new Comparator<Alert>() {
-            @Override
-            public int compare(Alert o1, Alert o2) {
-                return Long.compare(o2.getAlertLevel(), o1.getAlertLevel());
-            }
-        });
+    public void remove(String id){
+        alertsMap.remove(id);
+        updateList();
+    }
+
+    private void updateList() {
+        alertsList.clear();
+        alertsList.addAll(alertsMap.values());
+        Collections.sort(alertsList, (o1, o2) -> Long.compare(o2.getAlertLevel(), o1.getAlertLevel()));
+
         notifyDataSetChanged();
+    }
+
+    public void update(String id, Alert alert) {
+        Log.e("ADAPTER", alertsMap.containsKey(id) ? alertsMap.get(id).toString() : "null");
+        alertsMap.put(id, alert);
+
+        Log.e("ADAPTER", alert.toString() + "\n");
+        updateList();
     }
 
     @Override
     public int getItemCount() {
-        return listArray.size();
+        return alertsMap.size();
+    }
+
+    public void updateRedRequested(String id, long redrequested) {
+//        for(Alert a: alertsMap){
+//            Log.e("f", id + " - " + a.getId());
+//            if (a.getId().equals(id)){
+//                a.setRedAlertRequested(redrequested);
+//                break;
+//            }
+//        }
+//        notifyDataSetChanged();
+    }
+
+    public List<Alert> getAlerts() {
+        return alertsList;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -87,6 +113,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         TextView txt_alert_level;
         TextView txt_hazard_name;
         TextView txt_num_of_people;
+        TextView txt_red_requested;
         ImageView img_alert_colour;
         ImageView img_hazard_icon;
         ImageView img_alert_req;
@@ -97,6 +124,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
             txt_alert_level = (TextView) itemView.findViewById(R.id.txt_alert_level);
             txt_hazard_name = (TextView) itemView.findViewById(R.id.txt_hazard_name);
             txt_num_of_people = (TextView) itemView.findViewById(R.id.txt_num_of_people);
+            txt_red_requested = (TextView) itemView.findViewById(R.id.textViewAlertReq);
             img_alert_colour = (ImageView) itemView.findViewById(R.id.img_alert_colour);
             img_hazard_icon = (ImageView) itemView.findViewById(R.id.img_hazard_icon);
             img_alert_req = (ImageView) itemView.findViewById(R.id.imgRedReq);
@@ -106,14 +134,17 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
                 public void onClick(View view) {
                     int position = getAdapterPosition();
                     if (listener != null) {
-                        listener.onAlertItemClicked(listArray.get(position));
+                        listener.onAlertItemClicked(alertsList.get(position));
                     }
                 }
             });
         }
 
         private void bind(Alert alert) {
-            img_alert_req.setVisibility(View.GONE);
+          //  Log.e("RED", String.valueOf(alert.getRedAlertRequested()));
+
+           // img_alert_req.setVisibility((alert.getRedAlertRequested() == 0) ? View.VISIBLE : View.GONE);
+
             for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
                 if (i == alert.getHazardScenario() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
                     fetchIcon(Constants.HAZARD_SCENARIO_NAME[i], img_hazard_icon);
@@ -140,6 +171,18 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
                     txt_hazard_name.setText(alert.getOtherName());
                     txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(), alert.getNumOfAreas()));
                 }
+            }
+
+            if(isCountryDirector && alert.getRedAlertRequested() == 0) {
+                img_alert_req.setVisibility(View.VISIBLE);
+                img_alert_colour.setImageResource(R.drawable.gray_alert_left);
+                txt_red_requested.setText(R.string.txt_cd_red_request);
+            }else if(alert.getRedAlertRequested() == 0 && !isCountryDirector) {
+                img_alert_req.setVisibility(View.VISIBLE);
+                img_alert_colour.setImageResource(R.drawable.gray_alert_left);
+                txt_red_requested.setText(R.string.txt_red_requested);
+            }else {
+                img_alert_req.setVisibility(View.GONE);
             }
         }
     }
@@ -226,7 +269,6 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         return population + " people affected in " + numOfAreas + " area";
     }
 
-    public static void updateActivity(HomeScreen homeActivity) {
-        mActivityRef = new WeakReference<HomeScreen>(homeActivity);
-    }
+
+
 }

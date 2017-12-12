@@ -25,12 +25,22 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertFieldsAdapter;
 import org.alertpreparedness.platform.alert.dashboard.model.AlertFieldModel;
 import org.alertpreparedness.platform.alert.helper.AlertLevelDialog;
+import org.alertpreparedness.platform.alert.helper.UserInfo;
+import org.alertpreparedness.platform.alert.model.Alert;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity;
+import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SimpleAdapter;
 
 import java.util.ArrayList;
@@ -40,10 +50,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity.EXTRA_ALERT;
+
 public class CreateAlertActivity extends AppCompatActivity implements AlertFieldsAdapter.ClickListener, AlertLevelDialog.TypeSelectedListener {
 
     public static final int EFFECTED_AREA_REQUEST = 9002;
-    private static final int HAZARD_RESULT = 9003;
+    public static final int HAZARD_RESULT = 9003;
+
+    protected DatabaseReference database = FirebaseDatabase.getInstance().getReference();
 
     @BindView(R.id.btnSaveChanges)
     Button saveButton;
@@ -57,10 +71,17 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
     public AlertLevelDialog mAlertLevelFragment;
     public AlertFieldsAdapter mFieldsAdapter;
 
+    protected Alert alert;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_alert);
+
+        Intent intent = getIntent();
+        if (intent.hasExtra(EXTRA_ALERT)){
+            alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
+        }
 
         ButterKnife.bind(this);
 
@@ -119,8 +140,6 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
         else {
 
         }
-
-//        Log.d("result123", mFieldsAdapter.getModel(2).resultTitle);
     }
 
     @Override
@@ -135,6 +154,8 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
                             3,
                             displayable
                     );
+                addArea(area);
+
                 }
                 break;
             case HAZARD_RESULT:
@@ -145,8 +166,80 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
         }
     }
 
+    protected void addArea(ModelIndicatorLocation location){
+        if (alert == null || location == null) return;;
+
+        String countryID = UserInfo.getUser(CreateAlertActivity.this).countryID;
+
+        String mAppStatus = PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS);
+
+        DatabaseReference db = database.child(mAppStatus).child("alert").child(countryID)
+                .child(alert.getId());
+
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    int level1 = location.getLevel1() == null ? -1 : location.getLevel1();
+                    int level2 =location.getLevel2() == null ? -1 : location.getLevel2();
+                    AffectedArea affectedArea = new AffectedArea(location.getCountry(),
+                            level1, level2);
+                    db
+                            .child("affectedAreas")
+                            .child(String.valueOf(mFieldsAdapter.getSubListCapacity(3)))
+                            .setValue(affectedArea)
+                            .addOnCompleteListener(aVoid ->{});
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public static class AffectedArea{
+        private int country, level1, level2;
+
+        public AffectedArea(int country, int level1, int level2) {
+            this.country = country;
+            this.level1 = level1;
+            this.level2 = level2;
+        }
+
+        public AffectedArea() {
+        }
+
+        public int getCountry() {
+            return country;
+        }
+
+        public void setCountry(int country) {
+            this.country = country;
+        }
+
+        public int getLevel1() {
+            return level1;
+        }
+
+        public void setLevel1(int level1) {
+            this.level1 = level1;
+        }
+
+        public int getLevel2() {
+            return level2;
+        }
+
+        public void setLevel2(int level2) {
+            this.level2 = level2;
+        }
+    }
+
+    protected int levelNew = -1;
     @Override
     public void onTypeSelected(int type) {
+        levelNew =-1;
         @DrawableRes int icon;
         String title;
         switch (type) {
