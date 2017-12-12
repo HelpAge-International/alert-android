@@ -79,7 +79,7 @@ public class ResponsePlansAdapter extends RecyclerView.Adapter<ResponsePlansAdap
         holder.description.setText(model.description);
         holder.percentComplete.setText(String.format(context.getString(R.string.complete), model.completePercentage));
         holder.hazardType.setText(model.hazardType);
-        holder.lastUpdated.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(model.lastUpdated));
+        holder.lastUpdated.setText(String.format(context.getString(R.string.last_updated_f), DateFormat.getDateInstance(DateFormat.SHORT).format(model.lastUpdated)));
         switch (model.status) {
             case 0://grey
                 holder.line.setBackgroundColor(context.getResources().getColor(R.color.alertGray));

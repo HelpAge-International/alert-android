@@ -136,5 +136,6 @@
     <string name="in_progress">In Progress</string>
     <string name="approved">Approved</string>
     <string name="needs_reviewing">Needs reviewing</string>
+    <string name="last_updated_f">Last updated: %s</string>
 
 </resources>

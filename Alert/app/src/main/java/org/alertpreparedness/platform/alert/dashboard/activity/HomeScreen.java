@@ -63,14 +63,16 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
 
         toolbar = (Toolbar) findViewById(R.id.alert_appbar);
         setSupportActionBar(toolbar);
+
+        assert getSupportActionBar() != null;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
         boolean cdornot = UserInfo.getUser(this).isCountryDirector();
         System.out.println("CD or Not: " + cdornot);
 
-        appBarTitle = (TextView) findViewById(R.id.custom_bar_title);
-        appBarTitle.setOnClickListener(this);
+//        appBarTitle = (TextView) findViewById(R.id.custom_bar_title);
+//        appBarTitle.setOnClickListener(this);
 
         alertRecyclerView = (RecyclerView) findViewById(R.id.alert_list_view);
         alertRecyclerView.setHasFixedSize(true);
@@ -165,8 +167,8 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
 
     @Override
     public void updateTitle(int stringResource, int backgroundResource) {
-        appBarTitle.setText(stringResource);
-        appBarTitle.setBackgroundResource(backgroundResource);
+//        appBarTitle.setText(stringResource);
+//        appBarTitle.setBackgroundResource(backgroundResource);
     }
 
     @Override
