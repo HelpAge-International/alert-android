@@ -46,6 +46,8 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
     public static final int EFFECTED_AREA_REQUEST = 9002;
     private static final int HAZARD_RESULT = 9003;
 
+//    private ArrayList<>
+
     @BindView(R.id.btnSaveChanges)
     Button saveButton;
 
@@ -97,7 +99,7 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
 
     @Override
     public void onItemClicked(int position) {
-        System.out.println("position = [" + position + "]");
+//        System.out.println("position = [" + position + "]");
         switch (position) {
             case 0:
                 startActivityForResult(new Intent(this, HazardSelectionActivity.class), HAZARD_RESULT);
@@ -108,6 +110,13 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
             case 3:
                 startActivityForResult(new Intent(this, SelectAreaActivity.class), EFFECTED_AREA_REQUEST);
                 break;
+        }
+    }
+
+    @Override
+    public void onSubItemRemoved(int positionInParent, int position) {
+        if(positionInParent == 3) {//affected areas
+
         }
     }
 
@@ -179,7 +188,8 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
                 break;
             case HAZARD_RESULT:
                 if (resultCode == RESULT_OK) {
-                    int hazardType = data.getIntExtra(HazardSelectionActivity.HAZARD_TYPE, 0);
+                    String hazardType = data.getStringExtra(HazardSelectionActivity.HAZARD_TYPE);
+                    mFieldsAdapter.setTextFieldValue(0, hazardType);
                 }
                 break;
         }

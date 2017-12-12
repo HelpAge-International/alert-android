@@ -126,7 +126,7 @@ public class UpdateAlertActivity extends CreateAlertActivity {
     }
 
     @Override
-    public void onSaveClicked(View v) {
+    public void saveData(boolean isRedAlert) {
 
         String hName = mFieldsAdapter.getModel(0).resultTitle;
         String hType = mFieldsAdapter.getModel(1).resultTitle;
@@ -135,8 +135,6 @@ public class UpdateAlertActivity extends CreateAlertActivity {
         String info = mFieldsAdapter.getModel(4).resultTitle;
 
         update(hName, hType, population, areas, info);
-        super.onSaveClicked(v);
-
     }
 
     private void update(String hName, String hType, String population, List<String> areas, String info) {

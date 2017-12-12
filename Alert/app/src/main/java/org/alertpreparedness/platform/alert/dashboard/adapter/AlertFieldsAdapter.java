@@ -258,6 +258,8 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
         void onItemClicked(int position);
 
+        void onSubItemRemoved(int positionInParent, int position);
+
     }
 }
 

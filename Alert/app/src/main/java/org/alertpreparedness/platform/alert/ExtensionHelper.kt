@@ -95,6 +95,130 @@ fun GroupViewHolder.getHazardImg(title: String): Int =
             }
         }
 
+fun getHazardTypes() : ArrayList<String> {
+
+    var list : ArrayList<String> = arrayListOf(
+            "Cold Wave",
+            "Conflict",
+            "Cyclone",
+            "Drought",
+            "Earthquake",
+            "Epidemic",
+            "Fire",
+            "Flash Flood",
+            "Flood",
+            "Heat Wave",
+            "Heavy Rain",
+            "Humanitarian Access",
+            "Insect Infestation",
+            "Landslide",
+            "Locust Infestation",
+            "Mudslide",
+            "Population Displacement",
+            "Population Return",
+            "Snow Avalanche",
+            "Snowfall",
+            "Storm",
+            "Storm Surge",
+            "Technological Disaster",
+            "Tornado",
+            "Tsunami",
+            "Violent Wind",
+            "Volcano",
+            "Other"
+    )
+
+    return list
+}
+
+fun getHazardImg(title: String): Int =
+        when (title) {
+            "Cold Wave" -> {
+                R.drawable.cold_wave
+            }
+            "Conflict" -> {
+                R.drawable.conflict
+            }
+            "Cyclone" -> {
+                R.drawable.cyclone
+            }
+            "Drought" -> {
+                R.drawable.drought
+            }
+            "Earthquake" -> {
+                R.drawable.earthquake
+            }
+            "Epidemic" -> {
+                R.drawable.epidemic
+            }
+            "Fire" -> {
+                R.drawable.fire
+            }
+            "Flash Flood" -> {
+                R.drawable.flash_flood
+            }
+            "Flood" -> {
+                R.drawable.flood
+            }
+            "Heat Wave" -> {
+                R.drawable.heat_wave
+            }
+            "Heavy Rain" -> {
+                R.drawable.heavy_rain
+            }
+            "Humanitarian Access" -> {
+                R.drawable.humanitarian_access
+            }
+            "Insect Infestation" -> {
+                R.drawable.insect_infestation
+            }
+            "Landslide" -> {
+                R.drawable.landslide_mudslide
+            }
+            "Locust Infestation" -> {
+                R.drawable.locust_infestation
+            }
+            "Mudslide" -> {
+                R.drawable.landslide_mudslide
+            }
+            "Population Displacement" -> {
+                R.drawable.population_displacement
+            }
+            "Population Return" -> {
+                R.drawable.population_return
+            }
+            "Snow Avalanche" -> {
+                R.drawable.snow_avalanche
+            }
+            "Snowfall" -> {
+                R.drawable.snowfall
+            }
+            "Storm" -> {
+                R.drawable.storm
+            }
+            "Storm Surge" -> {
+                R.drawable.storm_surge
+            }
+            "Technological Disaster" -> {
+                R.drawable.technological_disaster
+            }
+            "Tornado" -> {
+                R.drawable.tornado
+            }
+            "Tsunami" -> {
+                R.drawable.tsunami
+            }
+            "Violent Wind" -> {
+                R.drawable.violent_wind
+            }
+            "Volcano" -> {
+                R.drawable.volcano
+            }
+            else -> {
+                R.drawable.other
+            }
+        }
+
 fun GroupViewHolder.getCountryImage(location: Int): Int =
         when (location) {
             Constants.AF -> R.drawable.af
