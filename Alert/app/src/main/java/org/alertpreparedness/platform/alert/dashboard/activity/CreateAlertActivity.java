@@ -176,6 +176,7 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
                             displayable
                     );
                 }
+
                 break;
             case HAZARD_RESULT:
                 if (resultCode == RESULT_OK) {
