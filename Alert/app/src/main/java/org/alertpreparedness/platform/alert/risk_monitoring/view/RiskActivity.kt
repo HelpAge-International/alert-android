@@ -9,6 +9,7 @@ import kotlinx.android.synthetic.main.activity_risk.*
 import kotlinx.android.synthetic.main.content_risk.*
 import org.alertpreparedness.platform.alert.MainDrawer
 import org.alertpreparedness.platform.alert.R
+import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity
 import org.alertpreparedness.platform.alert.risk_monitoring.adapter.RiskPagerAdapter
 import org.alertpreparedness.platform.alert.utils.Constants
 import timber.log.Timber
@@ -55,10 +56,9 @@ class RiskActivity : MainDrawer() {
             }
         })
         fabRiskAlert.setOnClickListener({
-            Timber.d("create alert")
             fabRiskMenu.close(true)
             Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).subscribe {
-                //TODO START CREATE ALERT ACTIVITY FROM HERE
+                startActivity(Intent(this, CreateAlertActivity::class.java))
             }
         })
 
