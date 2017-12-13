@@ -36,17 +36,17 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
     private boolean isCountryDirector;
 
 
-    public AlertAdapter(@NonNull HashMap<String, Alert> alertsMap, Context context) {
+    public AlertAdapter(@NonNull HashMap<String, Alert> alertsMap, Context context, OnAlertItemClickedListener listener) {
         super();
 
         this.isCountryDirector = UserInfo.getUser(context).isCountryDirector();
         this.alertsMap = alertsMap;
         this.context = context;
-        if (context != null) {
-            listener = (OnAlertItemClickedListener) context;
-        } else {
-            Log.e(_TAG, "Activity does not support OnAlertListListener interface");
-        }
+//        if (context != null) {
+            this.listener = listener;
+//        } else {
+//            Log.e(_TAG, "Activity does not support OnAlertListListener interface");
+//        }
     }
 
     public AlertAdapter() {

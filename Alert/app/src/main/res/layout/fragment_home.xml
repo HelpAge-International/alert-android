@@ -7,7 +7,7 @@
     android:fitsSystemWindows="true">
 
 
-        <!-- Include Appbar -->
+    <!-- Include Appbar -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -18,14 +18,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <include
+            android:id="@+id/home_main_content"
+            layout="@layout/my_tasks_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
 
     </LinearLayout>
 
-        <!-- Include Home Default Body -->
-        <!--<include-->
-        <!--android:id="@+id/task_empty"-->
-        <!--layout="@layout/empty_adapter" />-->
+    <!-- Include Home Default Body -->
+    <!--<include-->
+    <!--android:id="@+id/task_empty"-->
+    <!--layout="@layout/empty_adapter" />-->
 
 
 </android.support.constraint.ConstraintLayout>

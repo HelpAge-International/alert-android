@@ -1,16 +1,29 @@
 package org.alertpreparedness.platform.alert.dashboard.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.CallSuper;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.StringRes;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -28,8 +41,11 @@ import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
+import org.alertpreparedness.platform.alert.utils.SimpleAdapter;
+import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,6 +59,8 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
     public static final int HAZARD_RESULT = 9003;
 
     protected DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+
+//    private ArrayList<>
 
     @BindView(R.id.btnSaveChanges)
     Button saveButton;
@@ -102,7 +120,7 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
 
     @Override
     public void onItemClicked(int position) {
-        System.out.println("position = [" + position + "]");
+//        System.out.println("position = [" + position + "]");
         switch (position) {
             case 0:
                 startActivityForResult(new Intent(this, HazardSelectionActivity.class), HAZARD_RESULT);
@@ -116,15 +134,62 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
         }
     }
 
+    @Override
+    public void onSubItemRemoved(int positionInParent, int position) {
+        if(positionInParent == 3) {//affected areas
+
+        }
+    }
+
     @CallSuper
     @OnClick(R.id.btnSaveChanges)
     public void onSaveClicked(View v) {
-        if(mFieldsAdapter.isRedAlert()) {
 
+        if(!hasErrors(mFieldsAdapter.isRedAlert())) {
+            saveData(mFieldsAdapter.isRedAlert());
+        }
+
+    }
+
+    protected void saveData(boolean isRedAlert) {
+//        mFieldsAdapter.getModel(2).resultTitle);
+//        mFieldsAdapter.getModel((isRedAlert ? 4 : 3)).strings;
+    }
+
+    protected boolean hasErrors(boolean isRedAlert) {
+        boolean hasError = false;
+
+        if(mFieldsAdapter.getModel(0).resultTitle == null) {
+            SnackbarHelper.show(this, getString(R.string.specify_hazar));
+            hasError = true;
+        }
+        else if(mFieldsAdapter.getModel(1).resultTitle == null) {
+            SnackbarHelper.show(this, getString(R.string.specify_alert_level));
+            hasError = true;
+        }
+        else if(mFieldsAdapter.getModel(2).resultTitle == null) {
+            SnackbarHelper.show(this, getString(R.string.specify_peeps));
+            hasError = true;
+        }
+        else if(isRedAlert && mFieldsAdapter.getModel(3).resultTitle == null) {
+            SnackbarHelper.show(this, getString(R.string.red_alert_specify));
+            hasError = true;
         }
         else {
-
+            if(mFieldsAdapter.getModel(getIndex(isRedAlert, 3)).strings == null || mFieldsAdapter.getModel(getIndex(isRedAlert, 3)).strings.size() == 0) {
+                SnackbarHelper.show(this, getString(R.string.specify_areas));
+                hasError = true;
+            }
+            else if(mFieldsAdapter.getModel(getIndex(isRedAlert, 4)).resultTitle == null) {
+                SnackbarHelper.show(this, getString(R.string.specify_info));
+                hasError = true;
+            }
         }
+        return hasError;
+    }
+
+    protected static int getIndex(boolean isRedAlert, int base) {
+        return (isRedAlert ? base + 1 : base);
     }
 
     @Override
@@ -142,10 +207,12 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
                 addArea(area);
 
                 }
+
                 break;
             case HAZARD_RESULT:
                 if (resultCode == RESULT_OK) {
-                    int hazardType = data.getIntExtra(HazardSelectionActivity.HAZARD_TYPE, 0);
+                    String hazardType = data.getStringExtra(HazardSelectionActivity.HAZARD_TYPE);
+                    mFieldsAdapter.setTextFieldValue(0, hazardType);
                 }
                 break;
         }

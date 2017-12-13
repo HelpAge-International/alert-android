@@ -7,6 +7,7 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
+        android:orientation="horizontal"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_width="match_parent"
@@ -14,13 +15,13 @@
 
         <ImageView
             android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:id="@+id/ivIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <EditText
+        <TextView
             android:layout_marginTop="2dp"
-            android:background="@android:color/transparent"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingTop="@dimen/activity_vertical_margin"
@@ -28,10 +29,10 @@
             android:id="@+id/tvField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="@string/select_hazard"
             android:textColor="@android:color/black"
-            android:textColorHint="@color/hintGray"
-            android:textSize="@dimen/text_size"/>
-
+            android:textSize="15sp"
+            android:drawablePadding="15dip"/>
     </LinearLayout>
 
     <View

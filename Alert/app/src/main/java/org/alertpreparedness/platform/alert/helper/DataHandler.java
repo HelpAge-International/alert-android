@@ -44,10 +44,6 @@ public class DataHandler {
 
     public DatabaseReference database = FirebaseDatabase.getInstance().getReference();
 
-    public void getAlert(AlertCallback callback){
-
-    }
-
     public void getAlertsFromFirebase(IHomeActivity iHome, Context context) {
         countryID = UserInfo.getUser(context).countryID;
         //networkCountryID = UserInfo.getUser(context).networkCountryID;

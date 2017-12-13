@@ -188,6 +188,7 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         positionInParent = (isRedAlert && positionInParent >= 2? positionInParent + 1 : positionInParent);
         items.get(positionInParent).strings.remove(position);
         notifyItemChanged(positionInParent);
+        listener.onSubItemRemoved(positionInParent, position);
     }
 
     @Override
@@ -263,6 +264,8 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     public interface ClickListener {
 
         void onItemClicked(int position);
+
+        void onSubItemRemoved(int positionInParent, int position);
 
     }
 }

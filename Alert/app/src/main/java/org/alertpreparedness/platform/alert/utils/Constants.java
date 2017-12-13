@@ -58,12 +58,6 @@ public final class Constants {
     public static final int REQ_PENDING = 0;
     public static final int REQ_APPROVED = 1;
     public static final int REQ_REJECTED = 2;
-//
-//    public enum ActionType {
-//        chs(0),
-//        mandated(1),
-//        custom(2);
-//    }
 
 
 

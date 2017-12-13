@@ -90,7 +90,6 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
         if(alert.getOtherName() != null){
             mFieldsAdapter.setTextFieldValue(0, alert.getOtherName());
         }else {
-
             for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
                 if (i == alert.getHazardScenario()) {
                     mFieldsAdapter.setTextFieldValue(0, Constants.HAZARD_SCENARIO_NAME[i]);
@@ -136,22 +135,21 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
     }
 
     @Override
-    public void onSaveClicked(View v) {
+    public void saveData(boolean isRedAlert) {
 
         int alertLevel = levelNew == -1? (int) alert.getAlertLevel() : levelNew;
         long population = Long.parseLong(mFieldsAdapter.getModel(mFieldsAdapter.isRedAlert() ? 3 : 2).resultTitle);
         String info = mFieldsAdapter.getModel(mFieldsAdapter.isRedAlert() ?  5 : 4).resultTitle;
 
-        if(mFieldsAdapter.isRedAlert()) {
+        if(isRedAlert) {
             String reason = mFieldsAdapter.getModel(2).resultTitle;
             System.out.println("Level: "+ alertLevel +" Reason: "+ reason+ " Population: "+ population + " Info: "+ info);
             update(alertLevel, reason, population, affectedAreas, info);
-        }else if (alert.getAlertLevel() == 1){
+        }
+        else if (alert.getAlertLevel() == 1){
             update(alertLevel, null, population, affectedAreas, info);
             System.out.println("Level: "+ alertLevel );
         }
-
-        super.onSaveClicked(v);
 
     }
 
