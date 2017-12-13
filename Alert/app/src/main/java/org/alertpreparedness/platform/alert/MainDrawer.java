@@ -26,12 +26,18 @@ import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlanFragment;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.RiskFragment;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
+import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
+
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
 
 public class MainDrawer extends BaseActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
+
+    private int mCurrentItem = R.id.nav_home;
 
     public enum ActionBarState {
         ALERT,
@@ -180,33 +186,37 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         drawerLayout.closeDrawers();
-        switch (item.getItemId()) {
-            case R.id.nav_home:
-//                Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x->{
-//                    setFragment(new HomeFragment());
-//                });
-                setFragment(new HomeFragment());
-                break;
-            case R.id.nav_risk:
-//                Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x->{
-//                    startActivity(RiskFragment.RiskIntent.getIntent(MainDrawer.this));
-//                });
-                setFragment(new RiskFragment());
-                break;
-            case R.id.nav_logout:
-                PreferHelper.getInstance(getApplicationContext()).edit().remove(UserInfo.PREFS_USER).apply();
-                mUserInfo.clearAll();
-                firebaseAuth.signOut();
-                startActivity(new Intent(getApplicationContext(), LoginScreen.class));
-                finish();
-                clearAllActivities();
-//                        PreferHelper.getInstance(MainDrawer.this).edit().remove(UserInfo.PREFS_USER).apply();
-//                        finish();
-                break;
-            case R.id.nav_response:
-                setFragment(new ResponsePlanFragment());
-                break;
+        if(mCurrentItem != item.getItemId()) {
+            switch (item.getItemId()) {
+                case R.id.nav_home:
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x->{
+                        setFragment(new HomeFragment());
+                    });
+    //                setFragment(new HomeFragment());
+                    break;
+                case R.id.nav_risk:
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x->{
+                        setFragment(new RiskFragment());
+                    });
+                    break;
+                case R.id.nav_logout:
+                    PreferHelper.getInstance(getApplicationContext()).edit().remove(UserInfo.PREFS_USER).apply();
+                    mUserInfo.clearAll();
+                    firebaseAuth.signOut();
+                    startActivity(new Intent(getApplicationContext(), LoginScreen.class));
+                    finish();
+                    clearAllActivities();
+    //                        PreferHelper.getInstance(MainDrawer.this).edit().remove(UserInfo.PREFS_USER).apply();
+    //                        finish();
+                    break;
+                case R.id.nav_response:
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> {
+                        setFragment(new ResponsePlanFragment());
+                    });
+                    break;
 
+            }
+            mCurrentItem = item.getItemId();
         }
         return false;
     }
