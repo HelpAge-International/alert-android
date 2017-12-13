@@ -25,7 +25,7 @@ class RiskActivity : MainDrawer() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        onCreateDrawer(R.layout.activity_risk)
+//        onCreateDrawer(R.layout.activity_risk)
         initView()
         initListeners()
     }

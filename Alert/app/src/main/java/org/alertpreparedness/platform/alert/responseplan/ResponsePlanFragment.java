@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 
 import java.util.ArrayList;
@@ -35,6 +36,9 @@ public class ResponsePlanFragment extends Fragment implements ResponsePlansAdapt
         ButterKnife.bind(this, v);
 
         initViews();
+
+        ((MainDrawer)getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.NORMAL, R.string.response_plans);
+
         return v;
     }
 

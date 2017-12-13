@@ -139,5 +139,6 @@
     <string name="last_updated_f">Last updated: %s</string>
     <string name="txt_red_requested">Red alert requested</string>
     <string name="txt_cd_red_request">Red alert request requires your action</string>
+    <string name="response_plans">Respone Plans</string>
 
 </resources>
