@@ -1,7 +1,7 @@
 package org.alertpreparedness.platform.alert.interfaces;
 
-import org.alertpreparedness.platform.alert.model.Alert;
-import org.alertpreparedness.platform.alert.model.Tasks;
+import org.alertpreparedness.platform.alert.dashboard.model.Alert;
+import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 
 /**
  * Created by faizmohideen on 28/11/2017.

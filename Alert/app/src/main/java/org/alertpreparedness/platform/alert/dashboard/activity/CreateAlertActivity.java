@@ -1,29 +1,16 @@
 package org.alertpreparedness.platform.alert.dashboard.activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.CallSuper;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.StringRes;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.text.InputType;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -36,15 +23,13 @@ import org.alertpreparedness.platform.alert.dashboard.adapter.AlertFieldsAdapter
 import org.alertpreparedness.platform.alert.dashboard.model.AlertFieldModel;
 import org.alertpreparedness.platform.alert.helper.AlertLevelDialog;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
-import org.alertpreparedness.platform.alert.model.Alert;
+import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
-import org.alertpreparedness.platform.alert.utils.SimpleAdapter;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

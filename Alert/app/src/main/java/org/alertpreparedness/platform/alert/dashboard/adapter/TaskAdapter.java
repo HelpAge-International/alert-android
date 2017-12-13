@@ -2,7 +2,6 @@ package org.alertpreparedness.platform.alert.dashboard.adapter;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
-import org.alertpreparedness.platform.alert.model.Tasks;
+import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;

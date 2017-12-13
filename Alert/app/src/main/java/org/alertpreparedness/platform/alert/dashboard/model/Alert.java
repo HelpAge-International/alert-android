@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.model;
+package org.alertpreparedness.platform.alert.dashboard.model;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;

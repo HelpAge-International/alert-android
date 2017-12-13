@@ -1,6 +1,6 @@
 package org.alertpreparedness.platform.alert.helper;
 
-import org.alertpreparedness.platform.alert.model.Alert;
+import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 
 /**
  * Created by am2230 on 10/12/2017.

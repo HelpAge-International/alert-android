@@ -3,7 +3,6 @@ package org.alertpreparedness.platform.alert.dashboard.activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 
@@ -14,7 +13,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
-import org.alertpreparedness.platform.alert.model.Alert;
+import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity;
 import org.alertpreparedness.platform.alert.utils.Constants;

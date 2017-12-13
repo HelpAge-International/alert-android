@@ -13,13 +13,11 @@ import android.widget.TextView;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
-import org.alertpreparedness.platform.alert.interfaces.iRedAlertRequest;
-import org.alertpreparedness.platform.alert.model.Alert;
+import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 

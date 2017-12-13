@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.model.Tasks;
 
 
 /**
