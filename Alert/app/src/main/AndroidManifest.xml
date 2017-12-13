@@ -39,12 +39,12 @@
             android:resource="@array/preloaded_fonts" />
 
         <activity android:name=".MainDrawer" />
-        <activity
-            android:name=".risk_monitoring.view.RiskActivity"
-            android:label="@string/title_activity_risk"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+        <!--<activity-->
+            <!--android:name=".risk_monitoring.vRiskFragmentvity"-->
+            <!--android:label="@string/title_activity_risk"-->
+            <!--android:launchMode="singleTask"-->
+            <!--android:screenOrientation="portrait"-->
+            <!--android:theme="@style/AppTheme.NoActionBar" />-->
         <activity
             android:name=".risk_monitoring.view.AddIndicatorActivity"
             android:label="@string/title_activity_add_indicator"

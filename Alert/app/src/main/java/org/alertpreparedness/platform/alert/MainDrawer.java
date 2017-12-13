@@ -24,16 +24,12 @@ import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.home.HomeFragment;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlanFragment;
-import org.alertpreparedness.platform.alert.risk_monitoring.view.RiskActivity;
+import org.alertpreparedness.platform.alert.risk_monitoring.view.RiskFragment;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
-import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
-
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Observable;
 
 public class MainDrawer extends BaseActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
@@ -91,14 +87,21 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+    public void removeActionbarElevation() {
+        normalActionbarContainer.setCardElevation(0);
+        alertActionbarContainer.setCardElevation(0);
+    }
+
     public void toggleActionBar(ActionBarState type) {
         switch (type) {
             case ALERT:
                 alertActionbarContainer.setVisibility(View.VISIBLE);
                 normalActionbarContainer.setVisibility(View.GONE);
+                alertActionbarContainer.setCardElevation(6);
                 setSupportActionBar(alertToolbar);
                 break;
             case NORMAL:
+                normalActionbarContainer.setCardElevation(6);
                 alertActionbarContainer.setVisibility(View.GONE);
                 normalActionbarContainer.setVisibility(View.VISIBLE);
                 setSupportActionBar(normalToolbar);
@@ -122,6 +125,7 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                 appBarTitle.setBackgroundResource(bg);
                 break;
             case NORMAL:
+                assert getSupportActionBar() != null;
                 getSupportActionBar().setTitle(title);
                 break;
         }
@@ -134,6 +138,7 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                 appBarTitle.setText(title);
                 break;
             case NORMAL:
+                assert getSupportActionBar() != null;
                 getSupportActionBar().setTitle(title);
                 break;
         }
@@ -183,9 +188,10 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                 setFragment(new HomeFragment());
                 break;
             case R.id.nav_risk:
-                Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x->{
-                    startActivity(RiskActivity.RiskIntent.getIntent(MainDrawer.this));
-                });
+//                Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x->{
+//                    startActivity(RiskFragment.RiskIntent.getIntent(MainDrawer.this));
+//                });
+                setFragment(new RiskFragment());
                 break;
             case R.id.nav_logout:
                 PreferHelper.getInstance(getApplicationContext()).edit().remove(UserInfo.PREFS_USER).apply();
