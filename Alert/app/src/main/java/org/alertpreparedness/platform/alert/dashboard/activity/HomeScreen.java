@@ -1,9 +1,13 @@
 package org.alertpreparedness.platform.alert.dashboard.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -11,7 +15,9 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,12 +32,14 @@ import org.alertpreparedness.platform.alert.helper.DataHandler;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
+import org.alertpreparedness.platform.alert.interfaces.iRedAlertRequest;
 import org.alertpreparedness.platform.alert.model.Alert;
 import org.alertpreparedness.platform.alert.model.Tasks;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import io.reactivex.disposables.CompositeDisposable;
@@ -40,6 +48,9 @@ import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetai
 
 
 public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAlertItemClickedListener, IHomeActivity, FirebaseAuth.AuthStateListener {
+
+
+
     private static final int STORAGE_RC = 0x0013;
     private RecyclerView myTaskRecyclerView;
     private Toolbar toolbar;
@@ -50,8 +61,14 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
     public List<Tasks> tasksList;
     public TextView appBarTitle;
     public AlertAdapter alertAdapter;
-    public List<Alert> alertList;
+    public HashMap<String, Alert> alertList;
     public RecyclerView alertRecyclerView;
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +76,6 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         super.onCreateDrawer(R.layout.activity_home_screen);
 
         FirebaseAuth.getInstance().addAuthStateListener(this);
-        AlertAdapter.updateActivity(this);
-
         toolbar = (Toolbar) findViewById(R.id.alert_appbar);
         setSupportActionBar(toolbar);
 
@@ -68,11 +83,8 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        boolean cdornot = UserInfo.getUser(this).isCountryDirector();
-        System.out.println("CD or Not: " + cdornot);
-
-//        appBarTitle = (TextView) findViewById(R.id.custom_bar_title);
-//        appBarTitle.setOnClickListener(this);
+        appBarTitle = (TextView) findViewById(R.id.custom_bar_title);
+        appBarTitle.setOnClickListener(this);
 
         alertRecyclerView = (RecyclerView) findViewById(R.id.alert_list_view);
         alertRecyclerView.setHasFixedSize(true);
@@ -81,8 +93,8 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
         alertRecyclerView.setItemAnimator(new DefaultItemAnimator());
         alertRecyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayoutManager.VERTICAL));
 
-        alertList = new ArrayList<>();
-        alertAdapter = new AlertAdapter(alertList);
+        alertList = new HashMap<>();
+        alertAdapter = new AlertAdapter(alertList, this);
         alertRecyclerView.setAdapter(alertAdapter);
 
         myTaskRecyclerView = (RecyclerView) findViewById(R.id.tasks_list_view);
@@ -156,8 +168,33 @@ public class HomeScreen extends MainDrawer implements View.OnClickListener, OnAl
     }
 
     @Override
-    public void addAlert(Alert alert) {
-        alertAdapter.add(alert);
+    public void updateAlert(String id, Alert alert) {
+        Log.e("HOME", id);
+        alertAdapter.update(id, alert);
+
+        updateTitle();
+    }
+
+    private void updateTitle() {
+        boolean redPresent = false;
+        for(Alert a: alertAdapter.getAlerts()){
+            if (a.getAlertLevel() == 2){
+                redPresent = true;
+                break;
+            }
+        }
+        if (redPresent){
+            updateTitle(R.string.red_alert_level, R.drawable.alert_red_main);
+        } else {
+            updateTitle(R.string.amber_alert_level, R.drawable.alert_amber_main);
+        }
+    }
+
+    @Override
+    public void removeAlert(String id) {
+        alertAdapter.remove(id);
+
+        updateTitle();
     }
 
     @Override

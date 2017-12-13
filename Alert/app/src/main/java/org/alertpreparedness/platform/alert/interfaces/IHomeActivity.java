@@ -8,7 +8,8 @@ import org.alertpreparedness.platform.alert.model.Tasks;
  */
 
 public interface IHomeActivity {
-    void addAlert(Alert alert);
+    void updateAlert(String id, Alert alert);
+    void removeAlert(String id);
     void addTask(Tasks tasks);
     void updateTitle(int stringResource, int backgroundResource);
 }

@@ -2,66 +2,43 @@ package org.alertpreparedness.platform.alert.dashboard.activity;
 
 import android.content.Intent;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.dashboard.adapter.AlertFieldsAdapter;
-import org.alertpreparedness.platform.alert.dashboard.model.AlertFieldModel;
-import org.alertpreparedness.platform.alert.helper.AlertLevelDialog;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
-import org.alertpreparedness.platform.alert.interfaces.iRedAlertRequest;
 import org.alertpreparedness.platform.alert.model.Alert;
+import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.DBListener;
-import org.alertpreparedness.platform.alert.utils.FirebaseHelper;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity.EXTRA_ALERT;
 
-public class UpdateAlertActivity extends CreateAlertActivity {
+public class UpdateAlertActivity extends CreateAlertActivity  {
 
-    private Alert alert;
     private DBListener dbListener = new DBListener();
-    private DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+    private List<AffectedArea> affectedAreas = new ArrayList<>();
+    private String countryID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mToolbar.setTitle(R.string.update_alert);
-
-        if (alert == null){
-            Intent intent = getIntent();
-            alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
-        }
+        countryID = UserInfo.getUser(this).countryID;
 
         fetchDetails();
         setUpActionBarColour();
@@ -83,24 +60,58 @@ public class UpdateAlertActivity extends CreateAlertActivity {
         }
     }
 
+    int hazardNew = -1;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case EFFECTED_AREA_REQUEST:
+                if (resultCode == RESULT_OK) {
+                    ModelIndicatorLocation area = data.getParcelableExtra("selected_area");
+                    String displayable = data.getStringExtra("selected_area_text");
+
+                    mFieldsAdapter.addSubListValue(
+                            3,
+                            displayable
+                    );
+                    addArea(area);
+
+                }
+                break;
+            case HAZARD_RESULT:
+                if (resultCode == RESULT_OK) {
+                    hazardNew = data.getIntExtra(HazardSelectionActivity.HAZARD_TYPE, 0);
+                }
+                break;
+        }
+    }
+
     private void fetchDetails() {
-        for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
-            if(i == alert.getHazardScenario()) {
-                mFieldsAdapter.setTextFieldValue(0, Constants.HAZARD_SCENARIO_NAME[i]);
+
+        if(alert.getOtherName() != null){
+            mFieldsAdapter.setTextFieldValue(0, alert.getOtherName());
+        }else {
+
+            for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
+                if (i == alert.getHazardScenario()) {
+                    mFieldsAdapter.setTextFieldValue(0, Constants.HAZARD_SCENARIO_NAME[i]);
+                }
             }
         }
 
-        if(alert.getAlertLevel() == 1){
-            mFieldsAdapter.setTextFieldValue(1, R.drawable.amber_dot_26dp, "Amber Alert" );
-        }else if (alert.getAlertLevel() == 2){
-            mFieldsAdapter.setTextFieldValue(1, R.drawable.red_dot_26dp, "Red Alert" );
+        int alertLevel = levelNew == -1 ? (int) alert.getAlertLevel() : levelNew;
+
+        if (alertLevel == 1) {
+            mFieldsAdapter.setTextFieldValue(1, R.drawable.amber_dot_26dp, "Amber Alert");
+        } else if (alertLevel == 2) {
+            mFieldsAdapter.setTextFieldValue(1, R.drawable.red_dot_26dp, "Red Alert");
         }
 
-        mFieldsAdapter.setTextFieldValue(2, alert.getPopulation()+"");
+        mFieldsAdapter.setTextFieldValue(2, alert.getPopulation() + "");
 
-        for(int i = 0; i < Constants.COUNTRIES.length; i++){
-            if(alert.getCountry() == i){
-                mFieldsAdapter.addSubListValue(3,Constants.COUNTRIES[i] );
+        for (int i = 0; i < Constants.COUNTRIES.length; i++) {
+            if (alert.getCountry() == i) {
+                mFieldsAdapter.addSubListValue(3, Constants.COUNTRIES[i]);
             }
         }
 
@@ -109,14 +120,14 @@ public class UpdateAlertActivity extends CreateAlertActivity {
 
     private void setUpActionBarColour() {
         Window window = getWindow();
-        if(alert.getAlertLevel() == 1){
+        if (alert.getAlertLevel() == 1) {
             mToolbar.setBackgroundResource(R.color.alertAmber);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setStatusBarColor(getResources().getColor(R.color.sBar_Amber));
             }
 
-        }else if(alert.getAlertLevel() == 2){
+        } else if (alert.getAlertLevel() == 2) {
             mToolbar.setBackgroundResource(R.color.alertRed);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -128,49 +139,85 @@ public class UpdateAlertActivity extends CreateAlertActivity {
     @Override
     public void saveData(boolean isRedAlert) {
 
-        String hName = mFieldsAdapter.getModel(0).resultTitle;
-        String hType = mFieldsAdapter.getModel(1).resultTitle;
-        String population = mFieldsAdapter.getModel(2).resultTitle;
-        List<String> areas = mFieldsAdapter.getModel(3).strings;
-        String info = mFieldsAdapter.getModel(4).resultTitle;
+        int alertLevel = levelNew == -1? (int) alert.getAlertLevel() : levelNew;
+        long population = Long.parseLong(mFieldsAdapter.getModel(mFieldsAdapter.isRedAlert() ? 3 : 2).resultTitle);
+        String info = mFieldsAdapter.getModel(mFieldsAdapter.isRedAlert() ?  5 : 4).resultTitle;
 
-        update(hName, hType, population, areas, info);
-    }
-
-    private void update(String hName, String hType, String population, List<String> areas, String info) {
-        String countryID = UserInfo.getUser(UpdateAlertActivity.this).countryID;
-        String[] usersID = new String[]{countryID};
-        String mAppStatus = PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS);
-        ValueEventListener valueEventListener;
-
-//        for (String ids : usersID) {
-//            String key = database.child(mAppStatus).child("alert").child(ids).push().getKey();
-//
-//            System.out.println("KEY: " + key);
-//        }
-        for (String ids : usersID) {
-            DatabaseReference db = database.child(mAppStatus).child("alert").child(ids);
-            db.addListenerForSingleValueEvent(valueEventListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    try {
-                        //dataSnapshot.child()
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-            db.addValueEventListener(valueEventListener);
-            dbListener.add(db, valueEventListener);
+        if(mFieldsAdapter.isRedAlert()) {
+            String reason = mFieldsAdapter.getModel(2).resultTitle;
+            System.out.println("Level: "+ alertLevel +" Reason: "+ reason+ " Population: "+ population + " Info: "+ info);
+            update(alertLevel, reason, population, affectedAreas, info);
+        }
+        else if (alert.getAlertLevel() == 1){
+            update(alertLevel, null, population, affectedAreas, info);
+            System.out.println("Level: "+ alertLevel );
         }
 
-        backToDetailView();
     }
+
+    @Override
+    public void onTypeSelected(int type) {
+        switch (type) {
+            case 1:
+                mFieldsAdapter.removeRedReason();
+                alert.setAlertLevel(1);
+                break;
+//            case 2:
+//                alert.setRedAlertRequested(2);
+//            default:
+//                mFieldsAdapter.removeRedReason();
+//                alert.setAlertLevel(0);
+//                break;
+        }
+        super.onTypeSelected(type);
+    }
+
+    private void update(int alertLevel, String reason, long population, List<AffectedArea> areas, String info) {
+        String countryID = UserInfo.getUser(UpdateAlertActivity.this).countryID;
+        String mAppStatus = PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS);
+        DatabaseReference db = database.child(mAppStatus).child("alert").child(countryID)
+                .child(alert.getId());
+
+           db.addListenerForSingleValueEvent(new ValueEventListener() {
+               @Override
+               public void onDataChange(DataSnapshot dataSnapshot) {
+
+                   db.child("alertLevel").setValue(alertLevel).addOnCompleteListener(task -> backToDetailView());
+
+                   for (int i = 0; i < areas.size(); i++) {
+                       db.child("affectedAreas").child(String.valueOf(i))
+                               .setValue(areas.get(i));
+                   }
+
+                   if (reason != null) {
+                       alert.setAlertLevel(1);
+                       db.child("reasonForRedAlert").setValue(reason);
+                       db.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_PENDING);
+                   }else{
+                       db.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_REJECTED);
+                   }
+
+                   long time = System.currentTimeMillis();
+                   db.child("timeUpdated").setValue(time);
+
+                   db.child("infoNotes").setValue(info);
+                   db.child("estimatedPopulation").setValue(population);
+
+//        db.child("affectedAreas").removeValue((databaseError, databaseReference) -> {
+//            for (int i = 0; i < areas.size(); i++) {
+//                db.child("affectedAreas").child(String.valueOf(i))
+//                        .setValue(areas.get(i));
+//            }
+//        });
+               }
+
+               @Override
+               public void onCancelled(DatabaseError databaseError) {
+
+               }
+           });
+    }
+
 
     public void backToDetailView() {
 
@@ -184,8 +231,7 @@ public class UpdateAlertActivity extends CreateAlertActivity {
             } else {
                 SnackbarHelper.show(this, getString(R.string.txt_reason_for_red));
             }
-
-        }else{
+        } else {
             startActivity(intent);
         }
     }
@@ -199,7 +245,7 @@ public class UpdateAlertActivity extends CreateAlertActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (alert == null){
+        if (alert == null) {
             Intent intent = getIntent();
             alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
         }

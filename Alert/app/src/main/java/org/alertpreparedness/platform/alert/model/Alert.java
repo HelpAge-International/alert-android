@@ -12,6 +12,7 @@ import java.util.Map;
  */
 
 public class Alert implements Serializable{
+    private String id;
     public long alertLevel;
     private long numOfAreas;
     private long hazardScenario;
@@ -20,6 +21,7 @@ public class Alert implements Serializable{
     private long level2;
     private long population;
     private long timeUpdated;
+    private long redAlertRequested;
     private String updated;
     private String info;
     private String otherName;
@@ -27,19 +29,33 @@ public class Alert implements Serializable{
     private String updatedBy;
     private DatabaseReference dbRef;
 
+
     public Alert(DatabaseReference dbRef) {
         this.dbRef = dbRef;
     }
 
-    public Alert(long alertLevel, long hazardScenario, long population, long numOfAreas, String info, String updated, String otherName) {
+    public Alert(long alertLevel, long hazardScenario, long population, long numOfAreas, long redAlertRequested, String info, String updated, String otherName) {
         this.alertLevel = alertLevel;
         this.hazardScenario = hazardScenario;
         this.population = population;
         this.numOfAreas = numOfAreas;
+        this.redAlertRequested = redAlertRequested;
         this.info = info;
         this.updated = updated;
         this.otherName = otherName;
     }
+
+//    public Alert(long alertLevel, long hazardScenario, long population, long numOfAreas,
+//                 String info, String updated, String otherName, long redAlertRequested) {
+//        this.alertLevel = alertLevel;
+//        this.hazardScenario = hazardScenario;
+//        this.population = population;
+//        this.numOfAreas = numOfAreas;
+//        this.info = info;
+//        this.updated = updated;
+//        this.otherName = otherName;
+//        this.redAlertRequested = redAlertRequested;
+//    }
 
     public Alert(long country, long level1, long level2) {
         this.country = country;
@@ -52,6 +68,15 @@ public class Alert implements Serializable{
     }
 
     public Alert() {
+    }
+
+    @Exclude
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getUpdated() {
@@ -165,6 +190,38 @@ public class Alert implements Serializable{
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
+
+    public long getRedAlertRequested() {
+        return redAlertRequested;
+    }
+
+    public void setRedAlertRequested(long redAlertRequested) {
+        this.redAlertRequested = redAlertRequested;
+    }
+
+    @Override
+    public String toString() {
+        return "Alert{" +
+                "id='" + id + '\'' +
+                ", alertLevel=" + alertLevel +
+                ", numOfAreas=" + numOfAreas +
+                ", hazardScenario=" + hazardScenario +
+                ", country=" + country +
+                ", level1=" + level1 +
+                ", level2=" + level2 +
+                ", population=" + population +
+                ", timeUpdated=" + timeUpdated +
+                ", updated='" + updated + '\'' +
+                ", info='" + info + '\'' +
+                ", otherName='" + otherName + '\'' +
+                ", reason='" + reason + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", redAlertRequested=" + redAlertRequested +
+                ", dbRef=" + dbRef +
+                '}';
+    }
+
+
 
     @Exclude
     public Map<String, Object> toMap() {

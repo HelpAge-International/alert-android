@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.alert.helper;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -43,6 +44,10 @@ public class DataHandler {
 
     public DatabaseReference database = FirebaseDatabase.getInstance().getReference();
 
+    public void getAlert(AlertCallback callback){
+
+    }
+
     public void getAlertsFromFirebase(IHomeActivity iHome, Context context) {
         countryID = UserInfo.getUser(context).countryID;
         //networkCountryID = UserInfo.getUser(context).networkCountryID;
@@ -54,29 +59,41 @@ public class DataHandler {
 
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    getAlert(dataSnapshot, ids);
+                    iHome.updateTitle(R.string.amber_alert_level, R.drawable.alert_amber_main);   // alerts.add((int) alertLevel);
+                    //setRedActionBar(iHome, alerts.contains(2));
+
+                }
+
+                private void getAlert(DataSnapshot dataSnapshot, String ids) {
                     if (dataSnapshot.child("alertLevel").getValue() != null) {
                         long alertLevel = (long) dataSnapshot.child("alertLevel").getValue();
-                        Alert a = new Alert(db);
+                        String id = dataSnapshot.getKey();
 
                         if (alertLevel != 0) {
                             long numberOfAreas = dataSnapshot.child("affectedAreas").getChildrenCount();
+                            Log.e("f",id+" "+numberOfAreas);
                             long country = (long) dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("country").getValue();
                             long hazardScenario = (long) dataSnapshot.child("hazardScenario").getValue();
                             long population = (long) dataSnapshot.child("estimatedPopulation").getValue();
+                            long redStatus = (long) dataSnapshot.child("approval").child("countryDirector").child(ids).getValue();
                             String info = (String) dataSnapshot.child("infoNotes").getValue();
 
-                            if (dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("level1").getValue() != null) {
-                                if (country >= 0) {
-                                    long level1 = (long) dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("level1").getValue();
+//                            long timeUpdated = dataSnapshot.child("timeUpdated").exists() ?
+//                                    (long) dataSnapshot.child("timeUpdated").getValue() : 0;
 
-                                    if (level1 != -1) {
-                                        long level2 = (long) dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("level2").getValue();
-                                        Alert alert = new Alert(country, level1, level2);
-                                    }
-                                }
-                            } else {
-                                Alert alert = new Alert(country);
-                            }
+//                            if (dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("level1").getValue() != null) {
+//                                if (country >= 0) {
+//                                    long level1 = (long) dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("level1").getValue();
+//
+//                                    if (level1 != -1) {
+//                                        long level2 = (long) dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("level2").getValue();
+//                                        Alert alert = new Alert(country, level1, level2);
+//                                    }
+//                                }
+//                            } else {
+//                                Alert alert = new Alert(country);
+//                            }
 
                             if (dataSnapshot.child("timeUpdated").exists()) {
                                 long updated = (long) dataSnapshot.child("timeUpdated").getValue();
@@ -84,20 +101,17 @@ public class DataHandler {
                                 String updatedDay = format.format(date.getTime());
 
                                 if (hazardScenario != -1) {
-                                    Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas, info, updatedDay, null);
+                                    Alert alert = new Alert(alertLevel, hazardScenario, population,
+                                            numberOfAreas, redStatus, info, updatedDay, null);
+                                    alert.setId(id);
 
-                                    iHome.updateTitle(R.string.amber_alert_level, R.drawable.alert_amber_main);
-
-                                    alerts.add((int) alertLevel);
-                                    setRedActionBar(iHome, alerts.contains(2));
-
-                                    iHome.addAlert(alert);
+                                    iHome.updateAlert(dataSnapshot.getKey(), alert);
                                 } else if (dataSnapshot.child("otherName").exists()) {
                                     String nameId = (String) dataSnapshot.child("otherName").getValue();
                                     long level1 = alert.getLevel1();
                                     long level2 = alert.getLevel2();
-                                    System.out.println("L1: " + level1 + " L2: " + level2 + " Country: " + country);
-                                    setOtherName(iHome, nameId, alertLevel, hazardScenario, numberOfAreas, population, country, level1, level2, info, updatedDay);
+                                    setOtherName(iHome, nameId, alertLevel, hazardScenario, numberOfAreas,
+                                            redStatus, population, country, level1, level2, info, updatedDay);
                                 }
 
                             } else if (dataSnapshot.child("timeCreated").exists()) {
@@ -106,36 +120,33 @@ public class DataHandler {
                                 String updatedDay = format.format(date.getTime());
 
                                 if (hazardScenario != -1) {
-                                    Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas, info, updatedDay, null);
+                                    Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas,
+                                            redStatus, info, updatedDay, null);
+                                    alert.setId(id);
 
-                                    iHome.updateTitle(R.string.amber_alert_level, R.drawable.alert_amber_main);
-
-                                    alerts.add((int) alertLevel);
-                                    setRedActionBar(iHome, alerts.contains(2));
-
-                                    iHome.addAlert(alert);
+                                    iHome.updateAlert(dataSnapshot.getKey(), alert);
                                 } else if (dataSnapshot.child("otherName").exists()) {
                                     String nameId = (String) dataSnapshot.child("otherName").getValue();
                                     long level1 = alert.getLevel1();
                                     long level2 = alert.getLevel2();
 
-                                    setOtherName(iHome, nameId, alertLevel, hazardScenario, numberOfAreas, population, country, level1, level2, info, updatedDay);
+                                    setOtherName(iHome, nameId, alertLevel, hazardScenario, numberOfAreas,
+                                            redStatus, population, country, level1, level2, info, updatedDay);
                                 }
                             }
-
                         }
                     }
-
                 }
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+                    Log.e("CHANGED", dataSnapshot.getKey());
+                    getAlert(dataSnapshot, ids);
                 }
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                    iHome.removeAlert(dataSnapshot.getKey());
                 }
 
                 @Override
@@ -154,14 +165,16 @@ public class DataHandler {
         }
     }
 
-    private void setOtherName(IHomeActivity iHome, String nameId, long alertLevel, long hazardScenario, long numOfAreas, long population, long country, long level1, long level2, String info, String updatedDay) {
+    private void setOtherName(IHomeActivity iHome, String nameId, long alertLevel, long hazardScenario, long numOfAreas,
+                              long redStatus, long population, long country, long level1, long level2, String info, String updatedDay) {
         ValueEventListener valueEventListener = new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(DataSnapshot dataSnapshot) { //TODO signle event listener
                 String name = (String) dataSnapshot.child("name").getValue();
-                Alert alert = new Alert(alertLevel, hazardScenario, population, numOfAreas, updatedDay, info, name);
+                Alert alert = new Alert(alertLevel, hazardScenario, population, numOfAreas, redStatus, info, updatedDay, name);
                 Alert alert1 = new Alert(country, level1, level2);
-                iHome.addAlert(alert);
+                alert.setId(dataSnapshot.getKey());
+                iHome.updateAlert(dataSnapshot.getKey(), alert);
             }
 
             @Override
@@ -269,12 +282,6 @@ public class DataHandler {
                     dbListener.add(db, childEventListener);
                 }
             }
-        }
-    }
-
-    private void setRedActionBar(IHomeActivity iHome, boolean isRedExists) {
-        if (isRedExists) {
-            iHome.updateTitle(R.string.red_alert_level, R.drawable.alert_red_main);
         }
     }
 

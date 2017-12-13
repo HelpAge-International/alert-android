@@ -247,6 +247,12 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         notifyDataSetChanged();
     }
 
+    public int getSubListCapacity(int index){
+        index = (isRedAlert && index >= 2? index + 1 : index);
+        AlertFieldModel m = items.get(index);
+        return m.strings.size();
+    }
+
     public AlertFieldModel getModel(int i) {
         return items.get(i);
     }
