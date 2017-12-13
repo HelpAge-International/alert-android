@@ -23,7 +23,6 @@
 
         <TextView
             android:layout_marginTop="@dimen/activity_horizontal_margin"
-            android:text="Cyclone"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:id="@+id/tvHazardType"
@@ -36,7 +35,6 @@
             android:id="@+id/tvPercentComplete"
             android:layout_alignParentRight="true"
             android:layout_marginTop="@dimen/activity_horizontal_margin"
-            android:text="90% complete"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             tools:ignore="RtlHardcoded" />
@@ -45,7 +43,6 @@
             android:layout_alignParentLeft="true"
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:layout_below="@+id/tvHazardType"
-            android:text="qwfdsvq   ewrhfgm qwfghwqrer2qe"
             android:id="@+id/tvDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -55,7 +52,6 @@
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/tvDescription"
-            android:src="@color/alertRed"
             android:id="@+id/ivStatusIcon"
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -68,7 +64,6 @@
             android:layout_marginLeft="@dimen/activity_horizontal_margin_half"
             android:layout_below="@+id/tvDescription"
             android:layout_toRightOf="@+id/ivStatusIcon"
-            android:textColor="@color/alertRed"
             android:id="@+id/tvStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

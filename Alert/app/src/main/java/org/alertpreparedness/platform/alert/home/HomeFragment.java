@@ -9,18 +9,15 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-import org.alertpreparedness.platform.alert.BaseActivity;
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity;
-import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.helper.DataHandler;
@@ -28,11 +25,8 @@ import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.alert.model.Alert;
 import org.alertpreparedness.platform.alert.model.Tasks;
-import org.alertpreparedness.platform.alert.responseplan.ResponsePlanObj;
-import org.alertpreparedness.platform.alert.responseplan.ResponsePlansAdapter;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 

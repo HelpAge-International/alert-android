@@ -41,7 +41,7 @@ public class AlertApplication extends Application {
     @SuppressLint("StaticFieldLeak")
     private static Context sContext;
 
-    public static List<Activity> mActivities = new ArrayList<>();
+//    public static List<Activity> mActivities = new ArrayList<>();
 
     @Override
     public void onCreate() {

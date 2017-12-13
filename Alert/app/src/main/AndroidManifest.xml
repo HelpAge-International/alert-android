@@ -30,7 +30,7 @@
             android:name=".login.activity.LoginScreen"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".dashboard.activity.HomeScreen"
+            android:name=".home.HomeScreen"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
 
@@ -66,14 +66,14 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".dashboard.activity.AlertDetailActivity"
-            android:parentActivityName=".dashboard.activity.HomeScreen"
+            android:parentActivityName=".home.HomeScreen"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
             android:theme="@style/AppTheme.NoActionBar"
-            android:value=".dashboard.activity.HomeScreen" />
+            android:value=".home.HomeScreen" />
 
         <activity
             android:name=".risk_monitoring.view.UpdateIndicatorActivity"

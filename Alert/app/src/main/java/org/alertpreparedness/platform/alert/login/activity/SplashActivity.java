@@ -3,14 +3,10 @@ package org.alertpreparedness.platform.alert.login.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import org.alertpreparedness.platform.alert.BaseActivity;
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
+import org.alertpreparedness.platform.alert.home.HomeScreen;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 
 public class SplashActivity extends BaseActivity {

@@ -205,7 +205,7 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                     firebaseAuth.signOut();
                     startActivity(new Intent(getApplicationContext(), LoginScreen.class));
                     finish();
-                    clearAllActivities();
+//                    clearAllActivities();
     //                        PreferHelper.getInstance(MainDrawer.this).edit().remove(UserInfo.PREFS_USER).apply();
     //                        finish();
                     break;
