@@ -307,7 +307,7 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
             default:
                 mFieldsAdapter.removeRedReason();
                 icon = R.drawable.alert_green_icon;
-                title = getString(R.string.text_green);
+                title = getString(R.string.green_alert_text);
                 break;
         }
         mFieldsAdapter.setTextFieldValue(1, icon, title);

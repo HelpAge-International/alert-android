@@ -11,6 +11,7 @@ import com.squareup.leakcanary.LeakCanary;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
@@ -82,6 +83,9 @@ public class AlertApplication extends Application {
         } else if (CURRENT_STATUS == APP_STATUS.SAND) {
             PreferHelper.putString(getApplicationContext(), Constants.APP_STATUS, Constants.APP_STATUS_SAND);
         }
+
+        DependencyInjector.initialize(this);
+
 
     }
 

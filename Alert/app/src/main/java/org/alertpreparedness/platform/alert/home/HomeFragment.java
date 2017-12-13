@@ -52,7 +52,6 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     public List<Tasks> tasksList;
     public AlertAdapter alertAdapter;
     public HashMap<String, Alert> alertList;
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private List<DataHandler> mHandlerList = new ArrayList<>();
 
     @Nullable
