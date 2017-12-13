@@ -17,7 +17,7 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
 
         <RelativeLayout
-            android:layout_marginRight="30dp"
+            android:layout_marginRight="44dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
