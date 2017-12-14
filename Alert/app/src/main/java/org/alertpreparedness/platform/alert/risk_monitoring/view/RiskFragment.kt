@@ -55,6 +55,13 @@ class RiskFragment : Fragment() {
             }
         })
 
+        fabRiskIndicator.setOnClickListener({
+            fabRiskMenu.close(true)
+            Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).subscribe {
+                startActivity(Intent(context, AddIndicatorActivity::class.java))
+            }
+        })
+
 
     }
 

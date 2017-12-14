@@ -12,8 +12,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.dashboard.model.Alert;
+import org.alertpreparedness.platform.alert.home.HomeScreen;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -24,6 +27,8 @@ import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity.EXTRA_ALERT;
 
 public class UpdateAlertActivity extends CreateAlertActivity  {
@@ -32,9 +37,14 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
     private List<AffectedArea> affectedAreas = new ArrayList<>();
     private String countryID;
 
+    @Inject @AlertRef
+    DatabaseReference alertRef;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        DependencyInjector.applicationComponent().inject(this);
 
         mToolbar.setTitle(R.string.update_alert);
         countryID = UserInfo.getUser(this).countryID;
@@ -171,10 +181,8 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
     }
 
     private void update(int alertLevel, String reason, long population, List<AffectedArea> areas, String info) {
-        String countryID = UserInfo.getUser(UpdateAlertActivity.this).countryID;
-        String mAppStatus = PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS);
-        DatabaseReference db = database.child(mAppStatus).child("alert").child(countryID)
-                .child(alert.getId());
+
+        DatabaseReference db = alertRef.child(alert.getId());
 
            db.addListenerForSingleValueEvent(new ValueEventListener() {
                @Override
@@ -200,6 +208,10 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
 
                    db.child("infoNotes").setValue(info);
                    db.child("estimatedPopulation").setValue(population);
+
+                  if (dataSnapshot.child("otherName").exists()) {
+                        //TODO Fix other alert update
+                  }
 
 //        db.child("affectedAreas").removeValue((databaseError, databaseReference) -> {
 //            for (int i = 0; i < areas.size(); i++) {
@@ -248,5 +260,4 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
             alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
         }
     }
-
 }

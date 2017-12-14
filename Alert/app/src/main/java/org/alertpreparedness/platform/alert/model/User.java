@@ -18,12 +18,13 @@ public class User implements Serializable {
     public String countryID;
     private String systemAdminID;
     private boolean isCountryDirector;
-    //public String networkCountryID;
 
-    //public static User sharedInstance = new User();
+    private String firstName;
+    private String lastName;
+    private String email;
 
-    // Default constructor required for calls to
-    // DataSnapshot.getValue(User.class)
+//public String networkCountryID;
+
     public User(String userID, int userType, String agencyAdminID, String countryID, String systemAdminID, boolean isCountryDirector) {
         this.userID = userID;
         this.userType = userType;
@@ -32,6 +33,12 @@ public class User implements Serializable {
         this.systemAdminID = systemAdminID;
         this.isCountryDirector = isCountryDirector;
         //this.networkCountryID = networkCountryID;
+    }
+
+    public User(String firstName, String lastName, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
     }
 
     public User() {
@@ -56,6 +63,30 @@ public class User implements Serializable {
 
     public String getSystemAdminID() {
         return systemAdminID;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
   //  public String getNetworkCountryID() {

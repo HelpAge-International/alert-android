@@ -19,6 +19,9 @@ public final class Constants {
     public static final String AGENCY_ID = "agency_id";
     public static final String SYSTEM_ID = "system_id";
     public static final String USER_TYPE = "user_type";
+    public static final String FIRST_NAME = "first_name";
+    public static final String LAST_NAME = "last_name";
+    public static final String EMAIL = "email";
 
     //hazard
     public static final String HAZARD_ID = "hazard_id";

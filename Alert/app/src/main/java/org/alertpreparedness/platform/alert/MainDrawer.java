@@ -3,6 +3,7 @@ package org.alertpreparedness.platform.alert;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.sax.TextElementListener;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,12 +19,18 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.MinPreparednessFragment;
+import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlanFragment;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.RiskFragment;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
@@ -34,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Optional;
 import io.reactivex.Observable;
 
 public class MainDrawer extends BaseActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
@@ -70,6 +78,12 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     @BindView(R.id.normal_action_bar)
     CardView normalActionbarContainer;
 
+    @BindView(R.id.tvUserName)
+    TextView tvUserName;
+
+    @BindView(R.id.tvDepartment)
+    TextView tvDepartment;
+
     @Override
     public void onCreate(Bundle saved) {
         super.onCreate(saved);
@@ -77,6 +91,8 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
         setContentView(R.layout.activity_main_drawer);
 
         ButterKnife.bind(this);
+
+        setUserName();
 
 //        toggleActionBar(ActionBarState.ALERT);
 
@@ -97,6 +113,30 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     public void removeActionbarElevation() {
         normalActionbarContainer.setCardElevation(0);
         alertActionbarContainer.setCardElevation(0);
+    }
+
+    private void setUserName(){
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference db = ref.
+                child(PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS)).
+                child("userPublic").child(PreferHelper.getString(getApplicationContext(), Constants.UID));
+
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String firstname = dataSnapshot.child("firstName").getValue().toString();
+                String lastname = dataSnapshot.child("lastName").getValue().toString();
+                String email = dataSnapshot.child("email").getValue().toString();
+
+                User user = new User(firstname, lastname, email);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public void toggleActionBar(ActionBarState type) {
@@ -206,7 +246,7 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                     firebaseAuth.signOut();
                     startActivity(new Intent(getApplicationContext(), LoginScreen.class));
                     finish();
-                    clearAllActivities();
+//                    clearAllActivities();
     //                        PreferHelper.getInstance(MainDrawer.this).edit().remove(UserInfo.PREFS_USER).apply();
     //                        finish();
                     break;

@@ -9,18 +9,15 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-import org.alertpreparedness.platform.alert.BaseActivity;
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity;
-import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.helper.DataHandler;
@@ -30,9 +27,10 @@ import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlanObj;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlansAdapter;
+import org.alertpreparedness.platform.alert.dashboard.model.Alert;
+import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -58,7 +56,6 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     public List<Tasks> tasksList;
     public AlertAdapter alertAdapter;
     public HashMap<String, Alert> alertList;
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private List<DataHandler> mHandlerList = new ArrayList<>();
 
     @Nullable

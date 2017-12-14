@@ -23,10 +23,10 @@ public class Alert implements Serializable{
     private long timeUpdated;
     private long redAlertRequested;
     private String updated;
+    private String updatedBy;
     private String info;
     private String otherName;
     private String reason;
-    private String updatedBy;
     private DatabaseReference dbRef;
 
 
@@ -34,7 +34,7 @@ public class Alert implements Serializable{
         this.dbRef = dbRef;
     }
 
-    public Alert(long alertLevel, long hazardScenario, long population, long numOfAreas, long redAlertRequested, String info, String updated, String otherName) {
+    public Alert(long alertLevel, long hazardScenario, long population, long numOfAreas, long redAlertRequested, String info, String updated, String updatedBy, String otherName) {
         this.alertLevel = alertLevel;
         this.hazardScenario = hazardScenario;
         this.population = population;
@@ -42,20 +42,9 @@ public class Alert implements Serializable{
         this.redAlertRequested = redAlertRequested;
         this.info = info;
         this.updated = updated;
+        this.updatedBy = updatedBy;
         this.otherName = otherName;
     }
-
-//    public Alert(long alertLevel, long hazardScenario, long population, long numOfAreas,
-//                 String info, String updated, String otherName, long redAlertRequested) {
-//        this.alertLevel = alertLevel;
-//        this.hazardScenario = hazardScenario;
-//        this.population = population;
-//        this.numOfAreas = numOfAreas;
-//        this.info = info;
-//        this.updated = updated;
-//        this.otherName = otherName;
-//        this.redAlertRequested = redAlertRequested;
-//    }
 
     public Alert(long country, long level1, long level2) {
         this.country = country;
@@ -219,27 +208,6 @@ public class Alert implements Serializable{
                 ", redAlertRequested=" + redAlertRequested +
                 ", dbRef=" + dbRef +
                 '}';
-    }
-
-
-
-    @Exclude
-    public Map<String, Object> toMap() {
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("alertLevel", alertLevel);
-        result.put("hazardScenario", hazardScenario);
-        result.put("country", country);
-        result.put("level1", level1);
-        result.put("level2", level2);
-        result.put("estimatedPopulation", population);
-        result.put("infoNotes", info);
-        result.put("timeUpdated", updated);
-        result.put("otherName", otherName);
-        result.put("reasonForRedAlert", reason);
-        result.put("timeUpdated", timeUpdated);
-        result.put("updatedBy", updatedBy);
-
-        return result;
     }
 
 }

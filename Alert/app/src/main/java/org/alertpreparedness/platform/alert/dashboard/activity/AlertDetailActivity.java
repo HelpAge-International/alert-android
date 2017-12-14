@@ -27,9 +27,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.BaseRef;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.dashboard.model.Alert;
+import org.alertpreparedness.platform.alert.home.HomeScreen;
+import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
@@ -38,6 +42,8 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -65,6 +71,10 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
     public static final String EXTRA_ALERT = "extra_alert";
 
+    @Inject
+    @BaseRef
+    DatabaseReference baseRef;
+
     DatabaseReference mReference = FirebaseDatabase.getInstance().getReference();
     ValueEventListener mValueListener = new ValueEventListener() {
         @Override
@@ -90,6 +100,11 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             System.out.println("CD or Not: " + UserInfo.getUser(this).isCountryDirector());
         }
 
+        initView();
+
+    }
+
+    private void initView() {
         toolbar = (Toolbar) findViewById(R.id.action_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -108,14 +123,12 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         txtLastUpdated = (TextView) findViewById(R.id.txtLastUpdated);
         txtActionBarTitle = (TextView) findViewById(R.id.action_bar_title);
         txtRedRequested = (TextView) findViewById(R.id.tvRedRequested);
-
         imgHazard = (ImageView) findViewById(R.id.imgHazardIcon);
         imgPopulation = (ImageView) findViewById(R.id.imgPopulationIcon);
         imgAffectedArea = (ImageView) findViewById(R.id.imgAreaIcon);
         imgInfo = (ImageView) findViewById(R.id.imgInfo);
         imgClose = (ImageView) findViewById(R.id.leftImageView);
         imgUpdate = (ImageView) findViewById(R.id.rightImageView);
-
         btnApprove = (Button) findViewById(R.id.btnApprove);
         btnReject = (Button) findViewById(R.id.btnReject);
 
@@ -137,11 +150,9 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
             fetchDetails();
 
-            mAppStatus =  PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS);
+            mAppStatus = PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS);
 
-            mReference = FirebaseDatabase.getInstance().getReference().
-                    child(mAppStatus).child("alert").child(countryID)
-                    .child(alert.getId());
+            mReference = FirebaseDatabase.getInstance().getReference().child(mAppStatus).child("alert").child(countryID).child(alert.getId());
             mReference.addValueEventListener(mValueListener);
         }
     }
@@ -153,7 +164,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
             if (alertLevel != 0) {
                 long numberOfAreas = dataSnapshot.child("affectedAreas").getChildrenCount();
-                Log.e("f",id+" "+numberOfAreas);
+                Log.e("f", id + " " + numberOfAreas);
                 long country = (long) dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("country").getValue();
                 long hazardScenario = (long) dataSnapshot.child("hazardScenario").getValue();
                 long population = (long) dataSnapshot.child("estimatedPopulation").getValue();
@@ -162,12 +173,13 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
                 if (dataSnapshot.child("timeUpdated").exists()) {
                     long updated = (long) dataSnapshot.child("timeUpdated").getValue();
+                    String updatedBy = (String) dataSnapshot.child("updatedBy").getValue();
                     date.setTimeInMillis(updated);
                     String updatedDay = format.format(date.getTime());
 
                     if (hazardScenario != -1) {
                         Alert alert = new Alert(alertLevel, hazardScenario, population,
-                                numberOfAreas, redStatus, info, updatedDay, null);
+                                numberOfAreas, redStatus, info, updatedDay, updatedBy, null);
                         alert.setId(id);
 
                         this.alert = alert;
@@ -177,16 +189,15 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                         long level1 = alert.getLevel1();
                         long level2 = alert.getLevel2();
                         setOtherName(nameId, alertLevel, hazardScenario, numberOfAreas,
-                                redStatus, population, country, level1, level2, info, updatedDay);
+                                redStatus, population, country, level1, level2, info, updatedDay, updatedBy);
                     }
 
                 } else if (dataSnapshot.child("timeCreated").exists()) {
-
                     String updatedDay = this.alert.getUpdated();
 
                     if (hazardScenario != -1) {
                         Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas,
-                                redStatus, info, updatedDay, null);
+                                redStatus, info, updatedDay, null, null);
                         alert.setId(id);
 
                         this.alert = alert;
@@ -197,14 +208,15 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                         long level2 = alert.getLevel2();
 
                         setOtherName(nameId, alertLevel, hazardScenario, numberOfAreas,
-                                redStatus, population, country, level1, level2, info, updatedDay);
+                                redStatus, population, country, level1, level2, info, updatedDay, null);
                     }
-
                 }
             }
         }
     }
-    private void setOtherName(String nameId, long alertLevel, long hazardScenario, long numOfAreas, long redStatus, long population, long country, long level1, long level2, String info, String updatedDay) {
+
+    private void setOtherName(String nameId, long alertLevel, long hazardScenario, long numOfAreas, long redStatus,
+                              long population, long country, long level1, long level2, String info, String updatedDay, String updatedBy) {
 
         DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference().child(mAppStatus).child("hazardOther").child(nameId);
@@ -212,7 +224,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String name = (String) dataSnapshot.child("name").getValue();
-                Alert alert = new Alert(alertLevel, hazardScenario, population, numOfAreas, redStatus, info, updatedDay, name);
+                Alert alert = new Alert(alertLevel, hazardScenario, population, numOfAreas, redStatus, info, updatedDay, updatedBy, name);
                 Alert alert1 = new Alert(country, level1, level2);
                 alert.setId(dataSnapshot.getKey());
 
@@ -255,24 +267,20 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                 txtLastUpdated.setText(getUpdatedAsString(alert.getUpdated()));
             }
         }
-
-
     }
 
     private void setUpRedAlertRequestView() {
         Window window = getWindow();
-
         if (isCountryDirector && alert.getRedAlertRequested() == 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setStatusBarColor(getResources().getColor(R.color.sBar_Gray));
             }
             toolbar.setBackgroundResource(R.color.alertGray);
             txtActionBarTitle.setText(R.string.amber_alert_text);
-            txtRedRequested.setText(getRedDisplayText(alert.getUpdated()));
             clRequested.setVisibility(View.VISIBLE);
             llButtons.setVisibility(View.VISIBLE);
-
-        }else if (!isCountryDirector && alert.getRedAlertRequested() == 0) {
+            setUserName();
+        } else if (!isCountryDirector && alert.getRedAlertRequested() == 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setStatusBarColor(getResources().getColor(R.color.sBar_Gray));
             }
@@ -282,9 +290,38 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    private String getRedDisplayText(String updated) {
-        return "A user has requested the alert level to go from Amber to Red on the "+updated;
+    private void setUserName() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference db = ref.
+                child(PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS)).
+                child("userPublic").child(alert.getUpdatedBy());
+
+        System.out.println("REF: " + db.getRef());
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String firstname = dataSnapshot.child("firstName").getValue().toString();
+                String lastname = dataSnapshot.child("lastName").getValue().toString();
+                String email = dataSnapshot.child("email").getValue().toString();
+
+                txtRedRequested.setText(getRedDisplayText(firstname, lastname));
+
+                User user = new User(firstname, lastname, email);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
+
+    private String getRedDisplayText(String fn, String ln) {
+        return fn + " " + ln + " has requested the alert level to go from Amber to Red on the " + alert.getUpdated();
+    }
+
 
     private String getPeopleAsString(long population) {
         return population + " people";
@@ -342,7 +379,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mReference != null && mValueListener != null){
+        if (mReference != null && mValueListener != null) {
             mReference.removeEventListener(mValueListener);
         }
         compositeDisposable.clear();
@@ -357,31 +394,29 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             startActivity(intent);
         }
 
-        if(view == btnApprove){
+        if (view == btnApprove) {
             approveOrReject(true);
-
         }
 
-        if(view == btnReject){
+        if (view == btnReject) {
             approveOrReject(false);
         }
 
     }
 
     private void approveOrReject(boolean isApproved) {
-      //  DatabaseReference db = mReference;
-        Log.e("e:",mReference+" Clicked!");
+        Log.e("e:", mReference + " Clicked!");
         mReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(isApproved){
-                    mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants. REQ_APPROVED);
+                if (isApproved) {
+                    mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_APPROVED);
                     mReference.child("alertLevel").setValue(Constants.TRIGGER_RED);
-                    Intent intent = new Intent(AlertDetailActivity.this, HomeScreen.class);
-                    startActivity(intent);
-                }else {
+                } else {
                     mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_REJECTED);
                 }
+                Intent intent = new Intent(AlertDetailActivity.this, HomeScreen.class);
+                startActivity(intent);
             }
 
             @Override

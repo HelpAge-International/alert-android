@@ -22,18 +22,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public ProgressDialog mProgressDialog;
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        AlertApplication.mActivities.add(this);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        AlertApplication.mActivities.remove(this);
-    }
-
     public String getUid() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
@@ -56,9 +44,4 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public void clearAllActivities() {
-        for (Activity activity : AlertApplication.mActivities) {
-            activity.finish();
-        }
-    }
 }

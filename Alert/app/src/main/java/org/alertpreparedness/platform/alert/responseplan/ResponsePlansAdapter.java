@@ -85,21 +85,25 @@ public class ResponsePlansAdapter extends RecyclerView.Adapter<ResponsePlansAdap
                 holder.line.setBackgroundColor(context.getResources().getColor(R.color.alertGray));
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertGray));
                 holder.status.setText(R.string.waiting_approval);
+                holder.statusIcon.setImageResource(R.drawable.icon_pending_grey);
                 break;
             case 1://green
                 holder.line.setBackgroundColor(context.getResources().getColor(R.color.alertGreen));
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertGreen));
                 holder.status.setText(R.string.approved);
+                holder.statusIcon.setImageResource(R.drawable.icon_status_complete);
                 break;
             case 2://amber
                 holder.line.setBackgroundColor(context.getResources().getColor(R.color.alertAmber));
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertAmber));
                 holder.status.setText(R.string.in_progress);
+                holder.statusIcon.setImageResource(R.drawable.icon_pending_amber);
                 break;
             case 3:
                 holder.line.setBackgroundColor(context.getResources().getColor(R.color.alertRed));
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertRed));
                 holder.status.setText(R.string.needs_reviewing);
+                holder.statusIcon.setImageResource(R.drawable.icon_status_needs_reviewing);
                 break;
         }
         holder.itemView.setOnClickListener((v) -> listner.onResponsePlanSelected(position));

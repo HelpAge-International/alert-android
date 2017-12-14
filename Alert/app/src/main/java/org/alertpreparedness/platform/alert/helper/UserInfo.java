@@ -12,11 +12,15 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import org.alertpreparedness.platform.alert.AlertApplication;
+import org.alertpreparedness.platform.alert.dagger.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.UserRef;
 import org.alertpreparedness.platform.alert.interfaces.AuthCallback;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.DBListener;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
+
+import javax.inject.Inject;
 
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -31,6 +35,8 @@ public class UserInfo {
 
     public DatabaseReference database = FirebaseDatabase.getInstance().getReference();
     public static final String PREFS_USER = "prefs_user";
+
+    DatabaseReference userRef;
 
     public void authUser(final AuthCallback authCallback) {
         for (String nodeName : users) {
@@ -86,6 +92,8 @@ public class UserInfo {
         PreferHelper.putString(AlertApplication.getContext(), Constants.SYSTEM_ID, systemAdmin);
         PreferHelper.putInt(AlertApplication.getContext(), Constants.USER_TYPE, userType);
 
+       // Log.e("LINK", userRef.getRoot().toString());
+
         if(nodeName.equals("countryDirector")){
             isCountryDirector = true;
             User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin, isCountryDirector);
@@ -96,6 +104,10 @@ public class UserInfo {
             saveUser(callback.getContext(), user);
             callback.onUserAuthorized(user);
         }
+
+      //  System.out.println("LINK: "+ database.child(""));
+
+
     }
 
 
