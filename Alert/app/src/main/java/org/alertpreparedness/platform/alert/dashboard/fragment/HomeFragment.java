@@ -147,17 +147,29 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 //        super.onDestroy();
 //    }
 
-
     private void updateTitle() {
         boolean redPresent = false;
+        boolean amberPresent = false;
+        boolean noAlerts = false;
+
+        updateTitle(R.string.green_alert_level, R.drawable.alert_green);
         for(Alert a: alertAdapter.getAlerts()){
             if (a.getAlertLevel() == 2){
                 redPresent = true;
                 break;
+            } else if(a.getAlertLevel() == 1){
+                amberPresent = true;
+            } else if(a.getAlertLevel() == 0){
+                noAlerts = true;
             }
         }
+
+        if(!redPresent &&  !amberPresent && noAlerts){
+            updateTitle(R.string.green_alert_level, R.drawable.alert_green);
+        }
+
         if (redPresent){
-            updateTitle(R.string.red_alert_level, R.drawable.alert_red_main);
+            updateTitle( R.string.red_alert_level, R.drawable.alert_red_main);
         }
         else {
             updateTitle(R.string.amber_alert_level, R.drawable.alert_amber_main);

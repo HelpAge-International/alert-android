@@ -51,7 +51,6 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
 
         fetchDetails();
         setUpActionBarColour();
-
     }
 
     @Override
@@ -84,7 +83,6 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
                             displayable
                     );
                     addArea(area);
-
                 }
                 break;
             case HAZARD_RESULT:
@@ -96,7 +94,6 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
     }
 
     private void fetchDetails() {
-
         if(alert.getOtherName() != null){
             mFieldsAdapter.setTextFieldValue(0, alert.getOtherName());
         }else {
@@ -122,7 +119,6 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
                 mFieldsAdapter.addSubListValue(3, Constants.COUNTRIES[i]);
             }
         }
-
         mFieldsAdapter.setTextFieldValue(4, alert.getInfo());
     }
 
@@ -146,21 +142,16 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
 
     @Override
     public void saveData(boolean isRedAlert) {
-
         int alertLevel = levelNew == -1? (int) alert.getAlertLevel() : levelNew;
         long population = Long.parseLong(mFieldsAdapter.getModel(mFieldsAdapter.isRedAlert() ? 3 : 2).resultTitle);
         String info = mFieldsAdapter.getModel(mFieldsAdapter.isRedAlert() ?  5 : 4).resultTitle;
 
         if(isRedAlert) {
             String reason = mFieldsAdapter.getModel(2).resultTitle;
-            System.out.println("Level: "+ alertLevel +" Reason: "+ reason+ " Population: "+ population + " Info: "+ info);
             update(alertLevel, reason, population, affectedAreas, info);
-        }
-        else if (alert.getAlertLevel() == 1){
+        } else if (alert.getAlertLevel() == 1){
             update(alertLevel, null, population, affectedAreas, info);
-            System.out.println("Level: "+ alertLevel );
         }
-
     }
 
     @Override
@@ -230,7 +221,6 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
 
 
     public void backToDetailView() {
-
         Intent intent = new Intent(UpdateAlertActivity.this, AlertDetailActivity.class);
         intent.putExtra(EXTRA_ALERT, alert);
 

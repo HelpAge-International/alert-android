@@ -163,7 +163,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
                 PreferHelper.putString(this, Constants.UID, firebaseAuth.getCurrentUser().getUid());
 
                 progressDialog.dismiss();
-                userInfo.authUser(this);
+                userInfo.authUser(this, getContext());
             }
         }
         else {

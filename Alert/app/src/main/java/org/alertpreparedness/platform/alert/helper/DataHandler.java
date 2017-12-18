@@ -13,6 +13,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.interfaces.AuthCallback;
 import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
@@ -46,17 +47,16 @@ public class DataHandler {
 
     public void getAlertsFromFirebase(IHomeActivity iHome, Context context) {
         countryID = UserInfo.getUser(context).countryID;
-        //networkCountryID = UserInfo.getUser(context).networkCountryID;
+        networkCountryID = UserInfo.getUser(context).networkCountryID;
         usersID = new String[]{countryID};
 
         for (String ids : usersID) {
             DatabaseReference db = database.child(mAppStatus).child("alert").child(ids);
             ChildEventListener childEventListener = new ChildEventListener() {
-
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     getAlert(dataSnapshot, ids);
-                    iHome.updateTitle(R.string.amber_alert_level, R.drawable.alert_amber_main);   // alerts.add((int) alertLevel);
+                    //iHome.updateTitle(R.string.amber_alert_level, R.drawable.alert_amber_main);   // alerts.add((int) alertLevel);
                     //setRedActionBar(iHome, alerts.contains(2));
                 }
 
@@ -184,6 +184,7 @@ public class DataHandler {
                     ChildEventListener childEventListener;
                     DatabaseReference db = database.child(mAppStatus).child("action").child(ids);
                     db.addChildEventListener(childEventListener = new ChildEventListener() {
+
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                             String asignee = (String) dataSnapshot.child("asignee").getValue();
@@ -264,6 +265,4 @@ public class DataHandler {
             }
         }
     }
-
-
 }

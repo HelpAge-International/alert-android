@@ -78,11 +78,11 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     @BindView(R.id.normal_action_bar)
     CardView normalActionbarContainer;
 
-    @BindView(R.id.tvUserName)
-    TextView tvUserName;
-
-    @BindView(R.id.tvDepartment)
-    TextView tvDepartment;
+//    @BindView(R.id.tvUserName)
+//    TextView tvUserName;
+//
+//    @BindView(R.id.tvDepartment)
+//    TextView tvDepartment;
 
     @Override
     public void onCreate(Bundle saved) {
@@ -215,7 +215,6 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
         super.onConfigurationChanged(newConfig);
         drawerToggle.onConfigurationChanged(newConfig);
     }
-
 
     @Override
     public void onClick(View view) {

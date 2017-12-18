@@ -43,7 +43,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         this.alertsMap = alertsMap;
         this.context = context;
 //        if (context != null) {
-            this.listener = listener;
+        this.listener = listener;
 //        } else {
 //            Log.e(_TAG, "Activity does not support OnAlertListListener interface");
 //        }
@@ -144,6 +144,9 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
            // img_alert_req.setVisibility((alert.getRedAlertRequested() == 0) ? View.VISIBLE : View.GONE);
 
             for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
+//                if(alert.getAlertLevel() == 0){
+//                    remove(alert.getId());
+//                }
                 if (i == alert.getHazardScenario() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
                     fetchIcon(Constants.HAZARD_SCENARIO_NAME[i], img_hazard_icon);
                     txt_alert_level.setText(R.string.red_alert_text);
