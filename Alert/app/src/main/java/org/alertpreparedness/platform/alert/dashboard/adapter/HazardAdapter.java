@@ -57,7 +57,7 @@ public class HazardAdapter extends RecyclerView.Adapter<HazardAdapter.ViewHolder
     public void onBindViewHolder(HazardAdapter.ViewHolder holder, int position) {
         holder.icon.setImageResource(ExtensionHelperKt.getHazardImg(items.get(position)));
         holder.textView.setText(items.get(position));
-        holder.itemView.setOnClickListener((v) -> listner.onHazardSelected(items.get(position)));
+        holder.itemView.setOnClickListener((v) -> listner.onHazardSelected(position, items.get(position)));
     }
 
     @Override
@@ -66,6 +66,6 @@ public class HazardAdapter extends RecyclerView.Adapter<HazardAdapter.ViewHolder
     }
 
     public interface HazardSelectionListner {
-        void onHazardSelected(String hazardTitle);
+        void onHazardSelected(int type, String hazardTitle);
     }
 }

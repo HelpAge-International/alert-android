@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.alert.dashboard.adapter;
 
 import android.content.Context;
+import android.provider.Settings;
 import android.support.annotation.DrawableRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,7 +33,7 @@ public
 class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements SimpleAdapter.RemoveListener {
 
     private Context context;
-    private final List<AlertFieldModel> items;
+    public final List<AlertFieldModel> items;
     private ClickListener listener;
     public final static int TEXT_FIELD = 0;
     public final static int EDIT_TEXT = 1;
@@ -103,7 +104,7 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         AlertFieldModel m = items.get(position);
 
         if(m.originalPosition == -1) {
-            m.originalPosition = position;
+            m.originalPosition = holder.getAdapterPosition();
         }
 
         switch (getItemViewType(position)) {
@@ -148,6 +149,7 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
                     @Override
                     public void afterTextChanged(Editable editable) {
+                        System.out.println(context.getString(m.initialTitle) + " " + editable.toString());
                         m.resultTitle = editable.toString();
                     }
                 });
@@ -165,8 +167,7 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                 else {
                     h2.recyclerView.setVisibility(View.VISIBLE);
                     h2.recyclerView.setAdapter(new SimpleAdapter(m.originalPosition, m.strings, this));
-                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context.getApplicationContext());
-                    h2.recyclerView.setLayoutManager(mLayoutManager);
+                    h2.recyclerView.setLayoutManager(new LinearLayoutManager(context.getApplicationContext()));
                     h2.recyclerView.setHasFixedSize(true);
                     h2.recyclerView.setNestedScrollingEnabled(false);
 
@@ -221,7 +222,6 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             items.remove(2);
             isRedAlert = false;
             notifyItemRemoved(2);
-
         }
     }
 
