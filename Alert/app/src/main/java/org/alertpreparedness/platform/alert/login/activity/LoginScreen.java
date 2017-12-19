@@ -26,7 +26,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.home.HomeScreen;
+import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.helper.RightDrawableOnTouchListener;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.interfaces.AuthCallback;

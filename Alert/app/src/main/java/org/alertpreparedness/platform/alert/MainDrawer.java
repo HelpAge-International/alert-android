@@ -21,7 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
-import org.alertpreparedness.platform.alert.home.HomeFragment;
+import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlanFragment;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.RiskFragment;

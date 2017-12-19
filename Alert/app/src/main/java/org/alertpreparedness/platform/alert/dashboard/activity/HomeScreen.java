@@ -1,11 +1,11 @@
-package org.alertpreparedness.platform.alert.home;
+package org.alertpreparedness.platform.alert.dashboard.activity;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import org.alertpreparedness.platform.alert.MainDrawer;
-import org.alertpreparedness.platform.alert.home.HomeFragment;
+import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
 
 
 public class HomeScreen extends MainDrawer {
