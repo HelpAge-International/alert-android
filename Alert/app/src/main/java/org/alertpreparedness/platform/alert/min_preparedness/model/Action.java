@@ -8,9 +8,11 @@ public class Action {
     private String taskName;
     private String department;
     private String assignee;
+    private boolean isArchived;
     private long actionType;
     private long dueDate;
     private int budget;
+
 
     public Action(String taskName, String department, String assignee, long actionType, long dueDate, int budget) {
         this.taskName = taskName;

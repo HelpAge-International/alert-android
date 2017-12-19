@@ -6,23 +6,37 @@ package org.alertpreparedness.platform.alert.dashboard.model;
 
 public class Tasks {
 
-    private String alertLevel;
+    private int alertLevel;
     private String taskType;
     private String taskName;
     public long dueDate;
 
-    public Tasks(String alertLevel, String taskType, String taskName, long dueDate) {
+    public Tasks(boolean isCompleteTask) {
+        this.isCompleteTask = isCompleteTask;
+    }
+
+    public boolean isCompleteTask() {
+        return isCompleteTask;
+    }
+
+    public void setCompleteTask(boolean completeTask) {
+        isCompleteTask = completeTask;
+    }
+
+    private boolean isCompleteTask;
+
+    public Tasks(int alertLevel, String taskType, String taskName, long dueDate) {
         this.alertLevel = alertLevel;
         this.taskType = taskType;
         this.taskName = taskName;
         this.dueDate = dueDate;
     }
 
-    public String getAlertLevel() {
+    public int getAlertLevel() {
         return alertLevel;
     }
 
-    public void setAlertLevel(String alertLevel) {
+    public void setAlertLevel(int alertLevel) {
         this.alertLevel = alertLevel;
     }
 

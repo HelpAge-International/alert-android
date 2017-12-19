@@ -44,7 +44,6 @@ public class MinPreparednessFragment extends Fragment {
         actionsRecyclerView.setLayoutManager(alertlayoutManager);
         actionsRecyclerView.setItemAnimator(new DefaultItemAnimator());
         actionsRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
-
     }
 
     @Override
