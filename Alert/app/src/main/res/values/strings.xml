@@ -141,5 +141,8 @@
     <string name="txt_cd_red_request">Red alert request requires your action</string>
     <string name="response_plans">Respone Plans</string>
     <string name="green_alert_text">Green Alert</string>
+    <string name="my_country">My Country</string>
+    <string name="my_country_desc">You can see programmes from agencies in your country by selecting a region and pressing search</string>
+    <string name="search">Search</string>
 
 </resources>

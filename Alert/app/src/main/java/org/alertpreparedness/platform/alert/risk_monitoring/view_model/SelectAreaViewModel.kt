@@ -44,7 +44,7 @@ class SelectAreaViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
     }
 
 
-    private fun getCountryJsonData() {
+    fun getCountryJsonData() {
         mDisposables.add(
                 RiskMonitoringService.readJsonFile()
                         .map { fileText ->

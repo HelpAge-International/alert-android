@@ -206,10 +206,7 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
                     String displayable = data.getStringExtra("selected_area_text");
 
                     mCurrentAffectedAreas.add(new AffectedAreaModel(area));
-                    mFieldsAdapter.addSubListValue(
-                            3,
-                            displayable
-                    );
+                    mFieldsAdapter.addSubListValue(3, displayable);
                 }
 
                 break;
