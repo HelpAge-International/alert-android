@@ -25,4 +25,11 @@ public class FirebaseModule {
         return db.child("responsePlan").child(user.countryID);
     }
 
+    @Provides
+    @Singleton
+    @AlertRef
+    public DatabaseReference providesAlert(@BaseDatabaseRef DatabaseReference db, User user) {
+        return db.child("alert").child(user.countryID);
+    }
+
 }

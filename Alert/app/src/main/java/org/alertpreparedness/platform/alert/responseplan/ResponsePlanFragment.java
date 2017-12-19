@@ -41,7 +41,7 @@ import butterknife.ButterKnife;
  * Created by Tj on 12/12/2017.
  */
 
-public class ResponsePlanFragment extends Fragment implements ResponsePlansAdapter.ItemSelectedListner {
+public class ResponsePlanFragment extends Fragment implements ResponsePlansAdapter.ItemSelectedListner, ValueEventListener {
 
     @BindView(R.id.rvPlans)
     RecyclerView mPlansList;
@@ -51,6 +51,8 @@ public class ResponsePlanFragment extends Fragment implements ResponsePlansAdapt
 
     @Inject
     User user;
+
+    private ArrayList<ResponsePlanObj> items;
 
     @Nullable
     @Override
@@ -69,55 +71,13 @@ public class ResponsePlanFragment extends Fragment implements ResponsePlansAdapt
 
     private void initViews() {
 
-        ArrayList<ResponsePlanObj> items = new ArrayList<>();
-
-        System.out.println(responsePlans.getKey());
-
-        System.out.println("responsePlans = " + responsePlans);
+        items = new ArrayList<>();
 
         mPlansList.setAdapter(new ResponsePlansAdapter(getContext(), items, this));
         mPlansList.setLayoutManager(new LinearLayoutManager(getActivity()));
         mPlansList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 
-        responsePlans.addValueEventListener(new ValueEventListener() {
-
-            @SuppressWarnings("ConstantConditions")
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot child : dataSnapshot.getChildren()) {
-
-                    Long createdAt = (Long) child.child("timeCreated").getValue();
-                    String hazardType = ExtensionHelperKt.getHazardTypes().get(Integer.valueOf((String) child.child("hazardScenario").getValue()));
-                    String percentCompleted = String.valueOf(child.child("sectionsCompleted").getValue());
-                    int status = Integer.valueOf(String.valueOf(child.child("status").getValue()));
-                    String name = (String)child.child("name").getValue();
-
-                    items.add(new ResponsePlanObj(
-                            hazardType,
-                            percentCompleted,
-                            name,
-                            status,
-                            new Date(createdAt))
-                    );
-                    mPlansList.getAdapter().notifyItemInserted(items.size()-1);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError firebaseError) {
-
-            }
-
-        });
-//
-//        items.add(new ResponsePlanObj(
-//                "Cold Freeze",
-//                "90%",
-//                "Lorem inpum dlor sit amet",
-//                0,
-//                new Date()
-//        ));
-
+        responsePlans.addValueEventListener(this);
 
     }
 
@@ -126,11 +86,68 @@ public class ResponsePlanFragment extends Fragment implements ResponsePlansAdapt
         ApprovalStatusDialog dialog = new ApprovalStatusDialog();
         Bundle data = new Bundle();
         ApprovalStatusObj[] items = new ApprovalStatusObj[] {
-                new ApprovalStatusObj("Country Director", 0),
-                new ApprovalStatusObj("Regional Director", 0)
+                new ApprovalStatusObj("Country Director", this.items.get(pos).countryApproval),
+                new ApprovalStatusObj("Regional Director", this.items.get(pos).regionalApproval),
+                new ApprovalStatusObj("Global Director", this.items.get(pos).globalApproval)
         };
         data.putParcelableArray(ApprovalStatusDialog.APPROVAL_STATUSES, items);
         dialog.setArguments(data);
         dialog.show(getActivity().getSupportFragmentManager(), "alert_level");
     }
+
+
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public void onDataChange(DataSnapshot dataSnapshot) {
+        for(DataSnapshot child : dataSnapshot.getChildren()) {
+
+            System.out.println("child country = " + child.child("approval").child("countryDirector").getValue());
+            System.out.println("child global = " + child.child("approval").child("globalDirector").getValue());
+            System.out.println("child region = " + child.child("approval").child("regionDirector").getValue());
+
+            int regionalApproval = getApprovalStatus(child.child("approval").child("regionDirector"));
+            int countryApproval = getApprovalStatus(child.child("approval").child("countryDirector"));
+            int globalApproval = getApprovalStatus(child.child("approval").child("globalDirector"));
+
+            Long createdAt = (Long) child.child("timeCreated").getValue();
+            String hazardType = ExtensionHelperKt.getHazardTypes().get(Integer.valueOf((String) child.child("hazardScenario").getValue()));
+            String percentCompleted = String.valueOf(child.child("sectionsCompleted").getValue());
+            int status = Integer.valueOf(String.valueOf(child.child("status").getValue()));
+            String name = (String)child.child("name").getValue();
+
+            items.add(new ResponsePlanObj(
+                    hazardType,
+                    percentCompleted,
+                    name,
+                    status,
+                    new Date(createdAt),
+                    regionalApproval,
+                    countryApproval,
+                    globalApproval)
+            );
+            mPlansList.getAdapter().notifyItemInserted(items.size()-1);
+        }
+    }
+
+    @SuppressWarnings("LoopStatementThatDoesntLoop")
+    private int getApprovalStatus(DataSnapshot ref) {
+        if(ref.getValue() != null) {
+            for (DataSnapshot child : ref.getChildren()) {
+                if(child.getValue() != null) {
+                   return  (int)((long)child.getValue());
+                }
+                else {
+                    break;
+                }
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public void onCancelled(DatabaseError firebaseError) {
+
+    }
+
+
 }
