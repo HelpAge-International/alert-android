@@ -75,12 +75,12 @@ public class MinPreparednessFragment extends Fragment implements ActionAdapter.I
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot getChild : dataSnapshot.getChildren()){
+//
+//                    String taskName = (String) getChild.child("task").getValue();
+//                    String department = (String) getChild.child("department").getValue();
+//                    String assignee = (String) getChild.child("asignee").getValue();
+//                    boolean isArchived = (boolean) getChild.child("isArchived").getValue();
 
-                    String taskName = (String) getChild.child("task").getValue();
-                    String department = (String) getChild.child("department").getValue();
-                    String assignee = (String) getChild.child("asignee").getValue();
-                    boolean isArchived = (boolean) getChild.child("isArchived").getValue();
-                    Long
                     //String assignee = (String) getChild.child("asignee").getValue();
                     //System.out.println("Child: "+ taskName);
                 }
