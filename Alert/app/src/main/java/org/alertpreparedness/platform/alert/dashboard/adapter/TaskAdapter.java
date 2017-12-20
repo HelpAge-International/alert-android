@@ -55,12 +55,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
 
     public void add(Tasks tasks) {
         listArray.add(tasks);
-        Collections.sort(listArray, new Comparator<Tasks>() {
-            @Override
-            public int compare(Tasks o1, Tasks o2) {
-                return Long.compare(o1.getDueDate(), o2.getDueDate());
-            }
-        });
+        Collections.sort(listArray, (o1, o2) -> Long.compare(o1.getDueDate(), o2.getDueDate()));
         notifyDataSetChanged();
     }
 

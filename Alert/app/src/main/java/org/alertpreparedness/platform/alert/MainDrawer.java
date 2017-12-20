@@ -177,7 +177,7 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
         drawerToggle.syncState();
     }
 
-    public void toggleActionBarWithTitle(ActionBarState type, @StringRes int title, @Nullable @ColorRes int bg) {
+    public void toggleActionBarWithTitle(ActionBarState type, @StringRes int title, @Nullable int bg) {
         toggleActionBar(type);
         switch (type) {
             case ALERT:

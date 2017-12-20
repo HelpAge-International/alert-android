@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.alertpreparedness.platform.alert.ExtensionHelperKt;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
@@ -42,15 +43,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         this.isCountryDirector = UserInfo.getUser(context).isCountryDirector();
         this.alertsMap = alertsMap;
         this.context = context;
-//        if (context != null) {
         this.listener = listener;
-//        } else {
-//            Log.e(_TAG, "Activity does not support OnAlertListListener interface");
-//        }
-    }
-
-    public AlertAdapter() {
-        // Required empty public constructor
     }
 
     @Override
@@ -79,10 +72,8 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
     }
 
     public void update(String id, Alert alert) {
-        Log.e("ADAPTER", alertsMap.containsKey(id) ? alertsMap.get(id).toString() : "null");
         alertsMap.put(id, alert);
 
-        Log.e("ADAPTER", alert.toString() + "\n");
         updateList();
     }
 
@@ -139,14 +130,9 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         }
 
         private void bind(Alert alert) {
-          //  Log.e("RED", String.valueOf(alert.getRedAlertRequested()));
-
-           // img_alert_req.setVisibility((alert.getRedAlertRequested() == 0) ? View.VISIBLE : View.GONE);
 
             for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
-//                if(alert.getAlertLevel() == 0){
-//                    remove(alert.getId());
-//                }
+
                 if (i == alert.getHazardScenario() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
                     fetchIcon(Constants.HAZARD_SCENARIO_NAME[i], img_hazard_icon);
                     txt_alert_level.setText(R.string.red_alert_text);
@@ -189,81 +175,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
     }
 
     public static void fetchIcon(String hazardName, ImageView imageView) {
-        switch (hazardName) {
-            case "Cold Wave":
-                imageView.setImageResource(R.drawable.cold_wave);
-                break;
-            case "Conflict":
-                imageView.setImageResource(R.drawable.conflict);
-                break;
-            case "Cyclone":
-                imageView.setImageResource(R.drawable.cyclone);
-                break;
-            case "Drought":
-                imageView.setImageResource(R.drawable.drought);
-                break;
-            case "Earthquake":
-                imageView.setImageResource(R.drawable.earthquake);
-                break;
-            case "Epidemic":
-                imageView.setImageResource(R.drawable.epidemic);
-                break;
-            case "Fire":
-                imageView.setImageResource(R.drawable.fire);
-                break;
-            case "Flash Flood":
-                imageView.setImageResource(R.drawable.flash_flood);
-                break;
-            case "Heat Wave":
-                imageView.setImageResource(R.drawable.heat_wave);
-                break;
-            case "Humanitarian Access":
-                imageView.setImageResource(R.drawable.humanitarian_access);
-                break;
-            case "Insect Infestation":
-                imageView.setImageResource(R.drawable.insect_infestation);
-                break;
-            case "Landslide":
-            case "Mudslide":
-                imageView.setImageResource(R.drawable.landslide_mudslide);
-                break;
-            case "Locust Infestation":
-                imageView.setImageResource(R.drawable.locust_infestation);
-                break;
-            case "Population Displacement":
-                imageView.setImageResource(R.drawable.population_displacement);
-                break;
-            case "Population Return":
-                imageView.setImageResource(R.drawable.population_return);
-                break;
-            case "Snow Avalanche":
-                imageView.setImageResource(R.drawable.snow_avalanche);
-                break;
-            case "Snowfall":
-                imageView.setImageResource(R.drawable.snowfall);
-                break;
-            case "Storm":
-                imageView.setImageResource(R.drawable.storm);
-                break;
-            case "Storm Surge":
-                imageView.setImageResource(R.drawable.storm_surge);
-                break;
-            case "Technological Disaster":
-                imageView.setImageResource(R.drawable.technological_disaster);
-                break;
-            case "Tornado":
-                imageView.setImageResource(R.drawable.tornado);
-                break;
-            case "Tsunami":
-                imageView.setImageResource(R.drawable.tsunami);
-                break;
-            case "Violent Wind":
-                imageView.setImageResource(R.drawable.violent_wind);
-                break;
-            case "Volcano":
-                imageView.setImageResource(R.drawable.volcano);
-                break;
-        }
+        imageView.setImageResource(ExtensionHelperKt.getHazardImg(hazardName));
     }
 
     private String getNumOfPeopleText(long population, long numOfAreas) {
