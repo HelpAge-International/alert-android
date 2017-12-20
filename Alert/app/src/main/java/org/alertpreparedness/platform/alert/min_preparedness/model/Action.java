@@ -1,19 +1,21 @@
 package org.alertpreparedness.platform.alert.min_preparedness.model;
 
+import java.util.Date;
+
 /**
  * Created by faizmohideen on 13/12/2017.
  */
 
 public class Action {
+    private Boolean isArchived;
     private String taskName;
     private String department;
     private String assignee;
-    private boolean isArchived;
     private Long actionType;
-    private Long dueDate;
-    private int budget;
+    private Long budget;
+    private Date dueDate;
 
-    public Action(String taskName, String department, String assignee, boolean isArchived, Long actionType, Long dueDate, int budget) {
+    public Action(String taskName, String department, String assignee, Boolean isArchived, Long actionType, Date dueDate, Long budget) {
         this.taskName = taskName;
         this.department = department;
         this.assignee = assignee;
@@ -55,27 +57,27 @@ public class Action {
         this.actionType = actionType;
     }
 
-    public Long getDueDate() {
+    public Date getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(Long dueDate) {
+    public void setDueDate(Date dueDate) {
         this.dueDate = dueDate;
     }
 
-    public int getBudget() {
+    public Long getBudget() {
         return budget;
     }
 
-    public void setBudget(int budget) {
+    public void setBudget(Long budget) {
         this.budget = budget;
     }
 
-    public boolean isArchived() {
+    public Boolean isArchived() {
         return isArchived;
     }
 
-    public void setArchived(boolean archived) {
+    public void setArchived(Boolean archived) {
         isArchived = archived;
     }
 }
