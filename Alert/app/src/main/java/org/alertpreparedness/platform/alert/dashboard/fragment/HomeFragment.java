@@ -14,12 +14,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
+import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.helper.DataHandler;
 import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
@@ -119,7 +121,6 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     @Override
     public void updateAlert(String id, Alert alert) {
         alertAdapter.update(id, alert);
-
         updateTitle();
     }
 
@@ -164,4 +165,5 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     public void updateTitle(int stringResource, int backgroundResource) {
         ((MainDrawer)getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.ALERT, stringResource, backgroundResource);
     }
+
 }

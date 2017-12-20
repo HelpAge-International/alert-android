@@ -144,5 +144,10 @@
     <string name="my_country">My Country</string>
     <string name="my_country_desc">You can see programmes from agencies in your country by selecting a region and pressing search</string>
     <string name="search">Search</string>
+    <string name="select_level_1_error">Please select a level 1 value first</string>
+    <string name="select_level_2_error">Please select a level 2 value first</string>
+    <string name="select_country_error">Please select a country first</string>
+    <string name="progrmme_results">Programme Results</string>
+    <string name="results_for">Results for: %s%s %s</string>
 
 </resources>

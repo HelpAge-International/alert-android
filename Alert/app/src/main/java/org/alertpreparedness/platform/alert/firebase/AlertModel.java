@@ -1,5 +1,7 @@
 package org.alertpreparedness.platform.alert.firebase;
 
+import org.alertpreparedness.platform.alert.model.Alert;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

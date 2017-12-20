@@ -1,11 +1,22 @@
 package org.alertpreparedness.platform.alert
 
 import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder
+import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData
 import org.alertpreparedness.platform.alert.utils.Constants
 
 /**
  * Created by fei on 14/11/2017.
  */
+
+fun getLevel1Values(countryId: Int, mCountryDataList : ArrayList<CountryJsonData>) : List<String>? {
+    val selectedCountry = mCountryDataList.first { countryJsonData -> countryJsonData.countryId == countryId }
+    return selectedCountry.levelOneValues?.map { it.value }
+}
+
+fun getLevel2Values(countryId: Int, level1Id: Int, mCountryDataList : ArrayList<CountryJsonData>) : List<String>? {
+    val selectedCountry = mCountryDataList.first { countryJsonData -> countryJsonData.countryId == countryId }
+    return selectedCountry.levelOneValues?.first { it.id == level1Id }?.levelTwoValues?.map { it.value }
+}
 
 fun GroupViewHolder.getHazardImg(title: String): Int =
         when (title) {

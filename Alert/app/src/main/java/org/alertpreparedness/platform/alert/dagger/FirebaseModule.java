@@ -32,4 +32,12 @@ public class FirebaseModule {
         return db.child("alert").child(user.countryID);
     }
 
+
+    @Provides
+    @Singleton
+    @AgencyRef
+    public DatabaseReference providesAgency(@BaseDatabaseRef DatabaseReference db, User user) {
+        return db.child("agency").child(user.agencyAdminID);
+    }
+
 }

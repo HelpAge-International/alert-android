@@ -49,6 +49,7 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/tvSelectLevel1Heading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="12sp"
@@ -79,6 +80,7 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/tvSelectLevel2Heading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="12sp"
