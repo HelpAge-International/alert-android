@@ -177,7 +177,7 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
         drawerToggle.syncState();
     }
 
-    public void toggleActionBarWithTitle(ActionBarState type, @StringRes int title, @Nullable @ColorRes int bg) {
+    public void toggleActionBarWithTitle(ActionBarState type, @StringRes int title, @Nullable int bg) {
         toggleActionBar(type);
         switch (type) {
             case ALERT:
@@ -263,7 +263,6 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                     Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> setFragment(new ResponsePlanFragment()));
                     break;
                 case R.id.nav_my_country:
-                    System.out.println("HERE CLOSED");
                     Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> setFragment(new MyCountryFragment()));
                     break;
 

@@ -88,7 +88,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
         FirebaseAuth.getInstance().addAuthStateListener(this);
 
-        ((MainDrawer)getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.ALERT, R.string.green_alert_level, R.color.alertGreen);
+        ((MainDrawer)getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.ALERT, R.string.green_alert_level, R.drawable.alert_green);
 
         return v;
     }
@@ -146,6 +146,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
     @Override
     public void updateAlert(String id, Alert alert) {
+        alertRecyclerView.setVisibility(View.VISIBLE);
         alertAdapter.update(id, alert);
         updateTitle();
     }
@@ -158,17 +159,6 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
             }
         }
     }
-
-//
-//    @Override
-//    public void onDestroy() {
-//        FirebaseAuth.getInstance().removeAuthStateListener(this);
-//        for (DataHandler dataHandler : mHandlerList) {
-//            dataHandler.detach();
-//        }
-//
-//        super.onDestroy();
-//    }
 
     private void updateTitle() {
         boolean redPresent = false;
