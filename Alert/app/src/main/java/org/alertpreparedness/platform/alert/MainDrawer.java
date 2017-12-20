@@ -56,10 +56,10 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     DrawerLayout drawerLayout;
 
     @BindView(R.id.alert_appbar)
-    Toolbar alertToolbar;
+    public Toolbar alertToolbar;
 
     @BindView(R.id.toolbar)
-    Toolbar normalToolbar;
+    public Toolbar normalToolbar;
 
     @BindView(R.id.custom_bar_title)
     TextView appBarTitle;
@@ -97,6 +97,11 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     public void removeActionbarElevation() {
         normalActionbarContainer.setCardElevation(0);
         alertActionbarContainer.setCardElevation(0);
+    }
+
+    public void showActionbarElevation() {
+        normalActionbarContainer.setCardElevation(8);
+        alertActionbarContainer.setCardElevation(8);
     }
 
     public void toggleActionBar(ActionBarState type) {

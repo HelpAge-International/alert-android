@@ -1,10 +1,14 @@
 package org.alertpreparedness.platform.alert.dashboard.fragment;
 
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.NestedScrollView;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,6 +16,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -31,7 +37,9 @@ import org.alertpreparedness.platform.alert.model.Tasks;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
+import butterknife.BindFloat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.disposables.CompositeDisposable;
@@ -42,13 +50,22 @@ import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetai
  * Created by Tj on 13/12/2017.
  */
 
-public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemClickedListener, FirebaseAuth.AuthStateListener {
+public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemClickedListener, FirebaseAuth.AuthStateListener, NestedScrollView.OnScrollChangeListener {
 
     @BindView(R.id.tasks_list_view)
     RecyclerView myTaskRecyclerView;
 
     @BindView(R.id.alert_list_view)
     RecyclerView alertRecyclerView;
+
+    @BindView(R.id.nsScrollView)
+    NestedScrollView scroller;
+
+    @BindView(R.id.textView3)
+    TextView mTaskText;
+
+    @BindView(R.id.llPinned)
+    CardView mPinnedHeader;
 
     public TaskAdapter taskAdapter;
     public List<Tasks> tasksList;
@@ -73,6 +90,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     }
 
     private void initViews() {
+
         alertRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager alertlayoutManager = new LinearLayoutManager(getContext());
         alertRecyclerView.setLayoutManager(alertlayoutManager);
@@ -96,6 +114,11 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
         obj.getAlertsFromFirebase(this, getContext());
         obj.getTasksFromFirebase(this, getContext());
         mHandlerList.add(obj);
+
+        scroller.setNestedScrollingEnabled(false);
+        ViewCompat.setNestedScrollingEnabled(alertRecyclerView, false);
+        ViewCompat.setNestedScrollingEnabled(myTaskRecyclerView, false);
+        scroller.setOnScrollChangeListener(this);
     }
 
     @Override
@@ -165,4 +188,21 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
         ((MainDrawer)getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.ALERT, stringResource, backgroundResource);
     }
 
+    @Override
+    public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+        Rect rectf = new Rect();
+        mTaskText.getGlobalVisibleRect(rectf);
+        Rect rectf2 = new Rect();
+        ((MainDrawer)getActivity()).alertToolbar.getGlobalVisibleRect(rectf2);
+
+        if(rectf.top <= rectf2.bottom) {
+            mPinnedHeader.setVisibility(View.VISIBLE);
+            ((MainDrawer)getActivity()).removeActionbarElevation();
+        }
+        else {
+            mPinnedHeader.setVisibility(View.GONE);
+            ((MainDrawer)getActivity()).showActionbarElevation();
+        }
+
+    }
 }
