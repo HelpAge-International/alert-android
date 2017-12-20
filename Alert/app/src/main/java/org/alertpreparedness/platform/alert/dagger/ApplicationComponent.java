@@ -4,6 +4,8 @@ import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
 import org.alertpreparedness.platform.alert.helper.DataHandler;
 import org.alertpreparedness.platform.alert.mycountry.MyCountryFragment;
+import org.alertpreparedness.platform.alert.responseplan.ActiveFragment;
+import org.alertpreparedness.platform.alert.responseplan.ArchivedFragment;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlanFragment;
 
 import javax.inject.Singleton;
@@ -21,4 +23,7 @@ public interface ApplicationComponent {
     void inject(CreateAlertActivity activity);
     void inject(DataHandler dataHandler);
     void inject(MyCountryFragment fragment);
+    void inject(ActiveFragment fragment);
+    void inject(ArchivedFragment fragment);
+
 }

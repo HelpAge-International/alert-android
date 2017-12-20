@@ -3,13 +3,19 @@ package org.alertpreparedness.platform.alert.responseplan;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,6 +37,7 @@ import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.inject.Inject;
 
@@ -41,18 +48,13 @@ import butterknife.ButterKnife;
  * Created by Tj on 12/12/2017.
  */
 
-public class ResponsePlanFragment extends Fragment implements ResponsePlansAdapter.ItemSelectedListner, ValueEventListener {
+public class ResponsePlanFragment extends Fragment {
 
-    @BindView(R.id.rvPlans)
-    RecyclerView mPlansList;
+    @BindView(R.id.tabLayout)
+    TabLayout mTabs;
 
-    @Inject @ResponsePlansRef
-    DatabaseReference responsePlans;
-
-    @Inject
-    User user;
-
-    private ArrayList<ResponsePlanObj> items;
+    @BindView(R.id.pager)
+    ViewPager mPager;
 
     @Nullable
     @Override
@@ -60,94 +62,52 @@ public class ResponsePlanFragment extends Fragment implements ResponsePlansAdapt
         View v = inflater.inflate(R.layout.fragment_response_plans, container, false);
 
         ButterKnife.bind(this, v);
-        DependencyInjector.applicationComponent().inject(this);
 
         initViews();
 
         ((MainDrawer)getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.NORMAL, R.string.response_plans);
-
+        ((MainDrawer)getActivity()).removeActionbarElevation();
         return v;
     }
 
     private void initViews() {
 
-        items = new ArrayList<>();
-
-        mPlansList.setAdapter(new ResponsePlansAdapter(getContext(), items, this));
-        mPlansList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mPlansList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-
-        responsePlans.addValueEventListener(this);
+        mTabs.addTab(mTabs.newTab());
+        mTabs.addTab(mTabs.newTab());
+        mTabs.setupWithViewPager(mPager);
+        mPager.setAdapter(new ResponsePlanFragment.PagerAdapter(getFragmentManager()));
 
     }
 
-    @Override
-    public void onResponsePlanSelected(int pos) {
-        ApprovalStatusDialog dialog = new ApprovalStatusDialog();
-        Bundle data = new Bundle();
-        ApprovalStatusObj[] items = new ApprovalStatusObj[] {
-                new ApprovalStatusObj("Country Director", this.items.get(pos).countryApproval),
-                new ApprovalStatusObj("Regional Director", this.items.get(pos).regionalApproval),
-                new ApprovalStatusObj("Global Director", this.items.get(pos).globalApproval)
-        };
-        data.putParcelableArray(ApprovalStatusDialog.APPROVAL_STATUSES, items);
-        dialog.setArguments(data);
-        dialog.show(getActivity().getSupportFragmentManager(), "alert_level");
-    }
 
+    private class PagerAdapter extends FragmentStatePagerAdapter {
 
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
-        for(DataSnapshot child : dataSnapshot.getChildren()) {
-
-            System.out.println("child country = " + child.child("approval").child("countryDirector").getValue());
-            System.out.println("child global = " + child.child("approval").child("globalDirector").getValue());
-            System.out.println("child region = " + child.child("approval").child("regionDirector").getValue());
-
-            int regionalApproval = getApprovalStatus(child.child("approval").child("regionDirector"));
-            int countryApproval = getApprovalStatus(child.child("approval").child("countryDirector"));
-            int globalApproval = getApprovalStatus(child.child("approval").child("globalDirector"));
-
-            Long createdAt = (Long) child.child("timeCreated").getValue();
-            String hazardType = ExtensionHelperKt.getHazardTypes().get(Integer.valueOf((String) child.child("hazardScenario").getValue()));
-            String percentCompleted = String.valueOf(child.child("sectionsCompleted").getValue());
-            int status = Integer.valueOf(String.valueOf(child.child("status").getValue()));
-            String name = (String)child.child("name").getValue();
-
-            items.add(new ResponsePlanObj(
-                    hazardType,
-                    percentCompleted,
-                    name,
-                    status,
-                    new Date(createdAt),
-                    regionalApproval,
-                    countryApproval,
-                    globalApproval)
-            );
-            mPlansList.getAdapter().notifyItemInserted(items.size()-1);
+        public PagerAdapter(FragmentManager fm) {
+            super(fm);
         }
-    }
 
-    @SuppressWarnings("LoopStatementThatDoesntLoop")
-    private int getApprovalStatus(DataSnapshot ref) {
-        if(ref.getValue() != null) {
-            for (DataSnapshot child : ref.getChildren()) {
-                if(child.getValue() != null) {
-                   return  (int)((long)child.getValue());
-                }
-                else {
-                    break;
-                }
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 1:
+                    return new ArchivedFragment();
+                default:
+                    return new ActiveFragment();
             }
         }
-        return 0;
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 1:
+                    return "Archived";
+                default: return "Active";
+            }
+        }
     }
-
-    @Override
-    public void onCancelled(DatabaseError firebaseError) {
-
-    }
-
-
 }

@@ -6,14 +6,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.dashboard.adapter.HazardAdapter;
 
 import java.text.DateFormat;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,11 +26,68 @@ import butterknife.ButterKnife;
  * Created by Tj on 12/12/2017.
  */
 
-public class ResponsePlansAdapter extends RecyclerView.Adapter<ResponsePlansAdapter.ViewHolder> {
+public class ResponsePlansAdapter extends RecyclerView.Adapter<ResponsePlansAdapter.ViewHolder> implements ChildEventListener {
 
+    private final ArrayList<String> keys;
     private Context context;
-    private List<ResponsePlanObj> items;
-    private ItemSelectedListner listner;
+    private boolean shouldBeActive;
+    private HashMap<String, ResponsePlanObj> items;
+    private DatabaseReference responsePlans;
+    private ResponseAdapterListener listner;
+
+    public void addItem(String key, ResponsePlanObj responsePlanObj) {
+        if(keys.indexOf(key) == -1) {
+            keys.add(key);
+            items.put(key, responsePlanObj);
+            notifyItemInserted(keys.size()-1);
+        }
+        else {
+            items.put(key, responsePlanObj);
+            notifyItemChanged(keys.indexOf(key));
+        }
+    }
+
+    public ResponsePlanObj getItem(int index) {
+        return items.get(keys.get(index));
+    }
+
+    @Override
+    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+        //handled by activity
+    }
+
+    @Override
+    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+        //handled by activity
+        boolean a = (boolean)dataSnapshot.child("isActive").getValue();
+        System.out.println("a = " + a);
+        System.out.println("shouldBeActive = " + shouldBeActive);
+        if(a != shouldBeActive) {
+            removeItem(dataSnapshot);
+        }
+    }
+
+    @Override
+    public void onChildRemoved(DataSnapshot dataSnapshot) {
+        removeItem(dataSnapshot);
+    }
+
+    private void removeItem(DataSnapshot dataSnapshot) {
+        int index = keys.indexOf(dataSnapshot.getKey());
+        items.remove(dataSnapshot.getKey());
+        keys.remove(index);
+        notifyItemRemoved(index);
+    }
+
+    @Override
+    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+    }
+
+    @Override
+    public void onCancelled(DatabaseError databaseError) {
+
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -58,10 +119,15 @@ public class ResponsePlansAdapter extends RecyclerView.Adapter<ResponsePlansAdap
     }
 
 
-    public ResponsePlansAdapter(Context context, List<ResponsePlanObj> items, ItemSelectedListner listner) {
+    public ResponsePlansAdapter(Context context, DatabaseReference responsePlans, boolean shouldBeActive, ResponseAdapterListener listner) {
         this.context = context;
-        this.items = items;
+        this.shouldBeActive = shouldBeActive;
+        System.out.println("shouldBeActive = " + shouldBeActive);
+        this.items = new HashMap<>();
+        this.keys = new ArrayList<>(items.keySet());
+        this.responsePlans = responsePlans;
         this.listner = listner;
+        this.responsePlans.addChildEventListener(this);
     }
 
     @Override
@@ -74,7 +140,7 @@ public class ResponsePlansAdapter extends RecyclerView.Adapter<ResponsePlansAdap
     @Override
     public void onBindViewHolder(ResponsePlansAdapter.ViewHolder holder, int position) {
 
-        ResponsePlanObj model = items.get(position);
+        ResponsePlanObj model = items.get(keys.get(position));
 
         holder.description.setText(model.description);
         holder.percentComplete.setText(String.format(context.getString(R.string.complete), model.completePercentage));
@@ -114,7 +180,7 @@ public class ResponsePlansAdapter extends RecyclerView.Adapter<ResponsePlansAdap
         return items.size();
     }
 
-    public interface ItemSelectedListner {
+    public interface ResponseAdapterListener {
         void onResponsePlanSelected(int pos);
     }
 }
