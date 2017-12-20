@@ -12,11 +12,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.AlertApplication;
-import org.alertpreparedness.platform.alert.ExtensionHelperKt;
-import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.HazardOtherRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
-import org.alertpreparedness.platform.alert.model.Alert;
-import org.alertpreparedness.platform.alert.model.Tasks;
+import org.alertpreparedness.platform.alert.dashboard.model.Alert;
+import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.DBListener;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
@@ -26,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 
 /**
@@ -43,27 +49,38 @@ public class DataHandler {
     private String[] usersID;
     private Alert alert = new Alert();
 
-    public DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+    @Inject
+    @AlertRef
+    DatabaseReference dbAlertRef;
 
-    public void getAlert(AlertCallback callback){
+    @Inject
+    @ActionRef
+    DatabaseReference dbActionRef;
 
+    @Inject
+    @IndicatorRef
+    DatabaseReference dbIndicatorRef;
+
+    @Inject
+    @HazardOtherRef
+    DatabaseReference dbHazardOtherRef;
+
+
+    public DataHandler() {
+        DependencyInjector.applicationComponent().inject(this);
     }
 
     public void getAlertsFromFirebase(IHomeActivity iHome, Context context) {
         countryID = UserInfo.getUser(context).countryID;
-        //networkCountryID = UserInfo.getUser(context).networkCountryID;
+        networkCountryID = UserInfo.getUser(context).networkCountryID;
         usersID = new String[]{countryID};
 
         for (String ids : usersID) {
-            DatabaseReference db = database.child(mAppStatus).child("alert").child(ids);
+            DatabaseReference db = dbAlertRef;
             ChildEventListener childEventListener = new ChildEventListener() {
-
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     getAlert(dataSnapshot, ids);
-                    iHome.updateTitle(R.string.amber_alert_level, R.drawable.alert_amber_main);   // alerts.add((int) alertLevel);
-                    //setRedActionBar(iHome, alerts.contains(2));
-
                 }
 
                 private void getAlert(DataSnapshot dataSnapshot, String ids) {
@@ -71,40 +88,26 @@ public class DataHandler {
                         long alertLevel = (long) dataSnapshot.child("alertLevel").getValue();
                         String id = dataSnapshot.getKey();
 
-                        if (alertLevel != 0) {
-                            try {
+                        try {
+                            if (alertLevel != 0) {
                                 long numberOfAreas = dataSnapshot.child("affectedAreas").getChildrenCount();
                                 Log.e("f", id + " " + numberOfAreas);
                                 long country = (long) dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("country").getValue();
                                 long hazardScenario = (long) dataSnapshot.child("hazardScenario").getValue();
                                 long population = (long) dataSnapshot.child("estimatedPopulation").getValue();
                                 long redStatus = (long) dataSnapshot.child("approval").child("countryDirector").child(ids).getValue();
+
                                 String info = (String) dataSnapshot.child("infoNotes").getValue();
-
-                                //                            long timeUpdated = dataSnapshot.child("timeUpdated").exists() ?
-                                //                                    (long) dataSnapshot.child("timeUpdated").getValue() : 0;
-
-                                //                            if (dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("level1").getValue() != null) {
-                                //                                if (country >= 0) {
-                                //                                    long level1 = (long) dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("level1").getValue();
-                                //
-                                //                                    if (level1 != -1) {
-                                //                                        long level2 = (long) dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("level2").getValue();
-                                //                                        Alert alert = new Alert(country, level1, level2);
-                                //                                    }
-                                //                                }
-                                //                            } else {
-                                //                                Alert alert = new Alert(country);
-                                //                            }
 
                                 if (dataSnapshot.child("timeUpdated").exists()) {
                                     long updated = (long) dataSnapshot.child("timeUpdated").getValue();
+                                    String updatedBy = (String) dataSnapshot.child("updatedBy").getValue();
                                     date.setTimeInMillis(updated);
                                     String updatedDay = format.format(date.getTime());
 
                                     if (hazardScenario != -1) {
                                         Alert alert = new Alert(alertLevel, hazardScenario, population,
-                                                numberOfAreas, redStatus, info, updatedDay, null);
+                                                numberOfAreas, redStatus, info, updatedDay, updatedBy, null);
                                         alert.setId(id);
 
                                         iHome.updateAlert(dataSnapshot.getKey(), alert);
@@ -113,7 +116,7 @@ public class DataHandler {
                                         long level1 = alert.getLevel1();
                                         long level2 = alert.getLevel2();
                                         setOtherName(iHome, nameId, alertLevel, hazardScenario, numberOfAreas,
-                                                redStatus, population, country, level1, level2, info, updatedDay);
+                                                redStatus, population, country, level1, level2, info, updatedDay, updatedBy);
                                     }
 
                                 } else if (dataSnapshot.child("timeCreated").exists()) {
@@ -123,7 +126,7 @@ public class DataHandler {
 
                                     if (hazardScenario != -1) {
                                         Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas,
-                                                redStatus, info, updatedDay, null);
+                                                redStatus, info, updatedDay, null, null);
                                         alert.setId(id);
 
                                         iHome.updateAlert(dataSnapshot.getKey(), alert);
@@ -133,14 +136,12 @@ public class DataHandler {
                                         long level2 = alert.getLevel2();
 
                                         setOtherName(iHome, nameId, alertLevel, hazardScenario, numberOfAreas,
-                                                redStatus, population, country, level1, level2, info, updatedDay);
+                                                redStatus, population, country, level1, level2, info, updatedDay, null);
                                     }
                                 }
                             }
-                            catch (Exception e) {
-                                System.out.println("dataSnapshot = " + dataSnapshot);
-                                e.printStackTrace();
-                            }
+                        } catch (Exception e) {
+                            Log.e("ALERT_EXCEPTION", String.valueOf(e));
                         }
                     }
                 }
@@ -153,6 +154,7 @@ public class DataHandler {
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    getAlert(dataSnapshot, ids);
                     iHome.removeAlert(dataSnapshot.getKey());
                 }
 
@@ -173,12 +175,12 @@ public class DataHandler {
     }
 
     private void setOtherName(IHomeActivity iHome, String nameId, long alertLevel, long hazardScenario, long numOfAreas,
-                              long redStatus, long population, long country, long level1, long level2, String info, String updatedDay) {
+                              long redStatus, long population, long country, long level1, long level2, String info, String updatedDay, String updatedBy) {
         ValueEventListener valueEventListener = new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) { //TODO signle event listener
+            public void onDataChange(DataSnapshot dataSnapshot) {
                 String name = (String) dataSnapshot.child("name").getValue();
-                Alert alert = new Alert(alertLevel, hazardScenario, population, numOfAreas, redStatus, info, updatedDay, name);
+                Alert alert = new Alert(alertLevel, hazardScenario, population, numOfAreas, redStatus, info, updatedDay, updatedBy, name);
                 Alert alert1 = new Alert(country, level1, level2);
                 alert.setId(dataSnapshot.getKey());
                 iHome.updateAlert(dataSnapshot.getKey(), alert);
@@ -189,37 +191,48 @@ public class DataHandler {
 
             }
         };
-        DatabaseReference ref = database.child(mAppStatus).child("hazardOther").child(nameId);
+
+        DatabaseReference ref = dbHazardOtherRef.child(nameId);
         ref.addValueEventListener(valueEventListener);
         dbListener.add(ref, valueEventListener);
 
     }
 
-    public void detach() {
-        dbListener.detatch();
-    }
-
     public void getTasksFromFirebase(IHomeActivity iHome, Context context) {
         countryID = UserInfo.getUser(context).countryID;
         agencyAdminID = UserInfo.getUser(context).agencyAdminID;
-        usersID = new String[]{countryID};
+        usersID = new String[]{countryID};//More IDs will be added in the future
         String types[] = {"action", "indicator"};
 
         for (String ids : usersID) {
             for (String type : types) {
                 if (type.equals("action")) {
-                    ChildEventListener childEventListener;
-                    DatabaseReference db = database.child(mAppStatus).child("action").child(ids);
-                    db.addChildEventListener(childEventListener = new ChildEventListener() {
+
+                    DatabaseReference db = dbActionRef;
+                    ChildEventListener childEventListener = new ChildEventListener() {
+
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            getActionTasks(dataSnapshot);
+                        }
+
+                        private void getActionTasks(DataSnapshot dataSnapshot) {
                             String asignee = (String) dataSnapshot.child("asignee").getValue();
                             String task = (String) dataSnapshot.child("task").getValue();
                             String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                            if (asignee != null && task != null && asignee.equals(uid)) {
+                            boolean isCompleteExist = dataSnapshot.child("isComplete").exists();
+
+                            if( isCompleteExist){
+                                boolean isComplete = (boolean) dataSnapshot.child("isComplete").getValue();
+                                Tasks tasks = new Tasks(isComplete);
+
+                            }
+
+                            if (asignee != null && task != null && !isCompleteExist && asignee.equals(uid)) {
                                 if (dataSnapshot.hasChild("dueDate")) {
+
                                     long dueDate = (long) dataSnapshot.child("dueDate").getValue();
-                                    Tasks tasks = new Tasks("red", "action", task, dueDate);
+                                    Tasks tasks = new Tasks(0, "action", task, dueDate);
                                     iHome.addTask(tasks);
                                 }
                             }
@@ -227,7 +240,7 @@ public class DataHandler {
 
                         @Override
                         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+                            getActionTasks(dataSnapshot);
                         }
 
                         @Override
@@ -244,22 +257,30 @@ public class DataHandler {
                         public void onCancelled(DatabaseError databaseError) {
 
                         }
-                    });
+                    };
+                    db.addChildEventListener(childEventListener);
                     dbListener.add(db, childEventListener);
+
                 } else if (type.equals("indicator")) {
-                    ChildEventListener childEventListener;
-                    DatabaseReference db = database.child(mAppStatus).child("indicator").child(ids);
-                    db.addChildEventListener(childEventListener = new ChildEventListener() {
+                    DatabaseReference db = dbIndicatorRef;
+                    ChildEventListener childEventListener = new ChildEventListener() {
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            getIndicatorTasks(dataSnapshot);
+                        }
+
+                        private void getIndicatorTasks(DataSnapshot dataSnapshot) {
                             String asignee = (String) dataSnapshot.child("assignee").getValue();
                             String taskName = (String) dataSnapshot.child("name").getValue();
+                            long trigger = (long) dataSnapshot.child("triggerSelected").getValue();
+                            int level = (int) trigger;
 
                             String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
                             if (asignee != null && taskName != null && asignee.equals(uid)) {
                                 if (dataSnapshot.hasChild("dueDate")) {
                                     long dueDate = (long) dataSnapshot.child("dueDate").getValue();
-                                    Tasks tasks = new Tasks("red", "indicator", taskName, dueDate);
+                                    Tasks tasks = new Tasks(level, "indicator", taskName, dueDate);
 
                                     iHome.addTask(tasks);
                                 }
@@ -268,7 +289,7 @@ public class DataHandler {
 
                         @Override
                         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+                            getIndicatorTasks(dataSnapshot);
                         }
 
                         @Override
@@ -285,12 +306,15 @@ public class DataHandler {
                         public void onCancelled(DatabaseError databaseError) {
 
                         }
-                    });
+                    };
+                    db.addChildEventListener(childEventListener);
                     dbListener.add(db, childEventListener);
                 }
             }
         }
     }
 
-
+    public void detach() {
+        dbListener.detatch();
+    }
 }

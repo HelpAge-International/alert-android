@@ -30,18 +30,17 @@
             app:srcCompat="@android:drawable/sym_def_app_icon" />
 
         <TextView
-            android:id="@+id/name"
+            android:id="@+id/tvUserName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/nav_header_vertical_spacing"
-            android:text="Luis Vidal"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+            android:layout_marginTop="@dimen/nav_header_vertical_spacing"
+            android:text="Luis Vidal" />
 
         <TextView
-            android:id="@+id/organisation_name"
+            android:id="@+id/tvDepartment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ERT Lead for HelpAge International Philippines"/>
+            android:text="ERT Lead for HelpAge International Philippines" />
 
     </LinearLayout>
 </RelativeLayout>

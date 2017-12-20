@@ -26,4 +26,5 @@
     <color name="hazard_tab_color">#F3F3F3</color>
     <color name="log_content">#aa000000</color>
     <color name="light_blue">#006EA0</color>
+    <color name="divider_gray">#d1d1d1</color>
 </resources>

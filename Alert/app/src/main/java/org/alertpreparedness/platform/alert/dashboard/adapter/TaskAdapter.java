@@ -2,6 +2,9 @@ package org.alertpreparedness.platform.alert.dashboard.adapter;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.model.Tasks;
+import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -24,11 +27,8 @@ import java.util.Locale;
  */
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> implements Comparable<Tasks> {
-
     private List<Tasks> listArray;
-    private Calendar today = Calendar.getInstance();
-    private Calendar date = Calendar.getInstance();
-    private String dateFormat = "dd/MM/yyyy hh:mm:ss.SSS";
+    private String dateFormat = "MMM dd,yyyy";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
 
     public TaskAdapter(List<Tasks> List) {
@@ -55,7 +55,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
 
     public void add(Tasks tasks) {
         listArray.add(tasks);
-
         Collections.sort(listArray, new Comparator<Tasks>() {
             @Override
             public int compare(Tasks o1, Tasks o2) {
@@ -78,32 +77,31 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         }
 
         private void bind(Tasks tasks) {
-
             if (tasks.getTaskType().equals("action") && isDueToday(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
-                txt_taskStatus.setText(dueTodayString("red level", "preparedness action"));
+                txt_taskStatus.setText(dueTodayString(tasks.getAlertLevel(), "action"));
                 img_task.setImageResource(R.drawable.home_task_red);
             } else if (tasks.getTaskType().equals("indicator") && isDueToday(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
-                txt_taskStatus.setText(dueTodayString("red level", "indicator"));
+                txt_taskStatus.setText(dueTodayString(tasks.getAlertLevel(), "indicator"));
                 img_task.setImageResource(R.drawable.home_task_red);
             } else if (tasks.getTaskType().equals("action") && isDueInWeek(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
-                txt_taskStatus.setText(dueWeekString("amber level", "preparedness action"));
+                txt_taskStatus.setText(dueWeekString(tasks.getAlertLevel(), "action"));
                 img_task.setImageResource(R.drawable.home_task_amber);
             } else if (tasks.getTaskType().equals("indicator") && isDueInWeek(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
-                txt_taskStatus.setText(dueTodayString("amber level", "indicator"));
+                txt_taskStatus.setText(dueWeekString(tasks.getAlertLevel(), "indicator"));
                 img_task.setImageResource(R.drawable.home_task_amber);
             } else if (tasks.getTaskType().equals("action") && itWasDue(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
-                txt_taskStatus.setText(dueBeforeString("red level", "preparedness action", format.format(new Date(tasks.dueDate))));
+                txt_taskStatus.setText(dueBeforeString(tasks.getAlertLevel(), "action", format.format(new Date(tasks.dueDate))));
                 img_task.setImageResource(R.drawable.home_task_red);
-            } else if (tasks.getTaskType().equals("indicator") && itWasDue(tasks.getDueDate())) {
+            } else if (tasks.getTaskType().equals("indicator") && itWasDue(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
-                txt_taskStatus.setText(dueBeforeString("red level", "indicator", format.format(new Date(tasks.dueDate))));
+                txt_taskStatus.setText(dueBeforeString(tasks.getAlertLevel(), "indicator", format.format(new Date(tasks.dueDate))));
                 img_task.setImageResource(R.drawable.home_task_red);
-            }else{
+            }else {
                 txt_taskName.setVisibility(View.GONE);
                 txt_taskStatus.setVisibility(View.GONE);
                 img_task.setVisibility(View.GONE);
@@ -116,30 +114,85 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         return listArray.size();
     }
 
-    private String dueTodayString(String level, String type) {
-        return "A " + level + " " + type + "\n needs to be completed today";
+    private String getLevelAsString(int level){
+
+        switch (level){
+            case 0:
+                return "green level";
+            case 1:
+                return "amber level";
+            case 2:
+                return "red level";
+            default:
+                return "";
+        }
+
     }
 
-    private String dueWeekString(String level, String type) {
-        return "A " + level + " " + type + "\n needs to be completed this week";
+    private SpannableStringBuilder setBoldText(String str) {
+        SpannableStringBuilder sb = new SpannableStringBuilder(" "+str);
+        StyleSpan b = new StyleSpan(android.graphics.Typeface.BOLD);
+        sb.setSpan(b, 0, str.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        return sb;
     }
 
-    private String dueBeforeString(String level, String type, String date) {
-        return "A " + level + " " + type + " was due on \n" + date;
+    private String dueTodayString(int level, String type) {
+        if (type.equals("action")) {
+            return "A minimum preparedness action needs to be completed today";
+        } else {
+            return "A " + getLevelAsString(level) + " " + type + " needs to be completed today";
+        }
     }
 
-    private boolean isDueToday(long milliSeconds) {
-        date.setTimeInMillis(milliSeconds);
+    private String dueWeekString(int level, String type) {
+        if (type.equals("action")) {
+            return "A minimum preparedness action needs to be completed this week";
+        } else {
+            return "A " + getLevelAsString(level)  + " " + type + " needs to be completed this week";
+        }
+    }
+
+    private String dueBeforeString(int level, String type, String date) {
+        if (type.equals("action")) {
+            return "A minimum preparedness action was due on" + setBoldText(date);
+        } else {
+            return "A " + getLevelAsString(level)  + " " + type + " was due on" + setBoldText(date);
+        }
+    }
+
+    public boolean isDueToday(long milliseconds) {
+        Calendar today = Calendar.getInstance();
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(milliseconds);
+
         return today.get(Calendar.DAY_OF_YEAR) == date.get(Calendar.DAY_OF_YEAR);
     }
 
-    private boolean isDueInWeek(long milliSeconds) {
-        date.setTimeInMillis(milliSeconds);
-        return date.get(Calendar.DAY_OF_YEAR) > today.get(Calendar.DAY_OF_YEAR) && date.get(Calendar.DAY_OF_YEAR) < (today.get(Calendar.DAY_OF_YEAR) + 7);
+    public boolean isDueInWeek(long milliseconds) {
+        Calendar oneWeekAhead = Calendar.getInstance();
+        oneWeekAhead.add(Calendar.DAY_OF_YEAR, 8); // 8 to make it at the end of the day
+        oneWeekAhead.set(Calendar.HOUR, 0);
+        oneWeekAhead.set(Calendar.MINUTE, 0);
+        Calendar now = Calendar.getInstance();
+
+        return oneWeekAhead.getTimeInMillis() >= milliseconds && milliseconds >= now.getTimeInMillis();
     }
 
-    private boolean itWasDue(long milliSeconds) {
-        date.setTimeInMillis(milliSeconds);
-        return date.get(Calendar.DAY_OF_YEAR) < (today.get(Calendar.DAY_OF_YEAR));
+    private boolean itWasDue(long milliseconds) {
+        Calendar dueDate = Calendar.getInstance();
+        dueDate.setTimeInMillis(milliseconds);
+        Calendar today = Calendar.getInstance();
+
+        return dueDate.before(today);
     }
+
+    public boolean isNotDue(long milliseconds) {
+        Calendar oneWeekAhead = Calendar.getInstance();
+        oneWeekAhead.add(Calendar.DAY_OF_YEAR, 8); // 8 to make it at the end of the day
+        oneWeekAhead.set(Calendar.HOUR, 0);
+        oneWeekAhead.set(Calendar.MINUTE, 0);
+
+        return oneWeekAhead.after(new Date(milliseconds));
+    }
+
 }

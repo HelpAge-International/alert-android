@@ -16,8 +16,8 @@ import android.widget.Button;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.dagger.AlertRef;
-import org.alertpreparedness.platform.alert.dagger.BaseDatabaseRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertFieldsAdapter;
 import org.alertpreparedness.platform.alert.dashboard.model.AlertFieldModel;

@@ -3,8 +3,6 @@ package org.alertpreparedness.platform.alert.dashboard.activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.view.Window;
 
 import com.google.firebase.database.DataSnapshot;
@@ -14,17 +12,20 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.firebase.AffectedAreaModel;
+import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
-import org.alertpreparedness.platform.alert.model.Alert;
+import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.DBListener;
-import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity.EXTRA_ALERT;
 
@@ -38,6 +39,9 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
 
     protected Alert alert;
 
+    @Inject @AlertRef
+    DatabaseReference alertRef;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,13 +50,13 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
         if (intent.hasExtra(EXTRA_ALERT)){
             alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
         }
+        DependencyInjector.applicationComponent().inject(this);
 
         mToolbar.setTitle(R.string.update_alert);
         countryID = UserInfo.getUser(this).countryID;
 
         fetchDetails();
         setUpActionBarColour();
-
     }
 
     @Override
@@ -84,7 +88,6 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
                             displayable
                     );
                     addArea(area);
-
                 }
                 break;
             case HAZARD_RESULT:
@@ -124,11 +127,9 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
     }
 
     private void fetchDetails() {
-
         if(alert.getOtherName() != null){
             mFieldsAdapter.setTextFieldValue(0, alert.getOtherName());
         }else {
-
             for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
                 if (i == alert.getHazardScenario()) {
                     mFieldsAdapter.setTextFieldValue(0, Constants.HAZARD_SCENARIO_NAME[i]);
@@ -151,7 +152,6 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
                 mFieldsAdapter.addSubListValue(3, Constants.COUNTRIES[i]);
             }
         }
-
         mFieldsAdapter.setTextFieldValue(4, alert.getInfo());
     }
 
@@ -175,21 +175,16 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
 
     @Override
     public void saveData(boolean isRedAlert) {
-
         int alertLevel = levelNew == -1? (int) alert.getAlertLevel() : levelNew;
         long population = Long.parseLong(mFieldsAdapter.getModel(mFieldsAdapter.isRedAlert() ? 3 : 2).resultTitle);
         String info = mFieldsAdapter.getModel(mFieldsAdapter.isRedAlert() ?  5 : 4).resultTitle;
 
-        if(mFieldsAdapter.isRedAlert()) {
+        if(isRedAlert) {
             String reason = mFieldsAdapter.getModel(2).resultTitle;
-            System.out.println("Level: "+ alertLevel +" Reason: "+ reason+ " Population: "+ population + " Info: "+ info);
             update(alertLevel, reason, population, affectedAreas, info);
-        }
-        else if (alert.getAlertLevel() == 1){
+        } else if (alert.getAlertLevel() == 1){
             update(alertLevel, null, population, affectedAreas, info);
-            System.out.println("Level: "+ alertLevel );
         }
-
     }
 
     @Override
@@ -210,11 +205,10 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
         super.onTypeSelected(type);
     }
 
+
     private void update(int alertLevel, String reason, long population, List<AffectedAreaModel> areas, String info) {
-        String countryID = UserInfo.getUser(UpdateAlertActivity.this).countryID;
-        String mAppStatus = PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS);
-        DatabaseReference db = database.child(mAppStatus).child("alert").child(countryID)
-                .child(alert.getId());
+
+        DatabaseReference db = alertRef.child(alert.getId());
 
            db.addListenerForSingleValueEvent(new ValueEventListener() {
                @Override
@@ -241,6 +235,10 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
                    db.child("infoNotes").setValue(info);
                    db.child("estimatedPopulation").setValue(population);
 
+                  if (dataSnapshot.child("otherName").exists()) {
+                        //TODO Fix other alert update
+                  }
+
 //        db.child("affectedAreas").removeValue((databaseError, databaseReference) -> {
 //            for (int i = 0; i < areas.size(); i++) {
 //                db.child("affectedAreas").child(String.valueOf(i))
@@ -258,7 +256,6 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
 
 
     public void backToDetailView() {
-
         Intent intent = new Intent(UpdateAlertActivity.this, AlertDetailActivity.class);
         intent.putExtra(EXTRA_ALERT, alert);
 
@@ -288,5 +285,4 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
             alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
         }
     }
-
 }
