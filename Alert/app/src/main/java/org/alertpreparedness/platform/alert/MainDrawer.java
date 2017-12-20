@@ -263,7 +263,6 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                     Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> setFragment(new ResponsePlanFragment()));
                     break;
                 case R.id.nav_my_country:
-                    System.out.println("HERE CLOSED");
                     Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> setFragment(new MyCountryFragment()));
                     break;
 

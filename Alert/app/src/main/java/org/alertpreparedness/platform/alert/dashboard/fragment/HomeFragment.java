@@ -146,6 +146,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
     @Override
     public void updateAlert(String id, Alert alert) {
+        alertRecyclerView.setVisibility(View.VISIBLE);
         alertAdapter.update(id, alert);
         updateTitle();
     }
