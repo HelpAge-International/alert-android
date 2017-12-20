@@ -11,6 +11,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.firebase.AffectedAreaModel;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
@@ -31,8 +32,12 @@ import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetai
 public class UpdateAlertActivity extends CreateAlertActivity  {
 
     private DBListener dbListener = new DBListener();
-    private List<AffectedArea> affectedAreas = new ArrayList<>();
+    private List<AffectedAreaModel> affectedAreas = new ArrayList<>();
     private String countryID;
+    protected int levelNew = -1;
+    int hazardNew = -1;
+
+    protected Alert alert;
 
     @Inject @AlertRef
     DatabaseReference alertRef;
@@ -41,6 +46,10 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Intent intent = getIntent();
+        if (intent.hasExtra(EXTRA_ALERT)){
+            alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
+        }
         DependencyInjector.applicationComponent().inject(this);
 
         mToolbar.setTitle(R.string.update_alert);
@@ -65,7 +74,6 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
         }
     }
 
-    int hazardNew = -1;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -88,6 +96,34 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
                 }
                 break;
         }
+    }
+
+
+    protected void addArea(ModelIndicatorLocation location){
+        if (alert == null || location == null) return;
+
+        DatabaseReference db = alertRef.child(alert.getId());
+
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    int level1 = location.getLevel1() == null ? -1 : location.getLevel1();
+                    int level2 =location.getLevel2() == null ? -1 : location.getLevel2();
+                    AffectedAreaModel affectedArea = new AffectedAreaModel(location.getCountry(),
+                            level1, level2);
+                    db.child("affectedAreas")
+                            .child(String.valueOf(mFieldsAdapter.getSubListCapacity(3)))
+                            .setValue(affectedArea)
+                            .addOnCompleteListener(aVoid ->{});
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void fetchDetails() {
@@ -153,6 +189,7 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
 
     @Override
     public void onTypeSelected(int type) {
+        levelNew = -1;
         switch (type) {
             case 1:
                 mFieldsAdapter.removeRedReason();
@@ -168,7 +205,8 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
         super.onTypeSelected(type);
     }
 
-    private void update(int alertLevel, String reason, long population, List<AffectedArea> areas, String info) {
+
+    private void update(int alertLevel, String reason, long population, List<AffectedAreaModel> areas, String info) {
 
         DatabaseReference db = alertRef.child(alert.getId());
 

@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.home;
+package org.alertpreparedness.platform.alert.dashboard.activity;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;

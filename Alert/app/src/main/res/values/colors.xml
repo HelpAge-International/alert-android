@@ -21,6 +21,7 @@
     <color name="grey_title">#66000000</color>
     <color name="gray_title">#7A7A7A</color>
     <color name="divider_color">#FFEAEAEA</color>
+    <color name="divider_color_lighter">#ededed</color>
     <color name="remove_button">#E10514</color>
     <color name="hazard_tab_color">#F3F3F3</color>
     <color name="log_content">#aa000000</color>

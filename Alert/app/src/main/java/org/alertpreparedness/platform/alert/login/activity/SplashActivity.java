@@ -6,7 +6,7 @@ import android.os.Handler;
 
 import org.alertpreparedness.platform.alert.BaseActivity;
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.home.HomeScreen;
+import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 
 public class SplashActivity extends BaseActivity {

@@ -30,6 +30,7 @@ import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivi
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
+import org.alertpreparedness.platform.alert.mycountry.MyCountryFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.MinPreparednessFragment;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlanFragment;
@@ -66,10 +67,10 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     DrawerLayout drawerLayout;
 
     @BindView(R.id.alert_appbar)
-    Toolbar alertToolbar;
+    public Toolbar alertToolbar;
 
     @BindView(R.id.toolbar)
-    Toolbar normalToolbar;
+    public Toolbar normalToolbar;
 
     @BindView(R.id.custom_bar_title)
     TextView appBarTitle;
@@ -117,6 +118,12 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
         alertActionbarContainer.setCardElevation(0);
     }
 
+
+    public void showActionbarElevation() {
+        normalActionbarContainer.setCardElevation(8);
+        alertActionbarContainer.setCardElevation(8);
+    }
+
     private void setUserName() {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
         DatabaseReference db = ref.
@@ -150,11 +157,11 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
             case ALERT:
                 alertActionbarContainer.setVisibility(View.VISIBLE);
                 normalActionbarContainer.setVisibility(View.GONE);
-                alertActionbarContainer.setCardElevation(6);
+                alertActionbarContainer.setCardElevation(8);
                 setSupportActionBar(alertToolbar);
                 break;
             case NORMAL:
-                normalActionbarContainer.setCardElevation(6);
+                normalActionbarContainer.setCardElevation(8);
                 alertActionbarContainer.setVisibility(View.GONE);
                 normalActionbarContainer.setVisibility(View.VISIBLE);
                 setSupportActionBar(normalToolbar);
@@ -231,19 +238,16 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
         drawerLayout.closeDrawers();
         if (mCurrentItem != item.getItemId()) {
             switch (item.getItemId()) {
                 case R.id.nav_home:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> {
-                        setFragment(new HomeFragment());
-                    });
-                    //                setFragment(new HomeFragment());
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> setFragment(new HomeFragment()));
+    //                setFragment(new HomeFragment());
                     break;
                 case R.id.nav_risk:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> {
-                        setFragment(new RiskFragment());
-                    });
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> setFragment(new RiskFragment()));
                     break;
                 case R.id.nav_logout:
                     PreferHelper.getInstance(getApplicationContext()).edit().remove(UserInfo.PREFS_USER).apply();
@@ -251,19 +255,16 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                     firebaseAuth.signOut();
                     startActivity(new Intent(getApplicationContext(), LoginScreen.class));
                     finish();
-//                    clearAllActivities();
-                    //                        PreferHelper.getInstance(MainDrawer.this).edit().remove(UserInfo.PREFS_USER).apply();
-                    //                        finish();
                     break;
                 case R.id.nav_minimum:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> {
-                        setFragment(new MinPreparednessFragment());
-                    });
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> setFragment(new MinPreparednessFragment()));
                     break;
                 case R.id.nav_response:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> {
-                        setFragment(new ResponsePlanFragment());
-                    });
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> setFragment(new ResponsePlanFragment()));
+                    break;
+                case R.id.nav_my_country:
+                    System.out.println("HERE CLOSED");
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> setFragment(new MyCountryFragment()));
                     break;
 
             }

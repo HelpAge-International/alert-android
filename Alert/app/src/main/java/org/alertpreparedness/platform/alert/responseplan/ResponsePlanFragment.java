@@ -2,13 +2,19 @@ package org.alertpreparedness.platform.alert.responseplan;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,6 +30,7 @@ import org.alertpreparedness.platform.alert.model.User;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.inject.Inject;
 
@@ -34,16 +41,13 @@ import butterknife.ButterKnife;
  * Created by Tj on 12/12/2017.
  */
 
-public class ResponsePlanFragment extends Fragment implements ResponsePlansAdapter.ItemSelectedListner {
+public class ResponsePlanFragment extends Fragment {
 
-    @BindView(R.id.rvPlans)
-    RecyclerView mPlansList;
+    @BindView(R.id.tabLayout)
+    TabLayout mTabs;
 
-    @Inject @ResponsePlansRef
-    DatabaseReference responsePlans;
-
-    @Inject
-    User user;
+    @BindView(R.id.pager)
+    ViewPager mPager;
 
     @Nullable
     @Override
@@ -51,79 +55,52 @@ public class ResponsePlanFragment extends Fragment implements ResponsePlansAdapt
         View v = inflater.inflate(R.layout.fragment_response_plans, container, false);
 
         ButterKnife.bind(this, v);
-        DependencyInjector.applicationComponent().inject(this);
 
         initViews();
 
         ((MainDrawer)getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.NORMAL, R.string.response_plans);
-
+        ((MainDrawer)getActivity()).removeActionbarElevation();
         return v;
     }
 
     private void initViews() {
 
-        ArrayList<ResponsePlanObj> items = new ArrayList<>();
-
-        System.out.println(responsePlans.getKey());
-
-        System.out.println("responsePlans = " + responsePlans);
-
-        mPlansList.setAdapter(new ResponsePlansAdapter(getContext(), items, this));
-        mPlansList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mPlansList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-
-        responsePlans.addValueEventListener(new ValueEventListener() {
-
-            @SuppressWarnings("ConstantConditions")
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot child : dataSnapshot.getChildren()) {
-
-                    Long createdAt = (Long) child.child("timeCreated").getValue();
-                    String hazardType = ExtensionHelperKt.getHazardTypes().get(Integer.valueOf((String) child.child("hazardScenario").getValue()));
-                    String percentCompleted = String.valueOf(child.child("sectionsCompleted").getValue());
-                    int status = Integer.valueOf(String.valueOf(child.child("status").getValue()));
-                    String name = (String)child.child("name").getValue();
-
-                    items.add(new ResponsePlanObj(
-                            hazardType,
-                            percentCompleted,
-                            name,
-                            status,
-                            new Date(createdAt))
-                    );
-                    mPlansList.getAdapter().notifyItemInserted(items.size()-1);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError firebaseError) {
-
-            }
-
-        });
-//
-//        items.add(new ResponsePlanObj(
-//                "Cold Freeze",
-//                "90%",
-//                "Lorem inpum dlor sit amet",
-//                0,
-//                new Date()
-//        ));
-
+        mTabs.addTab(mTabs.newTab());
+        mTabs.addTab(mTabs.newTab());
+        mTabs.setupWithViewPager(mPager);
+        mPager.setAdapter(new ResponsePlanFragment.PagerAdapter(getFragmentManager()));
 
     }
 
-    @Override
-    public void onResponsePlanSelected(int pos) {
-        ApprovalStatusDialog dialog = new ApprovalStatusDialog();
-        Bundle data = new Bundle();
-        ApprovalStatusObj[] items = new ApprovalStatusObj[] {
-                new ApprovalStatusObj("Country Director", 0),
-                new ApprovalStatusObj("Regional Director", 0)
-        };
-        data.putParcelableArray(ApprovalStatusDialog.APPROVAL_STATUSES, items);
-        dialog.setArguments(data);
-        dialog.show(getActivity().getSupportFragmentManager(), "alert_level");
+
+    private class PagerAdapter extends FragmentStatePagerAdapter {
+
+        public PagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 1:
+                    return new ArchivedFragment();
+                default:
+                    return new ActiveFragment();
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 1:
+                    return "Archived";
+                default: return "Active";
+            }
+        }
     }
 }

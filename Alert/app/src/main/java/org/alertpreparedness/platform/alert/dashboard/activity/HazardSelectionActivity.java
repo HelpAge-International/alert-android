@@ -19,6 +19,7 @@ import butterknife.OnClick;
 public class HazardSelectionActivity extends AppCompatActivity implements HazardAdapter.HazardSelectionListner {
 
     public static final String HAZARD_TYPE = "hazard_type";
+    public static final String HAZARD_TITLE = "hazard_title";
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -49,9 +50,10 @@ public class HazardSelectionActivity extends AppCompatActivity implements Hazard
 
 
     @Override
-    public void onHazardSelected(String hazardTitle) {
+    public void onHazardSelected(int position, String hazardTitle) {
         Intent data = new Intent();
-        data.putExtra(HAZARD_TYPE, hazardTitle);
+        data.putExtra(HAZARD_TYPE, position);
+        data.putExtra(HAZARD_TITLE, hazardTitle);
         setResult(RESULT_OK, data);
         finish();
     }

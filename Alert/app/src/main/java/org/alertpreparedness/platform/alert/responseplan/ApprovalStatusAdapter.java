@@ -67,7 +67,7 @@ public class ApprovalStatusAdapter extends RecyclerView.Adapter<ApprovalStatusAd
                 holder.status.setText(R.string.waiting_approval);
                 holder.icon.setImageResource(R.drawable.icon_pending_grey);
                 break;
-            case 1://green
+            case 3://green
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertGreen));
                 holder.status.setText(R.string.approved);
                 holder.icon.setImageResource(R.drawable.icon_status_complete);
@@ -77,7 +77,7 @@ public class ApprovalStatusAdapter extends RecyclerView.Adapter<ApprovalStatusAd
                 holder.status.setText(R.string.in_progress);
                 holder.icon.setImageResource(R.drawable.icon_pending_amber);
                 break;
-            case 3:
+            case 1:
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertRed));
                 holder.status.setText(R.string.needs_reviewing);
                 holder.icon.setImageResource(R.drawable.icon_status_needs_reviewing);

@@ -30,7 +30,6 @@ import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.dashboard.model.Alert;
-import org.alertpreparedness.platform.alert.home.HomeScreen;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService;
 import org.alertpreparedness.platform.alert.utils.Constants;

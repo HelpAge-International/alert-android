@@ -35,8 +35,16 @@ public class FirebaseModule {
     @Provides
     @Singleton
     @AlertRef
-    public DatabaseReference provideAlertRef(@BaseDatabaseRef DatabaseReference db, User user) {
+    public DatabaseReference providesAlert(@BaseDatabaseRef DatabaseReference db, User user) {
         return db.child("alert").child(user.countryID);
+    }
+
+
+    @Provides
+    @Singleton
+    @AgencyRef
+    public DatabaseReference providesAgency(@BaseDatabaseRef DatabaseReference db, User user) {
+        return db.child("agency").child(user.agencyAdminID);
     }
 
     @Provides

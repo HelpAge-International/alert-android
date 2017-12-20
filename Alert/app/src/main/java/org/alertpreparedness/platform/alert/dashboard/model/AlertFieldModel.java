@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.dashboard.model;
 
+import android.content.Context;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
 import android.text.InputType;
@@ -23,9 +24,33 @@ public class AlertFieldModel {
     public String resultTitle;
     public int inputType = InputType.TYPE_CLASS_TEXT;
 
+    @Override
+    public String toString() {
+        return "AlertFieldModel{" +
+                "originalPosition=" + originalPosition +
+                ", viewType=" + viewType +
+                ", drawable=" + drawable +
+                ", initialTitle=" + initialTitle +
+                ", strings=" + strings +
+                ", resultTitle='" + resultTitle + '\'' +
+                ", inputType=" + inputType +
+                '}';
+    }
+
+    public String toString(Context context) {
+        return "AlertFieldModel{" +
+                "originalPosition=" + originalPosition +
+                ", viewType=" + viewType +
+                ", drawable=" + drawable +
+                ", initialTitle=" + context.getString(initialTitle) +
+                ", strings=" + strings +
+                ", resultTitle='" + resultTitle + '\'' +
+                ", inputType=" + inputType +
+                '}';
+    }
+
     public AlertFieldModel(int viewType, int drawable, int title) {
         this.viewType = viewType;
-
         this.drawable = drawable;
         this.initialTitle = title;
     }
