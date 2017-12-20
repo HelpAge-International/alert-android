@@ -1,7 +1,5 @@
 package org.alertpreparedness.platform.alert.min_preparedness.model;
 
-import java.util.Date;
-
 /**
  * Created by faizmohideen on 13/12/2017.
  */
@@ -12,10 +10,10 @@ public class Action {
     private String department;
     private String assignee;
     private Long actionType;
+    private Long dueDate;
     private Long budget;
-    private Date dueDate;
 
-    public Action(String taskName, String department, String assignee, Boolean isArchived, Long actionType, Date dueDate, Long budget) {
+    public Action(String taskName, String department, String assignee, Boolean isArchived, Long actionType, Long dueDate, Long budget) {
         this.taskName = taskName;
         this.department = department;
         this.assignee = assignee;
@@ -57,11 +55,11 @@ public class Action {
         this.actionType = actionType;
     }
 
-    public Date getDueDate() {
+    public Long getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(Date dueDate) {
+    public void setDueDate(Long dueDate) {
         this.dueDate = dueDate;
     }
 

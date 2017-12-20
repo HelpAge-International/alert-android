@@ -77,23 +77,23 @@ public class MinPreparednessFragment extends Fragment implements ActionAdapter.I
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot getChild : dataSnapshot.getChildren()){
 
-//                    String taskName = (String) getChild.child("task").getValue();
-//                    String department = (String) getChild.child("department").getValue();
-//                    String assignee = (String) getChild.child("asignee").getValue();
-//                    Boolean isArchived = (Boolean) getChild.child("isArchived").getValue();
-//                    Long actionType = (Long) getChild.child("type").getValue();
-//                    Long dueDate = (Long) getChild.child("dueDate").getValue();
-//                    Long budget = (Long) getChild.child("budget").getValue();
-//
-//                    items.add(new Action(
-//                            taskName,
-//                            department,
-//                            assignee,
-//                            isArchived,
-//                            actionType,
-//                            new Date (dueDate),
-//                            budget)
-//                    );
+                    String taskName = (String) getChild.child("task").getValue();
+                    String department = (String) getChild.child("department").getValue();
+                    String assignee = (String) getChild.child("asignee").getValue();
+                    Boolean isArchived = (Boolean) getChild.child("isArchived").getValue();
+                    Long actionType = (Long) getChild.child("type").getValue();
+                    Long dueDate = (Long) getChild.child("dueDate").getValue();
+                    Long budget = (Long) getChild.child("budget").getValue();
+
+                    items.add(new Action(
+                            taskName,
+                            department,
+                            assignee,
+                            isArchived,
+                            actionType,
+                            dueDate,
+                            budget)
+                    );
 
                     //String assignee = (String) getChild.child("asignee").getValue();
 //                    System.out.println(" Name: "+ taskName+
