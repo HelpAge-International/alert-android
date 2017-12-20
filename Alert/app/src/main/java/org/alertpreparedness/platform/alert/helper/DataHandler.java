@@ -12,8 +12,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.AlertApplication;
-import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.interfaces.AuthCallback;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.HazardOtherRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
@@ -26,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 
 /**
@@ -43,7 +49,26 @@ public class DataHandler {
     private String[] usersID;
     private Alert alert = new Alert();
 
-    public DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+    @Inject
+    @AlertRef
+    DatabaseReference dbAlertRef;
+
+    @Inject
+    @ActionRef
+    DatabaseReference dbActionRef;
+
+    @Inject
+    @IndicatorRef
+    DatabaseReference dbIndicatorRef;
+
+    @Inject
+    @HazardOtherRef
+    DatabaseReference dbHazardOtherRef;
+
+
+    public DataHandler() {
+        DependencyInjector.applicationComponent().inject(this);
+    }
 
     public void getAlertsFromFirebase(IHomeActivity iHome, Context context) {
         countryID = UserInfo.getUser(context).countryID;
@@ -51,13 +76,11 @@ public class DataHandler {
         usersID = new String[]{countryID};
 
         for (String ids : usersID) {
-            DatabaseReference db = database.child(mAppStatus).child("alert").child(ids);
+            DatabaseReference db = dbAlertRef;
             ChildEventListener childEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     getAlert(dataSnapshot, ids);
-                    //iHome.updateTitle(R.string.amber_alert_level, R.drawable.alert_amber_main);   // alerts.add((int) alertLevel);
-                    //setRedActionBar(iHome, alerts.contains(2));
                 }
 
                 private void getAlert(DataSnapshot dataSnapshot, String ids) {
@@ -131,6 +154,7 @@ public class DataHandler {
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    getAlert(dataSnapshot, ids);
                     iHome.removeAlert(dataSnapshot.getKey());
                 }
 
@@ -154,7 +178,7 @@ public class DataHandler {
                               long redStatus, long population, long country, long level1, long level2, String info, String updatedDay, String updatedBy) {
         ValueEventListener valueEventListener = new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) { //TODO signle event listener
+            public void onDataChange(DataSnapshot dataSnapshot) {
                 String name = (String) dataSnapshot.child("name").getValue();
                 Alert alert = new Alert(alertLevel, hazardScenario, population, numOfAreas, redStatus, info, updatedDay, updatedBy, name);
                 Alert alert1 = new Alert(country, level1, level2);
@@ -167,7 +191,8 @@ public class DataHandler {
 
             }
         };
-        DatabaseReference ref = database.child(mAppStatus).child("hazardOther").child(nameId);
+
+        DatabaseReference ref = dbHazardOtherRef.child(nameId);
         ref.addValueEventListener(valueEventListener);
         dbListener.add(ref, valueEventListener);
 
@@ -176,14 +201,14 @@ public class DataHandler {
     public void getTasksFromFirebase(IHomeActivity iHome, Context context) {
         countryID = UserInfo.getUser(context).countryID;
         agencyAdminID = UserInfo.getUser(context).agencyAdminID;
-        usersID = new String[]{countryID};
+        usersID = new String[]{countryID};//More IDs will be added in the future
         String types[] = {"action", "indicator"};
 
         for (String ids : usersID) {
             for (String type : types) {
                 if (type.equals("action")) {
 
-                    DatabaseReference db = database.child(mAppStatus).child("action").child(ids);
+                    DatabaseReference db = dbActionRef;
                     ChildEventListener childEventListener = new ChildEventListener() {
 
                         @Override
@@ -235,8 +260,9 @@ public class DataHandler {
                     };
                     db.addChildEventListener(childEventListener);
                     dbListener.add(db, childEventListener);
+
                 } else if (type.equals("indicator")) {
-                    DatabaseReference db = database.child(mAppStatus).child("indicator").child(ids);
+                    DatabaseReference db = dbIndicatorRef;
                     ChildEventListener childEventListener = new ChildEventListener() {
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {

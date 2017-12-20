@@ -3,7 +3,6 @@ package org.alertpreparedness.platform.alert.dashboard.activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
 import android.view.Window;
 
 import com.google.firebase.database.DataSnapshot;
@@ -12,16 +11,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.dagger.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.dashboard.model.Alert;
-import org.alertpreparedness.platform.alert.home.HomeScreen;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.DBListener;
-import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import java.util.ArrayList;

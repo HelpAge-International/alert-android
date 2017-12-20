@@ -3,7 +3,6 @@ package org.alertpreparedness.platform.alert.helper;
 import android.content.Context;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -13,8 +12,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import org.alertpreparedness.platform.alert.AlertApplication;
-import org.alertpreparedness.platform.alert.dagger.AlertRef;
-import org.alertpreparedness.platform.alert.dagger.UserRef;
 import org.alertpreparedness.platform.alert.interfaces.AuthCallback;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.service.NetworkService;
@@ -22,13 +19,7 @@ import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.DBListener;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Timer;
-
-import javax.inject.Inject;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -50,7 +41,6 @@ public class UserInfo {
 
     public void authUser(final AuthCallback authCallback, Context context) {
         for (String nodeName : users) {
-            //Timer timer[] = new Timer[4];
 
                 DatabaseReference db = database.child(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS)).child(nodeName);
                 db.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -63,21 +53,16 @@ public class UserInfo {
                             Log.e("Tag", "UID" + userNode);
                             populateUser(authCallback, nodeName, userNode, context);
                         }
-
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                     }
                 });
-                //dbListener.add(db, valueEventListener);
             }
-
-
     }
 
     private void setHazardId(AuthCallback authCallback, Context context, String userID, int userType, String agencyAdmin, String countryId, String systemAdmin, boolean isCountryDirector ) {
-
         //TODO hazard ID
 
         country = UserInfo.getUser(context).countryID;
@@ -119,8 +104,6 @@ public class UserInfo {
                 );
                 compositeDisposable.add(NSDisposable);
 
-
-
             }
 
             @Override
@@ -152,7 +135,6 @@ public class UserInfo {
         String userID = PreferHelper.getString(AlertApplication.getContext(), Constants.UID);
         int userType = getUserType(nodeName);
         boolean isCountryDirector = false;
-        String hazardId = null;
 
             String agencyAdmin = userNode.child("agencyAdmin").getChildren().iterator().next().getKey();
             String systemAdmin = userNode.child("systemAdmin").getChildren().iterator().next().getKey();
@@ -163,8 +145,6 @@ public class UserInfo {
             PreferHelper.putString(AlertApplication.getContext(), Constants.SYSTEM_ID, systemAdmin);
             PreferHelper.putInt(AlertApplication.getContext(), Constants.USER_TYPE, userType);
 
-            // Log.e("LINK", userRef.getRoot().toString());
-            //System.out.println("HAZARD: " + hazardId);
 
             if (nodeName.equals("countryDirector")) {
                 isCountryDirector = true;
@@ -178,19 +158,6 @@ public class UserInfo {
                 callback.onUserAuthorized(user);
                 setHazardId(callback, context, userID, userType, agencyAdmin, countryId, systemAdmin, isCountryDirector);
             }
-
-
-
-//        else  if(hazardNode !=null && hazardNode.equals("hazard")){
-//            System.out.println("HAZARD: YES");
-//            User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin, hazardId, isCountryDirector);
-//            saveUser(callback.getContext(), user);
-//            callback.onUserAuthorized(user);
-//        }
-
-
-
-        //  System.out.println("LINK: "+ database.child(""));
 
     }
 

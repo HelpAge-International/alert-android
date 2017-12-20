@@ -1,6 +1,5 @@
 package org.alertpreparedness.platform.alert.responseplan;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,20 +13,14 @@ import android.view.ViewGroup;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.ExtensionHelperKt;
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.dagger.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
-import org.alertpreparedness.platform.alert.dagger.ResponsePlansRef;
-import org.alertpreparedness.platform.alert.dashboard.activity.UpdateAlertActivity;
-import org.alertpreparedness.platform.alert.helper.UserInfo;
+import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.utils.Constants;
-import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
 import java.util.ArrayList;
 import java.util.Date;

@@ -1,4 +1,5 @@
-package org.alertpreparedness.platform.alert.dagger;
+package org.alertpreparedness.platform.alert.dagger.annotation;
+
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -6,10 +7,10 @@ import java.lang.annotation.RetentionPolicy;
 import javax.inject.Qualifier;
 
 /**
- * Created by faizmohideen on 14/12/2017.
+ * Created by Tj on 13/12/2017.
  */
 
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
-public @interface BaseRef {
+public @interface BaseDatabaseRef {
 }

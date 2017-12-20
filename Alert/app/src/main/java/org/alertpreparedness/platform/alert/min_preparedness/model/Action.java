@@ -9,15 +9,15 @@ public class Action {
     private String department;
     private String assignee;
     private boolean isArchived;
-    private long actionType;
-    private long dueDate;
+    private Long actionType;
+    private Long dueDate;
     private int budget;
 
-
-    public Action(String taskName, String department, String assignee, long actionType, long dueDate, int budget) {
+    public Action(String taskName, String department, String assignee, boolean isArchived, Long actionType, Long dueDate, int budget) {
         this.taskName = taskName;
         this.department = department;
         this.assignee = assignee;
+        this.isArchived = isArchived;
         this.actionType = actionType;
         this.dueDate = dueDate;
         this.budget = budget;
@@ -51,15 +51,15 @@ public class Action {
         return actionType;
     }
 
-    public void setActionType(long actionType) {
+    public void setActionType(Long actionType) {
         this.actionType = actionType;
     }
 
-    public long getDueDate() {
+    public Long getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(long dueDate) {
+    public void setDueDate(Long dueDate) {
         this.dueDate = dueDate;
     }
 
@@ -69,5 +69,13 @@ public class Action {
 
     public void setBudget(int budget) {
         this.budget = budget;
+    }
+
+    public boolean isArchived() {
+        return isArchived;
+    }
+
+    public void setArchived(boolean archived) {
+        isArchived = archived;
     }
 }

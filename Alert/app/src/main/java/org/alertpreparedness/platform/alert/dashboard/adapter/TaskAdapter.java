@@ -2,6 +2,9 @@ package org.alertpreparedness.platform.alert.dashboard.adapter;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +28,7 @@ import java.util.Locale;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> implements Comparable<Tasks> {
     private List<Tasks> listArray;
-    private String dateFormat = "dd/MM/yyyy";
+    private String dateFormat = "MMM dd,yyyy";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
 
     public TaskAdapter(List<Tasks> List) {
@@ -74,7 +77,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         }
 
         private void bind(Tasks tasks) {
-
             if (tasks.getTaskType().equals("action") && isDueToday(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueTodayString(tasks.getAlertLevel(), "action"));
@@ -127,6 +129,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
 
     }
 
+    private SpannableStringBuilder setBoldText(String str) {
+        SpannableStringBuilder sb = new SpannableStringBuilder(" "+str);
+        StyleSpan b = new StyleSpan(android.graphics.Typeface.BOLD);
+        sb.setSpan(b, 0, str.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        return sb;
+    }
+
     private String dueTodayString(int level, String type) {
         if (type.equals("action")) {
             return "A minimum preparedness action needs to be completed today";
@@ -145,9 +154,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
 
     private String dueBeforeString(int level, String type, String date) {
         if (type.equals("action")) {
-            return "A minimum preparedness action was due on " + date;
+            return "A minimum preparedness action was due on" + setBoldText(date);
         } else {
-            return "A " + getLevelAsString(level)  + " " + type + " was due on " + date;
+            return "A " + getLevelAsString(level)  + " " + type + " was due on" + setBoldText(date);
         }
     }
 

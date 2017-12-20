@@ -14,6 +14,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -56,6 +57,7 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     private ActionBarDrawerToggle drawerToggle;
     private FirebaseAuth firebaseAuth;
     private UserInfo mUserInfo;
+    public static final String TAG = "MAIN_DRAWER";
 
     @BindView(R.id.nav_view)
     NavigationView navigationView;
@@ -115,7 +117,7 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
         alertActionbarContainer.setCardElevation(0);
     }
 
-    private void setUserName(){
+    private void setUserName() {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
         DatabaseReference db = ref.
                 child(PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS)).
@@ -125,11 +127,15 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                String firstname = dataSnapshot.child("firstName").getValue().toString();
-                String lastname = dataSnapshot.child("lastName").getValue().toString();
-                String email = dataSnapshot.child("email").getValue().toString();
+                try {
+                    String firstname = dataSnapshot.child("firstName").getValue().toString();
+                    String lastname = dataSnapshot.child("lastName").getValue().toString();
+                    String email = dataSnapshot.child("email").getValue().toString();
 
-                User user = new User(firstname, lastname, email);
+                    User user = new User(firstname, lastname, email);
+                } catch (Exception e) {
+                    Log.e(TAG, String.valueOf(e));
+                }
             }
 
             @Override
@@ -226,16 +232,16 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         drawerLayout.closeDrawers();
-        if(mCurrentItem != item.getItemId()) {
+        if (mCurrentItem != item.getItemId()) {
             switch (item.getItemId()) {
                 case R.id.nav_home:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x->{
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> {
                         setFragment(new HomeFragment());
                     });
-    //                setFragment(new HomeFragment());
+                    //                setFragment(new HomeFragment());
                     break;
                 case R.id.nav_risk:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x->{
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> {
                         setFragment(new RiskFragment());
                     });
                     break;
@@ -246,16 +252,16 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                     startActivity(new Intent(getApplicationContext(), LoginScreen.class));
                     finish();
 //                    clearAllActivities();
-    //                        PreferHelper.getInstance(MainDrawer.this).edit().remove(UserInfo.PREFS_USER).apply();
-    //                        finish();
+                    //                        PreferHelper.getInstance(MainDrawer.this).edit().remove(UserInfo.PREFS_USER).apply();
+                    //                        finish();
                     break;
                 case R.id.nav_minimum:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x->{
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> {
                         setFragment(new MinPreparednessFragment());
                     });
                     break;
                 case R.id.nav_response:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> {
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> {
                         setFragment(new ResponsePlanFragment());
                     });
                     break;

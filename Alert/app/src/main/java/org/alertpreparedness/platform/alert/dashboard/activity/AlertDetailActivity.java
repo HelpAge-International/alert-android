@@ -27,8 +27,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.dagger.AlertRef;
-import org.alertpreparedness.platform.alert.dagger.BaseRef;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.dashboard.model.Alert;
@@ -42,8 +40,6 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
-
-import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -70,10 +66,6 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     private UpdateAlertActivity updateAlertActivity = new UpdateAlertActivity();
 
     public static final String EXTRA_ALERT = "extra_alert";
-
-    @Inject
-    @BaseRef
-    DatabaseReference baseRef;
 
     DatabaseReference mReference = FirebaseDatabase.getInstance().getReference();
     ValueEventListener mValueListener = new ValueEventListener() {
