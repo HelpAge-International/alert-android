@@ -43,7 +43,6 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Optional;
 import io.reactivex.Observable;
 
 public class MainDrawer extends BaseActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
@@ -81,12 +80,6 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     @BindView(R.id.normal_action_bar)
     CardView normalActionbarContainer;
 
-//    @BindView(R.id.tvUserName)
-//    TextView tvUserName;
-//
-//    @BindView(R.id.tvDepartment)
-//    TextView tvDepartment;
-
     @Override
     public void onCreate(Bundle saved) {
         super.onCreate(saved);
@@ -96,8 +89,6 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
         ButterKnife.bind(this);
 
         setUserName();
-
-//        toggleActionBar(ActionBarState.ALERT);
 
         appBarTitle.setOnClickListener(this);
 

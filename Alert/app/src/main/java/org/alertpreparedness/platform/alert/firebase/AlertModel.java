@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.alert.firebase;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,13 +10,13 @@ import java.util.List;
  * Created by Tj on 19/12/2017.
  */
 
-public class AlertModel {
+public class AlertModel implements Serializable{
 
     private List<AffectedAreaModel> affectedAreas = new ArrayList<>();
 
-    private int alertLevel;
+    private Integer alertLevel;
 
-    private int hazardScenario;
+    private Integer hazardScenario;
 
     private String infoNotes;
 
@@ -23,9 +24,19 @@ public class AlertModel {
 
     private String createdBy;
 
-    private int estimatedPopulation;
+    private Integer estimatedPopulation;
 
     private String reasonForRedAlert;
+
+    private ApprovalModel approval;
+
+    private Long timeUpdated;
+
+    private String updatedBy;
+
+    private String otherName;
+
+    private String name;
 
     public AlertModel() {}
 
@@ -39,11 +50,11 @@ public class AlertModel {
         this.affectedAreas = affectedAreas;
     }
 
-    public int getAlertLevel() {
+    public Integer getAlertLevel() {
         return alertLevel;
     }
 
-    public void setAlertLevel(int alertLevel) {
+    public void setAlertLevel(Integer alertLevel) {
         this.alertLevel = alertLevel;
     }
 
@@ -55,11 +66,11 @@ public class AlertModel {
         this.affectedAreas = affectedAreas;
     }
 
-    public int getHazardScenario() {
+    public Integer getHazardScenario() {
         return hazardScenario;
     }
 
-    public void setHazardScenario(int hazardScenario) {
+    public void setHazardScenario(Integer hazardScenario) {
         this.hazardScenario = hazardScenario;
     }
 
@@ -83,11 +94,11 @@ public class AlertModel {
         this.createdBy = createdBy;
     }
 
-    public int getEstimatedPopulation() {
+    public Integer getEstimatedPopulation() {
         return estimatedPopulation;
     }
 
-    public void setEstimatedPopulation(int estimatedPopulation) {
+    public void setEstimatedPopulation(Integer estimatedPopulation) {
         this.estimatedPopulation = estimatedPopulation;
     }
 
@@ -111,5 +122,45 @@ public class AlertModel {
                 ", estimatedPopulation=" + estimatedPopulation +
                 ", reasonForRedAlert='" + reasonForRedAlert + '\'' +
                 '}';
+    }
+
+    public ApprovalModel getApproval() {
+        return approval;
+    }
+
+    public void setApproval(ApprovalModel approval) {
+        this.approval = approval;
+    }
+
+    public Long getTimeUpdated() {
+        return timeUpdated;
+    }
+
+    public void setTimeUpdated(Long timeUpdated) {
+        this.timeUpdated = timeUpdated;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public String getOtherName() {
+        return otherName;
+    }
+
+    public void setOtherName(String otherName) {
+        this.otherName = otherName;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

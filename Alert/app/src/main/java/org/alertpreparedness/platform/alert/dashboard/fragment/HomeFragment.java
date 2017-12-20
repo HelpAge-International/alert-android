@@ -20,10 +20,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
@@ -33,6 +38,7 @@ import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
+import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlanObj;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlansAdapter;
 import org.alertpreparedness.platform.alert.dashboard.model.Alert;
@@ -42,6 +48,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
+
+import javax.inject.Inject;
 
 import butterknife.BindFloat;
 import butterknife.BindView;
@@ -71,10 +79,16 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     @BindView(R.id.llPinned)
     CardView mPinnedHeader;
 
+    @Inject @AlertRef
+    DatabaseReference alertRef;
+
+    @Inject
+    User user;
+
     public TaskAdapter taskAdapter;
     public List<Tasks> tasksList;
     public AlertAdapter alertAdapter;
-    public HashMap<String, Alert> alertList;
+    public HashMap<String, AlertModel> alertList;
     private List<DataHandler> mHandlerList = new ArrayList<>();
 
     @Nullable
@@ -84,16 +98,21 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
         ButterKnife.bind(this, v);
 
+        DependencyInjector.applicationComponent().inject(this);
+
+        ((MainDrawer)getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.ALERT, R.string.green_alert_level, R.drawable.alert_green);
+
         initViews();
 
         FirebaseAuth.getInstance().addAuthStateListener(this);
 
-        ((MainDrawer)getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.ALERT, R.string.green_alert_level, R.drawable.alert_green);
 
         return v;
     }
 
     private void initViews() {
+
+        alertRef.addChildEventListener(new HomeFragment.AlertListener());
 
         alertRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager alertlayoutManager = new LinearLayoutManager(getContext());
@@ -114,11 +133,6 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
         taskAdapter = new TaskAdapter(tasksList);
         myTaskRecyclerView.setAdapter(taskAdapter);
 
-        DataHandler obj = new DataHandler();
-        obj.getAlertsFromFirebase(this, getContext());
-        obj.getTasksFromFirebase(this, getContext());
-        mHandlerList.add(obj);
-
         scroller.setNestedScrollingEnabled(false);
         ViewCompat.setNestedScrollingEnabled(alertRecyclerView, false);
         ViewCompat.setNestedScrollingEnabled(myTaskRecyclerView, false);
@@ -138,14 +152,14 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     }
 
     @Override
-    public void onAlertItemClicked(Alert alert) {
+    public void onAlertItemClicked(AlertModel alert) {
         Intent intent = new Intent(getActivity(), AlertDetailActivity.class);
         intent.putExtra(EXTRA_ALERT, alert);
         startActivity(intent);
     }
 
     @Override
-    public void updateAlert(String id, Alert alert) {
+    public void updateAlert(String id, AlertModel alert) {
         alertRecyclerView.setVisibility(View.VISIBLE);
         alertAdapter.update(id, alert);
         updateTitle();
@@ -166,7 +180,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
         boolean noAlerts = false;
 
         updateTitle(R.string.green_alert_level, R.drawable.alert_green);
-        for(Alert a: alertAdapter.getAlerts()){
+        for(AlertModel a: alertAdapter.getAlerts()){
             if (a.getAlertLevel() == 2){
                 redPresent = true;
                 break;
@@ -191,7 +205,10 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
     @Override
     public void updateTitle(int stringResource, int backgroundResource) {
-        ((MainDrawer)getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.ALERT, stringResource, backgroundResource);
+        try {
+            ((MainDrawer) getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.ALERT, stringResource, backgroundResource);
+        }
+        catch (Exception e){}
     }
 
     @Override
@@ -210,5 +227,39 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
             ((MainDrawer)getActivity()).showActionbarElevation();
         }
 
+    }
+
+    private class AlertListener implements ChildEventListener {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            System.out.println("dataSnapshot.getRef() = " + dataSnapshot.getRef());
+            AlertModel model = dataSnapshot.getValue(AlertModel.class);
+
+            assert model != null;
+            if(model.getAlertLevel() != 0) {
+                updateAlert(dataSnapshot.getKey(), model);
+            }
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//            AlertModel model = dataSnapshot.getValue(AlertModel.class);
+//            updateAlert(dataSnapshot.getKey(), model);
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
     }
 }

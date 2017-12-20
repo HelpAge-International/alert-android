@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import org.alertpreparedness.platform.alert.ExtensionHelperKt;
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.alert.dashboard.model.Alert;
@@ -31,13 +32,13 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
 
     private Context context;
     private OnAlertItemClickedListener listener;
-    private HashMap<String, Alert> alertsMap;
-    private List<Alert> alertsList = new ArrayList<>();
+    private HashMap<String, AlertModel> alertsMap;
+    private List<AlertModel> alertsList = new ArrayList<>();
     private final static String _TAG = "Adapter";
     private boolean isCountryDirector;
 
 
-    public AlertAdapter(@NonNull HashMap<String, Alert> alertsMap, Context context, OnAlertItemClickedListener listener) {
+    public AlertAdapter(@NonNull HashMap<String, AlertModel> alertsMap, Context context, OnAlertItemClickedListener listener) {
         super();
 
         this.isCountryDirector = UserInfo.getUser(context).isCountryDirector();
@@ -54,7 +55,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(AlertAdapter.ViewHolder holder, int position) {
-        Alert alert = alertsList.get(position);
+        AlertModel alert = alertsList.get(position);
         holder.bind(alert);
     }
 
@@ -71,7 +72,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
 
-    public void update(String id, Alert alert) {
+    public void update(String id, AlertModel alert) {
         alertsMap.put(id, alert);
 
         updateList();
@@ -82,18 +83,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         return alertsMap.size();
     }
 
-    public void updateRedRequested(String id, long redrequested) {
-//        for(Alert a: alertsMap){
-//            Log.e("f", id + " - " + a.getId());
-//            if (a.getId().equals(id)){
-//                a.setRedAlertRequested(redrequested);
-//                break;
-//            }
-//        }
-//        notifyDataSetChanged();
-    }
-
-    public List<Alert> getAlerts() {
+    public List<AlertModel> getAlerts() {
         return alertsList;
     }
 
@@ -118,57 +108,58 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
             img_hazard_icon = (ImageView) itemView.findViewById(R.id.img_hazard_icon);
             img_alert_req = (ImageView) itemView.findViewById(R.id.imgRedReq);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    int position = getAdapterPosition();
-                    if (listener != null) {
-                        listener.onAlertItemClicked(alertsList.get(position));
-                    }
+            itemView.setOnClickListener(view -> {
+                int position = getAdapterPosition();
+                if (listener != null) {
+                    listener.onAlertItemClicked(alertsList.get(position));
                 }
             });
         }
 
-        private void bind(Alert alert) {
+        private void bind(AlertModel alert) {
 
-            for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
+            String hazardName;
 
-                if (i == alert.getHazardScenario() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
-                    fetchIcon(Constants.HAZARD_SCENARIO_NAME[i], img_hazard_icon);
-                    txt_alert_level.setText(R.string.red_alert_text);
-                    img_alert_colour.setImageResource(R.drawable.red_alert_left);
-                    txt_hazard_name.setText(Constants.HAZARD_SCENARIO_NAME[i]);
-                    txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(), alert.getNumOfAreas()));
-                } else if (i == alert.getHazardScenario() && alert.getAlertLevel() == Constants.TRIGGER_AMBER) {
-                    txt_alert_level.setText(R.string.amber_alert_text);
-                    img_alert_colour.setImageResource(R.drawable.amber_alert_left);
-                    txt_hazard_name.setText(Constants.HAZARD_SCENARIO_NAME[i]);
-                    txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(), alert.getNumOfAreas()));
-                    fetchIcon(Constants.HAZARD_SCENARIO_NAME[i], img_hazard_icon);
-                } else if (alert.getOtherName() != null && alert.getAlertLevel() == Constants.TRIGGER_RED) {
-                    txt_alert_level.setText(R.string.red_alert_text);
-                    img_alert_colour.setImageResource(R.drawable.red_alert_left);
-                    img_hazard_icon.setImageResource(R.drawable.other);
-                    txt_hazard_name.setText(alert.getOtherName());
-                    txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(), alert.getNumOfAreas()));
-                } else if (alert.getOtherName() != null && alert.getAlertLevel() == Constants.TRIGGER_AMBER) {
-                    txt_alert_level.setText(R.string.amber_alert_text);
-                    img_alert_colour.setImageResource(R.drawable.amber_alert_left);
-                    img_hazard_icon.setImageResource(R.drawable.other);
-                    txt_hazard_name.setText(alert.getOtherName());
-                    txt_num_of_people.setText(getNumOfPeopleText(alert.getPopulation(), alert.getNumOfAreas()));
-                }
+            if(alert.getHazardScenario() != -1) {
+                 hazardName = ExtensionHelperKt.getHazardTypes().get(alert.getHazardScenario());
+            }
+            else {
+                hazardName = "Other";
             }
 
-            if(isCountryDirector && alert.getRedAlertRequested() == 0) {
+            switch (alert.getAlertLevel()) {
+                case Constants.TRIGGER_RED:
+                    fetchIcon(hazardName, img_hazard_icon);
+                    txt_alert_level.setText(R.string.red_alert_text);
+                    img_alert_colour.setImageResource(R.drawable.red_alert_left);
+                    break;
+                case Constants.TRIGGER_AMBER:
+                    fetchIcon(hazardName, img_hazard_icon);
+                    txt_alert_level.setText(R.string.amber_alert_text);
+                    img_alert_colour.setImageResource(R.drawable.amber_alert_left);
+                    break;
+            }
+
+            if(!hazardName.equals("Other")) {
+                txt_hazard_name.setText(hazardName);
+            }
+            else {
+                txt_hazard_name.setText(alert.getOtherName());
+            }
+            txt_num_of_people.setText(getNumOfPeopleText(alert.getEstimatedPopulation(), alert.getAffectedAreas().size()));
+
+
+            if(isCountryDirector && alert.getReasonForRedAlert() != null) {
                 img_alert_req.setVisibility(View.VISIBLE);
                 img_alert_colour.setImageResource(R.drawable.gray_alert_left);
                 txt_red_requested.setText(R.string.txt_cd_red_request);
-            }else if(alert.getRedAlertRequested() == 0 && !isCountryDirector) {
+            }
+            else if(alert.getReasonForRedAlert() != null && !isCountryDirector) {
                 img_alert_req.setVisibility(View.VISIBLE);
                 img_alert_colour.setImageResource(R.drawable.gray_alert_left);
                 txt_red_requested.setText(R.string.txt_red_requested);
-            }else {
+            }
+            else {
                 img_alert_req.setVisibility(View.GONE);
             }
         }
@@ -179,7 +170,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
     }
 
     private String getNumOfPeopleText(long population, long numOfAreas) {
-        return population + " people affected in " + numOfAreas + " area";
+        return population + " people affected in " + numOfAreas + " areas";
     }
 
 

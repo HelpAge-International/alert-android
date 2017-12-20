@@ -18,6 +18,8 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardOtherRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
+import org.alertpreparedness.platform.alert.dashboard.model.AlertFieldModel;
+import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
@@ -80,11 +82,15 @@ public class DataHandler {
             ChildEventListener childEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    getAlert(dataSnapshot, ids);
+                    getAlert(dataSnapshot);
                 }
 
-                private void getAlert(DataSnapshot dataSnapshot, String ids) {
-                    if (dataSnapshot.child("alertLevel").getValue() != null) {
+                private void getAlert(DataSnapshot dataSnapshot) {
+
+                    AlertModel model = dataSnapshot.getValue(AlertModel.class);
+                    assert model != null;
+
+                    if (model.getAlertLevel() != null) {
                         long alertLevel = (long) dataSnapshot.child("alertLevel").getValue();
                         String id = dataSnapshot.getKey();
 
@@ -95,7 +101,7 @@ public class DataHandler {
                                 long country = (long) dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("country").getValue();
                                 long hazardScenario = (long) dataSnapshot.child("hazardScenario").getValue();
                                 long population = (long) dataSnapshot.child("estimatedPopulation").getValue();
-                                long redStatus = (long) dataSnapshot.child("approval").child("countryDirector").child(ids).getValue();
+                                long redStatus = (long) dataSnapshot.child("approval").child("countryDirector").child(countryID).getValue();
 
                                 String info = (String) dataSnapshot.child("infoNotes").getValue();
 
@@ -110,7 +116,7 @@ public class DataHandler {
                                                 numberOfAreas, redStatus, info, updatedDay, updatedBy, null);
                                         alert.setId(id);
 
-                                        iHome.updateAlert(dataSnapshot.getKey(), alert);
+//                                        iHome.updateAlert(dataSnapshot.getKey(), alert);
                                     } else if (dataSnapshot.child("otherName").exists()) {
                                         String nameId = (String) dataSnapshot.child("otherName").getValue();
                                         long level1 = alert.getLevel1();
@@ -129,7 +135,7 @@ public class DataHandler {
                                                 redStatus, info, updatedDay, null, null);
                                         alert.setId(id);
 
-                                        iHome.updateAlert(dataSnapshot.getKey(), alert);
+//                                        iHome.updateAlert(dataSnapshot.getKey(), alert);
                                     } else if (dataSnapshot.child("otherName").exists()) {
                                         String nameId = (String) dataSnapshot.child("otherName").getValue();
                                         long level1 = alert.getLevel1();
@@ -149,12 +155,12 @@ public class DataHandler {
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                     Log.e("CHANGED", dataSnapshot.getKey());
-                    getAlert(dataSnapshot, ids);
+                    getAlert(dataSnapshot);
                 }
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
-                    getAlert(dataSnapshot, ids);
+                    getAlert(dataSnapshot);
                     iHome.removeAlert(dataSnapshot.getKey());
                 }
 
@@ -181,9 +187,8 @@ public class DataHandler {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String name = (String) dataSnapshot.child("name").getValue();
                 Alert alert = new Alert(alertLevel, hazardScenario, population, numOfAreas, redStatus, info, updatedDay, updatedBy, name);
-                Alert alert1 = new Alert(country, level1, level2);
                 alert.setId(dataSnapshot.getKey());
-                iHome.updateAlert(dataSnapshot.getKey(), alert);
+//                iHome.updateAlert(dataSnapshot.getKey(), alert);
             }
 
             @Override
