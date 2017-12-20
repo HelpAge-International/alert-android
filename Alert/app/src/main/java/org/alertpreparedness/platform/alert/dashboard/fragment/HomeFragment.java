@@ -77,7 +77,6 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
         RecyclerView.LayoutManager alertlayoutManager = new LinearLayoutManager(getContext());
         alertRecyclerView.setLayoutManager(alertlayoutManager);
         alertRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        alertRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
         alertList = new HashMap<>();
         alertAdapter = new AlertAdapter(alertList, getContext(), this);
