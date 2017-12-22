@@ -3,6 +3,7 @@ package org.alertpreparedness.platform.alert.dagger;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardOtherRef;
@@ -39,11 +40,10 @@ public class FirebaseModule {
         return db.child("alert").child(user.countryID);
     }
 
-
     @Provides
     @Singleton
     @AgencyRef
-    public DatabaseReference providesAgency(@BaseDatabaseRef DatabaseReference db, User user) {
+    public DatabaseReference provideAgencyRef(@BaseDatabaseRef DatabaseReference db, User user) {
         return db.child("agency").child(user.agencyAdminID);
     }
 

@@ -20,7 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.alertpreparedness.platform.alert.ExtensionHelperKt;
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.dagger.AgencyRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.OnCountrySelectedListener;

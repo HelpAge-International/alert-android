@@ -2,6 +2,8 @@ package org.alertpreparedness.platform.alert.dagger;
 
 import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
 import org.alertpreparedness.platform.alert.helper.DataHandler;
+import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.fragment.InProgressFragment;
 import org.alertpreparedness.platform.alert.mycountry.MyCountryFragment;
 import org.alertpreparedness.platform.alert.responseplan.ActiveFragment;
 import org.alertpreparedness.platform.alert.responseplan.ArchivedFragment;
@@ -31,4 +33,7 @@ public interface ApplicationComponent {
     void inject(UpdateAlertActivity activity);
     void inject(AlertDetailActivity activity);
     void inject(MinPreparednessFragment fragment);
+    void inject(InProgressFragment fragment);
+    void inject(ActionAdapter adapter);
+
 }

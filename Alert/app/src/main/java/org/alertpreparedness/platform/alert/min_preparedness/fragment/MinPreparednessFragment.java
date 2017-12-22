@@ -3,6 +3,9 @@ package org.alertpreparedness.platform.alert.min_preparedness.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +26,8 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
+import org.alertpreparedness.platform.alert.responseplan.ActiveFragment;
+import org.alertpreparedness.platform.alert.responseplan.ArchivedFragment;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlanObj;
 
 import java.util.ArrayList;
@@ -37,14 +42,10 @@ import butterknife.ButterKnife;
  * Created by faizmohideen on 13/12/2017.
  */
 
-public class MinPreparednessFragment extends Fragment implements ActionAdapter.ItemSelectedListner{
+public class MinPreparednessFragment extends Fragment {
 
-    @BindView(R.id.rvActionsAssigned)
-    RecyclerView actionsRecyclerView;
-
-    @Inject
-    @ActionRef
-    DatabaseReference dbActionRef;
+    @BindView(R.id.action_pager)
+    ViewPager mPager;
 
     @Nullable
     @Override
@@ -52,76 +53,69 @@ public class MinPreparednessFragment extends Fragment implements ActionAdapter.I
         View v = inflater.inflate(R.layout.fragment_min_preparedness, container, false);
 
         ButterKnife.bind(this, v);
-        DependencyInjector.applicationComponent().inject(this);
 
         initViews();
 
         ((MainDrawer)getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.NORMAL, R.string.title_min_preparedness);
-
+        ((MainDrawer)getActivity()).removeActionbarElevation();
         return v;
     }
 
     private void initViews() {
-
-        ArrayList<Action> items = new ArrayList<>();
-
-        actionsRecyclerView.setAdapter(new ActionAdapter(getContext(), items, this));
-        actionsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        actionsRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        actionsRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
-
-        dbActionRef.addListenerForSingleValueEvent(new ValueEventListener() {
-
-            @SuppressWarnings("ConstantConditions")
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot getChild : dataSnapshot.getChildren()){
-
-                    String taskName = (String) getChild.child("task").getValue();
-                    String department = (String) getChild.child("department").getValue();
-                    String assignee = (String) getChild.child("asignee").getValue();
-                    Boolean isArchived = (Boolean) getChild.child("isArchived").getValue();
-                    Long actionType = (Long) getChild.child("type").getValue();
-                    Long dueDate = (Long) getChild.child("dueDate").getValue();
-                    Long budget = (Long) getChild.child("budget").getValue();
-
-                    items.add(new Action(
-                            taskName,
-                            department,
-                            assignee,
-                            isArchived,
-                            actionType,
-                            dueDate,
-                            budget)
-                    );
-
-                    //String assignee = (String) getChild.child("asignee").getValue();
-//                    System.out.println(" Name: "+ taskName+
-//                                        " Dep: "+ department+
-//                                        " Assignee: " +assignee+
-//                                        " isArch: "+isArchived+
-//                                        " Actype: "+actionType+
-//                                        " DueDate: "+dueDate+
-//                                        " Budget: "+budget);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        mPager.setAdapter(new MinPreparednessFragment.PagerAdapter(getFragmentManager()));
     }
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    private class PagerAdapter extends FragmentStatePagerAdapter {
+        //public static int x;
 
+        public PagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
 
-    }
+        @Override
+        public Fragment getItem(int position) {
 
-    @Override
-    public void onActionItemSelected(int pos) {
+            switch (position) {
+                case 1:
+                    return new ActionExpiredFragment();
+                case 2:
+                    return new ActionUnassignedFragment();
+                case 3:
+                    return new ActionCompletedFragment();
+                case 4:
+                    return new ActionArchivedFragment();
+                default:
+                    return new InProgressFragment();
+            }
+        }
 
+        @Override
+        public int getCount() {
+            return 5;
+        }
+
+//        @Override
+//        public CharSequence getPageTitle(int position) {
+//            switch (position) {
+//                case 1:
+//                    return "Expired";
+//                case 2:
+//                    return "Unassigned";
+//                case 3:
+//                    return "Completed";
+//                case 4:
+//                    return "Archived";
+//                default: return "In Progress";
+//            }
+//        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            if(object != null){
+                return ((Fragment)object).getView() == view;
+            }else{
+                return false;
+            }
+        }
     }
 }

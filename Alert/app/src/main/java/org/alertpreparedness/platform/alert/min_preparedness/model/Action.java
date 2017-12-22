@@ -1,5 +1,7 @@
 package org.alertpreparedness.platform.alert.min_preparedness.model;
 
+import com.google.firebase.database.DatabaseReference;
+
 /**
  * Created by faizmohideen on 13/12/2017.
  */
@@ -12,8 +14,9 @@ public class Action {
     private Long actionType;
     private Long dueDate;
     private Long budget;
+    public DatabaseReference db;
 
-    public Action(String taskName, String department, String assignee, Boolean isArchived, Long actionType, Long dueDate, Long budget) {
+    public Action(String taskName, String department, String assignee, Boolean isArchived, Long actionType, Long dueDate, Long budget, DatabaseReference db) {
         this.taskName = taskName;
         this.department = department;
         this.assignee = assignee;
@@ -21,6 +24,7 @@ public class Action {
         this.actionType = actionType;
         this.dueDate = dueDate;
         this.budget = budget;
+        this.db = db;
     }
 
     public String getTaskName() {
