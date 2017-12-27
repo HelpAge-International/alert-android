@@ -33,6 +33,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
+import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
@@ -93,7 +94,6 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     public List<Tasks> tasksList;
     public AlertAdapter alertAdapter;
     public HashMap<String, AlertModel> alertList;
-    private List<DataHandler> mHandlerList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -162,7 +162,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     @Override
     public void onAlertItemClicked(AlertModel alert) {
         Intent intent = new Intent(getActivity(), AlertDetailActivity.class);
-        intent.putExtra(EXTRA_ALERT, alert);
+        intent.putExtra(EXTRA_ALERT, new Alert(alert, user.countryID));
         startActivity(intent);
     }
 
@@ -176,9 +176,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     @Override
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
         if (firebaseAuth.getCurrentUser() == null) {
-            for (DataHandler dataHandler : mHandlerList) {
-                dataHandler.detach();
-            }
+
         }
     }
 
@@ -243,6 +241,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
             AlertModel model = dataSnapshot.getValue(AlertModel.class);
 
             assert model != null;
+            model.setSnapshot(dataSnapshot);
             if(model.getAlertLevel() != 0) {
                 updateAlert(dataSnapshot.getKey(), model);
             }

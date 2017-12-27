@@ -3,7 +3,6 @@ package org.alertpreparedness.platform.alert.dashboard.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,13 +14,16 @@ import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
-import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 /**
@@ -89,31 +91,38 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView txt_alert_level;
-        TextView txt_hazard_name;
-        TextView txt_num_of_people;
-        TextView txt_red_requested;
-        ImageView img_alert_colour;
-        ImageView img_hazard_icon;
-        ImageView img_alert_req;
+        @BindView(R.id.txt_alert_level)
+        TextView tvAlertLevel;
+
+        @BindView(R.id.txt_hazard_name)
+        TextView tvHazardName;
+
+        @BindView(R.id.txt_num_of_people)
+        TextView tvPeopleCount;
+
+        @BindView(R.id.textViewAlertReq)
+        TextView txtRedRequested;
+
+        @BindView(R.id.img_alert_colour)
+        ImageView imgAlertColour;
+
+        @BindView(R.id.img_hazard_icon)
+        ImageView imgHazardIcon;
+
+        @BindView(R.id.imgRedReq)
+        ImageView imgAlertReq;
 
         private ViewHolder(View itemView) {
             super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
 
-            txt_alert_level = (TextView) itemView.findViewById(R.id.txt_alert_level);
-            txt_hazard_name = (TextView) itemView.findViewById(R.id.txt_hazard_name);
-            txt_num_of_people = (TextView) itemView.findViewById(R.id.txt_num_of_people);
-            txt_red_requested = (TextView) itemView.findViewById(R.id.textViewAlertReq);
-            img_alert_colour = (ImageView) itemView.findViewById(R.id.img_alert_colour);
-            img_hazard_icon = (ImageView) itemView.findViewById(R.id.img_hazard_icon);
-            img_alert_req = (ImageView) itemView.findViewById(R.id.imgRedReq);
-
-            itemView.setOnClickListener(view -> {
-                int position = getAdapterPosition();
-                if (listener != null) {
-                    listener.onAlertItemClicked(alertsList.get(position));
-                }
-            });
+        @OnClick
+        public void onClick(View v) {
+            int position = getAdapterPosition();
+            if (listener != null) {
+                listener.onAlertItemClicked(alertsList.get(position));
+            }
         }
 
         private void bind(AlertModel alert) {
@@ -129,38 +138,38 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
 
             switch (alert.getAlertLevel()) {
                 case Constants.TRIGGER_RED:
-                    fetchIcon(hazardName, img_hazard_icon);
-                    txt_alert_level.setText(R.string.red_alert_text);
-                    img_alert_colour.setImageResource(R.drawable.red_alert_left);
+                    fetchIcon(hazardName, imgHazardIcon);
+                    tvAlertLevel.setText(R.string.red_alert_text);
+                    imgAlertColour.setImageResource(R.drawable.red_alert_left);
                     break;
                 case Constants.TRIGGER_AMBER:
-                    fetchIcon(hazardName, img_hazard_icon);
-                    txt_alert_level.setText(R.string.amber_alert_text);
-                    img_alert_colour.setImageResource(R.drawable.amber_alert_left);
+                    fetchIcon(hazardName, imgHazardIcon);
+                    tvAlertLevel.setText(R.string.amber_alert_text);
+                    imgAlertColour.setImageResource(R.drawable.amber_alert_left);
                     break;
             }
 
             if(!hazardName.equals("Other")) {
-                txt_hazard_name.setText(hazardName);
+                tvHazardName.setText(hazardName);
             }
             else {
-                txt_hazard_name.setText(alert.getOtherName());
+                tvHazardName.setText(alert.getOtherName());
             }
-            txt_num_of_people.setText(getNumOfPeopleText(alert.getEstimatedPopulation(), alert.getAffectedAreas().size()));
+            tvPeopleCount.setText(getNumOfPeopleText(alert.getEstimatedPopulation(), alert.getAffectedAreas().size()));
 
 
             if(isCountryDirector && alert.getReasonForRedAlert() != null) {
-                img_alert_req.setVisibility(View.VISIBLE);
-                img_alert_colour.setImageResource(R.drawable.gray_alert_left);
-                txt_red_requested.setText(R.string.txt_cd_red_request);
+                imgAlertReq.setVisibility(View.VISIBLE);
+                imgAlertColour.setImageResource(R.drawable.gray_alert_left);
+                txtRedRequested.setText(R.string.txt_cd_red_request);
             }
             else if(alert.getReasonForRedAlert() != null && !isCountryDirector) {
-                img_alert_req.setVisibility(View.VISIBLE);
-                img_alert_colour.setImageResource(R.drawable.gray_alert_left);
-                txt_red_requested.setText(R.string.txt_red_requested);
+                imgAlertReq.setVisibility(View.VISIBLE);
+                imgAlertColour.setImageResource(R.drawable.gray_alert_left);
+                txtRedRequested.setText(R.string.txt_red_requested);
             }
             else {
-                img_alert_req.setVisibility(View.GONE);
+                imgAlertReq.setVisibility(View.GONE);
             }
         }
     }

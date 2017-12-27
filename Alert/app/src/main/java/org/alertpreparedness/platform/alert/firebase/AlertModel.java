@@ -1,6 +1,8 @@
 package org.alertpreparedness.platform.alert.firebase;
 
 
+import com.google.firebase.database.DataSnapshot;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,7 +12,7 @@ import java.util.List;
  * Created by Tj on 19/12/2017.
  */
 
-public class AlertModel implements Serializable{
+public class AlertModel implements Serializable {
 
     private List<AffectedAreaModel> affectedAreas = new ArrayList<>();
 
@@ -37,6 +39,8 @@ public class AlertModel implements Serializable{
     private String otherName;
 
     private String name;
+
+    private DataSnapshot snapshot;
 
     public AlertModel() {}
 
@@ -162,5 +166,13 @@ public class AlertModel implements Serializable{
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public DataSnapshot getSnapshot() {
+        return snapshot;
+    }
+
+    public void setSnapshot(DataSnapshot snapshot) {
+        this.snapshot = snapshot;
     }
 }

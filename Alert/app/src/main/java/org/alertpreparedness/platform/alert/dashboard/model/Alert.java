@@ -1,10 +1,18 @@
 package org.alertpreparedness.platform.alert.dashboard.model;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
+import com.google.firebase.database.ValueEventListener;
+
+import org.alertpreparedness.platform.alert.firebase.AlertModel;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -28,7 +36,6 @@ public class Alert implements Serializable{
     private String otherName;
     private String reason;
     private DatabaseReference dbRef;
-
 
     public Alert(DatabaseReference dbRef) {
         this.dbRef = dbRef;
@@ -57,6 +64,24 @@ public class Alert implements Serializable{
     }
 
     public Alert() {
+    }
+
+    public Alert(AlertModel alert, String countryID) {
+        this.id = alert.getSnapshot().getKey();
+        DataSnapshot ref = alert.getSnapshot();
+        this.alertLevel = alert.getAlertLevel();
+        this.hazardScenario = alert.getHazardScenario();
+        this.population = alert.getEstimatedPopulation();
+        this.numOfAreas = alert.getAffectedAreas().size();
+        if(ref.child("approval").child("countryDirector").child(countryID).exists()) {
+            this.redAlertRequested = (long) ref.child("approval").child("countryDirector").child(countryID).getValue();
+        }
+        this.info = alert.getInfoNotes();
+        Date date = new Date(alert.getTimeUpdated());
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        this.updated = format.format(date.getTime());
+        this.updatedBy = alert.getUpdatedBy();
+        this.otherName = alert.getOtherName();
     }
 
     @Exclude
