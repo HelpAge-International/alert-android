@@ -23,6 +23,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.gson.Gson;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
@@ -42,6 +43,8 @@ import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +54,9 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity.EXTRA_ALERT;
 
@@ -110,9 +116,6 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
         FirebaseAuth.getInstance().addAuthStateListener(this);
 
-        System.out.println("user.getNetworkCountryID() = " + user.getNetworkCountryID());
-        System.out.println("user = " + user);
-
         return v;
     }
 
@@ -121,8 +124,6 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
         alertRef.addChildEventListener(new HomeFragment.AlertListener());
         taskRef.addChildEventListener(new HomeFragment.TaskListener());
         indicatorRef.addChildEventListener(new HomeFragment.TaskListener());
-        System.out.println("user.getUserID() = " + user.getUserID());
-        System.out.println("indicatorRef = " + indicatorRef);
 
         alertRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager alertlayoutManager = new LinearLayoutManager(getContext());
