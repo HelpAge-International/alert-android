@@ -48,11 +48,66 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     @AgencyRef
     DatabaseReference dbAgencyRef;
 
-    public void addItem(String key, Action action) {
+    public void addInProgressItem(String key, Action action) {
         if (keys.indexOf(key) == -1) {
-            keys.add(key);
+            if (action.getDueDate() != null && !DateHelper.itWasDue(action.getDueDate()) && action.getTaskName() != null) {
+                keys.add(key);
+                items.put(key, action);
+                notifyItemInserted(keys.size() - 1);
+            }
+        } else {
             items.put(key, action);
-            notifyItemInserted(keys.size() - 1);
+            notifyItemChanged(keys.indexOf(key));
+        }
+    }
+
+    public void addExpiredItem(String key, Action action) {
+        if (keys.indexOf(key) == -1) {
+            if (action.getDueDate() != null && DateHelper.itWasDue(action.getDueDate()) && action.getTaskName() != null) {
+                System.out.println("action = " + action.getAssignee());
+                keys.add(key);
+                items.put(key, action);
+                notifyItemInserted(keys.size() - 1);
+            }
+        } else {
+            items.put(key, action);
+            notifyItemChanged(keys.indexOf(key));
+        }
+    }
+
+    public void addUnassignedItem(String key, Action action) {
+        if (keys.indexOf(key) == -1) {
+            if (action.getDueDate() != null && !DateHelper.itWasDue(action.getDueDate()) && action.getTaskName() != null) {
+                keys.add(key);
+                items.put(key, action);
+                notifyItemInserted(keys.size() - 1);
+            }
+        } else {
+            items.put(key, action);
+            notifyItemChanged(keys.indexOf(key));
+        }
+    }
+
+    public void addCompletedItem(String key, Action action) {
+        if (keys.indexOf(key) == -1) {
+            if (action.getComplete() != null && action.getComplete()) {
+                keys.add(key);
+                items.put(key, action);
+                notifyItemInserted(keys.size() - 1);
+            }
+        } else {
+            items.put(key, action);
+            notifyItemChanged(keys.indexOf(key));
+        }
+    }
+
+    public void addArchivedItem(String key, Action action) {
+        if (keys.indexOf(key) == -1) {
+            if (action.getDueDate() != null && !DateHelper.itWasDue(action.getDueDate()) && action.getTaskName() != null) {
+                keys.add(key);
+                items.put(key, action);
+                notifyItemInserted(keys.size() - 1);
+            }
         } else {
             items.put(key, action);
             notifyItemChanged(keys.indexOf(key));
@@ -84,24 +139,17 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     public void onBindViewHolder(ActionAdapter.ViewHolder holder, int position) {
 
         Action action = items.get(keys.get(position));
-
-        if (action.getDueDate() != null && !DateHelper.itWasDue(action.getDueDate()) && action.getTaskName() != null) {
-            holder.tvActionType.setText(getActionType((int) action.getActionType()));
-            holder.tvActionName.setText(action.getTaskName());
-            holder.tvBudget.setText(getBudget(action.getBudget()));
-            getDepartment(action.db, holder);
-
-            if (action.getDueDate() != null) {
-                holder.tvDueDate.setText(getDate(action.getDueDate()));
-            }
-        }
-
+        holder.tvActionType.setText(getActionType((int) action.getActionType()));
+        holder.tvActionName.setText(action.getTaskName());
+        holder.tvBudget.setText(getBudget(action.getBudget()));
+        holder.tvDueDate.setText(getDate(action.getDueDate()));
+        getDepartment(action.db, holder);
         holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position));
     }
 
     private void getDepartment(DatabaseReference db, ActionAdapter.ViewHolder holder) {
 
-        db.addValueEventListener(new ValueEventListener() {
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

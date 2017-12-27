@@ -47,6 +47,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:text="Completed"
+                android:textColor="@color/alertGreen"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/rvActionCompleted"
                 app:layout_constraintEnd_toEndOf="@+id/vMinTitle"

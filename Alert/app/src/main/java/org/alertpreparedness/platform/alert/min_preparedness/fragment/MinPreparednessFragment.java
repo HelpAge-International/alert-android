@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -58,6 +59,7 @@ public class MinPreparednessFragment extends Fragment {
 
         ((MainDrawer)getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.NORMAL, R.string.title_min_preparedness);
         ((MainDrawer)getActivity()).removeActionbarElevation();
+
         return v;
     }
 
@@ -66,7 +68,6 @@ public class MinPreparednessFragment extends Fragment {
     }
 
     private class PagerAdapter extends FragmentStatePagerAdapter {
-        //public static int x;
 
         public PagerAdapter(FragmentManager fm) {
             super(fm);
@@ -94,28 +95,5 @@ public class MinPreparednessFragment extends Fragment {
             return 5;
         }
 
-//        @Override
-//        public CharSequence getPageTitle(int position) {
-//            switch (position) {
-//                case 1:
-//                    return "Expired";
-//                case 2:
-//                    return "Unassigned";
-//                case 3:
-//                    return "Completed";
-//                case 4:
-//                    return "Archived";
-//                default: return "In Progress";
-//            }
-//        }
-
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            if(object != null){
-                return ((Fragment)object).getView() == view;
-            }else{
-                return false;
-            }
-        }
     }
 }

@@ -46,7 +46,8 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:text="Completed"
+                android:text="Unassigned"
+                android:textColor="@color/alertRed"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/rvActionUnassigned"
                 app:layout_constraintEnd_toEndOf="@+id/vMinTitle"
@@ -73,8 +74,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/rvActionUnassigned"
                 app:layout_constraintEnd_toStartOf="@+id/tvActionUnassigned"
                 app:layout_constraintTop_toTopOf="@+id/vMinTitle"
-                app:srcCompat="@drawable/alert_green_icon"
-                android:layout_marginRight="11dp" />
+                app:srcCompat="@drawable/alert_red_icon" />
 
         </android.support.constraint.ConstraintLayout>
 

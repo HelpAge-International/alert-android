@@ -41,6 +41,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
         // Required empty public constructor
     }
 
+    @Nullable
     @BindView(R.id.rvInProgress)
     RecyclerView mActionRV;
 
@@ -52,7 +53,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     @AgencyRef
     DatabaseReference dbAgencyRef;
 
-    protected ActionAdapter mAdapter;
+    private ActionAdapter mAdapter;
 
     @Nullable
     @Override
@@ -104,15 +105,17 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
             String department = (String) getChild.child("departments").getValue();
             String assignee = (String) getChild.child("asignee").getValue();
             Boolean isArchived = (Boolean) getChild.child("isArchived").getValue();
+            Boolean isComplete = (Boolean) getChild.child("isComplete").getValue();
             Long actionType = (Long) getChild.child("type").getValue();
             Long dueDate = (Long) getChild.child("dueDate").getValue();
             Long budget = (Long) getChild.child("budget").getValue();
 
-            mAdapter.addItem(getChild.getKey(), new Action(
+            mAdapter.addInProgressItem(getChild.getKey(), new Action(
                     taskName,
                     department,
                     assignee,
                     isArchived,
+                    isComplete,
                     actionType,
                     dueDate,
                     budget,

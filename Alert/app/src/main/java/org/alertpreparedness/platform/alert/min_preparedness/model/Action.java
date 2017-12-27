@@ -8,6 +8,7 @@ import com.google.firebase.database.DatabaseReference;
 
 public class Action {
     private Boolean isArchived;
+    private Boolean isComplete;
     private String taskName;
     private String department;
     private String assignee;
@@ -16,7 +17,7 @@ public class Action {
     private Long budget;
     public DatabaseReference db;
 
-    public Action(String taskName, String department, String assignee, Boolean isArchived, Long actionType, Long dueDate, Long budget, DatabaseReference db) {
+    public Action(String taskName, String department, String assignee, Boolean isArchived, Boolean isComplete, Long actionType, Long dueDate, Long budget, DatabaseReference db) {
         this.taskName = taskName;
         this.department = department;
         this.assignee = assignee;
@@ -81,5 +82,13 @@ public class Action {
 
     public void setArchived(Boolean archived) {
         isArchived = archived;
+    }
+
+    public Boolean getComplete() {
+        return isComplete;
+    }
+
+    public void setComplete(Boolean complete) {
+        isComplete = complete;
     }
 }
