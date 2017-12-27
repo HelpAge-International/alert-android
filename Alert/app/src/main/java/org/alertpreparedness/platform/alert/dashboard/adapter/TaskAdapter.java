@@ -12,7 +12,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
+import org.alertpreparedness.platform.alert.model.User;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -21,6 +25,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 /**
  * Created by faizmohideen on 13/11/2017.
@@ -31,8 +37,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
     private String dateFormat = "MMM dd,yyyy";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
 
+    @Inject
+    User user;
+
+
     public TaskAdapter(List<Tasks> List) {
         this.listArray = List;
+        DependencyInjector.applicationComponent().inject(this);
     }
 
     @Override
@@ -53,8 +64,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         return Integer.compare(dueDate, dueDate);
     }
 
-    public void add(Tasks tasks) {
-        listArray.add(tasks);
+    public void add(Tasks task) {
+        listArray.add(task);
         Collections.sort(listArray, (o1, o2) -> Long.compare(o1.getDueDate(), o2.getDueDate()));
         notifyDataSetChanged();
     }

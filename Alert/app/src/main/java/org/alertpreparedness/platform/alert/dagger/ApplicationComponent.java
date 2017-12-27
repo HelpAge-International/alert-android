@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.alert.dagger;
 
 import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
+import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
 import org.alertpreparedness.platform.alert.helper.DataHandler;
 import org.alertpreparedness.platform.alert.mycountry.MyCountryFragment;
@@ -33,4 +34,5 @@ public interface ApplicationComponent {
     void inject(UpdateAlertActivity activity);
     void inject(AlertDetailActivity activity);
     void inject(MinPreparednessFragment fragment);
+    void inject(TaskAdapter adapter);
 }

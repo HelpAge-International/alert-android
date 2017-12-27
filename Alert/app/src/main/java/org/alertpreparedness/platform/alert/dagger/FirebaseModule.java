@@ -8,6 +8,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardOtherRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.TaskRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.model.User;
 
@@ -74,4 +75,11 @@ public class FirebaseModule {
     public DatabaseReference provideHazardOtherRef(@BaseDatabaseRef DatabaseReference db) {
         return db.child("hazardOther");
     }
+
+//    @Provides
+//    @Singleton
+//    @TaskRef
+//    public DatabaseReference provideTask(@BaseDatabaseRef DatabaseReference db) {
+//        return db.child("task");
+//    }
 }

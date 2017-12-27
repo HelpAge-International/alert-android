@@ -16,7 +16,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,33 +27,29 @@ import com.google.firebase.database.DatabaseReference;
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
+import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
 import org.alertpreparedness.platform.alert.helper.DataHandler;
 import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
-import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.responseplan.ResponsePlanObj;
-import org.alertpreparedness.platform.alert.responseplan.ResponsePlansAdapter;
-import org.alertpreparedness.platform.alert.dashboard.model.Alert;
-import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.zip.GZIPInputStream;
 
 import javax.inject.Inject;
 
-import butterknife.BindFloat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.disposables.CompositeDisposable;
 
 import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity.EXTRA_ALERT;
 
@@ -81,6 +76,15 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
     @Inject @AlertRef
     DatabaseReference alertRef;
+
+    @Inject
+    @ActionRef
+    DatabaseReference taskRef;
+
+
+    @Inject
+    @IndicatorRef
+    DatabaseReference indicatorRef;
 
     @Inject
     User user;
@@ -113,6 +117,10 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     private void initViews() {
 
         alertRef.addChildEventListener(new HomeFragment.AlertListener());
+        taskRef.addChildEventListener(new HomeFragment.TaskListener());
+        indicatorRef.addChildEventListener(new HomeFragment.TaskListener());
+        System.out.println("user.getUserID() = " + user.getUserID());
+        System.out.println("indicatorRef = " + indicatorRef);
 
         alertRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager alertlayoutManager = new LinearLayoutManager(getContext());
@@ -140,15 +148,15 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     }
 
     @Override
-    public void addTask(Tasks tasks) {
-        taskAdapter.add(tasks);
-    }
-
-    @Override
     public void removeAlert(String id) {
         alertAdapter.remove(id);
 
         updateTitle();
+    }
+
+    @Override
+    public void addTask(Tasks task) {
+        taskAdapter.add(task);
     }
 
     @Override
@@ -230,9 +238,8 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     }
 
     private class AlertListener implements ChildEventListener {
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            System.out.println("dataSnapshot.getRef() = " + dataSnapshot.getRef());
+
+        private void proccess(DataSnapshot dataSnapshot, String s) {
             AlertModel model = dataSnapshot.getValue(AlertModel.class);
 
             assert model != null;
@@ -242,9 +249,62 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
         }
 
         @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            proccess(dataSnapshot, s);
+        }
+
+        @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//            AlertModel model = dataSnapshot.getValue(AlertModel.class);
-//            updateAlert(dataSnapshot.getKey(), model);
+            proccess(dataSnapshot, s);
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    }
+
+    private class TaskListener implements ChildEventListener {
+
+        private void process(DataSnapshot dataSnapshot, String s) {
+            Tasks task;
+
+            if(dataSnapshot.getRef().getParent().getParent().getKey().equals("action")) {
+                ActionModel model = dataSnapshot.getValue(ActionModel.class);
+                assert model != null;
+                if (model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null) {
+                    task = new Tasks(0, "action", model.getTask(), model.getDueDate());
+                    addTask(task);
+                }
+            }
+            else if(dataSnapshot.getRef().getParent().getParent().getKey().equals("indicator")) {
+                IndicatorModel model = dataSnapshot.getValue(IndicatorModel.class);
+                assert model != null;
+                if (model.getAssignee() != null && model.getAssignee().equals(user.getUserID()) && model.getDueDate() != null) {
+                    Tasks tasks = new Tasks(model.getTriggerSelected().intValue(), "indicator", model.getName(), model.getDueDate());
+                    addTask(tasks);
+                }
+            }
+        }
+
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            process(dataSnapshot, s);
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            process(dataSnapshot, s);
         }
 
         @Override
