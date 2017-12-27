@@ -114,6 +114,19 @@ public class AlertModel implements Serializable {
         this.reasonForRedAlert = reasonForRedAlert;
     }
 
+    public boolean wasRedAlertRequested() {
+        if(snapshot.child("approval").child("countryDirector").child(snapshot.getRef().getParent().getKey()).exists()) {
+            try {
+                long res = ((long) snapshot.child("approval").child("countryDirector").child(snapshot.getRef().getParent().getKey()).getValue());
+                return res == 0;
+            }
+            catch (Exception e) {
+                return false;
+            }
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
         return "AlertModel{" +

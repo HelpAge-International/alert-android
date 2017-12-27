@@ -155,15 +155,15 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
             else {
                 tvHazardName.setText(alert.getOtherName());
             }
+
             tvPeopleCount.setText(getNumOfPeopleText(alert.getEstimatedPopulation(), alert.getAffectedAreas().size()));
 
-
-            if(isCountryDirector && alert.getReasonForRedAlert() != null) {
+            if(isCountryDirector && alert.wasRedAlertRequested()) {
                 imgAlertReq.setVisibility(View.VISIBLE);
                 imgAlertColour.setImageResource(R.drawable.gray_alert_left);
                 txtRedRequested.setText(R.string.txt_cd_red_request);
             }
-            else if(alert.getReasonForRedAlert() != null && !isCountryDirector) {
+            else if(alert.wasRedAlertRequested() && !isCountryDirector) {
                 imgAlertReq.setVisibility(View.VISIBLE);
                 imgAlertColour.setImageResource(R.drawable.gray_alert_left);
                 txtRedRequested.setText(R.string.txt_red_requested);

@@ -110,6 +110,8 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
         FirebaseAuth.getInstance().addAuthStateListener(this);
 
+        System.out.println("user.getNetworkCountryID() = " + user.getNetworkCountryID());
+        System.out.println("user = " + user);
 
         return v;
     }
@@ -150,7 +152,6 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     @Override
     public void removeAlert(String id) {
         alertAdapter.remove(id);
-
         updateTitle();
     }
 
@@ -259,7 +260,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+            removeAlert(dataSnapshot.getKey());
         }
 
         @Override

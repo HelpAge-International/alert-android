@@ -17,7 +17,22 @@ public class User implements Serializable {
     private String userID;
     private String systemAdminID;
 
-
+    @Override
+    public String toString() {
+        return "User{" +
+                "agencyAdminID='" + agencyAdminID + '\'' +
+                ", countryID='" + countryID + '\'' +
+                ", userID='" + userID + '\'' +
+                ", systemAdminID='" + systemAdminID + '\'' +
+                ", hazardID=" + hazardID +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", userType=" + userType +
+                ", isCountryDirector=" + isCountryDirector +
+                ", networkCountryID='" + networkCountryID + '\'' +
+                '}';
+    }
 
     public List <String> hazardID;
     private String firstName;
@@ -116,16 +131,4 @@ public class User implements Serializable {
         isCountryDirector = countryDirector;
     }
 
-//
-//    @Override
-//    public String toString() {
-//        return "User{" +
-//                "userID='" + userID + '\'' +
-//                ", userType=" + userType +
-//                ", agencyAdminID='" + agencyAdminID + '\'' +
-//                ", countryID='" + countryID + '\'' +
-//                ", systemAdminID='" + systemAdminID + '\'' +
-//                ", networkCountryID='" + networkCountryID + '\'' +
-//                '}';
-//    }
 }
