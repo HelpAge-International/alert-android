@@ -151,4 +151,19 @@
     <string name="results_for">Results for: %s%s %s</string>
 
     <string name="title_min_preparedness">Min. Preparedness</string>
+    <string name="nav_settings">Settings</string>
+    <string name="change_password">Change Password</string>
+    <string name="change_email">Change Email</string>
+    <string name="enter_valid_emial_error">Please enter a valid email address</string>
+    <string name="couldnt_update_email_error">Could not update email at this time, please ensure you have a data connection and try again</string>
+    <string name="done">Done</string>
+    <string name="re_enter_new_password">Re-enter new password</string>
+    <string name="new_password">New password</string>
+    <string name="existing_password">Existing password</string>
+    <string name="enter_new_password_error">Please enter a new password</string>
+    <string name="reenter_new_password_error">Please re-enter your new password</string>
+    <string name="passwords_dont_match_error">Your new password don't match. Please try again</string>
+    <string name="curreny_pas_incorrect_error">Your current password is incorrect. Please try again</string>
+    <string name="passwords_dont_match_temp_error">Passwords don\'t match</string>
+    <string name="couldnt_update_password_error">Could not update password at this time, please ensure you have a data connection and try again</string>
 </resources>

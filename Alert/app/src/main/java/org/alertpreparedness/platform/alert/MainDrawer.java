@@ -35,6 +35,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.fragment.MinPrepare
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlanFragment;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.RiskFragment;
+import org.alertpreparedness.platform.alert.settings.SettingsFragment;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
@@ -240,13 +241,13 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                 case R.id.nav_risk:
                     Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> setFragment(new RiskFragment()));
                     break;
-                case R.id.nav_logout:
-                    PreferHelper.getInstance(getApplicationContext()).edit().remove(UserInfo.PREFS_USER).apply();
-                    mUserInfo.clearAll();
-                    firebaseAuth.signOut();
-                    startActivity(new Intent(getApplicationContext(), LoginScreen.class));
-                    finish();
-                    break;
+//                case R.id.nav_logout:
+//                    PreferHelper.getInstance(getApplicationContext()).edit().remove(UserInfo.PREFS_USER).apply();
+//                    mUserInfo.clearAll();
+//                    firebaseAuth.signOut();
+//                    startActivity(new Intent(getApplicationContext(), LoginScreen.class));
+//                    finish();
+//                    break;
                 case R.id.nav_minimum:
                     Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> setFragment(new MinPreparednessFragment()));
                     break;
@@ -255,6 +256,9 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                     break;
                 case R.id.nav_my_country:
                     Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> setFragment(new MyCountryFragment()));
+                    break;
+                case R.id.nav_settings:
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> setFragment(new SettingsFragment()));
                     break;
 
             }

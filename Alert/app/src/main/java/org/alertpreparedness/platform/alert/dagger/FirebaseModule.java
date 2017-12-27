@@ -65,8 +65,8 @@ public class FirebaseModule {
     @Provides
     @Singleton
     @UserRef
-    public DatabaseReference provideUserRef(@BaseDatabaseRef DatabaseReference db) {
-        return db.child("userPublic");
+    public DatabaseReference provideUserRef(@BaseDatabaseRef DatabaseReference db, User user) {
+        return db.child("userPublic").child(user.getUserID());
     }
 
     @Provides

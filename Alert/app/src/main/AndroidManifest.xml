@@ -98,6 +98,8 @@
             android:label="@string/progrmme_results"
             android:name=".mycountry.ProgramResultsActivity"
             android:screenOrientation="portrait" />
+        <activity android:label="@string/change_email" android:name=".settings.ChangeEmailActivity" />
+        <activity android:label="@string/change_password" android:name=".settings.ChangePasswordActivity" />
     </application>
 
 </manifest>

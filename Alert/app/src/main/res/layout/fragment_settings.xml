@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+
+    <Button
+        android:textSize="15dp"
+        android:textAllCaps="false"
+        android:id="@+id/btnChangeEmail"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:textStyle="normal"
+        android:textAlignment="viewStart"
+        android:background="?selectableItemBackground"
+        style="?android:attr/borderlessButtonStyle"
+        android:text="@string/change_email"
+        android:drawableRight="@drawable/arrow_rght"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start|center_vertical" />
+
+    <View
+        android:id="@+id/emailBorder"
+        android:layout_below="@+id/btnChangeEmail"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_color"/>
+
+    <Button
+        android:layout_below="@+id/emailBorder"
+        android:textSize="15dp"
+        android:textAllCaps="false"
+        android:id="@+id/btnChangePassword"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:textStyle="normal"
+        android:textAlignment="viewStart"
+        android:background="?selectableItemBackground"
+        style="?android:attr/borderlessButtonStyle"
+        android:text="@string/change_password"
+        android:drawableRight="@drawable/arrow_rght"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start|center_vertical" />
+
+    <View
+        android:layout_below="@+id/btnChangePassword"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_color"/>
+
+    <Button
+        android:id="@+id/btnLogout"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/btnColor"
+        android:layout_alignParentBottom="true"
+        android:text="@string/nav_logout"
+        android:textColor="@android:color/white" />
+
+</RelativeLayout>

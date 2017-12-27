@@ -12,6 +12,9 @@ import org.alertpreparedness.platform.alert.dashboard.activity.UpdateAlertActivi
 import org.alertpreparedness.platform.alert.helper.DataHandler;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.MinPreparednessFragment;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlanFragment;
+import org.alertpreparedness.platform.alert.settings.ChangeEmailActivity;
+import org.alertpreparedness.platform.alert.settings.ChangePasswordActivity;
+import org.alertpreparedness.platform.alert.settings.SettingsFragment;
 
 import javax.inject.Singleton;
 
@@ -35,4 +38,7 @@ public interface ApplicationComponent {
     void inject(AlertDetailActivity activity);
     void inject(MinPreparednessFragment fragment);
     void inject(TaskAdapter adapter);
+    void inject(SettingsFragment frag);
+    void inject(ChangeEmailActivity a);
+    void inject(ChangePasswordActivity a);
 }
