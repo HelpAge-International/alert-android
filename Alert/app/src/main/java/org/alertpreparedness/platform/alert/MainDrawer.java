@@ -243,7 +243,7 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                     break;
 //                case R.id.nav_logout:
 //                    PreferHelper.getInstance(getApplicationContext()).edit().remove(UserInfo.PREFS_USER).apply();
-//                    mUserInfo.clearAll();
+                    mUserInfo.clearAll();
 //                    firebaseAuth.signOut();
 //                    startActivity(new Intent(getApplicationContext(), LoginScreen.class));
 //                    finish();

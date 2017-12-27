@@ -28,8 +28,11 @@ import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
+import org.alertpreparedness.platform.alert.helper.UserInfo;
+import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlansAdapter;
+import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import javax.inject.Inject;
@@ -78,6 +81,15 @@ public class SettingsFragment extends Fragment implements ValueEventListener {
     private void initViews() {
 
 
+    }
+
+    @OnClick(R.id.btnLogout)
+    void onLogoutClick(View v) {
+        PreferHelper.getInstance(getContext()).edit().remove(UserInfo.PREFS_USER).apply();
+        UserInfo.clearAll();
+        FirebaseAuth.getInstance().signOut();
+        startActivity(new Intent(getContext(), LoginScreen.class));
+        getActivity().finish();
     }
 
     @OnClick(R.id.btnChangeEmail)
