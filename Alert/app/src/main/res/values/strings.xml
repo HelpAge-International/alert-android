@@ -166,4 +166,8 @@
     <string name="curreny_pas_incorrect_error">Your current password is incorrect. Please try again</string>
     <string name="passwords_dont_match_temp_error">Passwords don\'t match</string>
     <string name="couldnt_update_password_error">Could not update password at this time, please ensure you have a data connection and try again</string>
+    <string name="txt_complete_action">Complete action</string>
+    <string name="txt_reassign_action">Reassign action</string>
+    <string name="txt_action_notes">Action notes</string>
+    <string name="txt_attachments">Attachments</string>
 </resources>

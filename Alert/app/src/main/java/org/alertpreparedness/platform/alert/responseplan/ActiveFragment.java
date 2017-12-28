@@ -91,8 +91,6 @@ public class ActiveFragment extends Fragment implements ResponsePlansAdapter.Res
         dialog.show(getActivity().getSupportFragmentManager(), "alert_level");
     }
 
-
-
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {

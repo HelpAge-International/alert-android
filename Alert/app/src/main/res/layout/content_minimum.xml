@@ -50,13 +50,13 @@
                 android:layout_marginTop="8dp"
                 android:text="Completed"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@+id/rvActionsAssigned"
+                app:layout_constraintBottom_toTopOf="@+id/rvInProgress"
                 app:layout_constraintEnd_toEndOf="@+id/vMinTitle"
                 app:layout_constraintStart_toStartOf="@+id/vMinTitle"
                 app:layout_constraintTop_toTopOf="@+id/vMinTitle" />
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/rvActionsAssigned"
+                android:id="@+id/rvInProgress"
                 android:layout_width="match_parent"
 
                 android:layout_height="143dp"
@@ -72,7 +72,7 @@
                 android:layout_marginBottom="8dp"
                 android:layout_marginEnd="11dp"
                 android:layout_marginTop="8dp"
-                app:layout_constraintBottom_toTopOf="@+id/rvActionsAssigned"
+                app:layout_constraintBottom_toTopOf="@+id/rvInProgress"
                 app:layout_constraintEnd_toStartOf="@+id/tvMinStatus"
                 app:layout_constraintTop_toTopOf="@+id/vMinTitle"
                 app:srcCompat="@drawable/alert_green_icon"

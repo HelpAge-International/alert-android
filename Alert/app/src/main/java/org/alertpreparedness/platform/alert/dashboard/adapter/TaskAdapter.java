@@ -17,6 +17,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.helper.DateHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -39,7 +40,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
 
     @Inject
     User user;
-
 
     public TaskAdapter(List<Tasks> List) {
         this.listArray = List;
@@ -83,27 +83,27 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         }
 
         private void bind(Tasks tasks) {
-            if (tasks.getTaskType().equals("action") && isDueToday(tasks.dueDate)) {
+            if (tasks.getTaskType().equals("action") && DateHelper.isDueToday(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueTodayString(tasks.getAlertLevel(), "action"));
                 img_task.setImageResource(R.drawable.home_task_red);
-            } else if (tasks.getTaskType().equals("indicator") && isDueToday(tasks.dueDate)) {
+            } else if (tasks.getTaskType().equals("indicator") && DateHelper.isDueToday(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueTodayString(tasks.getAlertLevel(), "indicator"));
                 img_task.setImageResource(R.drawable.home_task_red);
-            } else if (tasks.getTaskType().equals("action") && isDueInWeek(tasks.dueDate)) {
+            } else if (tasks.getTaskType().equals("action") && DateHelper.isDueInWeek(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueWeekString(tasks.getAlertLevel(), "action"));
                 img_task.setImageResource(R.drawable.home_task_amber);
-            } else if (tasks.getTaskType().equals("indicator") && isDueInWeek(tasks.dueDate)) {
+            } else if (tasks.getTaskType().equals("indicator") && DateHelper.isDueInWeek(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueWeekString(tasks.getAlertLevel(), "indicator"));
                 img_task.setImageResource(R.drawable.home_task_amber);
-            } else if (tasks.getTaskType().equals("action") && itWasDue(tasks.dueDate)) {
+            } else if (tasks.getTaskType().equals("action") && DateHelper.itWasDue(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueBeforeString(tasks.getAlertLevel(), "action", format.format(new Date(tasks.dueDate))));
                 img_task.setImageResource(R.drawable.home_task_red);
-            } else if (tasks.getTaskType().equals("indicator") && itWasDue(tasks.dueDate)) {
+            } else if (tasks.getTaskType().equals("indicator") && DateHelper.itWasDue(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueBeforeString(tasks.getAlertLevel(), "indicator", format.format(new Date(tasks.dueDate))));
                 img_task.setImageResource(R.drawable.home_task_red);
@@ -164,41 +164,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         } else {
             return "A " + getLevelAsString(level)  + " " + type + " was due on" + setBoldText(date);
         }
-    }
-
-    public boolean isDueToday(long milliseconds) {
-        Calendar today = Calendar.getInstance();
-        Calendar date = Calendar.getInstance();
-        date.setTimeInMillis(milliseconds);
-
-        return today.get(Calendar.DAY_OF_YEAR) == date.get(Calendar.DAY_OF_YEAR);
-    }
-
-    public boolean isDueInWeek(long milliseconds) {
-        Calendar oneWeekAhead = Calendar.getInstance();
-        oneWeekAhead.add(Calendar.DAY_OF_YEAR, 8); // 8 to make it at the end of the day
-        oneWeekAhead.set(Calendar.HOUR, 0);
-        oneWeekAhead.set(Calendar.MINUTE, 0);
-        Calendar now = Calendar.getInstance();
-
-        return oneWeekAhead.getTimeInMillis() >= milliseconds && milliseconds >= now.getTimeInMillis();
-    }
-
-    private boolean itWasDue(long milliseconds) {
-        Calendar dueDate = Calendar.getInstance();
-        dueDate.setTimeInMillis(milliseconds);
-        Calendar today = Calendar.getInstance();
-
-        return dueDate.before(today);
-    }
-
-    public boolean isNotDue(long milliseconds) {
-        Calendar oneWeekAhead = Calendar.getInstance();
-        oneWeekAhead.add(Calendar.DAY_OF_YEAR, 8); // 8 to make it at the end of the day
-        oneWeekAhead.set(Calendar.HOUR, 0);
-        oneWeekAhead.set(Calendar.MINUTE, 0);
-
-        return oneWeekAhead.after(new Date(milliseconds));
     }
 
 }

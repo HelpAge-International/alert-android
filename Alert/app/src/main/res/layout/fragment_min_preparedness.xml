@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/home_main_content"
-        layout="@layout/content_minimum"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/action_pager"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />z
-</android.support.constraint.ConstraintLayout>
+        android:layout_height="match_parent"/>
+
+</RelativeLayout>

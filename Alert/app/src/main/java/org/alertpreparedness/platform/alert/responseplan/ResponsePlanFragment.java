@@ -72,7 +72,6 @@ public class ResponsePlanFragment extends Fragment {
 
     }
 
-
     private class PagerAdapter extends FragmentStatePagerAdapter {
 
         public PagerAdapter(FragmentManager fm) {

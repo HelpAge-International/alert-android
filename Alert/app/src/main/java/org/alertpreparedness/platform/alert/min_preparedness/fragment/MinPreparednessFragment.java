@@ -3,6 +3,9 @@ package org.alertpreparedness.platform.alert.min_preparedness.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -23,9 +27,12 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
+import org.alertpreparedness.platform.alert.responseplan.ActiveFragment;
+import org.alertpreparedness.platform.alert.responseplan.ArchivedFragment;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlanObj;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.inject.Inject;
 
@@ -36,14 +43,10 @@ import butterknife.ButterKnife;
  * Created by faizmohideen on 13/12/2017.
  */
 
-public class MinPreparednessFragment extends Fragment implements ActionAdapter.ItemSelectedListner{
+public class MinPreparednessFragment extends Fragment {
 
-    @BindView(R.id.rvActionsAssigned)
-    RecyclerView actionsRecyclerView;
-
-    @Inject
-    @ActionRef
-    DatabaseReference dbActionRef;
+    @BindView(R.id.action_pager)
+    ViewPager mPager;
 
     @Nullable
     @Override
@@ -51,57 +54,46 @@ public class MinPreparednessFragment extends Fragment implements ActionAdapter.I
         View v = inflater.inflate(R.layout.fragment_min_preparedness, container, false);
 
         ButterKnife.bind(this, v);
-        DependencyInjector.applicationComponent().inject(this);
 
         initViews();
 
         ((MainDrawer)getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.NORMAL, R.string.title_min_preparedness);
+        ((MainDrawer)getActivity()).removeActionbarElevation();
 
         return v;
     }
 
     private void initViews() {
-
-        ArrayList<Action> items = new ArrayList<>();
-
-        actionsRecyclerView.setAdapter(new ActionAdapter(getContext(), items, this));
-        actionsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        actionsRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        actionsRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
-
-        dbActionRef.addListenerForSingleValueEvent(new ValueEventListener() {
-
-            @SuppressWarnings("ConstantConditions")
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot getChild : dataSnapshot.getChildren()){
-//
-//                    String taskName = (String) getChild.child("task").getValue();
-//                    String department = (String) getChild.child("department").getValue();
-//                    String assignee = (String) getChild.child("asignee").getValue();
-//                    boolean isArchived = (boolean) getChild.child("isArchived").getValue();
-
-                    //String assignee = (String) getChild.child("asignee").getValue();
-                    //System.out.println("Child: "+ taskName);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        mPager.setAdapter(new MinPreparednessFragment.PagerAdapter(getFragmentManager()));
     }
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    private class PagerAdapter extends FragmentStatePagerAdapter {
 
+        public PagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
 
-    }
+        @Override
+        public Fragment getItem(int position) {
 
-    @Override
-    public void onActionItemSelected(int pos) {
+            switch (position) {
+                case 1:
+                    return new ActionExpiredFragment();
+                case 2:
+                    return new ActionUnassignedFragment();
+                case 3:
+                    return new ActionCompletedFragment();
+                case 4:
+                    return new ActionArchivedFragment();
+                default:
+                    return new InProgressFragment();
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return 5;
+        }
 
     }
 }

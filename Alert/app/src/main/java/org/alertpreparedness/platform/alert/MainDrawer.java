@@ -241,13 +241,6 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                 case R.id.nav_risk:
                     Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> setFragment(new RiskFragment()));
                     break;
-//                case R.id.nav_logout:
-//                    PreferHelper.getInstance(getApplicationContext()).edit().remove(UserInfo.PREFS_USER).apply();
-//                    mUserInfo.clearAll();
-//                    firebaseAuth.signOut();
-//                    startActivity(new Intent(getApplicationContext(), LoginScreen.class));
-//                    finish();
-//                    break;
                 case R.id.nav_minimum:
                     Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> setFragment(new MinPreparednessFragment()));
                     break;

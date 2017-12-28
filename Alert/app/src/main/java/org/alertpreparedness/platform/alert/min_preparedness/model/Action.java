@@ -1,26 +1,32 @@
 package org.alertpreparedness.platform.alert.min_preparedness.model;
 
+import com.google.firebase.database.DatabaseReference;
+
 /**
  * Created by faizmohideen on 13/12/2017.
  */
 
 public class Action {
+    private Boolean isArchived;
+    private Boolean isComplete;
     private String taskName;
     private String department;
     private String assignee;
-    private boolean isArchived;
     private Long actionType;
     private Long dueDate;
-    private int budget;
+    private Long budget;
+    public DatabaseReference db;
 
-    public Action(String taskName, String department, String assignee, boolean isArchived, Long actionType, Long dueDate, int budget) {
+    public Action(String taskName, String department, String assignee, Boolean isArchived, Boolean isComplete, Long actionType, Long dueDate, Long budget, DatabaseReference db) {
         this.taskName = taskName;
         this.department = department;
         this.assignee = assignee;
         this.isArchived = isArchived;
+        this.isComplete = isComplete;
         this.actionType = actionType;
         this.dueDate = dueDate;
         this.budget = budget;
+        this.db = db;
     }
 
     public String getTaskName() {
@@ -63,19 +69,27 @@ public class Action {
         this.dueDate = dueDate;
     }
 
-    public int getBudget() {
+    public Long getBudget() {
         return budget;
     }
 
-    public void setBudget(int budget) {
+    public void setBudget(Long budget) {
         this.budget = budget;
     }
 
-    public boolean isArchived() {
+    public Boolean getArchived() {
         return isArchived;
     }
 
-    public void setArchived(boolean archived) {
+    public void setArchived(Boolean archived) {
         isArchived = archived;
+    }
+
+    public Boolean getComplete() {
+        return isComplete;
+    }
+
+    public void setComplete(Boolean complete) {
+        isComplete = complete;
     }
 }
