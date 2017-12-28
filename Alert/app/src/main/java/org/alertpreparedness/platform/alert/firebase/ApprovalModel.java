@@ -1,10 +1,12 @@
 package org.alertpreparedness.platform.alert.firebase;
 
+import java.io.Serializable;
+
 /**
  * Created by Tj on 20/12/2017.
  */
 
-public class ApprovalModel {
+public class ApprovalModel implements Serializable {
 
     private Object countryDirector;
 

@@ -2,11 +2,13 @@ package org.alertpreparedness.platform.alert.firebase;
 
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
 
+import java.io.Serializable;
+
 /**
  * Created by Tj on 19/12/2017.
  */
 
-public class AffectedAreaModel {
+public class AffectedAreaModel implements Serializable {
 
     private Integer country;
 

@@ -14,6 +14,8 @@ import java.util.List;
 
 public class AlertModel implements Serializable {
 
+    private String key;
+
     private List<AffectedAreaModel> affectedAreas = new ArrayList<>();
 
     private Integer alertLevel;
@@ -40,7 +42,7 @@ public class AlertModel implements Serializable {
 
     private String name;
 
-    private DataSnapshot snapshot;
+    private transient DataSnapshot snapshot;
 
     public AlertModel() {}
 
@@ -187,5 +189,13 @@ public class AlertModel implements Serializable {
 
     public void setSnapshot(DataSnapshot snapshot) {
         this.snapshot = snapshot;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

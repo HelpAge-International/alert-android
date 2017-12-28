@@ -164,7 +164,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     @Override
     public void onAlertItemClicked(AlertModel alert) {
         Intent intent = new Intent(getActivity(), AlertDetailActivity.class);
-        intent.putExtra(EXTRA_ALERT, new Alert(alert, user.countryID));
+        intent.putExtra(EXTRA_ALERT, alert);
         startActivity(intent);
     }
 
@@ -243,6 +243,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
             AlertModel model = dataSnapshot.getValue(AlertModel.class);
 
             assert model != null;
+            model.setKey(dataSnapshot.getKey());
             model.setSnapshot(dataSnapshot);
             if(model.getAlertLevel() != 0) {
                 updateAlert(dataSnapshot.getKey(), model);

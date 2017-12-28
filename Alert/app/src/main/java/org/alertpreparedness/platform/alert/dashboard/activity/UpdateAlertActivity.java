@@ -50,6 +50,7 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
         if (intent.hasExtra(EXTRA_ALERT)){
             alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
         }
+
         DependencyInjector.applicationComponent().inject(this);
 
         mToolbar.setTitle(R.string.update_alert);
