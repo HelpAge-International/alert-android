@@ -42,7 +42,7 @@ public class AlertModel implements Serializable {
 
     private String name;
 
-    private transient DataSnapshot snapshot;
+//    private transient DataSnapshot snapshot;
 
     public AlertModel() {}
 
@@ -117,30 +117,7 @@ public class AlertModel implements Serializable {
     }
 
     public boolean wasRedAlertRequested() {
-        if(snapshot.child("approval").child("countryDirector").child(snapshot.getRef().getParent().getKey()).exists()) {
-            try {
-                long res = ((long) snapshot.child("approval").child("countryDirector").child(snapshot.getRef().getParent().getKey()).getValue());
-                return res == 0;
-            }
-            catch (Exception e) {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return "AlertModel{" +
-                "affectedAreas=" + affectedAreas +
-                ", alertLevel=" + alertLevel +
-                ", hazardScenario=" + hazardScenario +
-                ", infoNotes='" + infoNotes + '\'' +
-                ", timeCreated=" + timeCreated +
-                ", createdBy='" + createdBy + '\'' +
-                ", estimatedPopulation=" + estimatedPopulation +
-                ", reasonForRedAlert='" + reasonForRedAlert + '\'' +
-                '}';
+        return approval.getCountryDirector().size() == 0;
     }
 
     public ApprovalModel getApproval() {
@@ -183,19 +160,31 @@ public class AlertModel implements Serializable {
         this.name = name;
     }
 
-    public DataSnapshot getSnapshot() {
-        return snapshot;
-    }
-
-    public void setSnapshot(DataSnapshot snapshot) {
-        this.snapshot = snapshot;
-    }
-
     public String getKey() {
         return key;
     }
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    @Override
+    public String toString() {
+        return "AlertModel{" +
+                "key='" + key + '\'' +
+                ", affectedAreas=" + affectedAreas +
+                ", alertLevel=" + alertLevel +
+                ", hazardScenario=" + hazardScenario +
+                ", infoNotes='" + infoNotes + '\'' +
+                ", timeCreated=" + timeCreated +
+                ", createdBy='" + createdBy + '\'' +
+                ", estimatedPopulation=" + estimatedPopulation +
+                ", reasonForRedAlert='" + reasonForRedAlert + '\'' +
+                ", approval=" + approval +
+                ", timeUpdated=" + timeUpdated +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", otherName='" + otherName + '\'' +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

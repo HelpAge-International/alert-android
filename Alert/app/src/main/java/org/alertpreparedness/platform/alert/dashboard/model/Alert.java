@@ -66,24 +66,6 @@ public class Alert implements Serializable{
     public Alert() {
     }
 
-    public Alert(AlertModel alert, String countryID) {
-        this.id = alert.getSnapshot().getKey();
-        DataSnapshot ref = alert.getSnapshot();
-        this.alertLevel = alert.getAlertLevel();
-        this.hazardScenario = alert.getHazardScenario();
-        this.population = alert.getEstimatedPopulation();
-        this.numOfAreas = alert.getAffectedAreas().size();
-        if(ref.child("approval").child("countryDirector").child(countryID).exists()) {
-            this.redAlertRequested = (long) ref.child("approval").child("countryDirector").child(countryID).getValue();
-        }
-        this.info = alert.getInfoNotes();
-        Date date = new Date(alert.getTimeUpdated());
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        this.updated = format.format(date.getTime());
-        this.updatedBy = alert.getUpdatedBy();
-        this.otherName = alert.getOtherName();
-    }
-
     @Exclude
     public String getId() {
         return id;

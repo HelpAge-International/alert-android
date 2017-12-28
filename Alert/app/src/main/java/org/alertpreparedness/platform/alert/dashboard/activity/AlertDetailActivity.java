@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.dashboard.activity;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -26,19 +27,30 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
+import org.alertpreparedness.platform.alert.ExtensionHelperKt;
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
+import org.alertpreparedness.platform.alert.firebase.AffectedAreaModel;
+import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData;
 import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService;
+import org.alertpreparedness.platform.alert.risk_monitoring.view_model.SelectAreaViewModel;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -53,7 +65,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     private Calendar date = Calendar.getInstance();
     private String dateFormat = "dd/MM/yyyy";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
-    private Alert alert;
+    private AlertModel alert;
     private String isRequestSent;
     private ConstraintLayout clRequested;
     private LinearLayout llButtons;
@@ -65,6 +77,9 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     private UpdateAlertActivity updateAlertActivity = new UpdateAlertActivity();
 
     public static final String EXTRA_ALERT = "extra_alert";
+
+    @Inject
+    SimpleDateFormat dateFormatter;
 
     DatabaseReference mReference = FirebaseDatabase.getInstance().getReference();
     ValueEventListener mValueListener = new ValueEventListener() {
@@ -78,11 +93,14 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
         }
     };
+    private ArrayList<CountryJsonData> mCountryDataList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alert_detail);
+
+        DependencyInjector.applicationComponent().inject(this);
 
         countryID = UserInfo.getUser(this).countryID;
         isCountryDirector = UserInfo.getUser(this).isCountryDirector();
@@ -91,11 +109,6 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             System.out.println("CD or Not: " + UserInfo.getUser(this).isCountryDirector());
         }
 
-        initView();
-
-    }
-
-    private void initView() {
         toolbar = (Toolbar) findViewById(R.id.action_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -105,8 +118,16 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         final Drawable upArrow = toolbar.getNavigationIcon();
         upArrow.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
 
-        clRequested = (ConstraintLayout) findViewById(R.id.clRedRequested);
-        llButtons = (LinearLayout) findViewById(R.id.llButtons);
+
+
+        initView();
+
+    }
+
+    private void initView() {
+
+        clRequested = findViewById(R.id.clRedRequested);
+        llButtons = findViewById(R.id.llButtons);
         txtHazardName = (TextView) findViewById(R.id.txtHazardName);
         txtPopulation = (TextView) findViewById(R.id.txtPopulationAffected);
         txtAffectedArea = (TextView) findViewById(R.id.txtArea);
@@ -138,12 +159,12 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                 isRequestSent = (String) bd.get("IS_RED_REQUEST");
                 System.out.println("REQ: " + isRequestSent);
             }
-            alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
+            alert = (AlertModel) intent.getSerializableExtra(EXTRA_ALERT);
             fetchDetails();
 
             mAppStatus = PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS);
 
-            mReference = FirebaseDatabase.getInstance().getReference().child(mAppStatus).child("alert").child(countryID).child(alert.getId());
+            mReference = FirebaseDatabase.getInstance().getReference().child(mAppStatus).child("alert").child(countryID).child(alert.getKey());
             mReference.addValueEventListener(mValueListener);
         }
     }
@@ -154,60 +175,30 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             String id = dataSnapshot.getKey();
 
             if (alertLevel != 0) {
-                long numberOfAreas = dataSnapshot.child("affectedAreas").getChildrenCount();
-                Log.e("f", id + " " + numberOfAreas);
-                long country = (long) dataSnapshot.child("affectedAreas").getChildren().iterator().next().child("country").getValue();
                 long hazardScenario = (long) dataSnapshot.child("hazardScenario").getValue();
-                long population = (long) dataSnapshot.child("estimatedPopulation").getValue();
-                long redStatus = (long) dataSnapshot.child("approval").child("countryDirector").child(countryID).getValue();
-                String info = (String) dataSnapshot.child("infoNotes").getValue();
 
                 if (dataSnapshot.child("timeUpdated").exists()) {
-                    long updated = (long) dataSnapshot.child("timeUpdated").getValue();
-                    String updatedBy = (String) dataSnapshot.child("updatedBy").getValue();
-                    date.setTimeInMillis(updated);
-                    String updatedDay = format.format(date.getTime());
-
                     if (hazardScenario != -1) {
-                        Alert alert = new Alert(alertLevel, hazardScenario, population,
-                                numberOfAreas, redStatus, info, updatedDay, updatedBy, null);
-                        alert.setId(id);
-
-                        this.alert = alert;
                         fetchDetails();
                     } else if (dataSnapshot.child("otherName").exists()) {
                         String nameId = (String) dataSnapshot.child("otherName").getValue();
-                        long level1 = alert.getLevel1();
-                        long level2 = alert.getLevel2();
-                        setOtherName(nameId, alertLevel, hazardScenario, numberOfAreas,
-                                redStatus, population, country, level1, level2, info, updatedDay, updatedBy);
+
+                        setOtherName(nameId);
                     }
 
                 } else if (dataSnapshot.child("timeCreated").exists()) {
-                    String updatedDay = this.alert.getUpdated();
-
                     if (hazardScenario != -1) {
-                        Alert alert = new Alert(alertLevel, hazardScenario, population, numberOfAreas,
-                                redStatus, info, updatedDay, null, null);
-                        alert.setId(id);
-
-                        this.alert = alert;
                         fetchDetails();
                     } else if (dataSnapshot.child("otherName").exists()) {
                         String nameId = (String) dataSnapshot.child("otherName").getValue();
-                        long level1 = alert.getLevel1();
-                        long level2 = alert.getLevel2();
-
-                        setOtherName(nameId, alertLevel, hazardScenario, numberOfAreas,
-                                redStatus, population, country, level1, level2, info, updatedDay, null);
+                        setOtherName(nameId);
                     }
                 }
             }
         }
     }
 
-    private void setOtherName(String nameId, long alertLevel, long hazardScenario, long numOfAreas, long redStatus,
-                              long population, long country, long level1, long level2, String info, String updatedDay, String updatedBy) {
+    private void setOtherName(String nameId) {
 
         DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference().child(mAppStatus).child("hazardOther").child(nameId);
@@ -215,11 +206,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String name = (String) dataSnapshot.child("name").getValue();
-                Alert alert = new Alert(alertLevel, hazardScenario, population, numOfAreas, redStatus, info, updatedDay, updatedBy, name);
-                Alert alert1 = new Alert(country, level1, level2);
-                alert.setId(dataSnapshot.getKey());
-
-                AlertDetailActivity.this.alert = alert;
+                AlertDetailActivity.this.alert.setOtherName(name);
             }
 
             @Override
@@ -233,11 +220,29 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         setUpActionBarColour();
         setUpRedAlertRequestView();
 
-        for (int i = 0; i < Constants.COUNTRIES.length; i++) {
-            if (alert.getCountry() == i) {
-                txtAffectedArea.setText(Constants.COUNTRIES[i]);
+        SelectAreaViewModel mViewModel = ViewModelProviders.of(this).get(SelectAreaViewModel.class);
+
+        mViewModel.getCountryJsonDataLive().observe(this, countryJsonData -> {
+
+            if(countryJsonData != null) {
+                mCountryDataList = new ArrayList<>(countryJsonData);
+
+                if (mCountryDataList.size() > 240) {
+
+                    StringBuilder res = new StringBuilder();
+                    for(AffectedAreaModel m : alert.getAffectedAreas()) {
+                        List<String> list = ExtensionHelperKt.getLevel1Values(m.getCountry(), mCountryDataList);
+                        res.append(Constants.COUNTRIES[m.getCountry()]);
+                        if(list != null && m.getLevel1() != null && list.get(m.getLevel1()) != null) {
+                            res.append(", ").append(list.get(m.getLevel1()));
+                        }
+                        res.append("\n");
+                    }
+                    txtAffectedArea.setText(res.toString());
+                }
             }
-        }
+
+        });
 
         imgPopulation.setImageResource(R.drawable.alert_population);
         imgAffectedArea.setImageResource(R.drawable.alert_areas);
@@ -247,22 +252,22 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             if (i == alert.getHazardScenario()) {
                 AlertAdapter.fetchIcon(Constants.HAZARD_SCENARIO_NAME[i], imgHazard);
                 txtHazardName.setText(Constants.HAZARD_SCENARIO_NAME[i]);
-                txtPopulation.setText(getPeopleAsString(alert.getPopulation()));
-                txtLastUpdated.setText(getUpdatedAsString(alert.getUpdated()));
-                txtInfo.setText((CharSequence) alert.getInfo());
+                txtPopulation.setText(getPeopleAsString(alert.getEstimatedPopulation()));
+                txtLastUpdated.setText(getUpdatedAsString(new Date(alert.getTimeUpdated())));
+                txtInfo.setText((CharSequence) alert.getInfoNotes());
             } else if (alert.getOtherName() != null) {
                 imgHazard.setImageResource(R.drawable.other);
                 txtHazardName.setText(alert.getOtherName());
-                txtPopulation.setText(getPeopleAsString(alert.getPopulation()));
-                txtInfo.setText((CharSequence) alert.getInfo());
-                txtLastUpdated.setText(getUpdatedAsString(alert.getUpdated()));
+                txtPopulation.setText(getPeopleAsString(alert.getEstimatedPopulation()));
+                txtInfo.setText((CharSequence) alert.getInfoNotes());
+                txtLastUpdated.setText(getUpdatedAsString(new Date(alert.getTimeUpdated())));
             }
         }
     }
 
     private void setUpRedAlertRequestView() {
         Window window = getWindow();
-        if (isCountryDirector && alert.getRedAlertRequested() == 0) {
+        if (isCountryDirector && alert.wasRedAlertRequested()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setStatusBarColor(getResources().getColor(R.color.sBar_Gray));
             }
@@ -271,7 +276,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             clRequested.setVisibility(View.VISIBLE);
             llButtons.setVisibility(View.VISIBLE);
             setUserName();
-        } else if (!isCountryDirector && alert.getRedAlertRequested() == 0) {
+        } else if (!isCountryDirector && alert.wasRedAlertRequested()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setStatusBarColor(getResources().getColor(R.color.sBar_Gray));
             }
@@ -310,7 +315,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     }
 
     private String getRedDisplayText(String fn, String ln) {
-        return fn + " " + ln + " has requested the alert level to go from Amber to Red on the " + alert.getUpdated();
+        return fn + " " + ln + " has requested the alert level to go from Amber to Red on the " + dateFormatter.format(new Date(alert.getTimeUpdated()));
     }
 
 
@@ -318,7 +323,8 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         return population + " people";
     }
 
-    private SpannableStringBuilder getUpdatedAsString(String updateDate) {
+    private SpannableStringBuilder getUpdatedAsString(Date date) {
+        String updateDate = dateFormatter.format(date);
         SpannableStringBuilder sb = new SpannableStringBuilder("Last updated: " + updateDate);
         StyleSpan b = new StyleSpan(android.graphics.Typeface.BOLD);
         sb.setSpan(b, 14, 14 + updateDate.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
@@ -396,7 +402,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void approveOrReject(boolean isApproved) {
-        Log.e("e:", mReference + " Clicked!");
+
         mReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -415,6 +421,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
             }
         });
+
     }
 
     @Override
