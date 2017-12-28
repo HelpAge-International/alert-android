@@ -17,8 +17,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,6 +28,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
@@ -41,6 +46,8 @@ import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
 import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,6 +66,14 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     private FirebaseAuth firebaseAuth;
     private UserInfo mUserInfo;
     public static final String TAG = "MAIN_DRAWER";
+
+    static class HeaderViews {
+        @BindView(R.id.tvUserName) TextView mUsername;
+        @BindView(R.id.tvDepartment) TextView mDepartment;
+        @BindView(R.id.img_profile) ImageView logo;
+    }
+
+    final HeaderViews header = new HeaderViews();
 
     @BindView(R.id.nav_view)
     NavigationView navigationView;
@@ -81,6 +96,12 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     @BindView(R.id.normal_action_bar)
     CardView normalActionbarContainer;
 
+    @Inject @UserRef
+    DatabaseReference userRef;
+
+    @Inject @AgencyRef
+    DatabaseReference agencyRef;
+
     @Override
     public void onCreate(Bundle saved) {
         super.onCreate(saved);
@@ -88,6 +109,9 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
         setContentView(R.layout.activity_main_drawer);
 
         ButterKnife.bind(this);
+        ButterKnife.bind(header, navigationView.getHeaderView(0));
+
+        DependencyInjector.applicationComponent().inject(this);
 
         setUserName();
 
@@ -117,23 +141,38 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     }
 
     private void setUserName() {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference db = ref.
-                child(PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS)).
-                child("userPublic").child(PreferHelper.getString(getApplicationContext(), Constants.UID));
 
-        db.addListenerForSingleValueEvent(new ValueEventListener() {
+        agencyRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                header.mDepartment.setText((String)dataSnapshot.child("name").getValue());
+                String urlPath = (String)dataSnapshot.child("logoPath").getValue();
+                Glide.with(MainDrawer.this)
+                        .load(urlPath)
+                        .placeholder(R.drawable.agency_icon_placeholder)
+                        .into(header.logo);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 try {
                     String firstname = dataSnapshot.child("firstName").getValue().toString();
                     String lastname = dataSnapshot.child("lastName").getValue().toString();
-                    String email = dataSnapshot.child("email").getValue().toString();
 
-                    User user = new User(firstname, lastname, email);
-                } catch (Exception e) {
-                    Log.e(TAG, String.valueOf(e));
+                    header.mUsername.setText(String.format("%s %s", firstname, lastname));
+
+
+                }
+                catch (Exception e) {
+
                 }
             }
 
