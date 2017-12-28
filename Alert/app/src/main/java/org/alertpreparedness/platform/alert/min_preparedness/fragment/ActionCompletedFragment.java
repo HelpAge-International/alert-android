@@ -28,7 +28,7 @@ import butterknife.ButterKnife;
 
 public class ActionCompletedFragment extends InProgressFragment {
 
-    @BindView(R.id.rvActionCompleted)
+    @BindView(R.id.rvCompleted)
     RecyclerView mActionCompleteRV;
 
     private ActionAdapter mAdapter;

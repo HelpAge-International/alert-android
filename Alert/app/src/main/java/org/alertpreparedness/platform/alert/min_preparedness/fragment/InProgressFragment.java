@@ -10,6 +10,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -31,6 +32,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -93,7 +95,26 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
 
     @Override
     public void onActionItemSelected(int pos) {
-        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Clicked", Snackbar.LENGTH_LONG).show();
+        SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress).setClick(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.complete_action:
+                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "In progress Clicked", Snackbar.LENGTH_LONG).show();
+                        break;
+                    case R.id.reassign_action:
+                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
+                        break;
+                    case R.id.action_notes:
+                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Notes Clicked", Snackbar.LENGTH_LONG).show();
+                        break;
+                    case R.id.attachments:
+                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
+                        break;
+                }
+                return false;
+            }
+        }).show();
     }
 
     @SuppressWarnings("ConstantConditions")

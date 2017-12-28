@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/complete_action"
+        android:icon="@drawable/ic_check_circle_24px"
+        android:title="@string/txt_complete_action" />
+    <item
+        android:id="@+id/reassign_action"
+        android:icon="@drawable/ic_assignment_24px"
+        android:title="@string/txt_reassign_action" />
+    <item
+        android:id="@+id/action_notes"
+        android:icon="@drawable/ic_chat_bubble_24px"
+        android:title="@string/txt_action_notes" />
+    <item
+        android:id="@+id/attachments"
+        android:icon="@drawable/ic_attach_file_24px"
+        android:title="@string/txt_attachments" />
+
+</menu>

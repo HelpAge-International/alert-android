@@ -49,8 +49,6 @@ public class UserInfo {
 
                         if (dataSnapshot.child(PreferHelper.getString(AlertApplication.getContext(), Constants.UID)).exists()) {
                             DataSnapshot userNode = dataSnapshot.child(PreferHelper.getString(AlertApplication.getContext(), Constants.UID));
-                            Log.e("Tag", "TRUE " + nodeName);
-                            Log.e("Tag", "UID" + userNode);
                             populateUser(authCallback, nodeName, userNode, context);
                         }
                     }
@@ -136,28 +134,41 @@ public class UserInfo {
         int userType = getUserType(nodeName);
         boolean isCountryDirector = false;
 
-            String agencyAdmin = userNode.child("agencyAdmin").getChildren().iterator().next().getKey();
-            String systemAdmin = userNode.child("systemAdmin").getChildren().iterator().next().getKey();
-            String countryId = userNode.child("countryId").getValue(String.class);
+//        DatabaseReference ref = database.child(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS)).child("network");
+//        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
 
-            PreferHelper.putString(AlertApplication.getContext(), Constants.AGENCY_ID, agencyAdmin);
-            PreferHelper.putString(AlertApplication.getContext(), Constants.COUNTRY_ID, countryId);
-            PreferHelper.putString(AlertApplication.getContext(), Constants.SYSTEM_ID, systemAdmin);
-            PreferHelper.putInt(AlertApplication.getContext(), Constants.USER_TYPE, userType);
+        String agencyAdmin = userNode.child("agencyAdmin").getChildren().iterator().next().getKey();
+        String systemAdmin = userNode.child("systemAdmin").getChildren().iterator().next().getKey();
+        String countryId = userNode.child("countryId").getValue(String.class);
+
+        PreferHelper.putString(AlertApplication.getContext(), Constants.AGENCY_ID, agencyAdmin);
+        PreferHelper.putString(AlertApplication.getContext(), Constants.COUNTRY_ID, countryId);
+        PreferHelper.putString(AlertApplication.getContext(), Constants.SYSTEM_ID, systemAdmin);
+        PreferHelper.putInt(AlertApplication.getContext(), Constants.USER_TYPE, userType);
 
 
-            if (nodeName.equals("countryDirector")) {
-                isCountryDirector = true;
-                User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin, null, null, isCountryDirector);
-                saveUser(callback.getContext(), user);
-                callback.onUserAuthorized(user);
-                setHazardId(callback, context, userID, userType, agencyAdmin, countryId, systemAdmin, isCountryDirector);
-            } else {
-                User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin,null, null, isCountryDirector);
-                saveUser(callback.getContext(), user);
-                callback.onUserAuthorized(user);
-                setHazardId(callback, context, userID, userType, agencyAdmin, countryId, systemAdmin, isCountryDirector);
-            }
+        if (nodeName.equals("countryDirector")) {
+            isCountryDirector = true;
+            User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin, null, null, isCountryDirector);
+            saveUser(callback.getContext(), user);
+            callback.onUserAuthorized(user);
+            setHazardId(callback, context, userID, userType, agencyAdmin, countryId, systemAdmin, isCountryDirector);
+        } else {
+            User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin,null, null, isCountryDirector);
+            saveUser(callback.getContext(), user);
+            callback.onUserAuthorized(user);
+            setHazardId(callback, context, userID, userType, agencyAdmin, countryId, systemAdmin, isCountryDirector);
+        }
 
     }
 

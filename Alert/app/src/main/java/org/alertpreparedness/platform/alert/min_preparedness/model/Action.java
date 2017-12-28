@@ -22,6 +22,7 @@ public class Action {
         this.department = department;
         this.assignee = assignee;
         this.isArchived = isArchived;
+        this.isComplete = isComplete;
         this.actionType = actionType;
         this.dueDate = dueDate;
         this.budget = budget;
@@ -76,7 +77,7 @@ public class Action {
         this.budget = budget;
     }
 
-    public Boolean isArchived() {
+    public Boolean getArchived() {
         return isArchived;
     }
 

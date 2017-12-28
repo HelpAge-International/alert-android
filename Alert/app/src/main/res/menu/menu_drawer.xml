@@ -1,35 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:checkableBehavior="single">
+    <group android:id="@+id/main" android:checkableBehavior="single">
         <item
+            android:orderInCategory="0"
             android:id="@+id/nav_home"
             android:title="@string/nav_home" />
         <item
+            android:orderInCategory="0"
             android:id="@+id/nav_risk"
             android:title="@string/nav_risk" />
         <item
+            android:orderInCategory="0"
             android:id="@+id/nav_minimum"
             android:title="@string/nav_minimum" />
         <item
+            android:orderInCategory="0"
             android:id="@+id/nav_advanced"
             android:title="@string/nav_advanced" />
         <item
+            android:orderInCategory="0"
             android:id="@+id/nav_response"
             android:title="@string/nav_response" />
         <item
+            android:orderInCategory="0"
             android:id="@+id/nav_country"
             android:title="@string/nav_country" />
         <item
+            android:orderInCategory="0"
             android:id="@+id/nav_my_country"
             android:title="@string/nav_my_country" />
     </group>
 
-    <item android:title="">
-        <menu>
-            <item
-                android:id="@+id/nav_logout"
-                android:icon="@drawable/logout"
-                android:title="@string/nav_logout" />
-        </menu>
-    </item>
+    <group android:id="@+id/settings" android:checkableBehavior="single">
+        <item
+            android:orderInCategory="1"
+            android:id="@+id/nav_settings"
+            android:title="@string/nav_settings" />
+    </group>
+
+    <!--<item android:title="">-->
+        <!--<menu>-->
+            <!--<item-->
+                <!--android:id="@+id/nav_logout"-->
+                <!--android:icon="@drawable/logout"-->
+                <!--android:title="@string/nav_logout" />-->
+        <!--</menu>-->
+    <!--</item>-->
 </menu>

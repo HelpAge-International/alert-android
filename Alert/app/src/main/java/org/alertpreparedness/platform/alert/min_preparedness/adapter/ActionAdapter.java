@@ -64,7 +64,6 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     public void addExpiredItem(String key, Action action) {
         if (keys.indexOf(key) == -1) {
             if (action.getDueDate() != null && DateHelper.itWasDue(action.getDueDate()) && action.getTaskName() != null) {
-                System.out.println("action = " + action.getAssignee());
                 keys.add(key);
                 items.put(key, action);
                 notifyItemInserted(keys.size() - 1);
@@ -90,7 +89,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     public void addCompletedItem(String key, Action action) {
         if (keys.indexOf(key) == -1) {
-            if (action.getComplete() != null && action.getComplete()) {
+            if (action.getComplete() != null && action.getComplete() && action.getDueDate() != null) {
                 keys.add(key);
                 items.put(key, action);
                 notifyItemInserted(keys.size() - 1);
@@ -103,7 +102,8 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     public void addArchivedItem(String key, Action action) {
         if (keys.indexOf(key) == -1) {
-            if (action.getDueDate() != null && !DateHelper.itWasDue(action.getDueDate()) && action.getTaskName() != null) {
+            System.out.println("action = " + action.getArchived());
+            if (action.getArchived() != null && action.getArchived() && action.getDueDate() != null) {
                 keys.add(key);
                 items.put(key, action);
                 notifyItemInserted(keys.size() - 1);

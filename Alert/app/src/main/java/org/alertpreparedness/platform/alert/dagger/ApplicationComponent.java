@@ -1,6 +1,8 @@
 package org.alertpreparedness.platform.alert.dagger;
 
 import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
+import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
+import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
 import org.alertpreparedness.platform.alert.helper.DataHandler;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.InProgressFragment;
@@ -12,6 +14,9 @@ import org.alertpreparedness.platform.alert.dashboard.activity.UpdateAlertActivi
 import org.alertpreparedness.platform.alert.helper.DataHandler;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.MinPreparednessFragment;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlanFragment;
+import org.alertpreparedness.platform.alert.settings.ChangeEmailActivity;
+import org.alertpreparedness.platform.alert.settings.ChangePasswordActivity;
+import org.alertpreparedness.platform.alert.settings.SettingsFragment;
 
 import javax.inject.Singleton;
 
@@ -25,6 +30,7 @@ import dagger.Component;
 @Component(modules = {ApplicationModule.class, FirebaseModule.class})
 public interface ApplicationComponent {
     void inject(ResponsePlanFragment fragment);
+    void inject(HomeFragment fragment);
     void inject(CreateAlertActivity activity);
     void inject(DataHandler dataHandler);
     void inject(MyCountryFragment fragment);
@@ -33,6 +39,10 @@ public interface ApplicationComponent {
     void inject(UpdateAlertActivity activity);
     void inject(AlertDetailActivity activity);
     void inject(MinPreparednessFragment fragment);
+    void inject(TaskAdapter adapter);
+    void inject(SettingsFragment frag);
+    void inject(ChangeEmailActivity a);
+    void inject(ChangePasswordActivity a);
     void inject(InProgressFragment fragment);
     void inject(ActionAdapter adapter);
 
