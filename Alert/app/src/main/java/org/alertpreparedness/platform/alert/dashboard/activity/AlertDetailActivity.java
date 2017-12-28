@@ -145,7 +145,6 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         btnReject = (Button) findViewById(R.id.btnReject);
 
         imgUpdate.setImageResource(R.drawable.ic_create_white_24dp);
-        imgUpdate.setOnClickListener(this);
         btnApprove.setOnClickListener(this);
         btnReject.setOnClickListener(this);
         imgClose.setVisibility(View.GONE);
@@ -234,11 +233,14 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                         List<String> list = ExtensionHelperKt.getLevel1Values(m.getCountry(), mCountryDataList);
                         res.append(Constants.COUNTRIES[m.getCountry()]);
                         if(list != null && m.getLevel1() != null && list.get(m.getLevel1()) != null) {
+                            m.setLevel1Name(list.get(m.getLevel1()));
                             res.append(", ").append(list.get(m.getLevel1()));
                         }
                         res.append("\n");
                     }
                     txtAffectedArea.setText(res.toString());
+                    imgUpdate.setOnClickListener(this);
+
                 }
             }
 
@@ -388,6 +390,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         if (view == imgUpdate) {
             Intent intent = new Intent(AlertDetailActivity.this, UpdateAlertActivity.class);
             intent.putExtra(EXTRA_ALERT, alert);
+            System.out.println("alertintent = " + alert);
             startActivity(intent);
         }
 

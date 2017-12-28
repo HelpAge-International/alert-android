@@ -16,6 +16,12 @@ public class AffectedAreaModel implements Serializable {
 
     private Integer level2;
 
+    //not set through firebase
+    private String level1Name;
+
+    //not set through firebase
+    private String level2Name;
+
     public AffectedAreaModel() {}
 
     public AffectedAreaModel(ModelIndicatorLocation area) {
@@ -61,6 +67,25 @@ public class AffectedAreaModel implements Serializable {
                 "country=" + country +
                 ", level1=" + level1 +
                 ", level2=" + level2 +
+                ", level1Name='" + level1Name + '\'' +
+                ", level2Name='" + level2Name + '\'' +
                 '}';
     }
+
+    public String getLevel2Name() {
+        return level2Name;
+    }
+
+    public void setLevel2Name(String level2Name) {
+        this.level2Name = level2Name;
+    }
+
+    public String getLevel1Name() {
+        return level1Name;
+    }
+
+    public void setLevel1Name(String level1Name) {
+        this.level1Name = level1Name;
+    }
+
 }

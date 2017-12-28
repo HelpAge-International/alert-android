@@ -116,11 +116,11 @@
 
         <TextView
             android:id="@+id/txtArea"
-            android:lineSpacingMultiplier="1.2"
+            android:lineSpacingMultiplier="1.6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="1dp"
+            android:layout_marginTop="@dimen/activity_vertical_margin_half"
             android:textColor="@android:color/black"
             android:textSize="15sp"
             app:layout_constraintStart_toEndOf="@+id/imgAreaIcon"
