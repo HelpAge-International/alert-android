@@ -2,8 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_logout"
-        android:orderInCategory="100"
-        android:title="@string/nav_my_country"
-        app:showAsAction="never" />
+        android:id="@+id/btn_confirm"
+        android:title="@string/txt_confirm"
+        app:showAsAction="always" />
 </menu>

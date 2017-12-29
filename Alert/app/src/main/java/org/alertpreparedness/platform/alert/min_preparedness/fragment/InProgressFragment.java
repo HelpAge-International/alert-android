@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.alert.min_preparedness.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -24,7 +25,9 @@ import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 
@@ -100,7 +103,8 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.complete_action:
-                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "In progress Clicked", Snackbar.LENGTH_LONG).show();
+                        Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
+                        startActivity(intent);
                         break;
                     case R.id.reassign_action:
                         Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
