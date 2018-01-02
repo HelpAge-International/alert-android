@@ -171,7 +171,6 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                     h2.recyclerView.setHasFixedSize(true);
                     h2.recyclerView.setNestedScrollingEnabled(false);
 
-
                     h2.textView.setText(R.string.add_another_area);
 
                 }

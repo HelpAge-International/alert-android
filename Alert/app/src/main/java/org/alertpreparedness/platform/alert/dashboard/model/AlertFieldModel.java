@@ -24,6 +24,9 @@ public class AlertFieldModel {
     public String resultTitle;
     public int inputType = InputType.TYPE_CLASS_TEXT;
 
+    public AlertFieldModel() {
+    }
+
     @Override
     public String toString() {
         return "AlertFieldModel{" +

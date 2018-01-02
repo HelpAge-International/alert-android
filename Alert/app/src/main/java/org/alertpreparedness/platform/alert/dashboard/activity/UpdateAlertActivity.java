@@ -195,12 +195,6 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
                 mFieldsAdapter.removeRedReason();
                 alert.setAlertLevel(1);
                 break;
-//            case 2:
-//                alert.setRedAlertRequested(2);
-//            default:
-//                mFieldsAdapter.removeRedReason();
-//                alert.setAlertLevel(0);
-//                break;
         }
         super.onTypeSelected(type);
     }
@@ -239,12 +233,6 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
                         //TODO Fix other alert update
                   }
 
-//        db.child("affectedAreas").removeValue((databaseError, databaseReference) -> {
-//            for (int i = 0; i < areas.size(); i++) {
-//                db.child("affectedAreas").child(String.valueOf(i))
-//                        .setValue(areas.get(i));
-//            }
-//        });
                }
 
                @Override

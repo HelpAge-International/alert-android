@@ -42,7 +42,6 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.MyViewHold
         }
     }
 
-
     public SimpleAdapter(int positionInParent, List<String> lit, RemoveListener listener) {
         this.positionInParent = positionInParent;
         this.strings = lit;
@@ -71,4 +70,12 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.MyViewHold
     public interface RemoveListener {
         void onItemRemove(int positionInParent, int position);
     }
+
+    public void addItem(int position){
+        notifyItemChanged(position);
+    }
+
+
+    //add item
+    //notifyItemInserted
 }

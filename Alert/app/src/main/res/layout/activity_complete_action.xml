@@ -67,11 +67,13 @@
                 android:id="@+id/rvCompletionAttachments"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/space_16"
                 android:paddingBottom="@dimen/space_16">
 
             </android.support.v7.widget.RecyclerView>
 
             <TextView
+                android:id="@+id/txtAddAttachments"
                 android:layout_width="@dimen/space_275"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/text_size"
