@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--row 1 -->
+<LinearLayout
+    android:layout_marginBottom="@dimen/activity_vertical_margin_half"
+    android:layout_marginTop="@dimen/activity_vertical_margin_half"
+    android:id="@+id/reveal_items"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorAccent"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!--Gallery Icon -->
+    <RelativeLayout
+        android:layout_marginLeft="@dimen/activity_horizontal_margin_half"
+        android:layout_marginRight="@dimen/activity_horizontal_margin_half"
+        android:layout_marginTop="@dimen/activity_vertical_margin_half"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_half"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin_half"
+            android:text="@string/all_agencies"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_horizontal_margin_half"
+            android:layout_alignParentStart="true" />
+
+        <android.support.v7.widget.AppCompatCheckBox
+            app:buttonTint="@color/checkbox_filter_tint"
+            android:checked="true"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_alignParentRight="true"
+            style="@style/checkBoxStyle"
+            android:id="@+id/allAgencies"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+    <View
+        android:background="@drawable/filter_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <RelativeLayout
+        android:layout_marginLeft="@dimen/activity_horizontal_margin_half"
+        android:layout_marginRight="@dimen/activity_horizontal_margin_half"
+        android:layout_marginTop="@dimen/activity_vertical_margin_half"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_half"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvAllAgencies"
+            android:alpha="0.5"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin_half"
+            android:text="@string/all_networks"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_horizontal_margin_half"
+            android:layout_alignParentStart="true" />
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:alpha="0.5"
+            app:buttonTint="@color/checkbox_filter_tint"
+            android:checked="true"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_alignParentRight="true"
+            style="@style/checkBoxStyle"
+            android:id="@+id/allNetworks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+    <View
+        android:background="@drawable/filter_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvFilters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

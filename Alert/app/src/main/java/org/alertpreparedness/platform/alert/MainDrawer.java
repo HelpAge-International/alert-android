@@ -169,7 +169,6 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
 
                     header.mUsername.setText(String.format("%s %s", firstname, lastname));
 
-
                 }
                 catch (Exception e) {
 
