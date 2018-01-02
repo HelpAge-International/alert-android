@@ -124,7 +124,7 @@ class UpdateIndicatorActivity : BaseActivity() {
             Timber.d("update level")
             mViewModel.updateIndicatorLevel(mHazardId as String, mIndicatorId as String, mIndicatorModel, level)
             val log = ModelLog(null, uid, when (level) {
-                GREEN_TRIGGER_POSITION-> {
+                GREEN_TRIGGER_POSITION -> {
                     "Indicator level was updated to GREEN"
                 }
                 AMBER_TRIGGER_POSITION -> {

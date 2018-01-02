@@ -145,6 +145,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         mSources = mutableListOf()
         mAreas = mutableListOf()
+//        mStaff.add()
         mViewModel.getStaffLive().observe(this, Observer { users ->
             mStaff = ArrayList(users)
         })

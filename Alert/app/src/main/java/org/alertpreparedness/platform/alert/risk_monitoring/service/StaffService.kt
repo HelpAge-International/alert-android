@@ -5,6 +5,7 @@ import durdinapps.rxfirebase2.RxFirebaseDatabase
 import io.reactivex.Flowable
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelUserPublic
+import org.alertpreparedness.platform.alert.utils.AppUtils
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.alertpreparedness.platform.alert.utils.FirebaseHelper
 import org.alertpreparedness.platform.alert.utils.PreferHelper
@@ -24,7 +25,25 @@ object StaffService {
                 }
     }
 
+    fun getCountryAdmin(): Flowable<List<String>> {
+        val admins = AppUtils.getDatabase().getReference(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS)).child("directorCountry")
+
+        return RxFirebaseDatabase.observeValueEvent(admins)
+                .map { snap ->
+                    snap.children.map { it.value as String }
+                }
+    }
+
     fun getUserDetail(userId: String): Flowable<ModelUserPublic> {
+        val userDetail = FirebaseHelper.getUserDetail(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), userId)
+        return RxFirebaseDatabase.observeValueEvent(userDetail, ModelUserPublic::class.java)
+                .map({ model: ModelUserPublic ->
+                    model.id = userId
+                    return@map model
+                })
+    }
+
+    fun getCountryAdminDetail(userId: String): Flowable<ModelUserPublic> {
         val userDetail = FirebaseHelper.getUserDetail(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), userId)
         return RxFirebaseDatabase.observeValueEvent(userDetail, ModelUserPublic::class.java)
                 .map({ model: ModelUserPublic ->
