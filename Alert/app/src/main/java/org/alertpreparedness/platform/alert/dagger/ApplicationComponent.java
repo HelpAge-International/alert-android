@@ -4,6 +4,7 @@ import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivi
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
 import org.alertpreparedness.platform.alert.helper.DataHandler;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.InProgressFragment;
@@ -47,5 +48,6 @@ public interface ApplicationComponent {
     void inject(InProgressFragment fragment);
     void inject(ActionAdapter adapter);
     void inject(CompleteActionActivity activity);
+    void inject(AddNotesActivity activity);
 
 }

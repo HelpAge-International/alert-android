@@ -27,6 +27,7 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
@@ -110,7 +111,8 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                         Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
                         break;
                     case R.id.action_notes:
-                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Notes Clicked", Snackbar.LENGTH_LONG).show();
+                        intent = new Intent(getActivity(), AddNotesActivity.class);
+                        startActivity(intent);
                         break;
                     case R.id.attachments:
                         Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();

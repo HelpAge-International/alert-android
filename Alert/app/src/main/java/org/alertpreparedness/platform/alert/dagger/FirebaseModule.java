@@ -1,8 +1,10 @@
 package org.alertpreparedness.platform.alert.dagger;
 
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.storage.StorageReference;
 
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionStorageRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
@@ -75,6 +77,7 @@ public class FirebaseModule {
     public DatabaseReference provideHazardOtherRef(@BaseDatabaseRef DatabaseReference db) {
         return db.child("hazardOther");
     }
+
 
 //    @Provides
 //    @Singleton

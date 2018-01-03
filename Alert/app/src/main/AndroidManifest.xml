@@ -4,7 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <!--<uses-permission android:name="android.permission.CAMERA" />-->
+    <!-- <uses-permission android:name="android.permission.CAMERA" /> -->
+
 
     <!-- Leak canary needs access to External storage to save heap dumps -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -107,7 +108,9 @@
             android:label="@string/change_password" />
         <activity
             android:name=".min_preparedness.activity.CompleteActionActivity"
-            android:label="@string/txt_complete_action"/>
+            android:label="@string/txt_complete_action" />
+        <activity android:name=".min_preparedness.activity.AddNotesActivity"
+            android:label="Notes" />
     </application>
 
 </manifest>

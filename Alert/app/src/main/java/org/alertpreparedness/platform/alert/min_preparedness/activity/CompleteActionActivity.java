@@ -23,8 +23,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseStorageRef;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertFieldsAdapter;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
@@ -37,6 +41,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -55,6 +61,10 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
 
     @BindView(R.id.txtAddAttachments)
     TextView addAttachments;
+
+    @Inject
+    @BaseStorageRef
+    StorageReference mStorageRef;
 
     ArrayList<String> list = new ArrayList<>();
     SimpleAdapter simpleAdapter;
@@ -77,6 +87,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         addAttachments.setOnClickListener(this);
+
         initView();
 
     }
@@ -126,8 +137,13 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
 
         if (list.size() == 0) {
             SnackbarHelper.show(this, getString(R.string.txt_err_add_attachments));
-            return;
         }
+
+        saveData();
+    }
+
+    private void saveData() {
+
 
     }
 
@@ -166,7 +182,6 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
         String path = finalFile.toString();
 
         String filename = path.substring(path.lastIndexOf("/") + 1);
-
 
         list.add(filename);
     }
