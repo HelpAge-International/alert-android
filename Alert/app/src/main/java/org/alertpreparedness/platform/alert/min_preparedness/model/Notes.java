@@ -6,11 +6,11 @@ package org.alertpreparedness.platform.alert.min_preparedness.model;
 
 public class Notes {
 
-    String timeStamp;
+    Long timeStamp;
     String content;
     String addedBy;
 
-    public Notes(String addedBy, String timeStamp, String content) {
+    public Notes(String addedBy, Long timeStamp, String content) {
         this.addedBy = addedBy;
         this.timeStamp = timeStamp;
         this.content = content;
@@ -24,11 +24,11 @@ public class Notes {
         this.addedBy = addedBy;
     }
 
-    public String getTimeStamp() {
+    public Long getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(String timeStamp) {
+    public void setTimeStamp(Long timeStamp) {
         this.timeStamp = timeStamp;
     }
 

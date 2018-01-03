@@ -80,7 +80,6 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
 
         mAdapter = getmAdapter();
         mActionRV.setAdapter(mAdapter);
-
         mActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
