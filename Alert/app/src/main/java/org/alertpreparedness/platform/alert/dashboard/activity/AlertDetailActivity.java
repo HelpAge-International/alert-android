@@ -85,6 +85,10 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     ValueEventListener mValueListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            System.out.println("dataSnapshot = " + dataSnapshot);
+
+
+
             parseAlert(dataSnapshot);
         }
 
@@ -102,8 +106,8 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
         DependencyInjector.applicationComponent().inject(this);
 
-        countryID = UserInfo.getUser(this).countryID;
-//        isCountryDirector = UserInfo.getUser(this).isCountryDirector();
+//        countryID = UserInfo.getUser(this).countryID;
+        isCountryDirector = UserInfo.getUser(this).isCountryDirector();
         isCountryDirector = true;
 
         if (UserInfo.getUser(this).isCountryDirector()) {
@@ -164,7 +168,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
             mAppStatus = PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS);
 
-            mReference = FirebaseDatabase.getInstance().getReference().child(mAppStatus).child("alert").child(countryID).child(alert.getKey());
+            mReference = FirebaseDatabase.getInstance().getReference().child(mAppStatus).child("alert").child(alert.getParentKey()).child(alert.getKey());
             mReference.addValueEventListener(mValueListener);
         }
     }

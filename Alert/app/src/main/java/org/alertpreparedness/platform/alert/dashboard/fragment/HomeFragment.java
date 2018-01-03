@@ -269,7 +269,8 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
             AlertModel model = dataSnapshot.getValue(AlertModel.class);
             assert model != null;
             model.setKey(dataSnapshot.getKey());
-            if(model.getAlertLevel() != 0) {
+            model.setParentKey(dataSnapshot.getRef().getParent().getKey());
+            if(model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
                 updateAlert(dataSnapshot.getKey(), model);
             }
         }
