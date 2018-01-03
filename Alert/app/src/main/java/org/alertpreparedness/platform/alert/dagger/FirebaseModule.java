@@ -1,5 +1,7 @@
 package org.alertpreparedness.platform.alert.dagger;
 
+import android.content.Context;
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.StorageReference;
 
@@ -7,13 +9,15 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionStorageRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardOtherRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.TaskRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
 import javax.inject.Singleton;
 
@@ -39,15 +43,23 @@ public class FirebaseModule {
     @Provides
     @Singleton
     @AlertRef
-    public DatabaseReference providesAlert(@BaseDatabaseRef DatabaseReference db, User user) {
-        return db.child("alert").child(user.countryID);
+    public DatabaseReference providesAlert(@BaseAlertRef DatabaseReference db, User user) {
+        return db.child(user.countryID);
+    }
+
+
+    @Provides
+    @Singleton
+    @BaseAlertRef
+    public DatabaseReference providesBaseAlert(@BaseDatabaseRef DatabaseReference db) {
+        return db.child("alert");
     }
 
     @Provides
     @Singleton
     @AgencyRef
-    public DatabaseReference provideAgencyRef(@BaseDatabaseRef DatabaseReference db, User user) {
-        return db.child("agency").child(user.agencyAdminID);
+    public DatabaseReference provideAgencyRef(@BaseDatabaseRef DatabaseReference db, Context context) {
+        return db.child("agency").child(PreferHelper.getString(context, Constants.AGENCY_ID));
     }
 
     @Provides
@@ -67,8 +79,8 @@ public class FirebaseModule {
     @Provides
     @Singleton
     @UserRef
-    public DatabaseReference provideUserRef(@BaseDatabaseRef DatabaseReference db, User user) {
-        return db.child("userPublic").child(user.getUserID());
+    public DatabaseReference provideUserRef(@BaseDatabaseRef DatabaseReference db, Context context) {
+        return db.child("userPublic").child(PreferHelper.getString(context, Constants.AGENCY_ID));
     }
 
     @Provides

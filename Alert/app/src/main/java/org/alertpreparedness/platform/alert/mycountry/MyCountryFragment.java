@@ -197,8 +197,10 @@ public class MyCountryFragment extends Fragment implements OnCountrySelectedList
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("select_country_args", mCountryDataList);
                 bundle.putInt("select_level1_args", mCountrySelected.getValue());
-                mSelectLevel1Dialog.setArguments(bundle);
-                mSelectLevel1Dialog.show(getFragmentManager(), "select_level1_args");
+                if(!mSelectLevel1Dialog.isAdded()) {
+                    mSelectLevel1Dialog.setArguments(bundle);
+                    mSelectLevel1Dialog.show(getFragmentManager(), "select_level1_args");
+                }
             }
         }
         else {
@@ -219,8 +221,10 @@ public class MyCountryFragment extends Fragment implements OnCountrySelectedList
             bundle.putSerializable("select_country_args", mCountryDataList);
             bundle.putInt("select_level1_args", mCountrySelected.getValue());
             bundle.putInt("select_level2_args", mLevel1Selected.getValue().getId());
-            mSelectLevel2Dialog.setArguments(bundle);
-            mSelectLevel2Dialog.show(getFragmentManager(), "select_level2_args");
+            if(!mSelectLevel2Dialog.isAdded()) {
+                mSelectLevel2Dialog.setArguments(bundle);
+                mSelectLevel2Dialog.show(getFragmentManager(), "select_level2_args");
+            }
         }
     }
 

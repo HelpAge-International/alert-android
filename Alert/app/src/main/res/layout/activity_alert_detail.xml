@@ -7,7 +7,7 @@
     tools:context="org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity">
 
     <include
-        android:id="@+id/action_toolbar"
+        android:id="@+id/action_toolbar_layout"
         layout="@layout/action_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

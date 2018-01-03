@@ -20,6 +20,9 @@ import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
@@ -67,4 +70,8 @@ public class ApplicationModule {
         return FirebaseStorage.getInstance().getReference();
     }
 
+    @Provides @Singleton
+    public SimpleDateFormat provideDateFomatter() {
+        return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+    }
 }

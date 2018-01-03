@@ -118,6 +118,24 @@ class AddIndicatorViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
 
     private fun getStaff() {
         val users = mutableListOf<ModelUserPublic>()
+
+        //TODO change this method to get country admin user profile
+        StaffService.getCountryAdmin().doOnSubscribe { }
+                .flatMap({ ids ->
+                    return@flatMap Flowable.fromIterable(ids)
+                })
+                .flatMap({ id ->
+                    return@flatMap StaffService.getUserDetail(id)
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ user ->
+                    println("staffserviceuser = ${user}")
+
+//                    users.add(user)
+//                    mStaff.value = users
+                })
+
         mDisposables.add(StaffService.getCountryStaff(countryId)
                 .doOnSubscribe { users.clear() }
                 .flatMap({ ids ->
@@ -133,6 +151,7 @@ class AddIndicatorViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                     mStaff.value = users
                 })
         )
+
     }
 
     private fun getHazardOtherName(hazard: ModelHazard) {

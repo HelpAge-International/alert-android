@@ -19,6 +19,7 @@ import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.DBListener;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import io.reactivex.disposables.CompositeDisposable;
@@ -134,22 +135,11 @@ public class UserInfo {
         int userType = getUserType(nodeName);
         boolean isCountryDirector = false;
 
-//        DatabaseReference ref = database.child(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS)).child("network");
-//        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
 
         String agencyAdmin = userNode.child("agencyAdmin").getChildren().iterator().next().getKey();
         String systemAdmin = userNode.child("systemAdmin").getChildren().iterator().next().getKey();
         String countryId = userNode.child("countryId").getValue(String.class);
+
 
         PreferHelper.putString(AlertApplication.getContext(), Constants.AGENCY_ID, agencyAdmin);
         PreferHelper.putString(AlertApplication.getContext(), Constants.COUNTRY_ID, countryId);

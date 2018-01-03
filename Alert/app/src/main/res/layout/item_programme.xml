@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:padding="@dimen/activity_vertical_margin"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <TextView
+        android:textColor="@color/grey_title"
+        android:layout_marginBottom="6dp"
+        android:id="@+id/title"
+        android:textStyle="bold"
+        android:textSize="14dp"
+        android:text="Shelter, Health"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="10dp"
+        android:id="@+id/desc"
+        android:textStyle="normal"
+        android:textSize="14dp"
+        android:text="Mobile Medical Support to Flood Affected Families"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:textSize="12dp"
+        android:layout_marginBottom="4dp"
+        android:textColor="@color/light_blue"
+        android:text="To: Flood Affected families who have no access to medical facilities"
+        android:id="@+id/to"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:textSize="12dp"
+        android:layout_marginBottom="10dp"
+        android:textColor="@color/light_blue"
+        android:text="In: Philippines, Laguna"
+        android:id="@+id/in"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_marginBottom="4dp"
+        android:text="From: 28/05/12 - 05/11/18"
+        android:textColor="@color/hintGray"
+        android:id="@+id/from"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

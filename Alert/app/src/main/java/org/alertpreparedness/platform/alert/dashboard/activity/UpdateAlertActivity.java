@@ -14,6 +14,7 @@ import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.firebase.AffectedAreaModel;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
@@ -37,7 +38,7 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
     protected int levelNew = -1;
     int hazardNew = -1;
 
-    protected Alert alert;
+    protected AlertModel alert;
 
     @Inject @AlertRef
     DatabaseReference alertRef;
@@ -48,8 +49,9 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
 
         Intent intent = getIntent();
         if (intent.hasExtra(EXTRA_ALERT)){
-            alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
+            alert = (AlertModel) intent.getSerializableExtra(EXTRA_ALERT);
         }
+
         DependencyInjector.applicationComponent().inject(this);
 
         mToolbar.setTitle(R.string.update_alert);
@@ -102,7 +104,7 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
     protected void addArea(ModelIndicatorLocation location){
         if (alert == null || location == null) return;
 
-        DatabaseReference db = alertRef.child(alert.getId());
+        DatabaseReference db = alertRef.child(alert.getKey());
 
         db.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -145,14 +147,16 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
             mFieldsAdapter.setTextFieldValue(1, R.drawable.red_dot_26dp, "Red Alert");
         }
 
-        mFieldsAdapter.setTextFieldValue(2, alert.getPopulation() + "");
+        mFieldsAdapter.setTextFieldValue(2, alert.getEstimatedPopulation() + "");
 
-        for (int i = 0; i < Constants.COUNTRIES.length; i++) {
-            if (alert.getCountry() == i) {
-                mFieldsAdapter.addSubListValue(3, Constants.COUNTRIES[i]);
+        for (AffectedAreaModel m : alert.getAffectedAreas()) {
+            String res = Constants.COUNTRIES[m.getCountry()];
+            if(m.getLevel1Name() != null) {
+                res += ", " + m.getLevel1Name();
             }
+            mFieldsAdapter.addSubListValue(3, res);
         }
-        mFieldsAdapter.setTextFieldValue(4, alert.getInfo());
+        mFieldsAdapter.setTextFieldValue(4, alert.getInfoNotes());
     }
 
     private void setUpActionBarColour() {
@@ -202,7 +206,7 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
 
     private void update(int alertLevel, String reason, long population, List<AffectedAreaModel> areas, String info) {
 
-        DatabaseReference db = alertRef.child(alert.getId());
+        DatabaseReference db = alertRef.child(alert.getKey());
 
            db.addListenerForSingleValueEvent(new ValueEventListener() {
                @Override
@@ -270,7 +274,7 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
         super.onResume();
         if (alert == null) {
             Intent intent = getIntent();
-            alert = (Alert) intent.getSerializableExtra(EXTRA_ALERT);
+            alert = (AlertModel) intent.getSerializableExtra(EXTRA_ALERT);
         }
     }
 }

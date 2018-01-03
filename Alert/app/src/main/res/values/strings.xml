@@ -170,6 +170,8 @@
     <string name="txt_reassign_action">Reassign action</string>
     <string name="txt_action_notes">Action notes</string>
     <string name="txt_attachments">Attachments</string>
+    <string name="all_networks">All Networks</string>
+    <string name="all_agencies">All Agencies</string>
     <string name="txt_confirm">CONFIRM</string>
     <string name="txt_completion_note">Add a completion note (required)</string>
     <string name="txt_add_attachments">+ Add attachments (required)</string>
