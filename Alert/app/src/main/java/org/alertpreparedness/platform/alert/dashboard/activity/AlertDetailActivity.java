@@ -255,7 +255,9 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                 AlertAdapter.fetchIcon(Constants.HAZARD_SCENARIO_NAME[i], imgHazard);
                 txtHazardName.setText(Constants.HAZARD_SCENARIO_NAME[i]);
                 txtPopulation.setText(getPeopleAsString(alert.getEstimatedPopulation()));
-                txtLastUpdated.setText(getUpdatedAsString(new Date(alert.getTimeUpdated())));
+                if(alert.getTimeUpdated() != null) {
+                    txtLastUpdated.setText(getUpdatedAsString(new Date(alert.getTimeUpdated())));
+                }
                 txtInfo.setText((CharSequence) alert.getInfoNotes());
             } else if (alert.getOtherName() != null) {
                 imgHazard.setImageResource(R.drawable.other);

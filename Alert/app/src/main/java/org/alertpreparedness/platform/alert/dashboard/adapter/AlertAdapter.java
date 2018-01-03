@@ -41,9 +41,8 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
 
 
     public AlertAdapter(@NonNull HashMap<String, AlertModel> alertsMap, Context context, OnAlertItemClickedListener listener) {
-        super();
-
-        this.isCountryDirector = UserInfo.getUser(context).isCountryDirector();
+//        this.isCountryDirector = UserInfo.getUser(context).isCountryDirector();
+        this.isCountryDirector = true;
         this.alertsMap = alertsMap;
         this.context = context;
         this.listener = listener;

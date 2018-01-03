@@ -250,7 +250,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
         private void proccess(DataSnapshot dataSnapshot, String s) {
             AlertModel model = dataSnapshot.getValue(AlertModel.class);
-
+            System.out.println("dataSnapshot = [" + dataSnapshot + "], s = [" + dataSnapshot.getRef() + "]");
             assert model != null;
             model.setKey(dataSnapshot.getKey());
             if(model.getAlertLevel() != 0) {

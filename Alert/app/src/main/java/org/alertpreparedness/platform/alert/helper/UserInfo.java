@@ -136,7 +136,6 @@ public class UserInfo {
         boolean isCountryDirector = false;
 
 
-
         String agencyAdmin = userNode.child("agencyAdmin").getChildren().iterator().next().getKey();
         String systemAdmin = userNode.child("systemAdmin").getChildren().iterator().next().getKey();
         String countryId = userNode.child("countryId").getValue(String.class);

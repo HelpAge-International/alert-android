@@ -117,7 +117,7 @@ public class AlertModel implements Serializable {
     }
 
     public boolean wasRedAlertRequested() {
-        return approval.getCountryDirector().size() == 0;
+        return approval == null || approval.getCountryDirector() == null || approval.getCountryDirector().size() == 0;
     }
 
     public ApprovalModel getApproval() {

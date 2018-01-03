@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:windowSoftInputMode="adjustResize"
+            android:windowSoftInputMode="adjustPan|adjustResize"
             android:name=".login.activity.LoginScreen"
             android:screenOrientation="portrait"/>
         <activity
