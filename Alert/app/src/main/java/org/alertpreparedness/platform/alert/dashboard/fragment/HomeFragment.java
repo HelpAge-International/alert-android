@@ -108,6 +108,11 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     public AlertAdapter alertAdapter;
     public HashMap<String, AlertModel> alertList;
 
+    private AgencyListener agencyListener = new AgencyListener();
+    private AlertListener alertListener = new AlertListener();
+    private TaskListener taskListener = new TaskListener();
+    private TaskListener indicatorListener = new TaskListener();
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -128,10 +133,10 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
     private void initViews() {
 
-        agencyRef.addListenerForSingleValueEvent(new AgencyListener());
-        alertRef.addChildEventListener(new HomeFragment.AlertListener());
-        taskRef.addChildEventListener(new HomeFragment.TaskListener());
-        indicatorRef.addChildEventListener(new HomeFragment.TaskListener());
+        agencyRef.addListenerForSingleValueEvent(agencyListener);
+        alertRef.addChildEventListener(alertListener);
+        taskRef.addChildEventListener(taskListener);
+        indicatorRef.addChildEventListener(indicatorListener);
 
         alertRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager alertlayoutManager = new LinearLayoutManager(getContext());
@@ -185,6 +190,15 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        alertRef.removeEventListener(alertListener);
+        agencyRef.removeEventListener(agencyListener);
+        taskRef.removeEventListener(taskListener);
+        indicatorRef.removeEventListener(taskListener);
+    }
+
+    @Override
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
         if (firebaseAuth.getCurrentUser() == null) {
 
@@ -198,13 +212,16 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
         updateTitle(R.string.green_alert_level, R.drawable.alert_green);
         for(AlertModel a: alertAdapter.getAlerts()){
-            if (a.getAlertLevel() == 2){
-                redPresent = true;
-                break;
-            } else if(a.getAlertLevel() == 1){
-                amberPresent = true;
-            } else if(a.getAlertLevel() == 0){
-                noAlerts = true;
+            switch (a.getAlertLevel()) {
+                case 2:
+                    redPresent = true;
+                    break;
+                case 1:
+                    amberPresent = true;
+                    break;
+                case 0:
+                    noAlerts = true;
+                    break;
             }
         }
 
@@ -250,7 +267,6 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
         private void proccess(DataSnapshot dataSnapshot, String s) {
             AlertModel model = dataSnapshot.getValue(AlertModel.class);
-            System.out.println("dataSnapshot = [" + dataSnapshot + "], s = [" + dataSnapshot.getRef() + "]");
             assert model != null;
             model.setKey(dataSnapshot.getKey());
             if(model.getAlertLevel() != 0) {
@@ -342,7 +358,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
             if(networks != null) {
                 for (String id : networks.keySet()) {
                     DatabaseReference ref = baseAlertRef.child(id);
-                    ref.addChildEventListener(new AlertListener());
+                    ref.addChildEventListener(alertListener);
 
                 }
             }

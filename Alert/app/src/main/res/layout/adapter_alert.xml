@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
+    android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -27,7 +28,6 @@
                 android:id="@+id/img_alert_colour"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/amber_alert_left" />
@@ -79,29 +79,33 @@
                 app:layout_constraintStart_toEndOf="@+id/img_hazard_icon"
                 app:layout_constraintTop_toBottomOf="@+id/txt_hazard_name"
                 android:layout_marginLeft="11dp" />
+
+            <TextView
+                app:layout_constraintTop_toBottomOf="@+id/img_alert_colour"
+                android:background="@color/alertRed"
+                android:visibility="gone"
+                android:id="@+id/textViewAlertReq"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
+                android:textAlignment="center"
+                android:paddingTop="4dp"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
         </android.support.constraint.ConstraintLayout>
+
+
 
     </android.support.v7.widget.CardView>
 
-    <ImageView
-        android:layout_below="@+id/alert_card"
-        android:id="@+id/imgRedReq"
-        android:layout_width="320dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="32dp"
-        android:layout_marginStart="32dp"/>
-
-    <TextView
-        android:layout_alignBaseline="@+id/imgRedReq"
-        android:id="@+id/textViewAlertReq"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="4dp"
-        android:textColor="@color/white"
-        android:textSize="12sp" />
+    <!--<ImageView-->
+        <!--android:visibility="gone"-->
+        <!--android:id="@+id/imgRedReq"-->
+        <!--android:layout_width="320dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginEnd="32dp"-->
+        <!--android:layout_marginStart="32dp"/>-->
 
 
-</RelativeLayout>
+
+</LinearLayout>
