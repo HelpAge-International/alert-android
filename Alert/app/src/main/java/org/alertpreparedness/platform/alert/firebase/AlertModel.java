@@ -16,6 +16,8 @@ public class AlertModel implements Serializable {
 
     private String key;
 
+    private String parentKey;
+
     private List<AffectedAreaModel> affectedAreas = new ArrayList<>();
 
     private Integer alertLevel;
@@ -186,5 +188,13 @@ public class AlertModel implements Serializable {
                 ", otherName='" + otherName + '\'' +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    public String getParentKey() {
+        return parentKey;
+    }
+
+    public void setParentKey(String parentKey) {
+        this.parentKey = parentKey;
     }
 }

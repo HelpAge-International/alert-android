@@ -85,6 +85,10 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     ValueEventListener mValueListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            System.out.println("dataSnapshot = " + dataSnapshot);
+
+
+
             parseAlert(dataSnapshot);
         }
 
@@ -102,8 +106,9 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
         DependencyInjector.applicationComponent().inject(this);
 
-        countryID = UserInfo.getUser(this).countryID;
+//        countryID = UserInfo.getUser(this).countryID;
         isCountryDirector = UserInfo.getUser(this).isCountryDirector();
+        isCountryDirector = true;
 
         if (UserInfo.getUser(this).isCountryDirector()) {
             System.out.println("CD or Not: " + UserInfo.getUser(this).isCountryDirector());
@@ -163,7 +168,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
             mAppStatus = PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS);
 
-            mReference = FirebaseDatabase.getInstance().getReference().child(mAppStatus).child("alert").child(countryID).child(alert.getKey());
+            mReference = FirebaseDatabase.getInstance().getReference().child(mAppStatus).child("alert").child(alert.getParentKey()).child(alert.getKey());
             mReference.addValueEventListener(mValueListener);
         }
     }
@@ -291,6 +296,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void setUserName() {
+
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
         DatabaseReference db = ref.
                 child(PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS)).
@@ -333,28 +339,6 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         StyleSpan b = new StyleSpan(android.graphics.Typeface.BOLD);
         sb.setSpan(b, 14, 14 + updateDate.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         return sb;
-    }
-
-    private void getNetwork() {
-        //TODO: need to add level 1 area
-        // List mCountryList = new ArrayList<CountryJsonData>();
-        //List mL1List = new ArrayList<CountryJsonData>();
-
-        Disposable RMDisposable = RiskMonitoringService.INSTANCE.readJsonFile()
-                .map(JSONObject::new).flatMap(jsonObject -> {
-                    return RiskMonitoringService.INSTANCE.mapJasonToCountryData(jsonObject, new Gson());
-                }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(countryJsonData -> {
-                            //Timber.d("Country id is: %s, level 1: %s", countryJsonData.getCountryId(), countryJsonData.getLevelOneValues().toString());
-                            //  mCountryList.add(countryJsonData.getCountryId());
-                            // mL1List.add(countryJsonData.getLevelOneValues().get(2));
-
-                            //  System.out.println("LIST: "+countryJsonData.getLevelOneValues().get(2));
-                        }
-                );
-
-        compositeDisposable.add(RMDisposable);
     }
 
     private void setUpActionBarColour() {

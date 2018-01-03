@@ -87,30 +87,39 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
                 txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueTodayString(tasks.getAlertLevel(), "action"));
                 img_task.setImageResource(R.drawable.home_task_red);
-            } else if (tasks.getTaskType().equals("indicator") && DateHelper.isDueToday(tasks.dueDate)) {
+            }
+            else if (tasks.getTaskType().equals("indicator") && DateHelper.isDueToday(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueTodayString(tasks.getAlertLevel(), "indicator"));
                 img_task.setImageResource(R.drawable.home_task_red);
-            } else if (tasks.getTaskType().equals("action") && DateHelper.isDueInWeek(tasks.dueDate)) {
+            }
+            else if (tasks.getTaskType().equals("action") && DateHelper.isDueInWeek(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueWeekString(tasks.getAlertLevel(), "action"));
                 img_task.setImageResource(R.drawable.home_task_amber);
-            } else if (tasks.getTaskType().equals("indicator") && DateHelper.isDueInWeek(tasks.dueDate)) {
+            }
+            else if (tasks.getTaskType().equals("indicator") && DateHelper.isDueInWeek(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueWeekString(tasks.getAlertLevel(), "indicator"));
                 img_task.setImageResource(R.drawable.home_task_amber);
-            } else if (tasks.getTaskType().equals("action") && DateHelper.itWasDue(tasks.dueDate)) {
+            }
+            else if (tasks.getTaskType().equals("action") && DateHelper.itWasDue(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueBeforeString(tasks.getAlertLevel(), "action", format.format(new Date(tasks.dueDate))));
                 img_task.setImageResource(R.drawable.home_task_red);
-            } else if (tasks.getTaskType().equals("indicator") && DateHelper.itWasDue(tasks.dueDate)) {
+            }
+            else if (tasks.getTaskType().equals("indicator") && DateHelper.itWasDue(tasks.dueDate)) {
                 txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueBeforeString(tasks.getAlertLevel(), "indicator", format.format(new Date(tasks.dueDate))));
                 img_task.setImageResource(R.drawable.home_task_red);
-            }else {
-                txt_taskName.setVisibility(View.GONE);
-                txt_taskStatus.setVisibility(View.GONE);
-                img_task.setVisibility(View.GONE);
+            }
+            else {
+                txt_taskName.setText(tasks.getTaskName());
+                txt_taskStatus.setText(dueBeforeString(tasks.getAlertLevel(), "indicator", format.format(new Date(tasks.dueDate))));
+                img_task.setImageResource(R.drawable.home_task_red);
+//                txt_taskName.setVisibility(View.GONE);
+//                txt_taskStatus.setVisibility(View.GONE);
+//                img_task.setVisibility(View.GONE);
             }
         }
     }
