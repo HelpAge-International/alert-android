@@ -23,10 +23,6 @@
             android:title="@string/nav_response" />
         <item
             android:orderInCategory="0"
-            android:id="@+id/nav_country"
-            android:title="@string/nav_country" />
-        <item
-            android:orderInCategory="0"
             android:id="@+id/nav_my_country"
             android:title="@string/nav_my_country" />
     </group>

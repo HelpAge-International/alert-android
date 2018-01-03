@@ -23,28 +23,27 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.gson.Gson;
+import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
-import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
-import org.alertpreparedness.platform.alert.helper.DataHandler;
 import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.risk_monitoring.service.RiskMonitoringService;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,9 +53,6 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity.EXTRA_ALERT;
 
@@ -81,6 +77,14 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     @BindView(R.id.llPinned)
     CardView mPinnedHeader;
 
+    @Inject
+    @BaseDatabaseRef
+    DatabaseReference database;
+
+    @Inject
+    @AgencyRef
+    DatabaseReference agencyRef;
+
     @Inject @AlertRef
     DatabaseReference alertRef;
 
@@ -88,10 +92,13 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     @ActionRef
     DatabaseReference taskRef;
 
-
     @Inject
     @IndicatorRef
     DatabaseReference indicatorRef;
+
+    @Inject
+    @BaseAlertRef
+    DatabaseReference baseAlertRef;
 
     @Inject
     User user;
@@ -121,6 +128,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
     private void initViews() {
 
+        agencyRef.addListenerForSingleValueEvent(new AgencyListener());
         alertRef.addChildEventListener(new HomeFragment.AlertListener());
         taskRef.addChildEventListener(new HomeFragment.TaskListener());
         indicatorRef.addChildEventListener(new HomeFragment.TaskListener());
@@ -317,6 +325,27 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
         @Override
         public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    }
+
+    private class AgencyListener implements ValueEventListener {
+        @SuppressWarnings("unchecked")
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            HashMap<String, Boolean> networks = (HashMap<String, Boolean>) dataSnapshot.child("networks").getValue();
+
+            if(networks != null) {
+                for (String id : networks.keySet()) {
+                    DatabaseReference ref = baseAlertRef.child(id);
+                    ref.addChildEventListener(new AlertListener());
+
+                }
+            }
         }
 
         @Override
