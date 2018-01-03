@@ -17,17 +17,19 @@
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/clRedRequested"
-        android:layout_width="0dp"
-        android:layout_height="55dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="@color/alertRed"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/action_toolbar">
+        app:layout_constraintTop_toBottomOf="@+id/action_toolbar_layout">
 
         <TextView
+            android:paddingTop="@dimen/activity_horizontal_margin_half"
+            android:paddingBottom="@dimen/activity_horizontal_margin_half"
             android:id="@+id/tvRedRequested"
-            android:layout_width="325dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/txt_req_red_alert"
             android:textAlignment="center"

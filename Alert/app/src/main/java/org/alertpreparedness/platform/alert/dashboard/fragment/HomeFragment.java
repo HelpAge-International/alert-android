@@ -190,8 +190,8 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onStop() {
+        super.onStop();
         alertRef.removeEventListener(alertListener);
         agencyRef.removeEventListener(agencyListener);
         taskRef.removeEventListener(taskListener);

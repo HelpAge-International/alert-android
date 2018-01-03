@@ -41,7 +41,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
 
 
     public AlertAdapter(@NonNull HashMap<String, AlertModel> alertsMap, Context context, OnAlertItemClickedListener listener) {
-        this.isCountryDirector = true;
+        this.isCountryDirector = UserInfo.getUser(context).isCountryDirector();
         this.alertsMap = alertsMap;
         this.context = context;
         this.listener = listener;
@@ -159,19 +159,16 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
             System.out.println("isCountryDirector && alert.wasRedAlertRequested() = " + (isCountryDirector && alert.wasRedAlertRequested()));
 
             if(isCountryDirector && alert.wasRedAlertRequested()) {
-//                imgAlertReq.setVisibility(View.VISIBLE);
                 txtRedRequested.setVisibility(View.VISIBLE);
                 imgAlertColour.setImageResource(R.drawable.gray_alert_left);
                 txtRedRequested.setText(R.string.txt_cd_red_request);
             }
             else if(alert.wasRedAlertRequested() && !isCountryDirector) {
-//                imgAlertReq.setVisibility(View.VISIBLE);
                 txtRedRequested.setVisibility(View.VISIBLE);
                 imgAlertColour.setImageResource(R.drawable.gray_alert_left);
                 txtRedRequested.setText(R.string.txt_red_requested);
             }
             else {
-//                imgAlertReq.setVisibility(View.GONE);
                 txtRedRequested.setVisibility(View.GONE);
             }
         }
