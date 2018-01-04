@@ -22,6 +22,18 @@ public class UserRealm extends RealmObject {
 
     public UserRealm(){}
 
+    @Override
+    public String toString() {
+        return "UserRealm{" +
+                "userId='" + userId + '\'' +
+                ", agencyAdmin='" + agencyAdmin + '\'' +
+                ", systemAdmin='" + systemAdmin + '\'' +
+                ", countryId='" + countryId + '\'' +
+                ", userType=" + userType +
+                ", isCountryDirector=" + isCountryDirector +
+                '}';
+    }
+
     public UserRealm(String userId, String agencyAdmin, String systemAdmin, String countryId, Integer userType, boolean isCountryDirector) {
         this.userId = userId;
         this.agencyAdmin = agencyAdmin;
@@ -30,6 +42,7 @@ public class UserRealm extends RealmObject {
         this.userType = userType;
         this.isCountryDirector = isCountryDirector;
     }
+
 
     public String getAgencyAdmin() {
         return agencyAdmin;

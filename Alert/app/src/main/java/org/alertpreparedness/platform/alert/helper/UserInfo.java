@@ -82,8 +82,8 @@ public class UserInfo {
         realm.close();
     }
 
-    public User getUser(Realm realm) {
-        UserRealm r = new UserRealm().getByPrimaryKey(realm, userId);
+    public User getUser() {
+        UserRealm r = new UserRealm().getByPrimaryKey(Realm.getDefaultInstance(), userId);
         if(r == null) {
             return new User();
         }
@@ -94,20 +94,25 @@ public class UserInfo {
 
         int userType = getUserType(nodeName);
         String agencyAdmin = "";
+        String systemAdmin = "";
 
         if(userNode.child("agencyAdmin").hasChildren()) {
             agencyAdmin = userNode.child("agencyAdmin").getChildren().iterator().next().getKey();
             PreferHelper.putString(AlertApplication.getContext(), Constants.AGENCY_ID, agencyAdmin);
         }
 
-        String systemAdmin = userNode.child("systemAdmin").getChildren().iterator().next().getKey();
+        if(userNode.child("systemAdmin").hasChildren()) {
+            systemAdmin = userNode.child("systemAdmin").getChildren().iterator().next().getKey();
+            PreferHelper.putString(AlertApplication.getContext(), Constants.SYSTEM_ID, systemAdmin);
+        }
+
         String countryId = userNode.child("countryId").getValue(String.class);
 
-        PreferHelper.putString(AlertApplication.getContext(), Constants.COUNTRY_ID, countryId);
-        PreferHelper.putString(AlertApplication.getContext(), Constants.SYSTEM_ID, systemAdmin);
+
         PreferHelper.putInt(AlertApplication.getContext(), Constants.USER_TYPE, userType);
 
         UserRealm user = new UserRealm(userId, agencyAdmin, systemAdmin, countryId, userType, nodeName.equals("countryDirector"));
+        System.out.println("user = " + user);
         saveUser(user);
         if(authCallback != null) {
             authCallback.onUserAuthorized(user.toUser());

@@ -45,8 +45,8 @@ public class ApplicationModule {
     }
 
     @Provides
-    public User provideUser(Realm realm) {
-        return new UserInfo().getUser(realm);
+    public User provideUser() {
+        return new UserInfo().getUser();
     }
 
     @Provides

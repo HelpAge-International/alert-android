@@ -136,7 +136,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     }
 
     private void initViews() {
-
+        System.out.println("user.countryID = " + user);
         agencyRef.addListenerForSingleValueEvent(agencyListener);
         alertRef.addChildEventListener(alertListener);
         taskRef.addChildEventListener(taskListener);
@@ -291,6 +291,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
             assert model != null;
             model.setKey(dataSnapshot.getKey());
             model.setParentKey(dataSnapshot.getRef().getParent().getKey());
+            System.out.println("model = " + model);
 
             if(!isNetworkAlert) {
                 if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {

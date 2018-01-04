@@ -169,7 +169,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
             }
         }
         else {
-
+            SnackbarHelper.show(this, "wdfsdgf");
         }
     }
 

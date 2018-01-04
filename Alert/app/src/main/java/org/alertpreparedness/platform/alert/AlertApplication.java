@@ -52,7 +52,7 @@ public class AlertApplication extends Application {
         sContext = getApplicationContext();
         FirebaseApp.initializeApp(this);
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        FirebaseAuth.getInstance().signOut();
+//        FirebaseAuth.getInstance().signOut();
         Realm.init(this);
         // JODA
         JodaTimeAndroid.init(this);
@@ -79,17 +79,19 @@ public class AlertApplication extends Application {
         // Check APP Status
         if (CURRENT_STATUS == APP_STATUS.LIVE) {
             PreferHelper.putString(getApplicationContext(), Constants.APP_STATUS, Constants.APP_STATUS_LIVE);
-        } else if (CURRENT_STATUS == APP_STATUS.TESTING) {
+        }
+        else if (CURRENT_STATUS == APP_STATUS.TESTING) {
             PreferHelper.putString(getApplicationContext(), Constants.APP_STATUS, Constants.APP_STATUS_TEST);
-        } else if (CURRENT_STATUS == APP_STATUS.UAT) {
+        }
+        else if (CURRENT_STATUS == APP_STATUS.UAT) {
             PreferHelper.putString(getApplicationContext(), Constants.APP_STATUS, Constants.APP_STATUS_UAT);
-        } else if (CURRENT_STATUS == APP_STATUS.SAND) {
+        }
+        else if (CURRENT_STATUS == APP_STATUS.SAND) {
             PreferHelper.putString(getApplicationContext(), Constants.APP_STATUS, Constants.APP_STATUS_SAND);
         }
 
         DependencyInjector.initialize(this);
-
-
+        
     }
 
     public static Context getContext() {
