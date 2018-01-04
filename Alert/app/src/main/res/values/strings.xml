@@ -172,4 +172,6 @@
     <string name="txt_attachments">Attachments</string>
     <string name="all_networks">All Networks</string>
     <string name="all_agencies">All Agencies</string>
+    <string name="network">Network</string>
+    <string name="country">Country</string>
 </resources>

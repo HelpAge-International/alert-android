@@ -153,7 +153,8 @@ public class UserInfo {
             saveUser(callback.getContext(), user);
             callback.onUserAuthorized(user);
             setHazardId(callback, context, userID, userType, agencyAdmin, countryId, systemAdmin, isCountryDirector);
-        } else {
+        }
+        else {
             User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin,null, null, isCountryDirector);
             saveUser(callback.getContext(), user);
             callback.onUserAuthorized(user);

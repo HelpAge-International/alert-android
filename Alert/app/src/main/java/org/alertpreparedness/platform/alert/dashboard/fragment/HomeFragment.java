@@ -77,6 +77,9 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     @BindView(R.id.llPinned)
     CardView mPinnedHeader;
 
+    @BindView(R.id.rvNetworkAlerts)
+    RecyclerView networkAlertList;
+
     @Inject
     @BaseDatabaseRef
     DatabaseReference database;
@@ -106,10 +109,11 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     public TaskAdapter taskAdapter;
     public List<Tasks> tasksList;
     public AlertAdapter alertAdapter;
-    public HashMap<String, AlertModel> alertList;
+    public AlertAdapter networkAlertAdapter;
 
     private AgencyListener agencyListener = new AgencyListener();
-    private AlertListener alertListener = new AlertListener();
+    private AlertListener alertListener = new AlertListener(false);
+    private AlertListener networkAlertListener = new AlertListener(true);
     private TaskListener taskListener = new TaskListener();
     private TaskListener indicatorListener = new TaskListener();
 
@@ -143,9 +147,13 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
         alertRecyclerView.setLayoutManager(alertlayoutManager);
         alertRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        alertList = new HashMap<>();
-        alertAdapter = new AlertAdapter(alertList, getContext(), this);
+        networkAlertList.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        alertAdapter = new AlertAdapter(new HashMap<>(), getContext(), this);
         alertRecyclerView.setAdapter(alertAdapter);
+
+        networkAlertAdapter = new AlertAdapter(new HashMap<>(), getContext(), this);
+        networkAlertList.setAdapter(networkAlertAdapter);
 
         myTaskRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -187,6 +195,11 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
         alertRecyclerView.setVisibility(View.VISIBLE);
         alertAdapter.update(id, alert);
         updateTitle();
+    }
+
+    public void updateNetworkAlert(String id, AlertModel alert) {
+        networkAlertList.setVisibility(View.VISIBLE);
+        networkAlertAdapter.update(id, alert);
     }
 
     @Override
@@ -265,13 +278,29 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
     private class AlertListener implements ChildEventListener {
 
+        private boolean isNetworkAlert;
+
+        public AlertListener(boolean isNetworkAlert) {
+
+            this.isNetworkAlert = isNetworkAlert;
+        }
+
         private void proccess(DataSnapshot dataSnapshot, String s) {
             AlertModel model = dataSnapshot.getValue(AlertModel.class);
+
             assert model != null;
             model.setKey(dataSnapshot.getKey());
             model.setParentKey(dataSnapshot.getRef().getParent().getKey());
-            if(model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
-                updateAlert(dataSnapshot.getKey(), model);
+
+            if(!isNetworkAlert) {
+                if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
+                    updateAlert(dataSnapshot.getKey(), model);
+                }
+            }
+            else if(isNetworkAlert && !model.hasNetworkApproval()) {
+                if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
+                    updateNetworkAlert(dataSnapshot.getKey(), model);
+                }
             }
         }
 
@@ -359,7 +388,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
             if(networks != null) {
                 for (String id : networks.keySet()) {
                     DatabaseReference ref = baseAlertRef.child(id);
-                    ref.addChildEventListener(alertListener);
+                    ref.addChildEventListener(networkAlertListener);
 
                 }
             }

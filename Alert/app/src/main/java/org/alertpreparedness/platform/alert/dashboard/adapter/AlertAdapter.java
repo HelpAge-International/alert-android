@@ -156,8 +156,6 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
 
             tvPeopleCount.setText(getNumOfPeopleText(alert.getEstimatedPopulation(), alert.getAffectedAreas().size()));
 
-            System.out.println("isCountryDirector && alert.wasRedAlertRequested() = " + (isCountryDirector && alert.wasRedAlertRequested()));
-
             if(isCountryDirector && alert.wasRedAlertRequested()) {
                 txtRedRequested.setVisibility(View.VISIBLE);
                 imgAlertColour.setImageResource(R.drawable.gray_alert_left);

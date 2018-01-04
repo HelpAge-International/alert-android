@@ -30,6 +30,7 @@ import com.google.gson.Gson;
 import org.alertpreparedness.platform.alert.ExtensionHelperKt;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.firebase.AffectedAreaModel;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
@@ -81,14 +82,14 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     @Inject
     SimpleDateFormat dateFormatter;
 
+    @Inject
+    @AlertRef
+    DatabaseReference countryAlertRef;
+
     DatabaseReference mReference = FirebaseDatabase.getInstance().getReference();
     ValueEventListener mValueListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            System.out.println("dataSnapshot = " + dataSnapshot);
-
-
-
             parseAlert(dataSnapshot);
         }
 
@@ -106,13 +107,9 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
         DependencyInjector.applicationComponent().inject(this);
 
-//        countryID = UserInfo.getUser(this).countryID;
+        countryID = UserInfo.getUser(this).countryID;
         isCountryDirector = UserInfo.getUser(this).isCountryDirector();
         isCountryDirector = true;
-
-        if (UserInfo.getUser(this).isCountryDirector()) {
-            System.out.println("CD or Not: " + UserInfo.getUser(this).isCountryDirector());
-        }
 
         toolbar = (Toolbar) findViewById(R.id.action_toolbar);
         setSupportActionBar(toolbar);
@@ -122,8 +119,6 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         // Change the color of the arrow
         final Drawable upArrow = toolbar.getNavigationIcon();
         upArrow.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-
-
 
         initView();
 
@@ -161,11 +156,9 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             Bundle bd = intent.getExtras();
             if (bd != null) {
                 isRequestSent = (String) bd.get("IS_RED_REQUEST");
-                System.out.println("REQ: " + isRequestSent);
             }
             alert = (AlertModel) intent.getSerializableExtra(EXTRA_ALERT);
             fetchDetails();
-
             mAppStatus = PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS);
 
             mReference = FirebaseDatabase.getInstance().getReference().child(mAppStatus).child("alert").child(alert.getParentKey()).child(alert.getKey());
@@ -398,6 +391,8 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                 if (isApproved) {
                     mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_APPROVED);
                     mReference.child("alertLevel").setValue(Constants.TRIGGER_RED);
+                    DatabaseReference rf = countryAlertRef.push();
+                    rf.setValue(alert);
                 } else {
                     mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_REJECTED);
                 }
