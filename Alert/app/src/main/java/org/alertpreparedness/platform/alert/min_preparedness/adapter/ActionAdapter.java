@@ -48,7 +48,9 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     @AgencyRef
     DatabaseReference dbAgencyRef;
 
+    //In progress
     public void addInProgressItem(String key, Action action) {
+      //  System.out.println("key.indexOf(key) = " + key.indexOf(key));
         if (keys.indexOf(key) == -1) {
             if (action.getDueDate() != null && !DateHelper.itWasDue(action.getDueDate()) && action.getTaskName() != null) {
                 keys.add(key);
@@ -62,6 +64,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     }
 
     public void addExpiredItem(String key, Action action) {
+      //  System.out.println("key.indexOf(key) = " + key.indexOf(key));
         if (keys.indexOf(key) == -1) {
             if (action.getDueDate() != null && DateHelper.itWasDue(action.getDueDate()) && action.getTaskName() != null) {
                 keys.add(key);
@@ -102,7 +105,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     public void addArchivedItem(String key, Action action) {
         if (keys.indexOf(key) == -1) {
-            System.out.println("action = " + action.getArchived());
+          //  System.out.println("action = " + action.getArchived());
             if (action.getArchived() != null && action.getArchived() && action.getDueDate() != null) {
                 keys.add(key);
                 items.put(key, action);
@@ -144,7 +147,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
         holder.tvBudget.setText(getBudget(action.getBudget()));
         holder.tvDueDate.setText(getDate(action.getDueDate()));
         getDepartment(action.db, holder);
-        holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position));
+        holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position, keys.get(position)));
     }
 
     private void getDepartment(DatabaseReference db, ActionAdapter.ViewHolder holder) {
@@ -241,6 +244,6 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     }
 
     public interface ItemSelectedListener {
-        void onActionItemSelected(int pos);
+        void onActionItemSelected(int pos, String key);
     }
 }

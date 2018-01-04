@@ -65,7 +65,7 @@ class IndicatorLogActivityFragment : Fragment() {
     private fun initListeners(view: View?) {
         view?.ivIndicatorLog?.setOnClickListener {
             if (view.etIndicatorLog.text.isEmpty()) {
-                Toasty.error(activity, "Log content cannot be empty!").show()
+                Toasty.error(activity, "Note content cannot be empty!").show()
                 return@setOnClickListener
             }
             Timber.d("save log: %s", view.etIndicatorLog.text)

@@ -1,10 +1,16 @@
 package org.alertpreparedness.platform.alert.min_preparedness.activity;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -16,22 +22,33 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.AddNotesAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Notes;
+import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SimpleAdapter;
+import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapter.ItemSelectedListener, ValueEventListener {
+public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapter.ItemSelectedListener, ValueEventListener, View.OnClickListener {
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
     @BindView(R.id.rvIndicatorLog)
     RecyclerView recyclerView;
+
+    @BindView(R.id.etIndicatorLog)
+    EditText etNotes;
+
+    @BindView(R.id.ivIndicatorLog)
+    ImageView submitNote;
 
     @Inject
     @ActionRef
@@ -40,6 +57,14 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
     @Inject
     @NoteRef
     DatabaseReference dbNoteRef;
+
+    @Inject
+    @UserPublicRef
+    DatabaseReference dbUserPublicRef;
+
+    @Inject
+    @UserRef
+    DatabaseReference dbUserRef;
 
     AddNotesAdapter addNotesAdapter;
 
@@ -50,6 +75,7 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
 
         ButterKnife.bind(this);
         DependencyInjector.applicationComponent().inject(this);
+        submitNote.setOnClickListener(this);
 
         setSupportActionBar(mToolbar);
 
@@ -58,19 +84,15 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         initData();
-        dbNoteRef.child("-KxIyUok6yZwYYL3jj9M").addListenerForSingleValueEvent( this);
-
-        initView();
-
     }
 
     private void initData() {
-
         dbActionRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    //System.out.println("dataSnapshot.getKey() = " + getChild.getKey());
+                    getData(getChild.getKey());
+                    initView(getChild.getKey());
                 }
             }
 
@@ -81,14 +103,16 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
         });
     }
 
-    protected AddNotesAdapter getmAdapter() {
-        return new AddNotesAdapter(getApplicationContext(), dbNoteRef,  this);
+    private void getData(String key) {
+        dbNoteRef.child(key).addListenerForSingleValueEvent(this);
     }
 
+    protected AddNotesAdapter getmAdapter(String key) {
+        return new AddNotesAdapter(getApplicationContext(), dbNoteRef.child(key), this);
+    }
 
-    private void initView() {
-        addNotesAdapter = getmAdapter();
-        recyclerView.setHasFixedSize(true);
+    private void initView(String key) {
+        addNotesAdapter = getmAdapter(key);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setNestedScrollingEnabled(false);
@@ -98,30 +122,72 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        System.out.println("dataSnapshot = " + dataSnapshot);
         for (DataSnapshot getChild : dataSnapshot.getChildren()) {
             String name = (String) getChild.child("uploadBy").getValue();
             String content = (String) getChild.child("content").getValue();
             Long time = (Long) getChild.child("time").getValue();
 
-            System.out.println("time = " + time);
-            System.out.println("content = " + content);
-            System.out.println("name = " + name);
-
-            addNotesAdapter.addInProgressItem(getChild.getKey(), new Notes(
-                    name,
-                    time,
-                    content
-            ));
-
+            setDataToAdapter(name, content, time, getChild.getKey());
         }
     }
+
+    public void setDataToAdapter(String name, String content, Long time, String key) {
+        dbUserPublicRef.child(name).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String firstname = (String) dataSnapshot.child("firstName").getValue();
+                String lastname = (String) dataSnapshot.child("lastName").getValue();
+                String fullname = String.format("%s %s", firstname, lastname);
+                addNotesAdapter.addInProgressItem(key, new Notes(
+                        content,
+                        time,
+                        fullname
+                ));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
 
     @Override
     public void onCancelled(DatabaseError databaseError) {
 
     }
 
+    private void saveNote() {
+        String texts = etNotes.getText().toString().trim();
+
+        if(!TextUtils.isEmpty(texts)) {
+            Intent intent = getIntent();
+            String key = intent.getStringExtra("ACTION_KEY");
+            String id = dbNoteRef.child(key).push().getKey();
+            String userID = PreferHelper.getString(getApplicationContext(), Constants.AGENCY_ID);
+            Long millis = System.currentTimeMillis();
+
+            Notes notes = new Notes(texts, millis, userID);
+            dbNoteRef.child(key).child(id).setValue(notes);
+
+        }else {
+            SnackbarHelper.show(this, getString(R.string.txt_note_not_empty));
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view == submitNote){
+            saveNote();
+        }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
+    }
 
     @Override
     public void onNoteItemSelected(int pos) {

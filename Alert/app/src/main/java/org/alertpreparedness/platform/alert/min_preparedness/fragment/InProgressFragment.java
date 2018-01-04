@@ -97,7 +97,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     }
 
     @Override
-    public void onActionItemSelected(int pos) {
+    public void onActionItemSelected(int pos, String key) {
         SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress).setClick(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -111,6 +111,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                         break;
                     case R.id.action_notes:
                         intent = new Intent(getActivity(), AddNotesActivity.class);
+                        intent.putExtra("ACTION_KEY", key);
                         startActivity(intent);
                         break;
                     case R.id.attachments:

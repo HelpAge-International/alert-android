@@ -109,7 +109,7 @@ public class ActionExpiredFragment extends InProgressFragment {
     }
 
     @Override
-    public void onActionItemSelected(int pos) {
+    public void onActionItemSelected(int pos, String key) {
         Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Clicked", Snackbar.LENGTH_LONG).show();
     }
 }

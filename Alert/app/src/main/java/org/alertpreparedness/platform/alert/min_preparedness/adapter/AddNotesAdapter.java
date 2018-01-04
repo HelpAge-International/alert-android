@@ -11,9 +11,13 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Notes;
 
@@ -24,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -32,6 +38,10 @@ import butterknife.ButterKnife;
  */
 
 public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHolder> implements ChildEventListener {
+
+    @Inject
+    @UserPublicRef
+    DatabaseReference dbUserPublicRef;
 
     private HashMap<String, Notes> items;
     private final ArrayList<String> keys;
@@ -48,6 +58,7 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
         this.listener = listener;
         this.keys = new ArrayList<>(items.keySet());
         this.dbRef.addChildEventListener(this);
+
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -66,19 +77,15 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-
             tvStatus.setVisibility(View.GONE);
         }
     }
 
     public void addInProgressItem(String key, Notes notes) {
         if (keys.indexOf(key) == -1) {
-            if (notes.getTimeStamp() != null) {
-                keys.add(key);
-                items.put(key, notes);
-                notifyItemInserted(keys.size() - 1);
-            }
-
+            keys.add(key);
+            items.put(key, notes);
+            notifyItemInserted(keys.size() - 1);
         } else {
             items.put(key, notes);
             notifyItemChanged(keys.indexOf(key));
@@ -87,17 +94,37 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
 
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
+        Notes note = dataSnapshot.getValue(Notes.class);
+        System.out.println("dataSnapshot = " + dataSnapshot);
+        if(keys.indexOf(dataSnapshot.getKey()) == -1) {
+            keys.add(dataSnapshot.getKey());
+        }
+        items.put(dataSnapshot.getKey(), note);
+        notifyItemInserted(keys.indexOf(dataSnapshot.getKey()));
     }
 
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+        Notes note = dataSnapshot.getValue(Notes.class);
+        System.out.println("dataSnapshochanged = " + dataSnapshot);
+        if(keys.indexOf(dataSnapshot.getKey()) == -1) {
+            System.out.println("herererererere");
+            keys.add(dataSnapshot.getKey());
+        }
+        items.put(dataSnapshot.getKey(), note);
+        System.out.println("keys = " + keys);
+        System.out.println("items = " + items);
+//      notifyItemChanged(keys.indexOf(dataSnapshot.getKey()));
+        notifyDataSetChanged();
     }
+
 
     @Override
     public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+        int index = keys.indexOf(dataSnapshot.getKey());
+        items.remove(dataSnapshot.getKey());
+        keys.remove(index);
+        notifyItemRemoved(index);
     }
 
     @Override
@@ -110,7 +137,6 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
 
     }
 
-
     @Override
     public AddNotesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
@@ -121,9 +147,10 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
     @Override
     public void onBindViewHolder(AddNotesAdapter.ViewHolder holder, int position) {
         Notes note = items.get(keys.get(position));
-        holder.tvName.setText(note.getAddedBy());
+        holder.tvName.setText(note.getUploadBy());
         holder.tvContent.setText(note.getContent());
-        holder.tvDate.setText(format.format(new Date(note.getTimeStamp())));
+        System.out.println("note = " + note);
+        holder.tvDate.setText(format.format(new Date(note.getTime())));
         holder.itemView.setOnClickListener((v) -> listener.onNoteItemSelected(position));
     }
 
@@ -135,6 +162,5 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
     public interface ItemSelectedListener {
         void onNoteItemSelected(int pos);
     }
-
 
 }

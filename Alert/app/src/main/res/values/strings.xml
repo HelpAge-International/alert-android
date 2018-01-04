@@ -180,4 +180,5 @@
     <string name="txt_select_file">Select file</string>
     <string name="txt_err_complete_action_note">A completion note is required to complete this action. Please enter and try again</string>
     <string name="txt_err_add_attachments">An attachment is required to complete this action. Please enter and try again</string>
+    <string name="txt_note_not_empty">Notes cannot be empty!</string>
 </resources>

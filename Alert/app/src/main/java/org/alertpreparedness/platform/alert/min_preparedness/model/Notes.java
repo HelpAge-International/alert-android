@@ -6,30 +6,38 @@ package org.alertpreparedness.platform.alert.min_preparedness.model;
 
 public class Notes {
 
-    Long timeStamp;
-    String content;
-    String addedBy;
+    private Long time;
+    private String content;
+    private String uploadBy;
+    private String actionTaskID;
 
-    public Notes(String addedBy, Long timeStamp, String content) {
-        this.addedBy = addedBy;
-        this.timeStamp = timeStamp;
+    public Notes() {
+    }
+
+    public Notes(String actionTaskID) {
+        this.actionTaskID = actionTaskID;
+    }
+
+    public Notes(String content, Long time, String uploadBy) {
         this.content = content;
+        this.time = time;
+        this.uploadBy = uploadBy;
     }
 
-    public String getAddedBy() {
-        return addedBy;
+    public Long getTime() {
+        return time;
     }
 
-    public void setAddedBy(String addedBy) {
-        this.addedBy = addedBy;
+    public void setTime(Long time) {
+        this.time = time;
     }
 
-    public Long getTimeStamp() {
-        return timeStamp;
+    public String getUploadBy() {
+        return uploadBy;
     }
 
-    public void setTimeStamp(Long timeStamp) {
-        this.timeStamp = timeStamp;
+    public void setUploadBy(String uploadBy) {
+        this.uploadBy = uploadBy;
     }
 
     public String getContent() {
@@ -40,4 +48,22 @@ public class Notes {
         this.content = content;
     }
 
+    public String getActionTaskID() {
+        return actionTaskID;
+    }
+
+    public void setActionTaskID(String actionTaskID) {
+        this.actionTaskID = actionTaskID;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Notes{" +
+                "time=" + time +
+                ", content='" + content + '\'' +
+                ", uploadBy='" + uploadBy + '\'' +
+                ", actionTaskID='" + actionTaskID + '\'' +
+                '}';
+    }
 }

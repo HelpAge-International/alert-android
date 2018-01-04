@@ -15,6 +15,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.HazardOtherRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -82,6 +83,13 @@ public class FirebaseModule {
     @UserRef
     public DatabaseReference provideUserRef(@BaseDatabaseRef DatabaseReference db, Context context) {
         return db.child("userPublic").child(PreferHelper.getString(context, Constants.AGENCY_ID));
+    }
+
+    @Provides
+    @Singleton
+    @UserPublicRef
+    public DatabaseReference provideUserPublicRef(@BaseDatabaseRef DatabaseReference db) {
+        return db.child("userPublic");
     }
 
     @Provides

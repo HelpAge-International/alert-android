@@ -173,10 +173,8 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
         super.onActivityResult(requestCode, resultCode, data);
         Bitmap photo = (Bitmap) data.getExtras().get("data");
 
-        // TO GET THE URI FROM THE BITMAP
         Uri tempUri = getImageUri(getApplicationContext(), photo);
 
-        // TO GET THE ACTUAL PATH
         File finalFile = new File(getRealPathFromURI(tempUri));
 
         String path = finalFile.toString();
