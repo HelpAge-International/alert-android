@@ -6,6 +6,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.leakcanary.LeakCanary;
 
@@ -18,6 +19,7 @@ import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
 import timber.log.Timber;
 
 /**
@@ -50,7 +52,8 @@ public class AlertApplication extends Application {
         sContext = getApplicationContext();
         FirebaseApp.initializeApp(this);
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-
+        FirebaseAuth.getInstance().signOut();
+        Realm.init(this);
         // JODA
         JodaTimeAndroid.init(this);
 

@@ -11,15 +11,19 @@ import android.widget.TextView;
 
 import org.alertpreparedness.platform.alert.ExtensionHelperKt;
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
+import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,9 +43,12 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
     private final static String _TAG = "Adapter";
     private boolean isCountryDirector;
 
+    @Inject
+    User user;
 
     public AlertAdapter(@NonNull HashMap<String, AlertModel> alertsMap, Context context, OnAlertItemClickedListener listener) {
-        this.isCountryDirector = UserInfo.getUser(context).isCountryDirector();
+        DependencyInjector.applicationComponent().inject(this);
+        this.isCountryDirector = user.isCountryDirector();
         this.alertsMap = alertsMap;
         this.context = context;
         this.listener = listener;

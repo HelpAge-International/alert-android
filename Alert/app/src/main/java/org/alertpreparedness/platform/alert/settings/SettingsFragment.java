@@ -86,7 +86,6 @@ public class SettingsFragment extends Fragment implements ValueEventListener {
     @OnClick(R.id.btnLogout)
     void onLogoutClick(View v) {
         PreferHelper.getInstance(getContext()).edit().remove(UserInfo.PREFS_USER).apply();
-        UserInfo.clearAll();
         FirebaseAuth.getInstance().signOut();
         startActivity(new Intent(getContext(), LoginScreen.class));
         getActivity().finish();

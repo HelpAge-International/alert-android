@@ -12,8 +12,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import org.alertpreparedness.platform.alert.AlertApplication;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
 import org.alertpreparedness.platform.alert.interfaces.AuthCallback;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.realm.UserRealm;
 import org.alertpreparedness.platform.alert.risk_monitoring.service.NetworkService;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.DBListener;
@@ -22,143 +27,90 @@ import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.realm.Realm;
 
 /**
  * Created by faizmohideen on 08/11/2017.
  */
 
 public class UserInfo {
-    private static CompositeDisposable compositeDisposable = new CompositeDisposable();
     private static String[] users = {"hazard", "administratorCountry", "countryDirector", "ert", "ertLeader", "partner"};
-    private static DBListener dbListener = new DBListener();
-    private String country, network;
 
-    public DatabaseReference database = FirebaseDatabase.getInstance().getReference();
     public static final String PREFS_USER = "prefs_user";
 
-    DatabaseReference userRef;
+    @Inject
+    @BaseDatabaseRef
+    DatabaseReference database;
 
-    public void authUser(final AuthCallback authCallback, Context context) {
+    @Inject
+    @UserId
+    String userId;
+
+    @Inject
+    Realm realm;
+
+    private UserAuthenticationListener listener = new UserAuthenticationListener();
+    private AuthCallback authCallback;
+    private DatabaseReference db;
+
+    public UserInfo() {
+        DependencyInjector.applicationComponent().inject(this);
+    }
+
+    public void authUser(final AuthCallback authCallback) {
+
+        this.authCallback = authCallback;
+
         for (String nodeName : users) {
-
-                DatabaseReference db = database.child(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS)).child(nodeName);
-                db.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        if (dataSnapshot.child(PreferHelper.getString(AlertApplication.getContext(), Constants.UID)).exists()) {
-                            DataSnapshot userNode = dataSnapshot.child(PreferHelper.getString(AlertApplication.getContext(), Constants.UID));
-                            populateUser(authCallback, nodeName, userNode, context);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
-            }
+            db = database.child(nodeName);
+            db.addListenerForSingleValueEvent(listener);
+        }
     }
 
-    private void setHazardId(AuthCallback authCallback, Context context, String userID, int userType, String agencyAdmin, String countryId, String systemAdmin, boolean isCountryDirector ) {
-        //TODO hazard ID
-
-        country = UserInfo.getUser(context).countryID;
-        System.out.println("CID: "+country);
-
-        DatabaseReference db = database.child(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS)).child("hazard");
-        db.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                Disposable NSDisposable = NetworkService.INSTANCE.mapNetworksForCountry(agencyAdmin, countryId).subscribe(
-                        (Map<String, String> stringStringMap) -> {
-                            for (String key : stringStringMap.keySet()) {
-                                String networkID = stringStringMap.get(key);
-                                String ids[] = {countryId, networkID};
-
-
-                                for (String id: ids) {
-                                    DataSnapshot hazardNode = dataSnapshot.child(id);
-                                    Iterable<DataSnapshot> hazardChildren = hazardNode.getChildren();
-                                    //ArrayList <User> users = new ArrayList<>();
-
-                                    for(DataSnapshot ds: hazardChildren){
-                                       // User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin, networkID, ds, isCountryDirector);
-
-                                        System.out.println("DataSnap: " + ds.getKey());
-                                        //users.add(user);
-                                    }
-                                  //  ArrayList <String> hazardId = new ArrayList<>();
-                                   // System.out.println("DataSnap: " + hazardId);
-                                    // User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin, networkID,  isCountryDirector);
-
-                                    //saveUser(authCallback.getContext(), user);
-                                    //authCallback.onUserAuthorized(user);
-                                }
-                                //TODO get all network id from networks
-                            }
-                        }
-                );
-                compositeDisposable.add(NSDisposable);
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-
+    public void removeListeners() {
+        db.removeEventListener(listener);
     }
 
-
-    private static void saveUser(Context context, User user) {
-        String serializedUser = new Gson().toJson(user);
-        PreferenceManager.getDefaultSharedPreferences(context)
-                .edit()
-                .putString(PREFS_USER, serializedUser)
-                .apply();
-        Log.e("USER", serializedUser);
+    private void saveUser(UserRealm user) {
+        realm.beginTransaction();
+        realm.copyToRealmOrUpdate(user);
+        realm.commitTransaction();
+        realm.close();
     }
 
-    public static User getUser(Context context) {
-        String serializedUser = PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(PREFS_USER, null);
-
-        return new Gson().fromJson(serializedUser, User.class);
+    public User getUser(Realm realm) {
+        UserRealm r = new UserRealm().getByPrimaryKey(realm, userId);
+        if(r == null) {
+            return new User();
+        }
+        return r.toUser();
     }
 
-    private void populateUser(AuthCallback callback, String nodeName, DataSnapshot userNode, Context context) {
+    private void populateUser(String nodeName, DataSnapshot userNode) {
 
-        String userID = PreferHelper.getString(AlertApplication.getContext(), Constants.UID);
         int userType = getUserType(nodeName);
-        boolean isCountryDirector = false;
+        String agencyAdmin = "";
 
+        if(userNode.child("agencyAdmin").hasChildren()) {
+            agencyAdmin = userNode.child("agencyAdmin").getChildren().iterator().next().getKey();
+            PreferHelper.putString(AlertApplication.getContext(), Constants.AGENCY_ID, agencyAdmin);
+        }
 
-        String agencyAdmin = userNode.child("agencyAdmin").getChildren().iterator().next().getKey();
         String systemAdmin = userNode.child("systemAdmin").getChildren().iterator().next().getKey();
         String countryId = userNode.child("countryId").getValue(String.class);
 
-
-        PreferHelper.putString(AlertApplication.getContext(), Constants.AGENCY_ID, agencyAdmin);
         PreferHelper.putString(AlertApplication.getContext(), Constants.COUNTRY_ID, countryId);
         PreferHelper.putString(AlertApplication.getContext(), Constants.SYSTEM_ID, systemAdmin);
         PreferHelper.putInt(AlertApplication.getContext(), Constants.USER_TYPE, userType);
 
-
-        if (nodeName.equals("countryDirector")) {
-            isCountryDirector = true;
-            User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin, null, null, isCountryDirector);
-            saveUser(callback.getContext(), user);
-            callback.onUserAuthorized(user);
-            setHazardId(callback, context, userID, userType, agencyAdmin, countryId, systemAdmin, isCountryDirector);
-        }
-        else {
-            User user = new User(userID, userType, agencyAdmin, countryId, systemAdmin,null, null, isCountryDirector);
-            saveUser(callback.getContext(), user);
-            callback.onUserAuthorized(user);
-            setHazardId(callback, context, userID, userType, agencyAdmin, countryId, systemAdmin, isCountryDirector);
+        UserRealm user = new UserRealm(userId, agencyAdmin, systemAdmin, countryId, userType, nodeName.equals("countryDirector"));
+        saveUser(user);
+        if(authCallback != null) {
+            authCallback.onUserAuthorized(user.toUser());
         }
 
     }
@@ -181,10 +133,21 @@ public class UserInfo {
         }
     }
 
-    public static void clearAll() {
-        compositeDisposable.clear();
-        dbListener.detatch();
-    }
+    private class UserAuthenticationListener implements ValueEventListener {
 
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+            if (dataSnapshot.child(userId).exists()) {
+                DataSnapshot userNode = dataSnapshot.child(userId);
+                populateUser(dataSnapshot.getKey(), userNode);
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+        }
+
+    }
 }
 

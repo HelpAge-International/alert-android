@@ -86,6 +86,9 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     @AlertRef
     DatabaseReference countryAlertRef;
 
+    @Inject
+    User user;
+
     DatabaseReference mReference = FirebaseDatabase.getInstance().getReference();
     ValueEventListener mValueListener = new ValueEventListener() {
         @Override
@@ -107,8 +110,8 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
         DependencyInjector.applicationComponent().inject(this);
 
-        countryID = UserInfo.getUser(this).countryID;
-        isCountryDirector = UserInfo.getUser(this).isCountryDirector();
+        countryID = user.countryID;
+        isCountryDirector = user.isCountryDirector();
         isCountryDirector = true;
 
         toolbar = (Toolbar) findViewById(R.id.action_toolbar);
