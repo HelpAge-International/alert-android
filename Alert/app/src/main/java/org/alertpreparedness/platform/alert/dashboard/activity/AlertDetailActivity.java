@@ -389,10 +389,11 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (isApproved) {
-                    mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_APPROVED);
-                    mReference.child("alertLevel").setValue(Constants.TRIGGER_RED);
                     DatabaseReference rf = countryAlertRef.push();
                     rf.setValue(alert);
+                    mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_APPROVED);
+                    mReference.child("alertLevel").setValue(Constants.TRIGGER_RED);
+
                 } else {
                     mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_REJECTED);
                 }
