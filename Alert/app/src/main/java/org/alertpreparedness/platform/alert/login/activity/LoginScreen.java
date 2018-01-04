@@ -168,9 +168,6 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
                 userInfo.authUser(this);
             }
         }
-        else {
-            SnackbarHelper.show(this, "wdfsdgf");
-        }
     }
 
     @Override

@@ -39,12 +39,10 @@ public class AlertApplication extends Application {
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.SAND;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING;
 
     @SuppressLint("StaticFieldLeak")
     private static Context sContext;
-
-//    public static List<Activity> mActivities = new ArrayList<>();
 
     @Override
     public void onCreate() {
@@ -52,13 +50,10 @@ public class AlertApplication extends Application {
         sContext = getApplicationContext();
         FirebaseApp.initializeApp(this);
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-//        FirebaseAuth.getInstance().signOut();
+        FirebaseAuth.getInstance().signOut();
         Realm.init(this);
         // JODA
         JodaTimeAndroid.init(this);
-
-        // FCM
-//        FCMNotifications.setup(CustomProcessor.class, getApplicationContext(), API_KEY);
 
         // Live-Only additions
         if (!IS_LIVE) {
@@ -91,7 +86,7 @@ public class AlertApplication extends Application {
         }
 
         DependencyInjector.initialize(this);
-        
+
     }
 
     public static Context getContext() {

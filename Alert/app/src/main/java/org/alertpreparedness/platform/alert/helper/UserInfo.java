@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 
 import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
@@ -38,7 +39,7 @@ import io.realm.Realm;
  */
 
 public class UserInfo {
-    private static String[] users = {"hazard", "administratorCountry", "countryDirector", "ert", "ertLeader", "partner"};
+    private static String[] users = {"administratorCountry", "countryDirector", "ert", "ertLeader", "partner"};
 
     public static final String PREFS_USER = "prefs_user";
 
@@ -53,16 +54,22 @@ public class UserInfo {
     @Inject
     Realm realm;
 
+    @Inject
+    @AgencyRef
+    DatabaseReference agencyRef;
+
     private UserAuthenticationListener listener = new UserAuthenticationListener();
     private AuthCallback authCallback;
     private DatabaseReference db;
+    private Context context;
 
-    public UserInfo() {
+    public UserInfo(Context context) {
+        this.context = context;
         DependencyInjector.applicationComponent().inject(this);
     }
 
     public void authUser(final AuthCallback authCallback) {
-
+        System.out.println("herehererererer");
         this.authCallback = authCallback;
 
         for (String nodeName : users) {
@@ -93,6 +100,7 @@ public class UserInfo {
     private void populateUser(String nodeName, DataSnapshot userNode) {
 
         int userType = getUserType(nodeName);
+
         String agencyAdmin = "";
         String systemAdmin = "";
 
@@ -106,8 +114,10 @@ public class UserInfo {
             PreferHelper.putString(AlertApplication.getContext(), Constants.SYSTEM_ID, systemAdmin);
         }
 
-        String countryId = userNode.child("countryId").getValue(String.class);
+        System.out.println("userNode.getRef() = " + userNode.getRef());
+        System.out.println("userNode = " + userNode);
 
+        String countryId = userNode.child("countryId").getValue(String.class);
 
         PreferHelper.putInt(AlertApplication.getContext(), Constants.USER_TYPE, userType);
 
@@ -151,6 +161,7 @@ public class UserInfo {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
+            System.out.println("databaseError = " + databaseError);
         }
 
     }

@@ -45,8 +45,8 @@ public class ApplicationModule {
     }
 
     @Provides
-    public User provideUser() {
-        return new UserInfo().getUser();
+    public User provideUser(UserInfo provideUserInfo) {
+        return provideUserInfo.getUser();
     }
 
     @Provides
@@ -55,8 +55,8 @@ public class ApplicationModule {
     }
 
     @Provides @Singleton
-    public UserInfo provideUserInfo() {
-        return new UserInfo();
+    public UserInfo provideUserInfo(Context context) {
+        return new UserInfo(context);
     }
 
     @Provides @Singleton @BaseDatabaseRef
@@ -79,7 +79,7 @@ public class ApplicationModule {
         return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
     }
 
-    @Provides @Singleton @UserId
+    @Provides @UserId
     public String provideUserId(Context context) {
         return PreferHelper.getString(context, Constants.UID);
     }
