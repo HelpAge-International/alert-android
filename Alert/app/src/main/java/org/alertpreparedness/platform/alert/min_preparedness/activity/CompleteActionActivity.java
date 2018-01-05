@@ -148,7 +148,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     }
 
     public void bottomSheet() {
-        SheetMenu.with(this).setTitle(R.string.txt_add_attachments).setMenu(R.menu.menu_add_attachment).setClick(new MenuItem.OnMenuItemClickListener() {
+        SheetMenu.with(this).setTitle("Add attachment").setMenu(R.menu.menu_add_attachment).setClick(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {

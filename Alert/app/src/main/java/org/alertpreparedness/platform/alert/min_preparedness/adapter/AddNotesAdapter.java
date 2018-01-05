@@ -118,7 +118,6 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
         notifyDataSetChanged();
     }
 
-
     @Override
     public void onChildRemoved(DataSnapshot dataSnapshot) {
         int index = keys.indexOf(dataSnapshot.getKey());

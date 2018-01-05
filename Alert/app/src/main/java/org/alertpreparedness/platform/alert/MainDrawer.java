@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.alertpreparedness.platform.alert.adv_preparedness.fragment.AdvPreparednessFragment;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
@@ -281,6 +282,9 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                     break;
                 case R.id.nav_minimum:
                     Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> setFragment(new MinPreparednessFragment()));
+                    break;
+                case R.id.nav_advanced:
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> setFragment(new AdvPreparednessFragment()));
                     break;
                 case R.id.nav_response:
                     Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> setFragment(new ResponsePlanFragment()));

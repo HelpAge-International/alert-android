@@ -62,7 +62,10 @@ public final class Constants {
     public static final int REQ_APPROVED = 1;
     public static final int REQ_REJECTED = 2;
 
-
+    //Preparedness
+    public static final int ALL = 0;
+    public static final int MPA = 1;
+    public static final int APA = 2;
 
     //copy over from portal
 //    public static final int HazardScenario0 = 0;

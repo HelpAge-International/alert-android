@@ -1,5 +1,4 @@
-package org.alertpreparedness.platform.alert.min_preparedness.fragment;
-
+package org.alertpreparedness.platform.alert.adv_preparedness.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,19 +20,16 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
-import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
-import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
+import org.alertpreparedness.platform.alert.adv_preparedness.model.AdvancedAction;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
-import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
-import org.alertpreparedness.platform.alert.helper.UserInfo;
+import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.utils.Constants;
 
 import javax.inject.Inject;
 
@@ -42,18 +38,18 @@ import butterknife.ButterKnife;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Created by faizmohideen on 05/01/2018.
  */
-public class InProgressFragment extends Fragment implements ActionAdapter.ItemSelectedListener, ValueEventListener {
 
-    public InProgressFragment() {
+public class APAInProgressFragment extends Fragment implements APActionAdapter.ItemSelectedListener, ValueEventListener {
+
+    public APAInProgressFragment() {
         // Required empty public constructor
     }
 
     @Nullable
-    @BindView(R.id.rvMinAction)
-    RecyclerView mActionRV;
-
+    @BindView(R.id.rvAdvAction)
+    RecyclerView mAdvActionRV;
 
     @Inject
     @ActionRef
@@ -63,12 +59,12 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     @AgencyRef
     DatabaseReference dbAgencyRef;
 
-    private ActionAdapter mAdapter;
+    private APActionAdapter mAPAdapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.content_minimum, container, false);
+        View v = inflater.inflate(R.layout.content_advanced, container, false);
 
         ButterKnife.bind(this, v);
         DependencyInjector.applicationComponent().inject(this);
@@ -79,20 +75,19 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     }
 
     private void initViews() {
-        mAdapter = getmAdapter();
-        assert mActionRV != null;
-        mActionRV.setAdapter(mAdapter);
+        mAPAdapter = getAPAdapter();
+        assert mAdvActionRV != null;
+        mAdvActionRV.setAdapter(mAPAdapter);
 
-        mActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mActionRV.setItemAnimator(new DefaultItemAnimator());
-        mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+        mAdvActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
+        mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
         dbActionRef.addValueEventListener(this);
-
     }
 
-    protected ActionAdapter getmAdapter() {
-        return new ActionAdapter(getContext(), dbActionRef, this);
+    protected APActionAdapter getAPAdapter() {
+        return new APActionAdapter(getContext(), dbActionRef, this);
     }
 
 
@@ -143,7 +138,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
             Long budget = (Long) getChild.child("budget").getValue();
             Long level = (Long) getChild.child("level").getValue();
 
-            mAdapter.addInProgressItem(getChild.getKey(), new Action(
+            mAPAdapter.addInProgressItem(getChild.getKey(), new AdvancedAction(
                     taskName,
                     department,
                     assignee,
@@ -164,5 +159,6 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     public void onCancelled(DatabaseError databaseError) {
 
     }
+
 
 }

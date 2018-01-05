@@ -1,12 +1,12 @@
-package org.alertpreparedness.platform.alert.min_preparedness.model;
+package org.alertpreparedness.platform.alert.adv_preparedness.model;
 
 import com.google.firebase.database.DatabaseReference;
 
 /**
- * Created by faizmohideen on 13/12/2017.
+ * Created by faizmohideen on 05/01/2018.
  */
 
-public class Action {
+public class AdvancedAction {
     private Boolean isArchived;
     private Boolean isComplete;
     private String taskName;
@@ -18,10 +18,10 @@ public class Action {
     private Long level;
     public DatabaseReference db;
 
-    public Action() {
+    public AdvancedAction() {
     }
 
-    public Action(String taskName, String department, String assignee, Boolean isArchived, Boolean isComplete, Long actionType, Long dueDate, Long budget, Long level, DatabaseReference db) {
+    public AdvancedAction(String taskName, String department, String assignee, Boolean isArchived, Boolean isComplete, Long actionType, Long dueDate, Long budget, Long level, DatabaseReference db) {
         this.taskName = taskName;
         this.department = department;
         this.assignee = assignee;

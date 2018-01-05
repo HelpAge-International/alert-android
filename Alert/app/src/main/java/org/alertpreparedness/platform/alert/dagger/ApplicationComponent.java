@@ -3,6 +3,9 @@ package org.alertpreparedness.platform.alert.dagger;
 import com.squareup.haha.perflib.Main;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
+import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
+import org.alertpreparedness.platform.alert.adv_preparedness.fragment.APAInProgressFragment;
+import org.alertpreparedness.platform.alert.adv_preparedness.fragment.AdvPreparednessFragment;
 import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
@@ -53,5 +56,8 @@ public interface ApplicationComponent {
     void inject(CompleteActionActivity activity);
     void inject(AddNotesActivity activity);
     void inject(MainDrawer drawer);
+    void inject(AdvPreparednessFragment fragment);
+    void inject(APAInProgressFragment fragment);
+    void inject(APActionAdapter adapter);
 
 }

@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.min_preparedness.adapter;
+package org.alertpreparedness.platform.alert.adv_preparedness.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -14,9 +14,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.adv_preparedness.model.AdvancedAction;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
-import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
@@ -32,16 +32,16 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Created by faizmohideen on 20/12/2017.
+ * Created by faizmohideen on 05/01/2018.
  */
 
-public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder> implements ChildEventListener {
+public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHolder> implements ChildEventListener {
 
     private final ArrayList<String> keys;
     private Context context;
-    private HashMap<String, Action> items;
+    private HashMap<String, AdvancedAction> items;
     private DatabaseReference dbRef;
-    private ItemSelectedListener listener;
+    private APActionAdapter.ItemSelectedListener listener;
     private String dateFormat = "MMM dd,yyyy";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
 
@@ -50,11 +50,9 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     DatabaseReference dbAgencyRef;
 
     //In progress
-    public void addInProgressItem(String key, Action action) {
-        System.out.println("action.getLevel() = " + action.getLevel());
+    public void addInProgressItem(String key, AdvancedAction action) {
         if (keys.indexOf(key) == -1) {
-            if (action.getLevel() == Constants.MPA
-                    && action.getDueDate() != null
+            if (action.getDueDate() != null
                     && !DateHelper.itWasDue(action.getDueDate())
                     && action.getTaskName() != null) {
                 keys.add(key);
@@ -65,65 +63,71 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
             items.put(key, action);
             notifyItemChanged(keys.indexOf(key));
         }
-    }
-
-    public void addExpiredItem(String key, Action action) {
-        if (keys.indexOf(key) == -1) {
-            if (action.getDueDate() != null && DateHelper.itWasDue(action.getDueDate()) && action.getTaskName() != null) {
-                keys.add(key);
-                items.put(key, action);
-                notifyItemInserted(keys.size() - 1);
-            }
-        } else {
-            items.put(key, action);
-            notifyItemChanged(keys.indexOf(key));
-        }
 
     }
 
-    public void addUnassignedItem(String key, Action action) {
-        if (keys.indexOf(key) == -1) {
-            if (action.getDueDate() != null && !DateHelper.itWasDue(action.getDueDate()) && action.getTaskName() != null) {
-                keys.add(key);
+    public void addExpiredItem(String key, AdvancedAction action) {
+        if (action.getLevel() == Constants.APA) {
+            if (keys.indexOf(key) == -1) {
+                if (action.getDueDate() != null && DateHelper.itWasDue(action.getDueDate()) && action.getTaskName() != null) {
+                    keys.add(key);
+                    items.put(key, action);
+                    notifyItemInserted(keys.size() - 1);
+                }
+            } else {
                 items.put(key, action);
-                notifyItemInserted(keys.size() - 1);
+                notifyItemChanged(keys.indexOf(key));
             }
-        } else {
-            items.put(key, action);
-            notifyItemChanged(keys.indexOf(key));
-        }
-
-    }
-
-    public void addCompletedItem(String key, Action action) {
-        if (keys.indexOf(key) == -1) {
-            if (action.getComplete() != null && action.getComplete() && action.getDueDate() != null) {
-                keys.add(key);
-                items.put(key, action);
-                notifyItemInserted(keys.size() - 1);
-            }
-        } else {
-            items.put(key, action);
-            notifyItemChanged(keys.indexOf(key));
-        }
-
-    }
-
-    public void addArchivedItem(String key, Action action) {
-        if (keys.indexOf(key) == -1) {
-            //  System.out.println("action = " + action.getArchived());
-            if (action.getArchived() != null && action.getArchived() && action.getDueDate() != null) {
-                keys.add(key);
-                items.put(key, action);
-                notifyItemInserted(keys.size() - 1);
-            }
-        } else {
-            items.put(key, action);
-            notifyItemChanged(keys.indexOf(key));
         }
     }
 
-    public ActionAdapter(Context context, DatabaseReference dbRef, ItemSelectedListener listener) {
+    public void addUnassignedItem(String key, AdvancedAction action) {
+        if (action.getLevel() == Constants.APA) {
+            if (keys.indexOf(key) == -1) {
+                if (action.getDueDate() != null && !DateHelper.itWasDue(action.getDueDate()) && action.getTaskName() != null) {
+                    keys.add(key);
+                    items.put(key, action);
+                    notifyItemInserted(keys.size() - 1);
+                }
+            } else {
+                items.put(key, action);
+                notifyItemChanged(keys.indexOf(key));
+            }
+        }
+    }
+
+    public void addCompletedItem(String key, AdvancedAction action) {
+        if (action.getLevel() == Constants.APA) {
+            if (keys.indexOf(key) == -1) {
+                if (action.getComplete() != null && action.getComplete() && action.getDueDate() != null) {
+                    keys.add(key);
+                    items.put(key, action);
+                    notifyItemInserted(keys.size() - 1);
+                }
+            } else {
+                items.put(key, action);
+                notifyItemChanged(keys.indexOf(key));
+            }
+        }
+    }
+
+    public void addArchivedItem(String key, AdvancedAction action) {
+        if (action.getLevel() == Constants.APA) {
+            if (keys.indexOf(key) == -1) {
+                //  System.out.println("action = " + action.getArchived());
+                if (action.getArchived() != null && action.getArchived() && action.getDueDate() != null) {
+                    keys.add(key);
+                    items.put(key, action);
+                    notifyItemInserted(keys.size() - 1);
+                }
+            } else {
+                items.put(key, action);
+                notifyItemChanged(keys.indexOf(key));
+            }
+        }
+    }
+
+    public APActionAdapter(Context context, DatabaseReference dbRef, APActionAdapter.ItemSelectedListener listener) {
         this.context = context;
         this.items = new HashMap<>();
         this.listener = listener;
@@ -133,21 +137,21 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
         this.dbRef.addChildEventListener(this);
     }
 
-    public Action getItem(int index) {
+    public AdvancedAction getItem(int index) {
         return items.get(keys.get(index));
     }
 
     @Override
-    public ActionAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public APActionAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.adapter_minimum_actions, parent, false);
-        return new ActionAdapter.ViewHolder(itemView);
+        return new APActionAdapter.ViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(ActionAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(APActionAdapter.ViewHolder holder, int position) {
 
-        Action action = items.get(keys.get(position));
+        AdvancedAction action = items.get(keys.get(position));
         holder.tvActionType.setText(getActionType((int) action.getActionType()));
         holder.tvActionName.setText(action.getTaskName());
         holder.tvBudget.setText(getBudget(action.getBudget()));
@@ -156,7 +160,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
         holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position, keys.get(position)));
     }
 
-    private void getDepartment(DatabaseReference db, ActionAdapter.ViewHolder holder) {
+    private void getDepartment(DatabaseReference db, APActionAdapter.ViewHolder holder) {
 
         db.addListenerForSingleValueEvent(new ValueEventListener() {
 
@@ -226,34 +230,11 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-        Action action = dataSnapshot.getValue(Action.class);
-        if (keys.indexOf(dataSnapshot.getKey()) == -1) {
-            if (action.getComplete() != null && action.getComplete() && action.getDueDate() != null) {
-                keys.add(dataSnapshot.getKey());
-                items.put(dataSnapshot.getKey(), action);
-                notifyItemInserted(keys.size() - 1);
-            }
-        } else {
-            items.put(dataSnapshot.getKey(), action);
-            notifyItemChanged(keys.indexOf(dataSnapshot.getKey()));
-        }
 
     }
 
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-        Action action = dataSnapshot.getValue(Action.class);
-        if (keys.indexOf(dataSnapshot.getKey()) == -1) {
-            if (action.getComplete() != null && action.getComplete() && action.getDueDate() != null) {
-                keys.add(dataSnapshot.getKey());
-                items.put(dataSnapshot.getKey(), action);
-                notifyItemInserted(keys.size() - 1);
-            }
-        } else {
-            items.put(dataSnapshot.getKey(), action);
-            notifyItemChanged(keys.indexOf(dataSnapshot.getKey()));
-        }
 
     }
 
@@ -275,5 +256,4 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     public interface ItemSelectedListener {
         void onActionItemSelected(int pos, String key);
     }
-
 }
