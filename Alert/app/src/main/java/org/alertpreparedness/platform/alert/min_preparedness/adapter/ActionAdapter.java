@@ -53,7 +53,8 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     public void addInProgressItem(String key, Action action) {
         System.out.println("action.getLevel() = " + action.getLevel());
         if (keys.indexOf(key) == -1) {
-            if (action.getLevel() == Constants.MPA
+            if (action.getLevel() != null
+                    && action.getLevel() == Constants.MPA
                     && action.getDueDate() != null
                     && !DateHelper.itWasDue(action.getDueDate())
                     && action.getTaskName() != null) {

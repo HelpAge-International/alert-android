@@ -1,5 +1,7 @@
 package org.alertpreparedness.platform.alert.min_preparedness.activity;
 
+import android.support.v4.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -9,6 +11,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +26,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -39,6 +43,7 @@ import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertFieldsAdapter;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.AttachmentAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.fragment.MinPreparednessFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Notes;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -84,8 +89,6 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     ArrayList<String> pathList = new ArrayList<>();
 
     SimpleAdapter simpleAdapter;
-    AddNotesActivity notesActivity = new AddNotesActivity();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,41 +163,38 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     }
 
     private void saveData(String texts) {
-
-
         Intent intent = getIntent();
         String key = intent.getStringExtra("ACTION_KEY");
         String userID = PreferHelper.getString(getApplicationContext(), Constants.AGENCY_ID);
-        //Uri tempUri = getImageUri(getApplicationContext(), photo);
 
         saveNote(texts, key);
         StorageReference riversRef = mStorageRef.child("documents/" + userID + "/" + key + "/images/");
 
-
         for (int i = 0; i < pathList.size(); i++) {
             System.out.println("Uri.parse(pathList.get(i)) = " + Uri.parse(pathList.get(i)));
+            final int finalI = i;
             riversRef.putFile(Uri.parse("file://" + pathList.get(i)))
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            System.out.println("Successful!");
+                            Toast.makeText(getApplicationContext(), "Action completed successfully", Toast.LENGTH_LONG).show();
+                            imgList.remove(finalI);
+                            simpleAdapter.notifyDataSetChanged();
+//                            FragmentManager fm = getSupportFragmentManager();
+//                            MinPreparednessFragment fragment = new MinPreparednessFragment();
+//                            fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception exception) {
-                            // Handle unsuccessful uploads
-                            // ...
-
                             System.out.println("exception = " + exception);
                         }
                     });
-
         }
     }
 
     public void saveNote(String texts, String key) {
-
         if (!TextUtils.isEmpty(texts)) {
             String id = dbNoteRef.child(key).push().getKey();
             String userID = PreferHelper.getString(getApplicationContext(), Constants.AGENCY_ID);

@@ -67,6 +67,7 @@ public class MinPreparednessFragment extends Fragment {
         mPager.setAdapter(new MinPreparednessFragment.PagerAdapter(getFragmentManager()));
     }
 
+
     private class PagerAdapter extends FragmentStatePagerAdapter {
 
         public PagerAdapter(FragmentManager fm) {
