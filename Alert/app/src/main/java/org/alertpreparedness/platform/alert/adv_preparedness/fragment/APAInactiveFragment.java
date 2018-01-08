@@ -26,6 +26,8 @@ import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAda
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
+import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
@@ -65,6 +67,10 @@ public class APAInactiveFragment  extends Fragment implements APActionAdapter.It
     @Inject
     @AgencyRef
     DatabaseReference dbAgencyRef;
+
+    @Inject
+    @AlertRef
+    DatabaseReference dbAlertRef;
 
     private APActionAdapter mAPAdapter;
 
@@ -150,18 +156,33 @@ public class APAInactiveFragment  extends Fragment implements APActionAdapter.It
             Long budget = (Long) getChild.child("budget").getValue();
             Long level = (Long) getChild.child("level").getValue();
 
-            mAPAdapter.addArchivedItem(getChild.getKey(), new Action(
-                    taskName,
-                    department,
-                    assignee,
-                    isArchived,
-                    isComplete,
-                    actionType,
-                    dueDate,
-                    budget,
-                    level,
-                    dbAgencyRef.getRef())
-            );
+
+            dbAlertRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Long alertLevel = (Long) dataSnapshot.child("alertLevel").getValue();
+                    mAPAdapter.addInActiveItem(getChild.getKey(), new Action(
+                            taskName,
+                            department,
+                            assignee,
+                            isArchived,
+                            isComplete,
+                            actionType,
+                            dueDate,
+                            budget,
+                            level,
+                            dbAgencyRef.getRef()),
+                            alertLevel
+                    );
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
 
         }
 

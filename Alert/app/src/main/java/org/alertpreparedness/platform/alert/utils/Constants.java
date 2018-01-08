@@ -48,6 +48,11 @@ public final class Constants {
     public static final int TRIGGER_AMBER = 1;
     public static final int TRIGGER_RED = 2;
 
+    //Action Type
+    public static final int CHS = 0;
+    public static final int MANDATED = 1;
+    public static final int CUSTOM = 2;
+
     //INDICATOR-FREQUENCY
 
     //user type
@@ -66,6 +71,7 @@ public final class Constants {
     public static final int ALL = 0;
     public static final int MPA = 1;
     public static final int APA = 2;
+
 
     //copy over from portal
 //    public static final int HazardScenario0 = 0;

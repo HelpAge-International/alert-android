@@ -12,12 +12,6 @@ import android.view.ViewGroup;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
-import org.alertpreparedness.platform.alert.min_preparedness.fragment.ActionArchivedFragment;
-import org.alertpreparedness.platform.alert.min_preparedness.fragment.ActionCompletedFragment;
-import org.alertpreparedness.platform.alert.min_preparedness.fragment.ActionExpiredFragment;
-import org.alertpreparedness.platform.alert.min_preparedness.fragment.ActionUnassignedFragment;
-import org.alertpreparedness.platform.alert.min_preparedness.fragment.InProgressFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

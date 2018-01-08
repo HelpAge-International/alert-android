@@ -39,7 +39,6 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
     private final static String _TAG = "Adapter";
     private boolean isCountryDirector;
 
-
     public AlertAdapter(@NonNull HashMap<String, AlertModel> alertsMap, Context context, OnAlertItemClickedListener listener) {
         this.isCountryDirector = UserInfo.getUser(context).isCountryDirector();
         this.alertsMap = alertsMap;
