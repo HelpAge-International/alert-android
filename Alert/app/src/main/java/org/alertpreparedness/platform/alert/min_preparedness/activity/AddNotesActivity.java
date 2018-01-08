@@ -158,8 +158,7 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
 
     }
 
-    private void saveNote() {
-        String texts = etNotes.getText().toString().trim();
+    public void saveNote(String texts) {
 
         if(!TextUtils.isEmpty(texts)) {
             Intent intent = getIntent();
@@ -179,7 +178,8 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
     @Override
     public void onClick(View view) {
         if(view == submitNote){
-            saveNote();
+            String texts = etNotes.getText().toString().trim();
+            saveNote(texts);
         }
     }
 

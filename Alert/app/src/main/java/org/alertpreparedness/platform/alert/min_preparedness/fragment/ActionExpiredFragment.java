@@ -62,11 +62,11 @@ public class ActionExpiredFragment extends InProgressFragment {
 
     @Nullable
     @BindView(R.id.tvStatus)
-    TextView tvActionStatus;
+    TextView tvActionExpired;
 
     @Nullable
     @BindView(R.id.imgStatus)
-    ImageView imgProgress;
+    ImageView imgExpired;
 
     protected ActionAdapter mExpiredAdapter;
 
@@ -84,11 +84,11 @@ public class ActionExpiredFragment extends InProgressFragment {
     }
 
     private void initViews() {
-        assert imgProgress != null;
-        imgProgress.setImageResource(R.drawable.ic_close_round);
-        assert tvActionStatus != null;
-        tvActionStatus.setText("Expired");
-        tvActionStatus.setTextColor(getResources().getColor(R.color.alertRed));
+        assert imgExpired != null;
+        imgExpired.setImageResource(R.drawable.ic_close_round);
+        assert tvActionExpired != null;
+        tvActionExpired.setText("Expired");
+        tvActionExpired.setTextColor(getResources().getColor(R.color.alertRed));
 
         mExpiredAdapter = getmAdapter();
         mActionRV.setAdapter(mExpiredAdapter);

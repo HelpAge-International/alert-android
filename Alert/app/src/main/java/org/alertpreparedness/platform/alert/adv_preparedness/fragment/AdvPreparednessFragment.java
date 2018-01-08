@@ -59,7 +59,16 @@ public class AdvPreparednessFragment extends Fragment {
         public Fragment getItem(int position) {
 
             switch (position) {
-
+                case 1:
+                    return new APAExpiredFragment();
+                case 2:
+                    return new APAUnassignedFragment();
+                case 3:
+                    return new APACompletedFragment();
+                case 4:
+                    return new APAInactiveFragment();
+                case 5:
+                    return new APAArchivedFragment();
                 default:
                     return new APAInProgressFragment();
             }
@@ -67,7 +76,7 @@ public class AdvPreparednessFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return 1;
+            return 6;
         }
 
     }

@@ -1,5 +1,7 @@
 package org.alertpreparedness.platform.alert.min_preparedness.model;
 
+import android.net.Uri;
+
 import com.google.firebase.database.DatabaseReference;
 
 /**
@@ -16,9 +18,15 @@ public class Action {
     private Long dueDate;
     private Long budget;
     private Long level;
+    private Uri path;
     public DatabaseReference db;
 
+
     public Action() {
+    }
+
+    public Action(Uri path) {
+        this.path = path;
     }
 
     public Action(String taskName, String department, String assignee, Boolean isArchived, Boolean isComplete, Long actionType, Long dueDate, Long budget, Long level, DatabaseReference db) {
@@ -104,6 +112,14 @@ public class Action {
 
     public void setLevel(Long level) {
         this.level = level;
+    }
+
+    public Uri getPath() {
+        return path;
+    }
+
+    public void setPath(Uri path) {
+        this.path = path;
     }
 
     @Override

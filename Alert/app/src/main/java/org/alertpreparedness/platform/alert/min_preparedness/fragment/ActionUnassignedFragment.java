@@ -37,11 +37,11 @@ public class ActionUnassignedFragment extends InProgressFragment{
 
     @Nullable
     @BindView(R.id.tvStatus)
-    TextView tvActionStatus;
+    TextView tvActionUnassigned;
 
     @Nullable
     @BindView(R.id.imgStatus)
-    ImageView imgProgress;
+    ImageView imgUnassigned;
 
     private ActionAdapter mUnassignedAdapter;
 
@@ -59,11 +59,11 @@ public class ActionUnassignedFragment extends InProgressFragment{
     }
 
     private void initViews() {
-        assert imgProgress != null;
-        imgProgress.setImageResource(R.drawable.ic_close_round);
-        assert tvActionStatus != null;
-        tvActionStatus.setText("Unassigned");
-        tvActionStatus.setTextColor(getResources().getColor(R.color.alertRed));
+        assert imgUnassigned != null;
+        imgUnassigned.setImageResource(R.drawable.ic_close_round);
+        assert tvActionUnassigned != null;
+        tvActionUnassigned.setText("Unassigned");
+        tvActionUnassigned.setTextColor(getResources().getColor(R.color.alertRed));
 
         mUnassignedAdapter= getmAdapter();
         mActionRV.setAdapter(mUnassignedAdapter);

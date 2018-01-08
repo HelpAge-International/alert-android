@@ -36,11 +36,11 @@ public class ActionCompletedFragment extends InProgressFragment {
 
     @Nullable
     @BindView(R.id.tvStatus)
-    TextView tvActionStatus;
+    TextView tvActionCompleted;
 
     @Nullable
     @BindView(R.id.imgStatus)
-    ImageView imgProgress;
+    ImageView imgCompleted;
 
     private ActionAdapter mAdapter;
 
@@ -59,11 +59,11 @@ public class ActionCompletedFragment extends InProgressFragment {
 
     private void initViews() {
 
-        assert imgProgress != null;
-        imgProgress.setImageResource(R.drawable.icon_status_complete);
-        assert tvActionStatus != null;
-        tvActionStatus.setText("Completed");
-        tvActionStatus.setTextColor(getResources().getColor(R.color.alertGreen));
+        assert imgCompleted != null;
+        imgCompleted.setImageResource(R.drawable.icon_status_complete);
+        assert tvActionCompleted != null;
+        tvActionCompleted.setText("Completed");
+        tvActionCompleted.setTextColor(getResources().getColor(R.color.alertGreen));
 
         mAdapter = getmAdapter();
         mActionRV.setAdapter(mAdapter);

@@ -36,11 +36,11 @@ public class ActionArchivedFragment extends InProgressFragment {
 
     @Nullable
     @BindView(R.id.tvStatus)
-    TextView tvActionStatus;
+    TextView tvActionArchived;
 
     @Nullable
     @BindView(R.id.imgStatus)
-    ImageView imgProgress;
+    ImageView imgArchived;
 
     private ActionAdapter mAdapter;
 
@@ -58,11 +58,11 @@ public class ActionArchivedFragment extends InProgressFragment {
     }
 
     private void initViews() {
-        assert imgProgress != null;
-        imgProgress.setImageResource(R.drawable.ic_close_round_gray);
-        assert tvActionStatus != null;
-        tvActionStatus.setText("Archived");
-        tvActionStatus.setTextColor(getResources().getColor(R.color.alertGray));
+        assert imgArchived != null;
+        imgArchived.setImageResource(R.drawable.ic_close_round_gray);
+        assert tvActionArchived != null;
+        tvActionArchived.setText("Archived");
+        tvActionArchived.setTextColor(getResources().getColor(R.color.alertGray));
 
         mAdapter = getmAdapter();
         mActionRV.setAdapter(mAdapter);

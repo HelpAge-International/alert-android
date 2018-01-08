@@ -4,7 +4,12 @@ import com.squareup.haha.perflib.Main;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
+import org.alertpreparedness.platform.alert.adv_preparedness.fragment.APAArchivedFragment;
+import org.alertpreparedness.platform.alert.adv_preparedness.fragment.APACompletedFragment;
+import org.alertpreparedness.platform.alert.adv_preparedness.fragment.APAExpiredFragment;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.APAInProgressFragment;
+import org.alertpreparedness.platform.alert.adv_preparedness.fragment.APAInactiveFragment;
+import org.alertpreparedness.platform.alert.adv_preparedness.fragment.APAUnassignedFragment;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.AdvPreparednessFragment;
 import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
@@ -58,6 +63,11 @@ public interface ApplicationComponent {
     void inject(MainDrawer drawer);
     void inject(AdvPreparednessFragment fragment);
     void inject(APAInProgressFragment fragment);
+    void inject(APAExpiredFragment fragment);
+    void inject(APAUnassignedFragment fragment);
+    void inject(APACompletedFragment fragment);
+    void inject(APAArchivedFragment fragment);
+    void inject(APAInactiveFragment fragment);
     void inject(APActionAdapter adapter);
 
 }

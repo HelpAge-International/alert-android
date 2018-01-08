@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -23,16 +24,25 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseStorageRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertFieldsAdapter;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.AttachmentAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
+import org.alertpreparedness.platform.alert.min_preparedness.model.Notes;
+import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SimpleAdapter;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 import org.w3c.dom.Text;
@@ -66,8 +76,15 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     @BaseStorageRef
     StorageReference mStorageRef;
 
-    ArrayList<String> list = new ArrayList<>();
+    @Inject
+    @NoteRef
+    DatabaseReference dbNoteRef;
+
+    ArrayList<String> imgList = new ArrayList<>();
+    ArrayList<String> pathList = new ArrayList<>();
+
     SimpleAdapter simpleAdapter;
+    AddNotesActivity notesActivity = new AddNotesActivity();
 
 
     @Override
@@ -93,7 +110,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     }
 
     private void initView() {
-        simpleAdapter = new SimpleAdapter(0, list, this);
+        simpleAdapter = new SimpleAdapter(0, imgList, this);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -116,7 +133,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
 
     @Override
     public void onItemRemove(int positionInParent, int position) {
-        list.remove(position);
+        imgList.remove(position);
         simpleAdapter.notifyDataSetChanged();
     }
 
@@ -135,17 +152,62 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
             return;
         }
 
-        if (list.size() == 0) {
+        if (imgList.size() == 0) {
             SnackbarHelper.show(this, getString(R.string.txt_err_add_attachments));
         }
 
-        saveData();
+        saveData(notes);
     }
 
-    private void saveData() {
+    private void saveData(String texts) {
 
 
+        Intent intent = getIntent();
+        String key = intent.getStringExtra("ACTION_KEY");
+        String userID = PreferHelper.getString(getApplicationContext(), Constants.AGENCY_ID);
+        //Uri tempUri = getImageUri(getApplicationContext(), photo);
+
+        saveNote(texts, key);
+        StorageReference riversRef = mStorageRef.child("documents/" + userID + "/" + key + "/images/");
+
+
+        for (int i = 0; i < pathList.size(); i++) {
+            System.out.println("Uri.parse(pathList.get(i)) = " + Uri.parse(pathList.get(i)));
+            riversRef.putFile(Uri.parse("file://" + pathList.get(i)))
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            System.out.println("Successful!");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle unsuccessful uploads
+                            // ...
+
+                            System.out.println("exception = " + exception);
+                        }
+                    });
+
+        }
     }
+
+    public void saveNote(String texts, String key) {
+
+        if (!TextUtils.isEmpty(texts)) {
+            String id = dbNoteRef.child(key).push().getKey();
+            String userID = PreferHelper.getString(getApplicationContext(), Constants.AGENCY_ID);
+            Long millis = System.currentTimeMillis();
+
+            Notes notes = new Notes(texts, millis, userID);
+            dbNoteRef.child(key).child(id).setValue(notes);
+
+        } else {
+            SnackbarHelper.show(this, getString(R.string.txt_note_not_empty));
+        }
+    }
+
 
     public void bottomSheet() {
         SheetMenu.with(this).setTitle("Add attachment").setMenu(R.menu.menu_add_attachment).setClick(new MenuItem.OnMenuItemClickListener() {
@@ -175,13 +237,18 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
 
         Uri tempUri = getImageUri(getApplicationContext(), photo);
 
-        File finalFile = new File(getRealPathFromURI(tempUri));
+        System.out.println("tempUri = " + tempUri);
+
+        Action action = new Action(tempUri);
+
+        File finalFile = new File(getRealPathFromURI(action.getPath()));
 
         String path = finalFile.toString();
 
         String filename = path.substring(path.lastIndexOf("/") + 1);
 
-        list.add(filename);
+        pathList.add(path);
+        imgList.add(filename);
     }
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {

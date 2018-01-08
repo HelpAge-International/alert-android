@@ -109,6 +109,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                 switch (menuItem.getItemId()) {
                     case R.id.complete_action:
                         Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
+                        intent.putExtra("ACTION_KEY", key);
                         startActivity(intent);
                         break;
                     case R.id.reassign_action:

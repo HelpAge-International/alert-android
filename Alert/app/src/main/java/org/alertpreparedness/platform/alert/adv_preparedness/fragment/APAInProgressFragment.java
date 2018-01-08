@@ -138,7 +138,7 @@ public class APAInProgressFragment extends Fragment implements APActionAdapter.I
             Long budget = (Long) getChild.child("budget").getValue();
             Long level = (Long) getChild.child("level").getValue();
 
-            mAPAdapter.addInProgressItem(getChild.getKey(), new AdvancedAction(
+            mAPAdapter.addInProgressItem(getChild.getKey(), new Action(
                     taskName,
                     department,
                     assignee,
