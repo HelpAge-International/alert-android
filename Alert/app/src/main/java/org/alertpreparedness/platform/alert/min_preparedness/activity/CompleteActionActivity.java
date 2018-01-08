@@ -178,11 +178,9 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             Toast.makeText(getApplicationContext(), "Action completed successfully", Toast.LENGTH_LONG).show();
+                            editTextNote.setText("");
                             imgList.remove(finalI);
                             simpleAdapter.notifyDataSetChanged();
-//                            FragmentManager fm = getSupportFragmentManager();
-//                            MinPreparednessFragment fragment = new MinPreparednessFragment();
-//                            fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
