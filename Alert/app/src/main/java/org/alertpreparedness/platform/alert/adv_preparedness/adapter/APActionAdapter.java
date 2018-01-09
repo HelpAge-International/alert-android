@@ -50,6 +50,31 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     private String dateFormat = "MMM dd,yyyy";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
 
+    public class ViewHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.tv_action_type)
+        TextView tvActionType;
+
+        @BindView(R.id.tv_due_date)
+        TextView tvDueDate;
+
+        @BindView(R.id.tv_action_name)
+        TextView tvActionName;
+
+        @BindView(R.id.tv_user_name)
+        TextView tvUserName;
+
+        @BindView(R.id.tv_budget)
+        TextView tvBudget;
+
+        @BindView(R.id.tvNoAction)
+        TextView tvEmptyAction;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+    }
 
     //In progress
     public void addInProgressItem(String key, Action action) {
@@ -64,7 +89,6 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
                 notifyItemInserted(keys.size() - 1);
             }
         }
-
     }
 
     public void addExpiredItem(String key, Action action) {
@@ -145,7 +169,6 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
         this.items = new HashMap<>();
         this.listener = listener;
         this.dbRef = dbRef;
-        this.listener = listener;
         this.keys = new ArrayList<>(items.keySet());
         this.dbRef.addChildEventListener(this);
     }
@@ -227,32 +250,6 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-
-        @BindView(R.id.tv_action_type)
-        TextView tvActionType;
-
-        @BindView(R.id.tv_due_date)
-        TextView tvDueDate;
-
-        @BindView(R.id.tv_action_name)
-        TextView tvActionName;
-
-        @BindView(R.id.tv_user_name)
-        TextView tvUserName;
-
-        @BindView(R.id.tv_budget)
-        TextView tvBudget;
-
-        @BindView(R.id.tvNoAction)
-        TextView tvEmptyAction;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-    }
-
     private String getBudget(Long budget) {
         return "$" + budget;
     }
@@ -281,6 +278,7 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
     @Override
     public int getItemCount() {
+
         return items.size();
     }
 

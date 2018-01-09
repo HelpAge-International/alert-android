@@ -119,7 +119,8 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.assign_action:
-                        
+                        UsersListDialogFragment dialog = new UsersListDialogFragment();
+                        dialog.show(getActivity().getFragmentManager(), "users_list");
                         break;
                     case R.id.edit_action:
                         Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "EDIT ACTION", Snackbar.LENGTH_LONG).show();

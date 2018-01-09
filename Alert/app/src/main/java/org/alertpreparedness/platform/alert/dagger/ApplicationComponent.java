@@ -11,6 +11,7 @@ import org.alertpreparedness.platform.alert.adv_preparedness.fragment.APAInProgr
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.APAInactiveFragment;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.APAUnassignedFragment;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.AdvPreparednessFragment;
+import org.alertpreparedness.platform.alert.adv_preparedness.fragment.UsersListDialogFragment;
 import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
@@ -69,5 +70,6 @@ public interface ApplicationComponent {
     void inject(APAArchivedFragment fragment);
     void inject(APAInactiveFragment fragment);
     void inject(APActionAdapter adapter);
+    void inject(UsersListDialogFragment fragment);
 
 }
