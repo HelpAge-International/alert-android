@@ -174,4 +174,5 @@
     <string name="all_agencies">All Agencies</string>
     <string name="network">Network</string>
     <string name="country">Country</string>
+    <string name="no_programmes">There are no programmes in this region</string>
 </resources>

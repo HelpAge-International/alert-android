@@ -233,11 +233,14 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                     for(AffectedAreaModel m : alert.getAffectedAreas()) {
                         List<String> list = ExtensionHelperKt.getLevel1Values(m.getCountry(), mCountryDataList);
                         res.append(Constants.COUNTRIES[m.getCountry()]);
-                        if(list != null && m.getLevel1() != null && list.get(m.getLevel1()) != null) {
-                            m.setLevel1Name(list.get(m.getLevel1()));
-                            res.append(", ").append(list.get(m.getLevel1()));
+                        try {
+                            if (list != null && m.getLevel1() != null && list.get(m.getLevel1()) != null) {
+                                m.setLevel1Name(list.get(m.getLevel1()));
+                                res.append(", ").append(list.get(m.getLevel1()));
+                            }
+                            res.append("\n");
                         }
-                        res.append("\n");
+                        catch (Exception e){}
                     }
                     txtAffectedArea.setText(res.toString());
                     imgUpdate.setOnClickListener(this);

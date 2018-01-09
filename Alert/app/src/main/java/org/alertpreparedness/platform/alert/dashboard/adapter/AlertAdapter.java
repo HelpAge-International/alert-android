@@ -81,7 +81,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
 //    }
 
     public void update(String id, AlertModel alert) {
-        System.out.println("id = [" + id + "], alert = [" + alert + "]");
+//        System.out.println("id = [" + id + "], alert = [" + alert + "]");
         int index = keys.indexOf(id);
         if(index == -1) {
             keys.add(id);

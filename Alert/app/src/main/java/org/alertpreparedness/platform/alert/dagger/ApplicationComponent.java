@@ -13,6 +13,7 @@ import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.InProgressFragment;
 import org.alertpreparedness.platform.alert.mycountry.MyCountryFragment;
+import org.alertpreparedness.platform.alert.mycountry.ProgramResultsActivity;
 import org.alertpreparedness.platform.alert.responseplan.ActiveFragment;
 import org.alertpreparedness.platform.alert.responseplan.ArchivedFragment;
 import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity;
@@ -55,4 +56,5 @@ public interface ApplicationComponent {
     void inject(UserInfo userInfo);
     void inject(AlertAdapter alertAdapter);
     void inject(LoginScreen loginScreen);
+    void inject(ProgramResultsActivity programResultsActivity);
 }

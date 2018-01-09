@@ -5,6 +5,7 @@ import android.content.Context;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.AgencyBaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
@@ -12,6 +13,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardOtherRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.ProgrammeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.model.User;
@@ -84,6 +86,14 @@ public class FirebaseModule {
 
     @Provides
     @Singleton
+    @ProgrammeRef
+    public DatabaseReference providePrgrammes(@BaseDatabaseRef DatabaseReference db, User user) {
+        return db.child("countryOfficeProfile").child("programme").child(user.countryID).child("4WMapping");
+    }
+
+
+    @Provides
+    @Singleton
     @HazardOtherRef
     public DatabaseReference provideHazardOtherRef(@BaseDatabaseRef DatabaseReference db) {
         return db.child("hazardOther");
@@ -94,6 +104,13 @@ public class FirebaseModule {
     @NetworkRef
     public DatabaseReference provideNetworkRef(@BaseDatabaseRef DatabaseReference db) {
         return db.child("network");
+    }
+
+    @Provides
+    @Singleton
+    @AgencyBaseRef
+    public DatabaseReference provideBaseAgencykRef(@BaseDatabaseRef DatabaseReference db) {
+        return db.child("agency");
     }
 
 }

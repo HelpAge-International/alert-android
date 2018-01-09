@@ -19,11 +19,27 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.AgencyBaseRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.ProgrammeRef;
+import org.alertpreparedness.platform.alert.firebase.AgencyModel;
+import org.alertpreparedness.platform.alert.firebase.ProgrammeModel;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,7 +51,7 @@ import io.codetail.animation.ViewAnimationUtils;
  * Created by Tj on 19/12/2017.
  */
 
-public class ProgramResultsActivity extends AppCompatActivity implements SupportAnimator.AnimatorListener, FilterAdapter.SelectListener, NestedScrollView.OnScrollChangeListener {
+public class ProgramResultsActivity extends AppCompatActivity implements SupportAnimator.AnimatorListener, FilterAdapter.SelectListener, NestedScrollView.OnScrollChangeListener, ValueEventListener {
 
     public static final String BUNDLE_FILTER = "filter";
     public static final String TITLE_1 = "title_1";
@@ -71,6 +87,18 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
     @BindView(R.id.revealCon)
     CardView revealCon;
 
+    @Inject
+    @ProgrammeRef
+    DatabaseReference programmesRef;
+
+    @Inject
+    @AgencyBaseRef
+    DatabaseReference agencyRef;
+
+    @Inject
+    @NetworkRef
+    DatabaseReference networkRef;
+
     private ModelIndicatorLocation filter;
 
     private String mTitle1;
@@ -79,6 +107,11 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
     private FilterAdapter mFilterAdapter;
     private float mToolbarElevation;
     private boolean hidding = true;
+    private HashMap<String, ArrayList<ProgrammeModel>> programmes = new HashMap<>();
+    private HashMap<String, Boolean> agencyRequests = new HashMap<>();
+    private ProgrammesAdapter mProgrammesAdapter;
+    private ArrayList<ProgrammeInfo> mProgrammes;
+    private HashMap<String, AgencyModel> agencyList = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,9 +125,13 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
         assert getSupportActionBar() != null;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        DependencyInjector.applicationComponent().inject(this);
+
         filter = getIntent().getParcelableExtra(BUNDLE_FILTER);
         mTitle1 = getIntent().getStringExtra(TITLE_1);
         mTitle2 = getIntent().getStringExtra(TITLE_2);
+
+        programmesRef.addValueEventListener(this);
 
         initViews();
     }
@@ -123,10 +160,7 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
             animator_reverse.start();
         });
 
-        List<String> filters = new ArrayList<>();
-        filters.add("START network");
-        filters.add("START network");
-        mFilterAdapter = new FilterAdapter(this, filters, this);
+        mFilterAdapter = new FilterAdapter(this, this);
         mFilterList.setAdapter(mFilterAdapter);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL);
@@ -134,15 +168,8 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
         mFilterList.addItemDecoration(dividerItemDecoration);
         mFilterList.setLayoutManager(new LinearLayoutManager(this));
 
-        List<ProgrammeInfo> programmes = new ArrayList<>();
-        List<Programme> l = new ArrayList<Programme>();
-        l.add(new Programme());
-        programmes.add(new ProgrammeInfo("first", l));
-        programmes.add(new ProgrammeInfo("first", l));
-        programmes.add(new ProgrammeInfo("first", l));
-
+        mProgrammes = new ArrayList<>();
         mResultsList.setLayoutManager(new LinearLayoutManager(this));
-        mResultsList.setAdapter(new ProgrammesAdapter(this, programmes));
 
         scrollView.setNestedScrollingEnabled(false);
         ViewCompat.setNestedScrollingEnabled(scrollView, false);
@@ -154,13 +181,21 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
 
     }
 
+    private void createAdapter() {
+        mProgrammesAdapter = new ProgrammesAdapter(this, mProgrammes);
+        mResultsList.setAdapter(mProgrammesAdapter);
+    }
+
     @OnCheckedChanged(R.id.allNetworks)
     void allNetworksChecked(CompoundButton b, boolean checked) {
         if(checked) {
             mFilterAdapter.disableAll();
+            mFilterAdapter.checkAll();
+            showNetworkProgrammesOnly();
         }
         else {
             mFilterAdapter.enableAll();
+            mFilterAdapter.checkAll();
         }
     }
 
@@ -171,14 +206,35 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
             mAllNetworks.setChecked(true);
             mAllNetworks.setAlpha(0.5f);
             mFilterAdapter.disableAll();
+            mFilterAdapter.checkAll();
             tvAllAgencies.setAlpha(0.5f);
         }
         else {
             mAllNetworks.setEnabled(true);
             mAllNetworks.setAlpha(1f);
-            mFilterAdapter.enableAll();
+            mFilterAdapter.disableAll();
+            mFilterAdapter.checkAll();
             tvAllAgencies.setAlpha(1f);
         }
+    }
+
+    private void showNetworkProgrammesOnly() {
+        ArrayList<ProgrammeInfo> list = new ArrayList<>();
+        List<String> keys = new ArrayList<>();
+
+        for(Map.Entry<String, FilterAdapter.NetworkHolder> holder : mFilterAdapter.getItems().entrySet()) {
+            for (String agencyId : holder.getValue().getIds()) {
+                if(keys.indexOf(agencyId) == -1) {
+                    keys.add(agencyId);
+                    list.add(new ProgrammeInfo(agencyList.get(agencyId), programmes.get(agencyId)));
+                }
+            }
+
+        }
+
+        mProgrammesAdapter = new ProgrammesAdapter(this, list);
+        mResultsList.setAdapter(mProgrammesAdapter);
+        mResultsList.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @Override
@@ -259,10 +315,131 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
     @Override
     public void onItemSelected(int position) {
 
+        ArrayList<ProgrammeInfo> list = new ArrayList<>();
+        List<String> keys = new ArrayList<>();
+
+        for(Integer pos : mFilterAdapter.getCheckedItems()) {
+            FilterAdapter.NetworkHolder holder = mFilterAdapter.getModel(pos);
+
+            for (String agencyId : holder.getIds()) {
+                if (keys.indexOf(agencyId) == -1) {
+                    keys.add(agencyId);
+
+                    list.add(new ProgrammeInfo(agencyList.get(agencyId), programmes.get(agencyId)));
+
+                }
+            }
+        }
+
+        mProgrammesAdapter = new ProgrammesAdapter(this, list);
+        mResultsList.setAdapter(mProgrammesAdapter);
+        mResultsList.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @Override
     public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
 
+    }
+
+    @Override
+    public void onDataChange(DataSnapshot dataSnapshot) {
+
+        for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+            ProgrammeModel model = snapshot.getValue(ProgrammeModel.class);
+            assert model != null;
+            model.setKey(snapshot.getKey());
+            assert filter.getLevel1() != null;
+            boolean hasLevel2 = filter.getLevel2() != null;
+
+            if(filter.getLevel1() == model.getLevel1() && (!hasLevel2 || filter.getLevel2().toString().equals(model.getLevel2()))) {
+                ArrayList<ProgrammeModel> models = programmes.get(model.getAgencyId());
+
+                if (programmes.get(model.getAgencyId()) == null) {
+                    models = new ArrayList<>();
+                }
+                models.add(model);
+                programmes.put(model.getAgencyId(), models);
+                agencyRequests.put(model.getAgencyId(), false);
+            }
+        }
+
+        for (String id : agencyRequests.keySet()) {
+            agencyRef.child(id).addValueEventListener(new AgencyListener());
+        }
+
+    }
+
+    @Override
+    public void onCancelled(DatabaseError databaseError) {
+
+    }
+
+    private class AgencyListener implements ValueEventListener {
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            AgencyModel model = dataSnapshot.getValue(AgencyModel.class);
+
+            assert model != null;
+            HashMap<String, Boolean> networks = null;
+            try {
+                networks = (HashMap<String, Boolean>)dataSnapshot.child("networks").getValue();
+            }
+            catch (Exception e) {
+
+            }
+
+            mProgrammes.add(new ProgrammeInfo(model, programmes.get(dataSnapshot.getKey())));
+            agencyRequests.put(dataSnapshot.getKey(), true);
+            agencyList.put(dataSnapshot.getKey(), model);
+
+            if(networks != null) {
+                for (String id : networks.keySet()) {
+                    DatabaseReference ref = networkRef.child(id);
+                    ref.addValueEventListener(new NetworkListener(dataSnapshot.getKey()));
+                }
+            }
+
+            if(allAgencyRequestsComplete()) {
+                createAdapter();
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    }
+
+    private class NetworkListener implements ValueEventListener {
+
+        private String key;
+
+        public NetworkListener(String key) {
+            this.key = key;
+        }
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+            String name = dataSnapshot.child("name").getValue(String.class);
+
+            mFilterAdapter.addItem(name, dataSnapshot.getKey(),key);
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    }
+
+    private boolean allAgencyRequestsComplete() {
+        boolean res = true;
+
+        for(Map.Entry<String, Boolean> entry : agencyRequests.entrySet()) {
+            Boolean value = entry.getValue();
+            res = res && value;
+        }
+        return res;
     }
 }
