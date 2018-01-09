@@ -16,6 +16,10 @@ public class AlertModel implements Serializable {
 
     private boolean isNetwork;
 
+    private String leadAgencyId;
+
+    private String agencyAdminId;
+
     private String key;
 
     private String parentKey;
@@ -218,5 +222,21 @@ public class AlertModel implements Serializable {
                 approval.getCountryDirector() != null &&
                 approval.getCountryDirector().size() > 0 &&
                 approval.getCountryDirector().entrySet().iterator().next().getValue() >= 1;
+    }
+
+    public String getLeadAgencyId() {
+        return leadAgencyId;
+    }
+
+    public void setLeadAgencyId(String leadAgencyId) {
+        this.leadAgencyId = leadAgencyId;
+    }
+
+    public String getAgencyAdminId() {
+        return agencyAdminId;
+    }
+
+    public void setAgencyAdminId(String agencyAdminId) {
+        this.agencyAdminId = agencyAdminId;
     }
 }

@@ -52,9 +52,6 @@ public class UserInfo {
     String userId;
 
     @Inject
-    Realm realm;
-
-    @Inject
     @AgencyRef
     DatabaseReference agencyRef;
 
@@ -69,7 +66,6 @@ public class UserInfo {
     }
 
     public void authUser(final AuthCallback authCallback) {
-        System.out.println("herehererererer");
         this.authCallback = authCallback;
 
         for (String nodeName : users) {
@@ -83,6 +79,7 @@ public class UserInfo {
     }
 
     private void saveUser(UserRealm user) {
+        Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(user);
         realm.commitTransaction();
@@ -107,6 +104,8 @@ public class UserInfo {
         if(userNode.child("agencyAdmin").hasChildren()) {
             agencyAdmin = userNode.child("agencyAdmin").getChildren().iterator().next().getKey();
             PreferHelper.putString(AlertApplication.getContext(), Constants.AGENCY_ID, agencyAdmin);
+            String agencyIDTemp = PreferHelper.getString(AlertApplication.getContext(), Constants.AGENCY_ID);
+            System.out.println("agencyIDTemp = " + agencyIDTemp);
         }
 
         if(userNode.child("systemAdmin").hasChildren()) {
@@ -152,6 +151,8 @@ public class UserInfo {
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+
+            System.out.println("user.exists() = " + dataSnapshot.child(userId).exists());
 
             if (dataSnapshot.child(userId).exists()) {
                 DataSnapshot userNode = dataSnapshot.child(userId);

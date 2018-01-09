@@ -112,7 +112,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
         countryID = user.countryID;
         isCountryDirector = user.isCountryDirector();
-        isCountryDirector = true;
+//        isCountryDirector = true;
 
         toolbar = (Toolbar) findViewById(R.id.action_toolbar);
         setSupportActionBar(toolbar);
@@ -272,7 +272,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
     private void setUpRedAlertRequestView() {
         Window window = getWindow();
-        if (isCountryDirector && alert.wasRedAlertRequested()) {
+        if (alert.isNetwork() && alert.getAgencyAdminId().equals(alert.getLeadAgencyId()) && alert.getAgencyAdminId().equals(user.getUserID())  && alert.wasRedAlertRequested() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setStatusBarColor(getResources().getColor(R.color.sBar_Gray));
             }
@@ -281,7 +281,17 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             clRequested.setVisibility(View.VISIBLE);
             llButtons.setVisibility(View.VISIBLE);
             setUserName();
-        } else if (!isCountryDirector && alert.wasRedAlertRequested()) {
+        }
+        else if (!alert.isNetwork() && isCountryDirector && alert.wasRedAlertRequested() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                window.setStatusBarColor(getResources().getColor(R.color.sBar_Gray));
+            }
+            toolbar.setBackgroundResource(R.color.alertGray);
+            txtActionBarTitle.setText(R.string.amber_alert_text);
+            clRequested.setVisibility(View.VISIBLE);
+            llButtons.setVisibility(View.VISIBLE);
+            setUserName();
+        } else if (!isCountryDirector && alert.wasRedAlertRequested() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setStatusBarColor(getResources().getColor(R.color.sBar_Gray));
             }

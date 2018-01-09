@@ -39,7 +39,7 @@ public class AlertApplication extends Application {
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.SAND;
 
     @SuppressLint("StaticFieldLeak")
     private static Context sContext;
@@ -50,7 +50,7 @@ public class AlertApplication extends Application {
         sContext = getApplicationContext();
         FirebaseApp.initializeApp(this);
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        FirebaseAuth.getInstance().signOut();
+//        FirebaseAuth.getInstance().signOut();
         Realm.init(this);
         // JODA
         JodaTimeAndroid.init(this);

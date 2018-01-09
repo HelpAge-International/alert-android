@@ -34,6 +34,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
@@ -44,6 +45,7 @@ import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 import org.alertpreparedness.platform.alert.model.User;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,7 +106,17 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     DatabaseReference baseAlertRef;
 
     @Inject
+    @NetworkRef
+    DatabaseReference networkRef;
+
+    @Inject
     User user;
+
+    @BindView(R.id.networkTitle)
+    TextView networkTitle;
+
+    @BindView(R.id.countryTitle)
+    TextView countryTitle;
 
     public TaskAdapter taskAdapter;
     public List<Tasks> tasksList;
@@ -116,6 +128,9 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     private AlertListener networkAlertListener = new AlertListener(true);
     private TaskListener taskListener = new TaskListener();
     private TaskListener indicatorListener = new TaskListener();
+    private NetworkListener networkListener = new NetworkListener();
+    private String agencyAdminId;
+    private String networkLeadId;
 
     @Nullable
     @Override
@@ -136,11 +151,10 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     }
 
     private void initViews() {
-        System.out.println("user.countryID = " + user);
-        agencyRef.addListenerForSingleValueEvent(agencyListener);
-        alertRef.addChildEventListener(alertListener);
+
         taskRef.addChildEventListener(taskListener);
         indicatorRef.addChildEventListener(indicatorListener);
+        networkRef.addValueEventListener(networkListener);
 
         alertRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager alertlayoutManager = new LinearLayoutManager(getContext());
@@ -149,10 +163,10 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
         networkAlertList.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        alertAdapter = new AlertAdapter(new HashMap<>(), getContext(), this);
+        alertAdapter = new AlertAdapter(getContext(), this);
         alertRecyclerView.setAdapter(alertAdapter);
 
-        networkAlertAdapter = new AlertAdapter(new HashMap<>(), getContext(), this);
+        networkAlertAdapter = new AlertAdapter(getContext(), this);
         networkAlertList.setAdapter(networkAlertAdapter);
 
         myTaskRecyclerView.setHasFixedSize(true);
@@ -192,12 +206,14 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
     @Override
     public void updateAlert(String id, AlertModel alert) {
+        countryTitle.setVisibility(View.VISIBLE);
         alertRecyclerView.setVisibility(View.VISIBLE);
         alertAdapter.update(id, alert);
         updateTitle();
     }
 
     public void updateNetworkAlert(String id, AlertModel alert) {
+        networkTitle.setVisibility(View.VISIBLE);
         networkAlertList.setVisibility(View.VISIBLE);
         networkAlertAdapter.update(id, alert);
     }
@@ -224,8 +240,9 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
         boolean noAlerts = false;
 
         updateTitle(R.string.green_alert_level, R.drawable.alert_green);
-        for(AlertModel a: alertAdapter.getAlerts()){
-            switch (a.getAlertLevel()) {
+        for(String a: alertAdapter.getAlerts()){
+            AlertModel model = alertAdapter.getModel(a);
+            switch (model.getAlertLevel()) {
                 case 2:
                     redPresent = true;
                     break;
@@ -291,27 +308,33 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
             assert model != null;
             model.setKey(dataSnapshot.getKey());
             model.setParentKey(dataSnapshot.getRef().getParent().getKey());
-            System.out.println("model = " + model);
 
             if(!isNetworkAlert) {
                 if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
                     updateAlert(dataSnapshot.getKey(), model);
                 }
             }
-            else if(isNetworkAlert && !model.hasNetworkApproval()) {
+            else if(!model.hasNetworkApproval()) {
+
+                model.setLeadAgencyId(networkLeadId);
+                model.setAgencyAdminId(agencyAdminId);
                 if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
-                    updateNetworkAlert(dataSnapshot.getKey(), model);
+                    System.out.println("updatednetworkalert");
+                    updateNetworkAlert(model.getKey(), model);
                 }
+
             }
         }
 
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            System.out.println("onChildAdded = [" + dataSnapshot + "], s = [" + s + "]");
             proccess(dataSnapshot, s);
         }
 
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            System.out.println("onChildChanged = [" + dataSnapshot + "], s = [" + s + "]");
             proccess(dataSnapshot, s);
         }
 
@@ -385,12 +408,12 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             HashMap<String, Boolean> networks = (HashMap<String, Boolean>) dataSnapshot.child("networks").getValue();
+            agencyAdminId = dataSnapshot.child("adminId").getValue(String.class);
 
             if(networks != null) {
                 for (String id : networks.keySet()) {
                     DatabaseReference ref = baseAlertRef.child(id);
                     ref.addChildEventListener(networkAlertListener);
-
                 }
             }
         }
@@ -399,5 +422,25 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
         public void onCancelled(DatabaseError databaseError) {
 
         }
+    }
+
+    private class NetworkListener implements ValueEventListener {
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+            onNetworkRetrieved(dataSnapshot);
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    }
+
+    private void onNetworkRetrieved(DataSnapshot snapshot) {
+        networkLeadId = snapshot.child("leadAgencyId").getValue(String.class);
+        agencyRef.addListenerForSingleValueEvent(agencyListener);
+        alertRef.addChildEventListener(alertListener);
     }
 }
