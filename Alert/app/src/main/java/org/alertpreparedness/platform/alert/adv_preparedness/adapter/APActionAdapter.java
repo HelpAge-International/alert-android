@@ -81,13 +81,15 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     }
 
     public void addUnassignedItem(String key, Action action) {
+        System.out.println("keys = " + keys.indexOf(key));
         if (keys.indexOf(key) == -1) {
             if (action.getLevel() != null
                     && action.getLevel() == Constants.APA
                     && action.getAssignee() == null
-                    && action.getTaskName() != null) {
-                if (action.getAssignee().equals(getActionType(Constants.MANDATED))
-                        || action.getAssignee().equals(getActionType(Constants.CUSTOM))) {
+                    && action.getTaskName() != null
+                    && action.getDueDate() == null) {
+                if (action.getActionType() == Constants.MANDATED
+                        || action.getActionType() == Constants.CUSTOM) {
                     keys.add(key);
                     items.put(key, action);
                     notifyItemInserted(keys.size() - 1);
@@ -160,16 +162,20 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(APActionAdapter.ViewHolder holder, int position) {
+        Action action = items.get(keys.get(position));
+        getDepartment(action.db, holder);
         holder.tvEmptyAction.setVisibility(View.GONE);
-        if (!items.isEmpty()) {
-            Action action = items.get(keys.get(position));
-            getDepartment(action.db, holder);
-            holder.tvActionType.setText(getActionType((int) action.getActionType()));
-            holder.tvActionName.setText(action.getTaskName());
-            holder.tvBudget.setText(getBudget(action.getBudget()));
-            holder.tvDueDate.setText(getDate(action.getDueDate()));
-            holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position, keys.get(position)));
-        } else {
+        holder.tvActionType.setText(getActionType((int) action.getActionType()));
+        holder.tvActionName.setText(action.getTaskName());
+        holder.tvBudget.setText(getBudget(action.getBudget()));
+        holder.tvDueDate.setText(getDate(action.getDueDate()));
+        holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position, keys.get(position)));
+
+        if (action.getDueDate() == null) {
+            holder.tvDueDate.setVisibility(View.GONE);
+        }
+
+        if (items.isEmpty()) {
             holder.tvEmptyAction.setVisibility(View.VISIBLE);
             holder.tvActionName.setVisibility(View.GONE);
             holder.tvActionType.setVisibility(View.GONE);
@@ -229,7 +235,11 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     }
 
     private String getDate(Long date) {
-        return "Due: " + format.format(new Date(date));
+        if(date != null) {
+            return "Due: " + format.format(new Date(date));
+        }else {
+            return "Not Assigned";
+        }
     }
 
     private String getActionType(int type) {
@@ -248,11 +258,7 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        if (!items.isEmpty() && items.size() > 0) {
-            return items.size();
-        } else {
-            return 1;
-        }
+        return items.size();
     }
 
     @Override
