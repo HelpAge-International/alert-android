@@ -104,7 +104,8 @@ public class ActionArchivedFragment extends InProgressFragment {
                     dueDate,
                     budget,
                     level,
-                    dbAgencyRef.getRef())
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef())
             );
 
         }

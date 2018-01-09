@@ -183,4 +183,6 @@
     <string name="txt_note_not_empty">Notes cannot be empty!</string>
     <string name="txt_update_due_date">Update due date</string>
     <string name="title_adv_preparedness">Adv. Preparedness</string>
+    <string name="txt_assign_action">Assign action</string>
+    <string name="txt_edit_action">Edit action</string>
 </resources>

@@ -20,6 +20,7 @@ public class Action {
     private Long level;
     private Uri path;
     public DatabaseReference db;
+    public DatabaseReference userRef;
 
 
     public Action() {
@@ -29,7 +30,7 @@ public class Action {
         this.path = path;
     }
 
-    public Action(String taskName, String department, String assignee, Boolean isArchived, Boolean isComplete, Long actionType, Long dueDate, Long budget, Long level, DatabaseReference db) {
+    public Action(String taskName, String department, String assignee, Boolean isArchived, Boolean isComplete, Long actionType, Long dueDate, Long budget, Long level, DatabaseReference db, DatabaseReference userRef) {
         this.taskName = taskName;
         this.department = department;
         this.assignee = assignee;
@@ -40,6 +41,7 @@ public class Action {
         this.budget = budget;
         this.level = level;
         this.db = db;
+        this.userRef = userRef;
     }
 
     public String getTaskName() {

@@ -25,6 +25,7 @@ import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAda
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
@@ -57,6 +58,10 @@ public class APAInProgressFragment extends Fragment implements APActionAdapter.I
     @Inject
     @AgencyRef
     DatabaseReference dbAgencyRef;
+
+    @Inject
+    @UserPublicRef
+    DatabaseReference dbUserPublicRef;
 
     private APActionAdapter mAPAdapter;
 
@@ -147,7 +152,8 @@ public class APAInProgressFragment extends Fragment implements APActionAdapter.I
                     dueDate,
                     budget,
                     level,
-                    dbAgencyRef.getRef())
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef())
             );
 
         }

@@ -26,6 +26,7 @@ import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAda
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
@@ -66,6 +67,10 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
     @AgencyRef
     DatabaseReference dbAgencyRef;
 
+    @Inject
+    @UserPublicRef
+    DatabaseReference dbUserPublicRef;
+
     private APActionAdapter mAPAdapter;
 
     @Nullable
@@ -102,7 +107,6 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
         return new APActionAdapter(getContext(), dbActionRef, this);
     }
 
-
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -110,24 +114,15 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
 
     @Override
     public void onActionItemSelected(int pos, String key) {
-        SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress).setClick(new MenuItem.OnMenuItemClickListener() {
+        SheetMenu.with(getContext()).setMenu(R.menu.menu_unassigned_apa).setClick(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
-                    case R.id.complete_action:
-                        Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
-                        startActivity(intent);
+                    case R.id.assign_action:
+                        
                         break;
-                    case R.id.reassign_action:
-                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
-                        break;
-                    case R.id.action_notes:
-                        intent = new Intent(getActivity(), AddNotesActivity.class);
-                        intent.putExtra("ACTION_KEY", key);
-                        startActivity(intent);
-                        break;
-                    case R.id.attachments:
-                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
+                    case R.id.edit_action:
+                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "EDIT ACTION", Snackbar.LENGTH_LONG).show();
                         break;
                 }
                 return false;
@@ -160,7 +155,8 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
                     dueDate,
                     budget,
                     level,
-                    dbAgencyRef.getRef())
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef())
             );
 
         }

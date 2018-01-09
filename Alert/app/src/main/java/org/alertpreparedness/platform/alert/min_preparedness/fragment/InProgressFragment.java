@@ -27,6 +27,7 @@ import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAda
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
@@ -62,6 +63,10 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     @Inject
     @AgencyRef
     DatabaseReference dbAgencyRef;
+
+    @Inject
+    @UserPublicRef
+    DatabaseReference dbUserPublicRef;
 
     private ActionAdapter mAdapter;
 
@@ -154,7 +159,8 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                     dueDate,
                     budget,
                     level,
-                    dbAgencyRef.getRef())
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef())
             );
 
         }
@@ -165,5 +171,6 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     public void onCancelled(DatabaseError databaseError) {
 
     }
+
 
 }

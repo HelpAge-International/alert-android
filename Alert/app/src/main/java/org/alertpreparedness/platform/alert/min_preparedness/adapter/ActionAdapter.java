@@ -167,7 +167,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     @Override
     public void onBindViewHolder(ActionAdapter.ViewHolder holder, int position) {
         Action action = items.get(keys.get(position));
-        getDepartment(action.db, holder);
+        getDepartment(action.db, action.userRef, action.getAssignee(), holder);
         holder.tvEmptyAction.setVisibility(View.GONE);
         holder.tvActionType.setText(getActionType((int) action.getActionType()));
         holder.tvActionName.setText(action.getTaskName());
@@ -190,14 +190,14 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     }
 
-    private void getDepartment(DatabaseReference db, ActionAdapter.ViewHolder holder) {
+    private void getDepartment(DatabaseReference db, DatabaseReference userRef, String assignee, ActionAdapter.ViewHolder holder) {
 
         db.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String department = (String) dataSnapshot.child("departments").getChildren().iterator().next().child("name").getValue();
-                holder.tvUserName.setText(department);
+                setUser(holder, userRef, assignee, department);
             }
 
             @Override
@@ -205,6 +205,28 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
             }
         });
+
+    }
+
+    private void setUser(ActionAdapter.ViewHolder holder, DatabaseReference userRef, String assignee, String department) {
+        if (assignee != null) {
+            userRef.child(assignee).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String firstname = (String) dataSnapshot.child("firstName").getValue();
+                    String lastname = (String) dataSnapshot.child("lastName").getValue();
+                    String fullname = String.format("%s %s", firstname, lastname);
+                    holder.tvUserName.setText(fullname + ", " + department);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        } else {
+            holder.tvUserName.setText("Unassigned, "+department);
+        }
 
     }
 

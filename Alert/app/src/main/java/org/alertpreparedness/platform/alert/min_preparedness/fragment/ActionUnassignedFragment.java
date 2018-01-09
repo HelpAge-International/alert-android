@@ -105,7 +105,8 @@ public class ActionUnassignedFragment extends InProgressFragment{
                     dueDate,
                     budget,
                     level,
-                    dbAgencyRef.getRef())
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef())
             );
 
         }

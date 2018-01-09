@@ -27,6 +27,7 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
@@ -42,7 +43,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAInactiveFragment  extends Fragment implements APActionAdapter.ItemSelectedListener, ValueEventListener {
+public class APAInactiveFragment extends Fragment implements APActionAdapter.ItemSelectedListener, ValueEventListener {
 
     public APAInactiveFragment() {
         // Required empty public constructor
@@ -71,6 +72,10 @@ public class APAInactiveFragment  extends Fragment implements APActionAdapter.It
     @Inject
     @AlertRef
     DatabaseReference dbAlertRef;
+
+    @Inject
+    @UserPublicRef
+    DatabaseReference dbUserPublicRef;
 
     private APActionAdapter mAPAdapter;
 
@@ -156,22 +161,22 @@ public class APAInactiveFragment  extends Fragment implements APActionAdapter.It
             Long budget = (Long) getChild.child("budget").getValue();
             Long level = (Long) getChild.child("level").getValue();
 
-
             dbAlertRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Long alertLevel = (Long) dataSnapshot.child("alertLevel").getValue();
                     mAPAdapter.addInActiveItem(getChild.getKey(), new Action(
-                            taskName,
-                            department,
-                            assignee,
-                            isArchived,
-                            isComplete,
-                            actionType,
-                            dueDate,
-                            budget,
-                            level,
-                            dbAgencyRef.getRef()),
+                                    taskName,
+                                    department,
+                                    assignee,
+                                    isArchived,
+                                    isComplete,
+                                    actionType,
+                                    dueDate,
+                                    budget,
+                                    level,
+                                    dbAgencyRef.getRef(),
+                                    dbUserPublicRef.getRef()),
                             alertLevel
                     );
 
@@ -183,7 +188,6 @@ public class APAInactiveFragment  extends Fragment implements APActionAdapter.It
                 }
             });
 
-
         }
 
     }
@@ -192,7 +196,6 @@ public class APAInactiveFragment  extends Fragment implements APActionAdapter.It
     public void onCancelled(DatabaseError databaseError) {
 
     }
-
 
 }
 

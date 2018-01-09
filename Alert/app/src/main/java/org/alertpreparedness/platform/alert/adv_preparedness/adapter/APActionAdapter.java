@@ -21,6 +21,7 @@ import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
 import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
+import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
@@ -163,7 +164,7 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     @Override
     public void onBindViewHolder(APActionAdapter.ViewHolder holder, int position) {
         Action action = items.get(keys.get(position));
-        getDepartment(action.db, holder);
+        getDepartment(action.db, action.userRef, action.getAssignee(), holder);
         holder.tvEmptyAction.setVisibility(View.GONE);
         holder.tvActionType.setText(getActionType((int) action.getActionType()));
         holder.tvActionName.setText(action.getTaskName());
@@ -186,14 +187,14 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
     }
 
-    private void getDepartment(DatabaseReference db, APActionAdapter.ViewHolder holder) {
+    private void getDepartment(DatabaseReference db, DatabaseReference userRef, String assignee, APActionAdapter.ViewHolder holder) {
 
         db.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String department = (String) dataSnapshot.child("departments").getChildren().iterator().next().child("name").getValue();
-                holder.tvUserName.setText(department);
+                setUser(holder, userRef, assignee, department);
             }
 
             @Override
@@ -201,6 +202,28 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
             }
         });
+
+    }
+
+    private void setUser(APActionAdapter.ViewHolder holder, DatabaseReference userRef, String assignee, String department) {
+        if (assignee != null) {
+            userRef.child(assignee).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String firstname = (String) dataSnapshot.child("firstName").getValue();
+                    String lastname = (String) dataSnapshot.child("lastName").getValue();
+                    String fullname = String.format("%s %s", firstname, lastname);
+                    holder.tvUserName.setText(fullname + ", " + department);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        } else {
+            holder.tvUserName.setText("Unassigned, "+department);
+        }
 
     }
 
