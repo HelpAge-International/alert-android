@@ -19,6 +19,7 @@ import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
 import org.alertpreparedness.platform.alert.helper.DataHandler;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
+import org.alertpreparedness.platform.alert.login.activity.SplashActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
@@ -79,4 +80,5 @@ public interface ApplicationComponent {
     void inject(APAInactiveFragment fragment);
     void inject(APActionAdapter adapter);
     void inject(UsersListDialogFragment fragment);
+    void inject(SplashActivity splashActivity);
 }

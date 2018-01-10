@@ -79,16 +79,18 @@ public class ActiveFragment extends Fragment implements ResponsePlansAdapter.Res
 
     @Override
     public void onResponsePlanSelected(int pos) {
-        ApprovalStatusDialog dialog = new ApprovalStatusDialog();
-        Bundle data = new Bundle();
-        ApprovalStatusObj[] items = new ApprovalStatusObj[] {
-                new ApprovalStatusObj("Country Director", mAdapter.getItem(pos).countryApproval),
-                new ApprovalStatusObj("Regional Director", mAdapter.getItem(pos).regionalApproval),
-                new ApprovalStatusObj("Global Director", mAdapter.getItem(pos).globalApproval)
-        };
-        data.putParcelableArray(ApprovalStatusDialog.APPROVAL_STATUSES, items);
-        dialog.setArguments(data);
-        dialog.show(getActivity().getSupportFragmentManager(), "alert_level");
+        if(mAdapter.getItem(pos).status > 0) {
+            ApprovalStatusDialog dialog = new ApprovalStatusDialog();
+            Bundle data = new Bundle();
+            ApprovalStatusObj[] items = new ApprovalStatusObj[]{
+                    new ApprovalStatusObj("Country Director", mAdapter.getItem(pos).countryApproval),
+                    new ApprovalStatusObj("Regional Director", mAdapter.getItem(pos).regionalApproval),
+                    new ApprovalStatusObj("Global Director", mAdapter.getItem(pos).globalApproval)
+            };
+            data.putParcelableArray(ApprovalStatusDialog.APPROVAL_STATUSES, items);
+            dialog.setArguments(data);
+            dialog.show(getActivity().getSupportFragmentManager(), "alert_level");
+        }
     }
 
     @SuppressWarnings("ConstantConditions")

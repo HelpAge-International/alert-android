@@ -42,14 +42,12 @@ import dagger.Provides;
 public class FirebaseModule {
 
     @Provides
-    @Singleton
     @ResponsePlansRef
     public DatabaseReference provideResponsePlansRef(@BaseDatabaseRef DatabaseReference db, User user) {
         return db.child("responsePlan").child(user.countryID);
     }
 
     @Provides
-    @Singleton
     @AlertRef
     public DatabaseReference providesAlert(@BaseAlertRef DatabaseReference db, User user) {
         return db.child(user.countryID);
@@ -64,35 +62,30 @@ public class FirebaseModule {
     }
 
     @Provides
-    @Singleton
     @AgencyRef
     public DatabaseReference provideAgencyRef(@BaseDatabaseRef DatabaseReference db, Context context) {
         return db.child("agency").child(PreferHelper.getString(context, Constants.AGENCY_ID));
     }
 
     @Provides
-    @Singleton
     @ActionRef
     public DatabaseReference provideActionRef(@BaseDatabaseRef DatabaseReference db, User user) {
         return db.child("action").child(user.countryID);
     }
 
     @Provides
-    @Singleton
     @IndicatorRef
     public DatabaseReference provideIndicatorRef(@BaseDatabaseRef DatabaseReference db, User user) {
         return db.child("indicator").child(user.countryID);
     }
 
     @Provides
-    @Singleton
     @UserRef
-    public DatabaseReference provideUserRef(@BaseDatabaseRef DatabaseReference db, @UserId @Nullable String userId) {
+    public DatabaseReference provideUserRef(@BaseDatabaseRef DatabaseReference db, @UserId String userId) {
         return db.child("userPublic").child(userId);
     }
 
     @Provides
-    @Singleton
     @ProgrammeRef
     public DatabaseReference providePrgrammes(@BaseDatabaseRef DatabaseReference db, User user) {
         return db.child("countryOfficeProfile").child("programme").child(user.countryID).child("4WMapping");
@@ -124,6 +117,7 @@ public class FirebaseModule {
     public DatabaseReference provideBaseAgencykRef(@BaseDatabaseRef DatabaseReference db) {
         return db.child("agency");
     }
+
     @Provides
     @NoteRef
     public DatabaseReference provideNoteRef(@BaseDatabaseRef DatabaseReference db, User user) {

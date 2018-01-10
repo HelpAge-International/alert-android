@@ -147,19 +147,19 @@ public class ResponsePlansAdapter extends RecyclerView.Adapter<ResponsePlansAdap
         holder.hazardType.setText(model.hazardType);
         holder.lastUpdated.setText(String.format(context.getString(R.string.last_updated_f), DateFormat.getDateInstance(DateFormat.SHORT).format(model.lastUpdated)));
         switch (model.status) {
-            case 0://grey
+            case 1://grey
                 holder.line.setBackgroundColor(context.getResources().getColor(R.color.alertGray));
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertGray));
                 holder.status.setText(R.string.waiting_approval);
                 holder.statusIcon.setImageResource(R.drawable.icon_pending_grey);
                 break;
-            case 1://green
+            case 2://green
                 holder.line.setBackgroundColor(context.getResources().getColor(R.color.alertGreen));
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertGreen));
                 holder.status.setText(R.string.approved);
                 holder.statusIcon.setImageResource(R.drawable.icon_status_complete);
                 break;
-            case 2://amber
+            case 0://amber
                 holder.line.setBackgroundColor(context.getResources().getColor(R.color.alertAmber));
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertAmber));
                 holder.status.setText(R.string.in_progress);

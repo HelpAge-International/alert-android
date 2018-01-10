@@ -52,8 +52,8 @@ public class ApplicationModule {
     }
 
     @Provides
-    public User provideUser(UserInfo provideUserInfo) {
-        return provideUserInfo.getUser();
+    public User provideUser(UserInfo info) {
+        return info.getUser();
     }
 
     @Provides
@@ -62,9 +62,8 @@ public class ApplicationModule {
     }
 
     @Provides
-    @Singleton
-    public UserInfo provideUserInfo(Context context) {
-        return new UserInfo(context);
+    public UserInfo provideUserInfo() {
+        return new UserInfo();
     }
 
     @Provides
@@ -101,13 +100,8 @@ public class ApplicationModule {
 
     @Provides
     @UserId
-    @Nullable
-    public String provideUserId() {
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            return FirebaseAuth.getInstance().getCurrentUser().getUid();
-        } else {
-            return null;
-        }
+    public String provideUserId(Context context) {
+        return PreferHelper.getString(context, Constants.UID);
     }
 
     @Provides

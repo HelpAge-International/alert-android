@@ -166,8 +166,8 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 try {
-                    String firstname = dataSnapshot.child("firstName").getValue().toString();
-                    String lastname = dataSnapshot.child("lastName").getValue().toString();
+                    String firstname = dataSnapshot.child("firstName").getValue(String.class);
+                    String lastname = dataSnapshot.child("lastName").getValue(String.class);
 
                     header.mUsername.setText(String.format("%s %s", firstname, lastname));
 

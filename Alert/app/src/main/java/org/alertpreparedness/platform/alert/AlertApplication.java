@@ -12,6 +12,11 @@ import com.squareup.leakcanary.LeakCanary;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
+import org.acra.ACRA;
+import org.acra.annotation.AcraMailSender;
+import org.acra.config.CoreConfigurationBuilder;
+import org.acra.config.MailSenderConfiguration;
+import org.acra.data.StringFormat;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
@@ -25,7 +30,7 @@ import timber.log.Timber;
 /**
  * Created by fei on 06/11/2017.
  */
-
+@AcraMailSender(mailTo = "tj@rolleragency.co.uk")
 public class AlertApplication extends Application {
 
     public static final boolean IS_LIVE = false;
@@ -54,6 +59,14 @@ public class AlertApplication extends Application {
         Realm.init(this);
         // JODA
         JodaTimeAndroid.init(this);
+
+
+        ACRA.init(this);
+
+        if(!PreferHelper.getBoolean(this, Constants.HAS_RUN_BEFORE)) {
+            FirebaseAuth.getInstance().signOut();
+            PreferHelper.putBoolean(this, Constants.HAS_RUN_BEFORE, true);
+        }
 
         // Live-Only additions
         if (!IS_LIVE) {

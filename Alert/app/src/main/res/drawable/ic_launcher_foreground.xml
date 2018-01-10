@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="108dp"
+        android:height="108dp"
+        android:viewportWidth="90.58442"
+        android:viewportHeight="90.58442">
+    <group android:translateX="32.29221"
+            android:translateY="29.792208">
+
+        <group
+            android:translateX="-41.000000"
+            android:translateY="-35.000000">
+            <group
+                android:translateX="41.000000"
+                android:translateY="35.000000">
+                <path
+                    android:fillColor="#E10514"
+                    android:fillType="evenOdd"
+                    android:strokeWidth="1"
+                    android:pathData="M22.5007668,22 C24.4327214,22 26,20.4397524 26,18.515691 L26,3.48414994
+    C26,1.55961127 24.4327214,0 22.5007668,0 C20.567432,0 19,1.55961127
+    19,3.48414994 L19,18.515691 C19,20.4397524 20.567432,22 22.5007668,22" />
+                <path
+                    android:fillColor="#F3A500"
+                    android:fillType="evenOdd"
+                    android:strokeWidth="1"
+                    android:pathData="M13.5007668,31 C15.432568,31 17,29.4399115 17,27.515691 L17,12.484309
+    C17,10.5597703 15.432568,9 13.5007668,9 C11.567432,9 10,10.5597703 10,12.484309
+    L10,27.515691 C10,29.4399115 11.567432,31 13.5007668,31" />
+                <path
+                    android:fillColor="#E10514"
+                    android:fillType="evenOdd"
+                    android:strokeWidth="1"
+                    android:pathData="M22.5001595,24 C20.5668475,24 19,25.5670951 19,27.4996809 C19,29.4325858
+    20.5668475,31 22.5001595,31 C24.4333121,31 26,29.4325858 26,27.4996809
+    C26,25.5670951 24.4333121,24 22.5001595,24" />
+                <path
+                    android:fillColor="#46AA31"
+                    android:fillType="evenOdd"
+                    android:strokeWidth="1"
+                    android:pathData="M3.49923323,18 C1.56681856,18 0,19.7957659 0,22.0112027 L0,26.9882905
+    C0,29.2035583 1.56681856,31 3.49923323,31 C5.43256802,31 7,29.2035583
+    7,26.9882905 L7,22.0112027 C7,19.7957659 5.43256802,18 3.49923323,18" />
+            </group>
+        </group>
+    </group>
+</vector>

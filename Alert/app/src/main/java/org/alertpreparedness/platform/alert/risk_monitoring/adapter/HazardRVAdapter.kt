@@ -26,7 +26,6 @@ import timber.log.Timber
 /**
  * Created by fei on 08/11/2017.
  */
-class Hazard(hazardId: String, indicators: List<ModelIndicator>) : ExpandableGroup<ModelIndicator>(hazardId, indicators)
 
 class HazardViewHolder(itemView: View, location:Int) : GroupViewHolder(itemView) {
     private val hazardTitle: TextView = itemView.findViewById(R.id.tvHazardName)
@@ -87,7 +86,8 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener,
             Constants.TRIGGER_GREEN -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_green, AlertApplication.getContext().theme)
-                } else {
+                }
+                else {
                     indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_green)
                 }
                 indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_GREEN]
@@ -97,7 +97,8 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener,
             Constants.TRIGGER_AMBER -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_amber, AlertApplication.getContext().theme)
-                } else {
+                }
+                else {
                     indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_amber)
                 }
                 indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_AMBER]
@@ -107,7 +108,8 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener,
             else -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_red, AlertApplication.getContext().theme)
-                } else {
+                }
+                else {
                     indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_red)
                 }
                 indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_RED]

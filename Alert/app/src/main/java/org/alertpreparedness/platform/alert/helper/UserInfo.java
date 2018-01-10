@@ -5,6 +5,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -57,13 +58,19 @@ public class UserInfo {
     @AgencyRef
     DatabaseReference agencyRef;
 
+    @Inject @BaseDatabaseRef
+    DatabaseReference db;
+
+    @Inject
+    Context context;
+
+    @Inject
+    Realm realm;
+
     private UserAuthenticationListener listener = new UserAuthenticationListener();
     private AuthCallback authCallback;
-    private DatabaseReference db;
-    private Context context;
 
-    public UserInfo(Context context) {
-        this.context = context;
+    public UserInfo() {
         DependencyInjector.applicationComponent().inject(this);
     }
 
@@ -83,21 +90,40 @@ public class UserInfo {
         }
     }
 
-    private void saveUser(UserRealm user) {
-        Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
-        realm.copyToRealmOrUpdate(user);
-        realm.commitTransaction();
-        realm.close();
+    private void saveUser(User user) {
+        String serializedUser = new Gson().toJson(user);
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putString(PREFS_USER, serializedUser)
+                .apply();
     }
 
     public User getUser() {
-        UserRealm r = new UserRealm().getByPrimaryKey(Realm.getDefaultInstance(), userId);
-        if(r == null) {
-            return new User();
-        }
-        return r.toUser();
+        String serializedUser = PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(PREFS_USER, null);
+
+        return new Gson().fromJson(serializedUser, User.class);
     }
+
+//    private void saveUser(UserRealm user) {
+//        System.out.println("SAVINGUSER" + user);
+//        realm.beginTransaction();
+//        realm.copyToRealmOrUpdate(user);
+//        realm.commitTransaction();
+//        realm.close();
+//    }
+//
+//    public User getUser(String userId) {
+//        UserRealm obj = realm.where(UserRealm.class).equalTo("userId", userId).findFirst();
+//        if(obj != null) {
+//            return obj.toUser();
+//        }
+//        else {
+//            System.out.println("exitting userId = " + userId);
+//            System.exit(0);
+//        }
+//        return null;
+//    }
 
     private void populateUser(String nodeName, DataSnapshot userNode) {
 
@@ -126,8 +152,7 @@ public class UserInfo {
         PreferHelper.putInt(AlertApplication.getContext(), Constants.USER_TYPE, userType);
 
         UserRealm user = new UserRealm(userId, agencyAdmin, systemAdmin, countryId, userType, nodeName.equals("countryDirector"));
-        System.out.println("user = " + user);
-        saveUser(user);
+        saveUser(user.toUser());
         if(authCallback != null) {
             authCallback.onUserAuthorized(user.toUser());
         }
@@ -150,6 +175,20 @@ public class UserInfo {
             default:
                 return -1;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "UserInfo{" +
+                "database=" + database +
+                ", userId='" + userId + '\'' +
+                ", agencyRef=" + agencyRef +
+                ", listener=" + listener +
+                ", authCallback=" + authCallback +
+                ", db=" + db +
+                ", User=" + getUser() +
+                ", context=" + context +
+                '}';
     }
 
     private class UserAuthenticationListener implements ValueEventListener {

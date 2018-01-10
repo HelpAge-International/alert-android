@@ -322,7 +322,6 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
                 txtRedRequested.setText(getRedDisplayText(firstname, lastname));
 
-                User user = new User(firstname, lastname, email);
             }
 
             @Override

@@ -27,6 +27,8 @@ android {
 }
 
 dependencies {
+    def acraVersion = '5.0.0'
+    implementation "ch.acra:acra-mail:$acraVersion"
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
