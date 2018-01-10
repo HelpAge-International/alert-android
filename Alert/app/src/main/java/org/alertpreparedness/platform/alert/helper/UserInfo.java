@@ -2,6 +2,7 @@ package org.alertpreparedness.platform.alert.helper;
 
 import android.content.Context;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
@@ -49,6 +50,7 @@ public class UserInfo {
 
     @Inject
     @UserId
+    @Nullable
     String userId;
 
     @Inject
@@ -65,7 +67,8 @@ public class UserInfo {
         DependencyInjector.applicationComponent().inject(this);
     }
 
-    public void authUser(final AuthCallback authCallback) {
+    public void authUser(final AuthCallback authCallback, String userId) {
+        this.userId = userId;
         this.authCallback = authCallback;
 
         for (String nodeName : users) {
@@ -75,7 +78,9 @@ public class UserInfo {
     }
 
     public void removeListeners() {
-        db.removeEventListener(listener);
+        if(db != null) {
+            db.removeEventListener(listener);
+        }
     }
 
     private void saveUser(UserRealm user) {
@@ -151,9 +156,6 @@ public class UserInfo {
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-
-            System.out.println("user.exists() = " + dataSnapshot.child(userId).exists());
-
             if (dataSnapshot.child(userId).exists()) {
                 DataSnapshot userNode = dataSnapshot.child(userId);
                 populateUser(dataSnapshot.getKey(), userNode);

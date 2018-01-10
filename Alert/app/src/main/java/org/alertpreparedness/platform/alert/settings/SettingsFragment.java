@@ -27,6 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserEmail;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
@@ -56,7 +57,7 @@ public class SettingsFragment extends Fragment implements ValueEventListener {
     @BindView(R.id.btnChangeEmail)
     Button mChangeEmail;
 
-    @Inject @UserRef
+    @Inject @UserRef @Nullable
     DatabaseReference userRef;
 
     private String email;
@@ -93,12 +94,10 @@ public class SettingsFragment extends Fragment implements ValueEventListener {
 
     @OnClick(R.id.btnChangeEmail)
     void onChangeEmailClick(View v) {
-
         Intent intent = new Intent(getContext(), ChangeEmailActivity.class);
         intent.putExtra(ChangeEmailActivity.EMAIL_KEY, email);
         startActivityForResult(intent, CHANGE_EMAIL);
         getActivity().overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
-
     }
 
     @OnClick(R.id.btnChangePassword)

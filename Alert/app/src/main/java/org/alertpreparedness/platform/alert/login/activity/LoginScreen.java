@@ -162,10 +162,12 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     public void onComplete(@NonNull Task<AuthResult> task) {
         if (task.isSuccessful()) {
             if (firebaseAuth.getCurrentUser()!=null) {
-                PreferHelper.putString(this, Constants.UID, firebaseAuth.getCurrentUser().getUid());
+                System.out.println("uid = " + firebaseAuth.getCurrentUser().getUid());
 
+                PreferHelper.putString(this, Constants.UID, firebaseAuth.getCurrentUser().getUid());
+                System.out.println(PreferHelper.getString(this, Constants.UID));
                 progressDialog.dismiss();
-                userInfo.authUser(this);
+                userInfo.authUser(this, PreferHelper.getString(this, Constants.UID));
             }
         }
     }

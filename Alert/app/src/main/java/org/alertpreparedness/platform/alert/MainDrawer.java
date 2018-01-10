@@ -30,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserEmail;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
@@ -95,7 +96,7 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     @BindView(R.id.normal_action_bar)
     CardView normalActionbarContainer;
 
-    @Inject @UserRef
+    @Inject @UserRef @Nullable
     DatabaseReference userRef;
 
     @Inject @AgencyRef

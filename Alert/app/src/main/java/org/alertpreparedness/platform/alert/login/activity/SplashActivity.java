@@ -19,7 +19,7 @@ public class SplashActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         String uid = getUid();
-
+        System.out.println("uid = " + uid);
         /*
          * Showing splash screen with a timer. This will be useful when you
          * want to show case your app logo / company

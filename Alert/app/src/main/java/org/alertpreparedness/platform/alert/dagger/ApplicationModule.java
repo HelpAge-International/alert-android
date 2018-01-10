@@ -5,13 +5,16 @@ package org.alertpreparedness.platform.alert.dagger;
  */
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.dagger.annotation.AppStatusConst;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserEmail;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.User;
@@ -39,7 +42,8 @@ public class ApplicationModule {
         this.application = application;
     }
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     public AlertApplication provideApplication() {
         return application;
     }
@@ -54,33 +58,58 @@ public class ApplicationModule {
         return Realm.getDefaultInstance();
     }
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     public UserInfo provideUserInfo(Context context) {
         return new UserInfo(context);
     }
 
-    @Provides @Singleton @BaseDatabaseRef
+    @Provides
+    @Singleton
+    @BaseDatabaseRef
     public DatabaseReference provideFirebaseRef(@AppStatusConst String appStatus) {
         return FirebaseDatabase.getInstance().getReference().child(appStatus);
     }
 
-    @Provides @Singleton @AppStatusConst
+    @Provides
+    @Singleton
+    @AppStatusConst
     public String provideAppStatus() {
         return PreferHelper.getString(application, Constants.APP_STATUS);
     }
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     public Context provideContext() {
         return application;
     }
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     public SimpleDateFormat provideDateFomatter() {
         return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
     }
 
-    @Provides @UserId
-    public String provideUserId(Context context) {
-        return PreferHelper.getString(context, Constants.UID);
+    @Provides
+    @UserId
+    @Nullable
+    public String provideUserId() {
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            return FirebaseAuth.getInstance().getCurrentUser().getUid();
+        } else {
+            return null;
+        }
+    }
+
+    @Provides
+    @UserEmail
+    @Nullable
+    public String provideUserEmail() {
+        try {
+            return FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        }
+        catch (NullPointerException e) {
+            return null;
+        }
     }
 }

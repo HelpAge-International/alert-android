@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.alert.dagger;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import com.google.firebase.database.DatabaseReference;
 
@@ -15,6 +16,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ProgrammeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -80,8 +82,8 @@ public class FirebaseModule {
     @Provides
     @Singleton
     @UserRef
-    public DatabaseReference provideUserRef(@BaseDatabaseRef DatabaseReference db, Context context) {
-        return db.child("userPublic").child(PreferHelper.getString(context, Constants.AGENCY_ID));
+    public DatabaseReference provideUserRef(@BaseDatabaseRef DatabaseReference db, @UserId @Nullable String userId) {
+        return db.child("userPublic").child(userId);
     }
 
     @Provides

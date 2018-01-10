@@ -39,7 +39,7 @@ public class AlertApplication extends Application {
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.SAND;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING;
 
     @SuppressLint("StaticFieldLeak")
     private static Context sContext;
