@@ -1,5 +1,7 @@
 package org.alertpreparedness.platform.alert.min_preparedness.model;
 
+import android.net.Uri;
+
 import com.google.firebase.database.DatabaseReference;
 
 /**
@@ -15,9 +17,20 @@ public class Action {
     private Long actionType;
     private Long dueDate;
     private Long budget;
+    private Long level;
+    private Uri path;
     public DatabaseReference db;
+    public DatabaseReference userRef;
 
-    public Action(String taskName, String department, String assignee, Boolean isArchived, Boolean isComplete, Long actionType, Long dueDate, Long budget, DatabaseReference db) {
+
+    public Action() {
+    }
+
+    public Action(Uri path) {
+        this.path = path;
+    }
+
+    public Action(String taskName, String department, String assignee, Boolean isArchived, Boolean isComplete, Long actionType, Long dueDate, Long budget, Long level, DatabaseReference db, DatabaseReference userRef) {
         this.taskName = taskName;
         this.department = department;
         this.assignee = assignee;
@@ -26,7 +39,9 @@ public class Action {
         this.actionType = actionType;
         this.dueDate = dueDate;
         this.budget = budget;
+        this.level = level;
         this.db = db;
+        this.userRef = userRef;
     }
 
     public String getTaskName() {
@@ -91,5 +106,37 @@ public class Action {
 
     public void setComplete(Boolean complete) {
         isComplete = complete;
+    }
+
+    public Long getLevel() {
+        return level;
+    }
+
+    public void setLevel(Long level) {
+        this.level = level;
+    }
+
+    public Uri getPath() {
+        return path;
+    }
+
+    public void setPath(Uri path) {
+        this.path = path;
+    }
+
+    @Override
+    public String toString() {
+        return "Action{" +
+                "isArchived=" + isArchived +
+                ", isComplete=" + isComplete +
+                ", taskName='" + taskName + '\'' +
+                ", department='" + department + '\'' +
+                ", assignee='" + assignee + '\'' +
+                ", actionType=" + actionType +
+                ", dueDate=" + dueDate +
+                ", budget=" + budget +
+                ", level=" + level +
+                ", db=" + db +
+                '}';
     }
 }

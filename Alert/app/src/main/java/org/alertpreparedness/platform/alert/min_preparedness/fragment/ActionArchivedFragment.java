@@ -10,6 +10,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 
@@ -28,35 +30,46 @@ import butterknife.ButterKnife;
 
 public class ActionArchivedFragment extends InProgressFragment {
 
-    @BindView(R.id.rvArchived)
-    RecyclerView mActionArchivedRV;
+    @Nullable
+    @BindView(R.id.rvMinAction)
+    RecyclerView mActionRV;
+
+    @Nullable
+    @BindView(R.id.tvStatus)
+    TextView tvActionArchived;
+
+    @Nullable
+    @BindView(R.id.imgStatus)
+    ImageView imgArchived;
 
     private ActionAdapter mAdapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_action_archived, container, false);
+        View v = inflater.inflate(R.layout.content_minimum, container, false);
 
         ButterKnife.bind(this, v);
         DependencyInjector.applicationComponent().inject(this);
 
         initViews();
 
-        ((MainDrawer) getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.NORMAL, R.string.title_min_preparedness);
-        ((MainDrawer) getActivity()).removeActionbarElevation();
-
         return v;
     }
 
     private void initViews() {
+        assert imgArchived != null;
+        imgArchived.setImageResource(R.drawable.ic_close_round_gray);
+        assert tvActionArchived != null;
+        tvActionArchived.setText("Archived");
+        tvActionArchived.setTextColor(getResources().getColor(R.color.alertGray));
 
         mAdapter = getmAdapter();
-        mActionArchivedRV.setAdapter(mAdapter);
+        mActionRV.setAdapter(mAdapter);
 
-        mActionArchivedRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mActionArchivedRV.setItemAnimator(new DefaultItemAnimator());
-        mActionArchivedRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+        mActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mActionRV.setItemAnimator(new DefaultItemAnimator());
+        mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
         dbActionRef.addValueEventListener(this);
     }
@@ -79,6 +92,7 @@ public class ActionArchivedFragment extends InProgressFragment {
             Long actionType = (Long) getChild.child("type").getValue();
             Long dueDate = (Long) getChild.child("dueDate").getValue();
             Long budget = (Long) getChild.child("budget").getValue();
+            Long level =  (Long) getChild.child("level").getValue();
 
             mAdapter.addArchivedItem(getChild.getKey(), new Action(
                     taskName,
@@ -89,7 +103,9 @@ public class ActionArchivedFragment extends InProgressFragment {
                     actionType,
                     dueDate,
                     budget,
-                    dbAgencyRef.getRef())
+                    level,
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef())
             );
 
         }

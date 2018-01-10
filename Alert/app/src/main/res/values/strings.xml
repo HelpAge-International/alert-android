@@ -162,7 +162,7 @@
     <string name="existing_password">Existing password</string>
     <string name="enter_new_password_error">Please enter a new password</string>
     <string name="reenter_new_password_error">Please re-enter your new password</string>
-    <string name="passwords_dont_match_error">Your new password don't match. Please try again</string>
+    <string name="passwords_dont_match_error">Your new password don\'t match. Please try again</string>
     <string name="curreny_pas_incorrect_error">Your current password is incorrect. Please try again</string>
     <string name="passwords_dont_match_temp_error">Passwords don\'t match</string>
     <string name="couldnt_update_password_error">Could not update password at this time, please ensure you have a data connection and try again</string>
@@ -175,4 +175,17 @@
     <string name="network">Network</string>
     <string name="country">Country</string>
     <string name="no_programmes">There are no programmes in this region</string>
+    <string name="txt_confirm">CONFIRM</string>
+    <string name="txt_completion_note">Add a completion note (required)</string>
+    <string name="txt_add_attachments">+ Add attachments (required)</string>
+    <string name="txt_take_photo">Take photo</string>
+    <string name="txt_take_video">Take video</string>
+    <string name="txt_select_file">Select file</string>
+    <string name="txt_err_complete_action_note">A completion note is required to complete this action. Please enter and try again</string>
+    <string name="txt_err_add_attachments">An attachment is required to complete this action. Please enter and try again</string>
+    <string name="txt_note_not_empty">Notes cannot be empty!</string>
+    <string name="txt_update_due_date">Update due date</string>
+    <string name="title_adv_preparedness">Adv. Preparedness</string>
+    <string name="txt_assign_action">Assign action</string>
+    <string name="txt_edit_action">Edit action</string>
 </resources>

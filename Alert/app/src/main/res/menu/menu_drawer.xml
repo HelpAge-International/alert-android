@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:id="@+id/main" android:checkableBehavior="single">
         <item
             android:orderInCategory="0"
@@ -8,7 +9,8 @@
         <item
             android:orderInCategory="0"
             android:id="@+id/nav_risk"
-            android:title="@string/nav_risk" />
+            android:title="@string/nav_risk"
+            app:showAsAction=""/>
         <item
             android:orderInCategory="0"
             android:id="@+id/nav_minimum"

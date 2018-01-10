@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.alert.min_preparedness.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -13,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,12 +23,18 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
+import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
+import org.alertpreparedness.platform.alert.utils.Constants;
 
 import javax.inject.Inject;
 
@@ -44,8 +52,9 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     }
 
     @Nullable
-    @BindView(R.id.rvInProgress)
+    @BindView(R.id.rvMinAction)
     RecyclerView mActionRV;
+
 
     @Inject
     @ActionRef
@@ -55,26 +64,28 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     @AgencyRef
     DatabaseReference dbAgencyRef;
 
+    @Inject
+    @UserPublicRef
+    DatabaseReference dbUserPublicRef;
+
     private ActionAdapter mAdapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_in_progress, container, false);
+        View v = inflater.inflate(R.layout.content_minimum, container, false);
 
         ButterKnife.bind(this, v);
         DependencyInjector.applicationComponent().inject(this);
 
         initViews();
 
-        ((MainDrawer) getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.NORMAL, R.string.title_min_preparedness);
-        ((MainDrawer) getActivity()).removeActionbarElevation();
         return v;
     }
 
     private void initViews() {
-
         mAdapter = getmAdapter();
+        assert mActionRV != null;
         mActionRV.setAdapter(mAdapter);
 
         mActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -82,11 +93,13 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
         dbActionRef.addValueEventListener(this);
+
     }
 
     protected ActionAdapter getmAdapter() {
         return new ActionAdapter(getContext(), dbActionRef, this);
     }
+
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -94,19 +107,23 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     }
 
     @Override
-    public void onActionItemSelected(int pos) {
+    public void onActionItemSelected(int pos, String key) {
         SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress).setClick(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.complete_action:
-                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "In progress Clicked", Snackbar.LENGTH_LONG).show();
+                        Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
+                        intent.putExtra("ACTION_KEY", key);
+                        startActivity(intent);
                         break;
                     case R.id.reassign_action:
                         Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
                         break;
                     case R.id.action_notes:
-                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Notes Clicked", Snackbar.LENGTH_LONG).show();
+                        intent = new Intent(getActivity(), AddNotesActivity.class);
+                        intent.putExtra("ACTION_KEY", key);
+                        startActivity(intent);
                         break;
                     case R.id.attachments:
                         Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
@@ -130,6 +147,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
             Long actionType = (Long) getChild.child("type").getValue();
             Long dueDate = (Long) getChild.child("dueDate").getValue();
             Long budget = (Long) getChild.child("budget").getValue();
+            Long level = (Long) getChild.child("level").getValue();
 
             mAdapter.addInProgressItem(getChild.getKey(), new Action(
                     taskName,
@@ -140,7 +158,9 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                     actionType,
                     dueDate,
                     budget,
-                    dbAgencyRef.getRef())
+                    level,
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef())
             );
 
         }
@@ -151,5 +171,6 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     public void onCancelled(DatabaseError databaseError) {
 
     }
+
 
 }

@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- <uses-permission android:name="android.permission.CAMERA" /> -->
+
 
     <!-- Leak canary needs access to External storage to save heap dumps -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -29,7 +31,7 @@
         <activity
             android:windowSoftInputMode="adjustPan|adjustResize"
             android:name=".login.activity.LoginScreen"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".dashboard.activity.HomeScreen"
             android:launchMode="singleTask"
@@ -40,12 +42,12 @@
             android:resource="@array/preloaded_fonts" />
 
         <activity android:name=".MainDrawer" />
-        <!--<activity-->
-            <!--android:name=".risk_monitoring.vRiskFragmentvity"-->
-            <!--android:label="@string/title_activity_risk"-->
-            <!--android:launchMode="singleTask"-->
-            <!--android:screenOrientation="portrait"-->
-            <!--android:theme="@style/AppTheme.NoActionBar" />-->
+        <!-- <activity -->
+        <!-- android:name=".risk_monitoring.vRiskFragmentvity" -->
+        <!-- android:label="@string/title_activity_risk" -->
+        <!-- android:launchMode="singleTask" -->
+        <!-- android:screenOrientation="portrait" -->
+        <!-- android:theme="@style/AppTheme.NoActionBar" /> -->
         <activity
             android:name=".risk_monitoring.view.AddIndicatorActivity"
             android:label="@string/title_activity_add_indicator"
@@ -57,10 +59,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:windowSoftInputMode="adjustPan"
             android:name=".dashboard.activity.CreateAlertActivity"
             android:label="@string/title_activity_create_alert"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".dashboard.activity.HazardSelectionActivity"
             android:label="@string/select_hazard_title"
@@ -80,27 +82,36 @@
             android:name=".risk_monitoring.view.UpdateIndicatorActivity"
             android:label="@string/title_activity_update_indicator"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".risk_monitoring.view.LogIndicatorActivity"
             android:label="@string/title_activity_log_indicator"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".risk_monitoring.view.IndicatorLogActivity"
             android:label="@string/title_activity_indicator_log"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".dashboard.activity.UpdateAlertActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:theme="@style/AppTheme"
-            android:label="@string/progrmme_results"
             android:name=".mycountry.ProgramResultsActivity"
-            android:screenOrientation="portrait" />
-        <activity android:label="@string/change_email" android:name=".settings.ChangeEmailActivity" />
-        <activity android:label="@string/change_password" android:name=".settings.ChangePasswordActivity" />
+            android:label="@string/progrmme_results"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".settings.ChangeEmailActivity"
+            android:label="@string/change_email" />
+        <activity
+            android:name=".settings.ChangePasswordActivity"
+            android:label="@string/change_password" />
+        <activity
+            android:name=".min_preparedness.activity.CompleteActionActivity"
+            android:label="@string/txt_complete_action" />
+        <activity android:name=".min_preparedness.activity.AddNotesActivity"
+            android:label="Notes" />
     </application>
 
 </manifest>

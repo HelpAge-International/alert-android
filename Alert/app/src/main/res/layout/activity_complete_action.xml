@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity">
+
+
+    <LinearLayout
+        android:id="@+id/llCompleteAction"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <include
+            android:id="@+id/toolbar_layout"
+            layout="@layout/actionbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/actionBarSize" />
+
+        <EditText
+            android:id="@+id/etCompletionNote"
+            android:layout_width="match_parent"
+            android:layout_height="170dp"
+            android:layout_marginBottom="100dp"
+            android:layout_marginLeft="@dimen/space_16"
+            android:layout_marginRight="@dimen/space_16"
+            android:layout_marginTop="@dimen/space_16"
+            android:backgroundTint="@android:color/transparent"
+            android:ems="10"
+            android:hint="@string/txt_completion_note"
+            android:inputType="text|textMultiLine|textCapSentences"
+            android:lines="2"
+            android:maxLines="4"
+            android:minLines="2"
+            android:scrollbars="vertical"
+            android:singleLine="false" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/space_16"
+            android:paddingStart="@dimen/space_16">
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="@dimen/space_275"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:paddingBottom="@dimen/space_16"
+                android:gravity="start"
+                android:text="@string/txt_attachments"
+                android:textAlignment="textStart"
+                android:textColor="@color/btnColor"
+                android:textStyle="bold" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rvCompletionAttachments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/space_16"
+                android:paddingBottom="@dimen/space_16">
+
+            </android.support.v7.widget.RecyclerView>
+
+            <TextView
+                android:id="@+id/txtAddAttachments"
+                android:layout_width="@dimen/space_275"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size"
+                android:text="@string/txt_add_attachments" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.alertpreparedness.platform.alert.adv_preparedness.fragment.AdvPreparednessFragment;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserEmail;
@@ -52,6 +53,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 import io.reactivex.Observable;
 
 public class MainDrawer extends BaseActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
@@ -70,7 +72,8 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     static class HeaderViews {
         @BindView(R.id.tvUserName) TextView mUsername;
         @BindView(R.id.tvDepartment) TextView mDepartment;
-        @BindView(R.id.img_profile) ImageView logo;
+        @BindView(R.id.img_profile)
+        CircleImageView logo;
     }
 
     final HeaderViews header = new HeaderViews();
@@ -147,6 +150,7 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                 String urlPath = (String)dataSnapshot.child("logoPath").getValue();
                 Glide.with(MainDrawer.this)
                         .load(urlPath)
+                        .dontAnimate()
                         .placeholder(R.drawable.agency_icon_placeholder)
                         .into(header.logo);
             }
@@ -279,6 +283,9 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                     break;
                 case R.id.nav_minimum:
                     Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> setFragment(new MinPreparednessFragment()));
+                    break;
+                case R.id.nav_advanced:
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> setFragment(new AdvPreparednessFragment()));
                     break;
                 case R.id.nav_response:
                     Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> setFragment(new ResponsePlanFragment()));

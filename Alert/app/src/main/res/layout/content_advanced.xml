@@ -1,11 +1,10 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cl_archived"
+    android:id="@+id/cl_in_progress"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/divider_color"
-    tools:context="org.alertpreparedness.platform.alert.min_preparedness.fragment.ActionArchivedFragment">
+    android:background="@color/divider_color">
 
     <android.support.v7.widget.CardView
         android:layout_width="0dp"
@@ -28,7 +27,7 @@
 
 
             <LinearLayout
-                android:id="@+id/llArchived"
+                android:id="@+id/linearLayout2"
                 android:layout_width="match_parent"
                 android:layout_height="42dp"
                 android:gravity="center_vertical|center_horizontal"
@@ -41,25 +40,25 @@
 
                 <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:padding="5dp">
 
                     <ImageView
-                        android:id="@+id/imgArchived"
-                        android:layout_width="13dp"
+                        android:id="@+id/imgStatus"
+                        android:layout_gravity="center_vertical"
+                        android:layout_width="16dp"
                         android:layout_height="16dp"
-                        android:paddingTop="4dp"
-                        app:srcCompat="@drawable/bg_circle" />
+                        app:srcCompat="@drawable/ic_in_progress" />
 
                     <TextView
-                        android:id="@+id/tvArchived"
+                        android:id="@+id/tvStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="right"
+                        android:layout_gravity="center_vertical"
                         android:paddingLeft="9dp"
-                        android:text="Archived"
+                        android:text="In Progress"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="@color/alertGray"
+                        android:textColor="@color/alertAmber"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -75,10 +74,11 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/llArchived" />
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/rvArchived"
+                android:id="@+id/rvAdvAction"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"

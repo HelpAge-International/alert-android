@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.storage.StorageReference;
 
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyBaseRef;
@@ -16,7 +17,11 @@ import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ProgrammeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.TaskRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
+import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -93,6 +98,11 @@ public class FirebaseModule {
         return db.child("countryOfficeProfile").child("programme").child(user.countryID).child("4WMapping");
     }
 
+    @Provides
+    @UserPublicRef
+    public DatabaseReference provideUserPublicRef(@BaseDatabaseRef DatabaseReference db) {
+        return db.child("userPublic");
+    }
 
     @Provides
     @Singleton
@@ -114,5 +124,17 @@ public class FirebaseModule {
     public DatabaseReference provideBaseAgencykRef(@BaseDatabaseRef DatabaseReference db) {
         return db.child("agency");
     }
+    @Provides
+    @NoteRef
+    public DatabaseReference provideNoteRef(@BaseDatabaseRef DatabaseReference db, User user) {
+        return db.child("note").child(user.countryID);
+    }
 
+
+//    @Provides
+//    @Singleton
+//    @TaskRef
+//    public DatabaseReference provideTask(@BaseDatabaseRef DatabaseReference db) {
+//        return db.child("task");
+//    }
 }

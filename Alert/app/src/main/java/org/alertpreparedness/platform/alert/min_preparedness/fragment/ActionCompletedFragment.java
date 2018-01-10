@@ -10,6 +10,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 
@@ -28,34 +30,47 @@ import butterknife.ButterKnife;
 
 public class ActionCompletedFragment extends InProgressFragment {
 
-    @BindView(R.id.rvCompleted)
-    RecyclerView mActionCompleteRV;
+    @Nullable
+    @BindView(R.id.rvMinAction)
+    RecyclerView mActionRV;
+
+    @Nullable
+    @BindView(R.id.tvStatus)
+    TextView tvActionCompleted;
+
+    @Nullable
+    @BindView(R.id.imgStatus)
+    ImageView imgCompleted;
 
     private ActionAdapter mAdapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_action_completed, container, false);
+        View v = inflater.inflate(R.layout.content_minimum, container, false);
 
         ButterKnife.bind(this, v);
         DependencyInjector.applicationComponent().inject(this);
 
         initViews();
 
-        ((MainDrawer) getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.NORMAL, R.string.title_min_preparedness);
-        ((MainDrawer) getActivity()).removeActionbarElevation();
         return v;
     }
 
     private void initViews() {
 
-        mAdapter = getmAdapter();
-        mActionCompleteRV.setAdapter(mAdapter);
+        assert imgCompleted != null;
+        imgCompleted.setImageResource(R.drawable.icon_status_complete);
+        assert tvActionCompleted != null;
+        tvActionCompleted.setText("Completed");
+        tvActionCompleted.setTextColor(getResources().getColor(R.color.alertGreen));
 
-        mActionCompleteRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mActionCompleteRV.setItemAnimator(new DefaultItemAnimator());
-        mActionCompleteRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+        mAdapter = getmAdapter();
+        mActionRV.setAdapter(mAdapter);
+
+        mActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mActionRV.setItemAnimator(new DefaultItemAnimator());
+        mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
         dbActionRef.addValueEventListener(this);
     }
@@ -78,6 +93,7 @@ public class ActionCompletedFragment extends InProgressFragment {
             Long actionType = (Long) getChild.child("type").getValue();
             Long dueDate = (Long) getChild.child("dueDate").getValue();
             Long budget = (Long) getChild.child("budget").getValue();
+            Long level =  (Long) getChild.child("level").getValue();
 
             mAdapter.addCompletedItem(getChild.getKey(), new Action(
                     taskName,
@@ -88,7 +104,9 @@ public class ActionCompletedFragment extends InProgressFragment {
                     actionType,
                     dueDate,
                     budget,
-                    dbAgencyRef.getRef())
+                    level,
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef())
             );
 
         }

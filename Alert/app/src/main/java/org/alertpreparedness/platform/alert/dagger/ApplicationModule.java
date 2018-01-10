@@ -10,12 +10,15 @@ import android.support.annotation.Nullable;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.dagger.annotation.AppStatusConst;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserEmail;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseStorageRef;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -86,6 +89,12 @@ public class ApplicationModule {
 
     @Provides
     @Singleton
+    @BaseStorageRef
+    public StorageReference provideFirebaseStorageRef() {
+        return FirebaseStorage.getInstance().getReference();
+    }
+
+    @Provides @Singleton
     public SimpleDateFormat provideDateFomatter() {
         return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
     }

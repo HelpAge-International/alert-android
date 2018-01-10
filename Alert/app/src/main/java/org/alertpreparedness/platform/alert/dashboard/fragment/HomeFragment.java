@@ -443,4 +443,5 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
         agencyRef.addListenerForSingleValueEvent(agencyListener);
         alertRef.addChildEventListener(alertListener);
     }
+
 }

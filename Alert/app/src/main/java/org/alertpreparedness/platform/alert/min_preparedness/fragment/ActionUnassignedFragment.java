@@ -7,9 +7,12 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 
@@ -27,34 +30,46 @@ import butterknife.ButterKnife;
  */
 
 public class ActionUnassignedFragment extends InProgressFragment{
-    @BindView(R.id.rvUnassigned)
-    RecyclerView mUnassignedRV;
+
+    @Nullable
+    @BindView(R.id.rvMinAction)
+    RecyclerView mActionRV;
+
+    @Nullable
+    @BindView(R.id.tvStatus)
+    TextView tvActionUnassigned;
+
+    @Nullable
+    @BindView(R.id.imgStatus)
+    ImageView imgUnassigned;
 
     private ActionAdapter mUnassignedAdapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_action_unassigned, container, false);
+        View v = inflater.inflate(R.layout.content_minimum, container, false);
 
         ButterKnife.bind(this, v);
         DependencyInjector.applicationComponent().inject(this);
 
         initViews();
 
-        ((MainDrawer) getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.NORMAL, R.string.title_min_preparedness);
-        ((MainDrawer) getActivity()).removeActionbarElevation();
-
         return v;
     }
 
     private void initViews() {
-        mUnassignedAdapter= getmAdapter();
-        mUnassignedRV.setAdapter(mUnassignedAdapter);
+        assert imgUnassigned != null;
+        imgUnassigned.setImageResource(R.drawable.ic_close_round);
+        assert tvActionUnassigned != null;
+        tvActionUnassigned.setText("Unassigned");
+        tvActionUnassigned.setTextColor(getResources().getColor(R.color.alertRed));
 
-        mUnassignedRV.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mUnassignedRV.setItemAnimator(new DefaultItemAnimator());
-        mUnassignedRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+        mUnassignedAdapter= getmAdapter();
+        mActionRV.setAdapter(mUnassignedAdapter);
+        mActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mActionRV.setItemAnimator(new DefaultItemAnimator());
+        mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
         dbActionRef.addValueEventListener(this);
     }
@@ -78,6 +93,7 @@ public class ActionUnassignedFragment extends InProgressFragment{
             Long actionType = (Long) getChild.child("type").getValue();
             Long dueDate = (Long) getChild.child("dueDate").getValue();
             Long budget = (Long) getChild.child("budget").getValue();
+            Long level =  (Long) getChild.child("level").getValue();
 
             mUnassignedAdapter.addUnassignedItem(getChild.getKey(), new Action(
                     taskName,
@@ -88,7 +104,9 @@ public class ActionUnassignedFragment extends InProgressFragment{
                     actionType,
                     dueDate,
                     budget,
-                    dbAgencyRef.getRef())
+                    level,
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef())
             );
 
         }
