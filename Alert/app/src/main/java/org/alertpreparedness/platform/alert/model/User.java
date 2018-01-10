@@ -17,6 +17,12 @@ public class User implements Serializable {
     private String userID;
     private String systemAdminID;
 
+    enum UserLevel {
+        STANDARD,
+        COUNTRY_DIRECTOR,
+        COUNTRY_OFFICE_ADMIN
+    }
+
     @Override
     public String toString() {
         return "User{" +

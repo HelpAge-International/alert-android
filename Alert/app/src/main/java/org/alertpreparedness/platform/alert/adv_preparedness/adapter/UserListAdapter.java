@@ -22,6 +22,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by faizmohideen on 09/01/2018.
@@ -44,6 +45,12 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
         this.keys = new ArrayList<>(items.keySet());
     }
 
+    public UserListAdapter(Context context, List<UserModel> list) {
+        this.context = context;
+        this.list = list;
+        this.keys = new ArrayList<>(items.keySet());
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.rbUsers)
         RadioButton radioButtonUsers;
@@ -51,6 +58,12 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+        }
+
+        @OnClick(R.id.rbUsers)
+        void onCLick(View v) {
+            System.out.println("getAdapterPosition() = " + getAdapterPosition());
+            listener.onActionItemSelected(getItem(getAdapterPosition()));
         }
     }
 
@@ -75,13 +88,16 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
         holder.radioButtonUsers.setText(user.getFullName());
 
     }
-
+    public UserModel getItem(int index) {
+        return items.get(keys.get(index));
+    }
     @Override
     public int getItemCount() {
         return items.size();
     }
 
     public interface ItemSelectedListener {
+        void onActionItemSelected(UserModel user);
     }
 
 }

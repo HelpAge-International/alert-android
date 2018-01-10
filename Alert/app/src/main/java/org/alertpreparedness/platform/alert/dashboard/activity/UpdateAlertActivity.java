@@ -17,6 +17,7 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.dashboard.model.Alert;
+import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -43,6 +44,9 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
     @Inject @AlertRef
     DatabaseReference alertRef;
 
+    @Inject
+    User user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +59,7 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
         DependencyInjector.applicationComponent().inject(this);
 
         mToolbar.setTitle(R.string.update_alert);
-        countryID = UserInfo.getUser(this).countryID;
+        countryID = user.countryID;
 
         fetchDetails();
         setUpActionBarColour();

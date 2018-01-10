@@ -14,6 +14,12 @@ import java.util.List;
 
 public class AlertModel implements Serializable {
 
+    private boolean isNetwork;
+
+    private String leadAgencyId;
+
+    private String agencyAdminId;
+
     private String key;
 
     private String parentKey;
@@ -119,7 +125,10 @@ public class AlertModel implements Serializable {
     }
 
     public boolean wasRedAlertRequested() {
-        return approval == null || approval.getCountryDirector() == null || approval.getCountryDirector().size() == 0;
+        return approval == null ||
+                approval.getCountryDirector() == null ||
+                approval.getCountryDirector().size() == 0 ||
+                (alertLevel == 2 && approval.getCountryDirector().entrySet().iterator().next().getValue() == 0);
     }
 
     public ApprovalModel getApproval() {
@@ -173,7 +182,9 @@ public class AlertModel implements Serializable {
     @Override
     public String toString() {
         return "AlertModel{" +
-                "key='" + key + '\'' +
+                "isNetwork=" + isNetwork +
+                ", key='" + key + '\'' +
+                ", parentKey='" + parentKey + '\'' +
                 ", affectedAreas=" + affectedAreas +
                 ", alertLevel=" + alertLevel +
                 ", hazardScenario=" + hazardScenario +
@@ -196,5 +207,36 @@ public class AlertModel implements Serializable {
 
     public void setParentKey(String parentKey) {
         this.parentKey = parentKey;
+    }
+
+    public boolean isNetwork() {
+        return isNetwork;
+    }
+
+    public void setNetwork(boolean network) {
+        isNetwork = network;
+    }
+
+    public boolean hasNetworkApproval() {
+        return approval != null &&
+                approval.getCountryDirector() != null &&
+                approval.getCountryDirector().size() > 0 &&
+                approval.getCountryDirector().entrySet().iterator().next().getValue() >= 1;
+    }
+
+    public String getLeadAgencyId() {
+        return leadAgencyId;
+    }
+
+    public void setLeadAgencyId(String leadAgencyId) {
+        this.leadAgencyId = leadAgencyId;
+    }
+
+    public String getAgencyAdminId() {
+        return agencyAdminId;
+    }
+
+    public void setAgencyAdminId(String agencyAdminId) {
+        this.agencyAdminId = agencyAdminId;
     }
 }

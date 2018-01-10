@@ -6,6 +6,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.leakcanary.LeakCanary;
 
@@ -18,6 +19,7 @@ import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
 import timber.log.Timber;
 
 /**
@@ -42,20 +44,16 @@ public class AlertApplication extends Application {
     @SuppressLint("StaticFieldLeak")
     private static Context sContext;
 
-//    public static List<Activity> mActivities = new ArrayList<>();
-
     @Override
     public void onCreate() {
         super.onCreate();
         sContext = getApplicationContext();
         FirebaseApp.initializeApp(this);
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-
+      //  FirebaseAuth.getInstance().signOut();
+        Realm.init(this);
         // JODA
         JodaTimeAndroid.init(this);
-
-        // FCM
-//        FCMNotifications.setup(CustomProcessor.class, getApplicationContext(), API_KEY);
 
         // Live-Only additions
         if (!IS_LIVE) {
@@ -76,16 +74,18 @@ public class AlertApplication extends Application {
         // Check APP Status
         if (CURRENT_STATUS == APP_STATUS.LIVE) {
             PreferHelper.putString(getApplicationContext(), Constants.APP_STATUS, Constants.APP_STATUS_LIVE);
-        } else if (CURRENT_STATUS == APP_STATUS.TESTING) {
+        }
+        else if (CURRENT_STATUS == APP_STATUS.TESTING) {
             PreferHelper.putString(getApplicationContext(), Constants.APP_STATUS, Constants.APP_STATUS_TEST);
-        } else if (CURRENT_STATUS == APP_STATUS.UAT) {
+        }
+        else if (CURRENT_STATUS == APP_STATUS.UAT) {
             PreferHelper.putString(getApplicationContext(), Constants.APP_STATUS, Constants.APP_STATUS_UAT);
-        } else if (CURRENT_STATUS == APP_STATUS.SAND) {
+        }
+        else if (CURRENT_STATUS == APP_STATUS.SAND) {
             PreferHelper.putString(getApplicationContext(), Constants.APP_STATUS, Constants.APP_STATUS_SAND);
         }
 
         DependencyInjector.initialize(this);
-
 
     }
 

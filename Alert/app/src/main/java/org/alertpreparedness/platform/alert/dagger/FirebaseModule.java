@@ -7,6 +7,7 @@ import com.google.firebase.storage.StorageReference;
 
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionStorageRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.AgencyBaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
@@ -14,6 +15,8 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardOtherRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.ProgrammeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
@@ -87,6 +90,14 @@ public class FirebaseModule {
 
     @Provides
     @Singleton
+    @ProgrammeRef
+    public DatabaseReference providePrgrammes(@BaseDatabaseRef DatabaseReference db, User user) {
+        return db.child("countryOfficeProfile").child("programme").child(user.countryID).child("4WMapping");
+    }
+
+
+    @Provides
+    @Singleton
     @UserPublicRef
     public DatabaseReference provideUserPublicRef(@BaseDatabaseRef DatabaseReference db) {
         return db.child("userPublic");
@@ -97,6 +108,20 @@ public class FirebaseModule {
     @HazardOtherRef
     public DatabaseReference provideHazardOtherRef(@BaseDatabaseRef DatabaseReference db) {
         return db.child("hazardOther");
+    }
+
+    @Provides
+    @Singleton
+    @NetworkRef
+    public DatabaseReference provideNetworkRef(@BaseDatabaseRef DatabaseReference db) {
+        return db.child("network");
+    }
+
+    @Provides
+    @Singleton
+    @AgencyBaseRef
+    public DatabaseReference provideBaseAgencykRef(@BaseDatabaseRef DatabaseReference db) {
+        return db.child("agency");
     }
 
     @Provides

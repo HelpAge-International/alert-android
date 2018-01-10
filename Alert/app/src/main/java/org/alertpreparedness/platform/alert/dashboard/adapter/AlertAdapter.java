@@ -11,15 +11,19 @@ import android.widget.TextView;
 
 import org.alertpreparedness.platform.alert.ExtensionHelperKt;
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
+import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,14 +38,17 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
 
     private Context context;
     private OnAlertItemClickedListener listener;
-    private HashMap<String, AlertModel> alertsMap;
-    private List<AlertModel> alertsList = new ArrayList<>();
+    private HashMap<String, AlertModel> items = new HashMap<>();
+    private List<String> keys = new ArrayList<>();
     private final static String _TAG = "Adapter";
     private boolean isCountryDirector;
 
-    public AlertAdapter(@NonNull HashMap<String, AlertModel> alertsMap, Context context, OnAlertItemClickedListener listener) {
-        this.isCountryDirector = UserInfo.getUser(context).isCountryDirector();
-        this.alertsMap = alertsMap;
+    @Inject
+    User user;
+
+    public AlertAdapter(Context context, OnAlertItemClickedListener listener) {
+        DependencyInjector.applicationComponent().inject(this);
+        this.isCountryDirector = user.isCountryDirector();
         this.context = context;
         this.listener = listener;
     }
@@ -54,36 +61,55 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(AlertAdapter.ViewHolder holder, int position) {
-        AlertModel alert = alertsList.get(position);
+        AlertModel alert = items.get(keys.get(position));
         holder.bind(alert);
     }
 
     public void remove(String id){
-        alertsMap.remove(id);
-        updateList();
+        int index = keys.indexOf(id);
+        keys.remove(index);
+        items.remove(id);
+        notifyItemRemoved(index);
     }
 
-    private void updateList() {
-        alertsList.clear();
-        alertsList.addAll(alertsMap.values());
-        Collections.sort(alertsList, (o1, o2) -> Long.compare(o2.getAlertLevel(), o1.getAlertLevel()));
-
-        notifyDataSetChanged();
-    }
+//    private void updateList() {
+//        alertsList.clear();
+//        alertsList.addAll(alertsMap.values());
+//        Collections.sort(alertsList, (o1, o2) -> Long.compare(o2.getAlertLevel(), o1.getAlertLevel()));
+//
+//        notifyDataSetChanged();
+//    }
 
     public void update(String id, AlertModel alert) {
-        alertsMap.put(id, alert);
-
-        updateList();
+//        System.out.println("id = [" + id + "], alert = [" + alert + "]");
+        int index = keys.indexOf(id);
+        if(index == -1) {
+            keys.add(id);
+            items.put(id, alert);
+            notifyItemInserted(keys.size() - 1);
+        }
+        else {
+            items.put(id, alert);
+            notifyDataSetChanged();
+        }
+        if(alert.isNetwork() && alert.hasNetworkApproval() || alert.getAlertLevel() == Constants.TRIGGER_GREEN) {
+            keys.remove(index);
+            items.remove(id);
+            notifyItemRemoved(index);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return alertsMap.size();
+        return keys.size();
     }
 
-    public List<AlertModel> getAlerts() {
-        return alertsList;
+    public List<String> getAlerts() {
+        return keys;
+    }
+
+    public AlertModel getModel(String key) {
+        return items.get(key);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -118,7 +144,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         public void onClick(View v) {
             int position = getAdapterPosition();
             if (listener != null) {
-                listener.onAlertItemClicked(alertsList.get(position));
+                listener.onAlertItemClicked(items.get(keys.get(position)));
             }
         }
 
@@ -138,11 +164,13 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
                     fetchIcon(hazardName, imgHazardIcon);
                     tvAlertLevel.setText(R.string.red_alert_text);
                     imgAlertColour.setImageResource(R.drawable.red_alert_left);
+                    txtRedRequested.setVisibility(View.GONE);
                     break;
                 case Constants.TRIGGER_AMBER:
                     fetchIcon(hazardName, imgHazardIcon);
                     tvAlertLevel.setText(R.string.amber_alert_text);
                     imgAlertColour.setImageResource(R.drawable.amber_alert_left);
+                    txtRedRequested.setVisibility(View.GONE);
                     break;
             }
 
@@ -155,14 +183,17 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
 
             tvPeopleCount.setText(getNumOfPeopleText(alert.getEstimatedPopulation(), alert.getAffectedAreas().size()));
 
-            System.out.println("isCountryDirector && alert.wasRedAlertRequested() = " + (isCountryDirector && alert.wasRedAlertRequested()));
-
-            if(isCountryDirector && alert.wasRedAlertRequested()) {
+            if(isCountryDirector && alert.wasRedAlertRequested() && !alert.isNetwork() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
                 txtRedRequested.setVisibility(View.VISIBLE);
                 imgAlertColour.setImageResource(R.drawable.gray_alert_left);
                 txtRedRequested.setText(R.string.txt_cd_red_request);
             }
-            else if(alert.wasRedAlertRequested() && !isCountryDirector) {
+            else if(alert.isNetwork() && alert.wasRedAlertRequested() && alert.getAgencyAdminId().equals(alert.getLeadAgencyId()) && alert.getAgencyAdminId().equals(user.getUserID())  && alert.getAlertLevel() == Constants.TRIGGER_RED) {
+                txtRedRequested.setVisibility(View.VISIBLE);
+                imgAlertColour.setImageResource(R.drawable.gray_alert_left);
+                txtRedRequested.setText(R.string.txt_cd_red_request);
+            }
+            else if(alert.wasRedAlertRequested() && !isCountryDirector && alert.getAlertLevel() == Constants.TRIGGER_RED) {
                 txtRedRequested.setVisibility(View.VISIBLE);
                 imgAlertColour.setImageResource(R.drawable.gray_alert_left);
                 txtRedRequested.setText(R.string.txt_red_requested);

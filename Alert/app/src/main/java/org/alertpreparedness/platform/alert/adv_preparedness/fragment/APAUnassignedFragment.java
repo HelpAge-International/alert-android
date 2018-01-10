@@ -23,6 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
+import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
@@ -41,7 +42,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAUnassignedFragment extends Fragment implements APActionAdapter.ItemSelectedListener, ValueEventListener {
+public class APAUnassignedFragment extends Fragment implements APActionAdapter.ItemSelectedListener, ValueEventListener, UsersListDialogFragment.ItemSelectedListener {
 
     public APAUnassignedFragment() {
         // Required empty public constructor
@@ -72,6 +73,7 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
     DatabaseReference dbUserPublicRef;
 
     private APActionAdapter mAPAdapter;
+    private UsersListDialogFragment dialog = new UsersListDialogFragment();
 
     @Nullable
     @Override
@@ -82,6 +84,8 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
         DependencyInjector.applicationComponent().inject(this);
 
         initViews();
+
+        dialog.setListener(this);
 
         return v;
     }
@@ -119,7 +123,6 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.assign_action:
-                        UsersListDialogFragment dialog = new UsersListDialogFragment();
                         dialog.show(getActivity().getFragmentManager(), "users_list");
                         break;
                     case R.id.edit_action:
@@ -137,7 +140,7 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
         for (DataSnapshot getChild : dataSnapshot.getChildren()) {
 
             String taskName = (String) getChild.child("task").getValue();
-            String department = (String) getChild.child("departments").getValue();
+            String department = (String) getChild.child("department").getValue();
             String assignee = (String) getChild.child("asignee").getValue();
             Boolean isArchived = (Boolean) getChild.child("isArchived").getValue();
             Boolean isComplete = (Boolean) getChild.child("isComplete").getValue();
@@ -170,5 +173,8 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
     }
 
 
+    @Override
+    public void onItemSelected(UserModel userModel) {
+        System.out.println("userModel = [" + userModel + "]");
+    }
 }
-

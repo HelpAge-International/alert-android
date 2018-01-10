@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -26,6 +27,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.helper.RightDrawableOnTouchListener;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
@@ -34,6 +36,8 @@ import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
+
+import javax.inject.Inject;
 
 import timber.log.Timber;
 
@@ -46,16 +50,18 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     private TextView txt_forgotPasword;
     private ProgressDialog progressDialog;
     private FirebaseAuth firebaseAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-    private UserInfo userInfo = new UserInfo();
-    private final static String TAG = "LoginActivity";
     private boolean isPasswordShowing = false;
+
+    @Inject
+    UserInfo userInfo;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_screen);
+
+        DependencyInjector.applicationComponent().inject(this);
 
         progressDialog = new ProgressDialog(this);
         firebaseAuth = FirebaseAuth.getInstance();
@@ -101,7 +107,6 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
         if (TextUtils.isEmpty(email)) {
             SnackbarHelper.show(this, getString(R.string.enter_email_error));
-
             return;
         }
 
@@ -119,9 +124,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onUserAuthorized(User user) {
-//        progressDialog.dismiss();
-        startActivity(new Intent(LoginScreen.this, HomeScreen.class));
-        userInfo.clearAll();
+        startActivity(new Intent(this, HomeScreen.class));
         finish();
     }
 
@@ -159,17 +162,18 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     public void onComplete(@NonNull Task<AuthResult> task) {
         if (task.isSuccessful()) {
             if (firebaseAuth.getCurrentUser()!=null) {
-                Timber.tag("uid").w(firebaseAuth.getCurrentUser().getUid());
                 PreferHelper.putString(this, Constants.UID, firebaseAuth.getCurrentUser().getUid());
 
                 progressDialog.dismiss();
-                userInfo.authUser(this, getContext());
+                userInfo.authUser(this);
             }
         }
-        else {
-            Timber.tag("signInWithEmail").w("Eher");
+    }
 
-        }
+    @Override
+    public void onStop() {
+        super.onStop();
+        userInfo.removeListeners();
     }
 }
 

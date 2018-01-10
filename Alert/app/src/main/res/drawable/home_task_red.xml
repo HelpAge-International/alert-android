@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="18dp"
+    android:height="18dp"
+    android:viewportWidth="18"
+    android:viewportHeight="18">
+
+    <group
+        android:translateX="-22.000000"
+        android:translateY="-362.000000">
+        <group
+            android:translateX="22.000000"
+            android:translateY="360.000000">
+            <group
+                android:translateY="2.000000">
+                <path
+                    android:fillColor="@color/alertRed"
+                    android:fillType="evenOdd"
+                    android:strokeWidth="1"
+                    android:pathData="M10.191645,9.95301 C10.191645,10.58454 9.6579,11.096595 9.000225,11.096595
+C8.341965,11.096595 7.808355,10.58454 7.808355,9.95301 L7.808355,5.019615
+C7.808355,4.38795 8.341965,3.876075 9.000225,3.876075 C9.6579,3.876075
+10.191645,4.38795 10.191645,5.019615 L10.191645,9.95301 Z M9.000045,14.12397
+C8.34174,14.12397 7.808445,13.590225 7.808445,12.93228 C7.808445,12.274155
+8.34174,11.740725 9.000045,11.740725 C9.65817,11.740725 10.1916,12.274155
+10.1916,12.93228 C10.1916,13.590225 9.65817,14.12397 9.000045,14.12397
+L9.000045,14.12397 Z M9,0 C4.029435,0 0,4.029435 0,9 C0,13.970565 4.029435,18
+9,18 C13.970565,18 18,13.970565 18,9 C18,4.029435 13.970565,0 9,0 L9,0 Z" />
+            </group>
+        </group>
+    </group>
+</vector>

@@ -9,12 +9,15 @@ import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder;
 import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder;
 
+import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.firebase.ProgrammeModel;
 
 import java.util.List;
 
@@ -53,16 +56,14 @@ public class ProgrammesAdapter extends ExpandableRecyclerViewAdapter<ProgrammesA
     @Override
     public void onBindChildViewHolder(ProgrammeInfoViewHolder holder, int flatPosition, ExpandableGroup group,
                                       int childIndex) {
-        final Programme programme = ((ProgrammeInfo) group).getItems().get(childIndex);
+        final ProgrammeModel programme = ((ProgrammeInfo) group).getItems().get(childIndex);
 
     }
 
     @Override
     public void onBindGroupViewHolder(ProgrammeHolder holder, int flatPosition, ExpandableGroup group) {
-        holder.setTitle(group);
+        holder.bind(group);
     }
-
-
 
     public class ProgrammeInfoViewHolder extends ChildViewHolder {
 
@@ -86,7 +87,7 @@ public class ProgrammesAdapter extends ExpandableRecyclerViewAdapter<ProgrammesA
             ButterKnife.bind(this, itemView);
         }
 
-        public void onBind(Programme artist) {
+        public void bind(ProgrammeModel model) {
 
         }
     }
@@ -107,8 +108,13 @@ public class ProgrammesAdapter extends ExpandableRecyclerViewAdapter<ProgrammesA
             ButterKnife.bind(this, itemView);
         }
 
-        public void setTitle(ExpandableGroup group) {
+        public void bind(ExpandableGroup group) {
+            ProgrammeInfo info = (ProgrammeInfo)group;
             title.setText(group.getTitle());
+            Glide.with(context)
+                    .load(info.getAgency().getLogoPath())
+                    .placeholder(R.drawable.agency_icon_placeholder)
+                    .into(icon);
         }
 
         @Override

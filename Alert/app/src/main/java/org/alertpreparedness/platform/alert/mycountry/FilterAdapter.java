@@ -14,6 +14,8 @@ import android.widget.TextView;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.utils.SimpleAdapter;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -26,10 +28,13 @@ import butterknife.ButterKnife;
 class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.MyViewHolder> {
 
     private Context context;
-    private List<String> strings;
+    private HashMap<String, NetworkHolder> items = new HashMap<>();
+    private List<String> keys = new ArrayList<>();
+    private List<Integer> checkedItems = new ArrayList<>();
     private FilterAdapter.SelectListener listener;
 
     private boolean enabled;
+    private boolean checked;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
@@ -45,10 +50,12 @@ class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.MyViewHolder> {
         }
     }
 
+    public HashMap<String, NetworkHolder> getItems() {
+        return items;
+    }
 
-    public FilterAdapter(Context context, List<String> lit, FilterAdapter.SelectListener listener) {
+    public FilterAdapter(Context context, FilterAdapter.SelectListener listener) {
         this.context = context;
-        this.strings = lit;
         this.listener = listener;
     }
 
@@ -60,16 +67,45 @@ class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.MyViewHolder> {
         return new FilterAdapter.MyViewHolder(itemView);
     }
 
-    @Override
-    public void onBindViewHolder(FilterAdapter.MyViewHolder holder, int position) {
-        holder.view.setText(strings.get(position));
-        holder.checkBox.setOnCheckedChangeListener((compoundButton, b) -> listener.onItemSelected(position));
-        if(enabled) {
-            holder.view.setEnabled(true);
-            holder.checkBox.setEnabled(true);
+    public void addItem(String title, String networkId, String agencyId) {
+        if(keys.indexOf(networkId) == -1) {
+            keys.add(networkId);
+            items.put(networkId, new NetworkHolder(title, agencyId));
+            checkedItems.add(keys.size() - 1);
+            notifyItemInserted(keys.size() - 1);
         }
         else {
-//            holder.view.setTextColor(context.getResources().getColor(R.color.divider_gray));
+            items.get(networkId).agencyIds.add(agencyId);
+        }
+    }
+
+    public NetworkHolder getModel(int pos) {
+        return items.get(keys.get(pos));
+    }
+
+    public List<Integer> getCheckedItems() {
+        return checkedItems;
+    }
+
+    @Override
+    public void onBindViewHolder(FilterAdapter.MyViewHolder holder, int position) {
+        holder.view.setText(items.get(keys.get(position)).getTitle());
+        holder.checkBox.setOnCheckedChangeListener((compoundButton, checked) -> {
+            if(checked) {
+                checkedItems.add(position);
+            }
+            else {
+                checkedItems.remove(checkedItems.indexOf(position));
+            }
+            listener.onItemSelected(position);
+        });
+        if(checked) {
+            holder.checkBox.setEnabled(true);
+        }
+        if(enabled) {
+            holder.view.setEnabled(true);
+        }
+        else {
             holder.view.setAlpha(0.5f);
             holder.checkBox.setAlpha(0.5f);
             holder.view.setEnabled(false);
@@ -79,7 +115,7 @@ class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.MyViewHolder> {
 
     @Override
     public int getItemCount() {
-        return strings.size();
+        return keys.size();
     }
 
     public void disableAll() {
@@ -96,7 +132,41 @@ class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.MyViewHolder> {
         }
     }
 
+    public void checkAll() {
+        if(checked) {
+            checked = true;
+            notifyItemRangeChanged(0, getItemCount());
+        }
+    }
+
     public interface SelectListener {
         void onItemSelected(int position);
+    }
+
+    public final class NetworkHolder {
+
+        private List<String> agencyIds = new ArrayList<>();
+        private String title;
+
+        public NetworkHolder(String title) {
+            this.title = title;
+        }
+
+        public NetworkHolder(String title, String agencyId) {
+            this.title = title;
+            this.agencyIds.add(agencyId);
+        }
+
+        public void addId(String id) {
+            agencyIds.add(id);
+        }
+
+        public List<String> getIds() {
+            return agencyIds;
+        }
+
+        public String getTitle() {
+            return title;
+        }
     }
 }

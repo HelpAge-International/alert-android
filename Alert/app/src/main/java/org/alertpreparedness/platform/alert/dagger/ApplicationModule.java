@@ -15,6 +15,7 @@ import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.dagger.annotation.AppStatusConst;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseStorageRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -26,6 +27,7 @@ import java.util.Locale;
 import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
+import io.realm.Realm;
 
 /**
  * Currently, the only provider of injections, application-wide.
@@ -45,9 +47,19 @@ public class ApplicationModule {
         return application;
     }
 
+    @Provides
+    public User provideUser(UserInfo provideUserInfo) {
+        return provideUserInfo.getUser();
+    }
+
+    @Provides
+    public Realm providesRealm() {
+        return Realm.getDefaultInstance();
+    }
+
     @Provides @Singleton
-    public User provideUser() {
-        return UserInfo.getUser(application);
+    public UserInfo provideUserInfo(Context context) {
+        return new UserInfo(context);
     }
 
     @Provides @Singleton @BaseDatabaseRef
@@ -73,5 +85,10 @@ public class ApplicationModule {
     @Provides @Singleton
     public SimpleDateFormat provideDateFomatter() {
         return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+    }
+
+    @Provides @UserId
+    public String provideUserId(Context context) {
+        return PreferHelper.getString(context, Constants.UID);
     }
 }

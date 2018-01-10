@@ -30,6 +30,7 @@ import com.google.gson.Gson;
 import org.alertpreparedness.platform.alert.ExtensionHelperKt;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.firebase.AffectedAreaModel;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
@@ -81,14 +82,17 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     @Inject
     SimpleDateFormat dateFormatter;
 
+    @Inject
+    @AlertRef
+    DatabaseReference countryAlertRef;
+
+    @Inject
+    User user;
+
     DatabaseReference mReference = FirebaseDatabase.getInstance().getReference();
     ValueEventListener mValueListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            System.out.println("dataSnapshot = " + dataSnapshot);
-
-
-
             parseAlert(dataSnapshot);
         }
 
@@ -106,13 +110,9 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
         DependencyInjector.applicationComponent().inject(this);
 
-//        countryID = UserInfo.getUser(this).countryID;
-        isCountryDirector = UserInfo.getUser(this).isCountryDirector();
-        isCountryDirector = true;
-
-        if (UserInfo.getUser(this).isCountryDirector()) {
-            System.out.println("CD or Not: " + UserInfo.getUser(this).isCountryDirector());
-        }
+        countryID = user.countryID;
+        isCountryDirector = user.isCountryDirector();
+//        isCountryDirector = true;
 
         toolbar = (Toolbar) findViewById(R.id.action_toolbar);
         setSupportActionBar(toolbar);
@@ -122,8 +122,6 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         // Change the color of the arrow
         final Drawable upArrow = toolbar.getNavigationIcon();
         upArrow.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-
-
 
         initView();
 
@@ -161,11 +159,9 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             Bundle bd = intent.getExtras();
             if (bd != null) {
                 isRequestSent = (String) bd.get("IS_RED_REQUEST");
-                System.out.println("REQ: " + isRequestSent);
             }
             alert = (AlertModel) intent.getSerializableExtra(EXTRA_ALERT);
             fetchDetails();
-
             mAppStatus = PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS);
 
             mReference = FirebaseDatabase.getInstance().getReference().child(mAppStatus).child("alert").child(alert.getParentKey()).child(alert.getKey());
@@ -237,11 +233,14 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                     for(AffectedAreaModel m : alert.getAffectedAreas()) {
                         List<String> list = ExtensionHelperKt.getLevel1Values(m.getCountry(), mCountryDataList);
                         res.append(Constants.COUNTRIES[m.getCountry()]);
-                        if(list != null && m.getLevel1() != null && list.get(m.getLevel1()) != null) {
-                            m.setLevel1Name(list.get(m.getLevel1()));
-                            res.append(", ").append(list.get(m.getLevel1()));
+                        try {
+                            if (list != null && m.getLevel1() != null && list.get(m.getLevel1()) != null) {
+                                m.setLevel1Name(list.get(m.getLevel1()));
+                                res.append(", ").append(list.get(m.getLevel1()));
+                            }
+                            res.append("\n");
                         }
-                        res.append("\n");
+                        catch (Exception e){}
                     }
                     txtAffectedArea.setText(res.toString());
                     imgUpdate.setOnClickListener(this);
@@ -276,7 +275,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
     private void setUpRedAlertRequestView() {
         Window window = getWindow();
-        if (isCountryDirector && alert.wasRedAlertRequested()) {
+        if (alert.isNetwork() && alert.getAgencyAdminId().equals(alert.getLeadAgencyId()) && alert.getAgencyAdminId().equals(user.getUserID())  && alert.wasRedAlertRequested() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setStatusBarColor(getResources().getColor(R.color.sBar_Gray));
             }
@@ -285,7 +284,17 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             clRequested.setVisibility(View.VISIBLE);
             llButtons.setVisibility(View.VISIBLE);
             setUserName();
-        } else if (!isCountryDirector && alert.wasRedAlertRequested()) {
+        }
+        else if (!alert.isNetwork() && isCountryDirector && alert.wasRedAlertRequested() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                window.setStatusBarColor(getResources().getColor(R.color.sBar_Gray));
+            }
+            toolbar.setBackgroundResource(R.color.alertGray);
+            txtActionBarTitle.setText(R.string.amber_alert_text);
+            clRequested.setVisibility(View.VISIBLE);
+            llButtons.setVisibility(View.VISIBLE);
+            setUserName();
+        } else if (!isCountryDirector && alert.wasRedAlertRequested() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setStatusBarColor(getResources().getColor(R.color.sBar_Gray));
             }
@@ -396,8 +405,11 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (isApproved) {
+                    DatabaseReference rf = countryAlertRef.push();
+                    rf.setValue(alert);
                     mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_APPROVED);
                     mReference.child("alertLevel").setValue(Constants.TRIGGER_RED);
+
                 } else {
                     mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_REJECTED);
                 }

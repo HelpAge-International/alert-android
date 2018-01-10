@@ -14,6 +14,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertFieldsAdapter;
@@ -45,6 +46,7 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     private final ArrayList<String> keys;
     private Context context;
     private HashMap<String, Action> items;
+    private HashMap<String, UserModel> users;
     private DatabaseReference dbRef;
     private APActionAdapter.ItemSelectedListener listener;
     private String dateFormat = "MMM dd,yyyy";
@@ -75,6 +77,8 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
             ButterKnife.bind(this, itemView);
         }
     }
+
+
 
     //In progress
     public void addInProgressItem(String key, Action action) {
@@ -167,6 +171,7 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     public APActionAdapter(Context context, DatabaseReference dbRef, APActionAdapter.ItemSelectedListener listener) {
         this.context = context;
         this.items = new HashMap<>();
+        this.users = new HashMap<>();
         this.listener = listener;
         this.dbRef = dbRef;
         this.keys = new ArrayList<>(items.keySet());
@@ -187,7 +192,9 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     @Override
     public void onBindViewHolder(APActionAdapter.ViewHolder holder, int position) {
         Action action = items.get(keys.get(position));
-        getDepartment(action.db, action.userRef, action.getAssignee(), holder);
+
+        System.out.println("action.getDepartment() = " + action.getDepartment());
+        getDepartment(action.db, action.userRef, action.getDepartment(), action.getAssignee(), holder);
         holder.tvEmptyAction.setVisibility(View.GONE);
         holder.tvActionType.setText(getActionType((int) action.getActionType()));
         holder.tvActionName.setText(action.getTaskName());
@@ -210,13 +217,13 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
     }
 
-    private void getDepartment(DatabaseReference db, DatabaseReference userRef, String assignee, APActionAdapter.ViewHolder holder) {
+    private void getDepartment(DatabaseReference db, DatabaseReference userRef, String departmentID, String assignee, APActionAdapter.ViewHolder holder) {
 
         db.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String department = (String) dataSnapshot.child("departments").getChildren().iterator().next().child("name").getValue();
+                String department = (String) dataSnapshot.child("departments").child(departmentID).child("name").getValue();
                 setUser(holder, userRef, assignee, department);
             }
 
@@ -229,7 +236,7 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     }
 
     private void setUser(APActionAdapter.ViewHolder holder, DatabaseReference userRef, String assignee, String department) {
-        if (assignee != null) {
+        if (assignee != null && department != null) {
             userRef.child(assignee).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {

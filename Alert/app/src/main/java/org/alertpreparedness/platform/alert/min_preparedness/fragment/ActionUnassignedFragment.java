@@ -86,7 +86,7 @@ public class ActionUnassignedFragment extends InProgressFragment{
         for (DataSnapshot getChild : dataSnapshot.getChildren()) {
 
             String taskName = (String) getChild.child("task").getValue();
-            String department = (String) getChild.child("departments").getValue();
+            String department = (String) getChild.child("department").getValue();
             String assignee = (String) getChild.child("asignee").getValue();
             Boolean isArchived = (Boolean) getChild.child("isArchived").getValue();
             Boolean isComplete = (Boolean) getChild.child("isComplete").getValue();

@@ -22,6 +22,7 @@ import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.ProgrammeRef;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.OnCountrySelectedListener;
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.OnLevel1SelectedListener;
@@ -313,7 +314,6 @@ public class MyCountryFragment extends Fragment implements OnCountrySelectedList
     public void onDataChange(DataSnapshot dataSnapshot) {
         tvSelectCountry.setText(Constants.COUNTRIES[((int)(long)dataSnapshot.getValue())]);
         mCountrySelected.setValue(((int)(long)dataSnapshot.getValue()));
-
 
         mLevel1Selected.setValue(null);
         mLevel2Selected.setValue(null);

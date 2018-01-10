@@ -65,7 +65,6 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
 
     private ActionBarDrawerToggle drawerToggle;
     private FirebaseAuth firebaseAuth;
-    private UserInfo mUserInfo;
     public static final String TAG = "MAIN_DRAWER";
 
     static class HeaderViews {
@@ -117,8 +116,6 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
         setUserName();
 
         appBarTitle.setOnClickListener(this);
-
-        mUserInfo = new UserInfo();
 
         firebaseAuth = FirebaseAuth.getInstance();
 
