@@ -12,6 +12,7 @@ import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
+import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
@@ -32,7 +33,7 @@ public class SplashActivity extends BaseActivity {
             // This method will be executed once the timer is over
             // Start your app main activity
             AppUtils.getDatabase();
-            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            if (FirebaseAuth.getInstance().getCurrentUser() != null && new UserInfo().getUser() != null) {
                 startActivity(new Intent(this, HomeScreen.class));
             } else {
                 startActivity(new Intent(this, LoginScreen.class));

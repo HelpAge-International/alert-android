@@ -99,11 +99,14 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     @BindView(R.id.normal_action_bar)
     CardView normalActionbarContainer;
 
-    @Inject @UserRef @Nullable
+    @Inject @UserRef
     DatabaseReference userRef;
 
     @Inject @AgencyRef
     DatabaseReference agencyRef;
+
+    @Inject
+    User user;
 
     @Override
     public void onCreate(Bundle saved) {
@@ -146,7 +149,13 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
         agencyRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                header.mDepartment.setText((String)dataSnapshot.child("name").getValue());
+                String res = String.format(
+                        getString(R.string.navbar_subtitle),
+                        AppUtils.getUserTypeString(user.getUserType()),
+                        dataSnapshot.child("name").getValue(String.class),
+                        user.getCountryName()
+                );
+                header.mDepartment.setText(res);
                 String urlPath = (String)dataSnapshot.child("logoPath").getValue();
                 Glide.with(MainDrawer.this)
                         .load(urlPath)

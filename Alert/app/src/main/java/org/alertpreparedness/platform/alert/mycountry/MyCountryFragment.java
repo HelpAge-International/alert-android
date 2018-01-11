@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -82,6 +83,9 @@ public class MyCountryFragment extends Fragment implements OnCountrySelectedList
     @BindView(R.id.llAreaCountry)
     LinearLayout countryCon;
 
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
+
     @BindColor(R.color.page_indicator_color)
     int activeColor;
 
@@ -148,6 +152,8 @@ public class MyCountryFragment extends Fragment implements OnCountrySelectedList
 
         startObservers();
 
+        tvSelectCountry.setText(user.getCountryName());
+
     }
 
     private void startObservers() {
@@ -183,13 +189,13 @@ public class MyCountryFragment extends Fragment implements OnCountrySelectedList
 
     }
 
-//    @OnClick(R.id.llAreaCountry)
-//    public void onCountryClicked(View v) {
-//        Bundle bundle = new Bundle();
-//        bundle.putSerializable("select_country_args", mCountryDataList);
-//        mSelectCountryDialog.setArguments(bundle);
-//        mSelectCountryDialog.show(getFragmentManager(), "select_country_args");
-//    }
+    @OnClick(R.id.llAreaCountry)
+    public void onCountryClicked(View v) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("select_country_args", mCountryDataList);
+        mSelectCountryDialog.setArguments(bundle);
+        mSelectCountryDialog.show(getFragmentManager(), "select_country_args");
+    }
 
     @OnClick(R.id.llAreaLevel1)
     public void onLevel1Clicked(View v) {
@@ -312,8 +318,8 @@ public class MyCountryFragment extends Fragment implements OnCountrySelectedList
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        tvSelectCountry.setText(Constants.COUNTRIES[((int)(long)dataSnapshot.getValue())]);
-        mCountrySelected.setValue(((int)(long)dataSnapshot.getValue()));
+        mCountrySelected.setValue(user.getCountryListId());
+        countryCon.setClickable(true);
 
         mLevel1Selected.setValue(null);
         mLevel2Selected.setValue(null);
@@ -335,6 +341,7 @@ public class MyCountryFragment extends Fragment implements OnCountrySelectedList
             level2Con.setClickable(false);
             tvSelectLevel2Heading.setTextColor(inactiveColor);
         }
+        progressBar.setVisibility(View.GONE);
     }
 
     @Override

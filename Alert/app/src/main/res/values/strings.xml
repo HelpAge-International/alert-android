@@ -188,4 +188,5 @@
     <string name="title_adv_preparedness">Adv. Preparedness</string>
     <string name="txt_assign_action">Assign action</string>
     <string name="txt_edit_action">Edit action</string>
+    <string name="navbar_subtitle">%s for %s, %s</string>
 </resources>

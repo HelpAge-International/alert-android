@@ -231,9 +231,9 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
                     StringBuilder res = new StringBuilder();
                     for(AffectedAreaModel m : alert.getAffectedAreas()) {
-                        List<String> list = ExtensionHelperKt.getLevel1Values(m.getCountry(), mCountryDataList);
-                        res.append(Constants.COUNTRIES[m.getCountry()]);
                         try {
+                            List<String> list = ExtensionHelperKt.getLevel1Values(m.getCountry(), mCountryDataList);
+                            res.append(Constants.COUNTRIES[m.getCountry()]);
                             if (list != null && m.getLevel1() != null && list.get(m.getLevel1()) != null) {
                                 m.setLevel1Name(list.get(m.getLevel1()));
                                 res.append(", ").append(list.get(m.getLevel1()));

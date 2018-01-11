@@ -3,17 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/view_container"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/nav_header_height"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/nav_header_height"
     android:gravity="bottom"
     android:orientation="vertical"
+    android:background="@color/colorPrimaryDark"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
-
-    <ImageView
-        android:id="@+id/img_header_bg"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitXY"
-        android:background="@color/colorPrimaryDark"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -23,6 +18,7 @@
         android:padding="@dimen/activity_horizontal_margin">
 
         <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_marginBottom="4dp"
             app:civ_circle_background_color="@color/divider_gray"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/img_profile"
@@ -39,6 +35,10 @@
             android:layout_marginTop="@dimen/nav_header_vertical_spacing" />
 
         <TextView
+            android:layout_marginBottom="@dimen/activity_vertical_margin_half"
+            android:layout_marginTop="4dp"
+            android:textSize="12sp"
+            android:lineSpacingMultiplier="1.2"
             android:id="@+id/tvDepartment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>

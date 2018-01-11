@@ -1,7 +1,11 @@
 package org.alertpreparedness.platform.alert.helper;
 
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -15,18 +19,23 @@ import com.google.gson.Gson;
 
 import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.AgencyBaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseCountryOfficeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
 import org.alertpreparedness.platform.alert.interfaces.AuthCallback;
+import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.realm.UserRealm;
 import org.alertpreparedness.platform.alert.risk_monitoring.service.NetworkService;
+import org.alertpreparedness.platform.alert.risk_monitoring.view_model.SelectAreaViewModel;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.DBListener;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +49,7 @@ import io.realm.Realm;
  * Created by faizmohideen on 08/11/2017.
  */
 
-public class UserInfo {
+public class UserInfo implements ValueEventListener {
     private static String[] users = {"administratorCountry", "countryDirector", "ert", "ertLeader", "partner"};
 
     public static final String PREFS_USER = "prefs_user";
@@ -51,24 +60,22 @@ public class UserInfo {
 
     @Inject
     @UserId
-    @Nullable
     String userId;
-
-    @Inject
-    @AgencyRef
-    DatabaseReference agencyRef;
 
     @Inject @BaseDatabaseRef
     DatabaseReference db;
 
+    @Inject @BaseCountryOfficeRef
+    DatabaseReference countryOffice;
+
     @Inject
     Context context;
 
-    @Inject
-    Realm realm;
-
     private UserAuthenticationListener listener = new UserAuthenticationListener();
     private AuthCallback authCallback;
+    private User userObj;
+    private ArrayList mCountryDataList;
+    private LoginScreen activity;
 
     public UserInfo() {
         DependencyInjector.applicationComponent().inject(this);
@@ -105,26 +112,6 @@ public class UserInfo {
         return new Gson().fromJson(serializedUser, User.class);
     }
 
-//    private void saveUser(UserRealm user) {
-//        System.out.println("SAVINGUSER" + user);
-//        realm.beginTransaction();
-//        realm.copyToRealmOrUpdate(user);
-//        realm.commitTransaction();
-//        realm.close();
-//    }
-//
-//    public User getUser(String userId) {
-//        UserRealm obj = realm.where(UserRealm.class).equalTo("userId", userId).findFirst();
-//        if(obj != null) {
-//            return obj.toUser();
-//        }
-//        else {
-//            System.out.println("exitting userId = " + userId);
-//            System.exit(0);
-//        }
-//        return null;
-//    }
-
     private void populateUser(String nodeName, DataSnapshot userNode) {
 
         int userType = getUserType(nodeName);
@@ -152,13 +139,10 @@ public class UserInfo {
         PreferHelper.putInt(AlertApplication.getContext(), Constants.USER_TYPE, userType);
 
         UserRealm user = new UserRealm(userId, agencyAdmin, systemAdmin, countryId, userType, nodeName.equals("countryDirector"));
-        saveUser(user.toUser());
-        if(authCallback != null) {
-            authCallback.onUserAuthorized(user.toUser());
-        }
+        userObj = user.toUser();
+        countryOffice.child(user.getAgencyAdmin()).child(user.getCountryId()).addValueEventListener(this);
 
     }
-
 
     private int getUserType(String node) {
         switch (node) {
@@ -182,13 +166,47 @@ public class UserInfo {
         return "UserInfo{" +
                 "database=" + database +
                 ", userId='" + userId + '\'' +
-                ", agencyRef=" + agencyRef +
                 ", listener=" + listener +
                 ", authCallback=" + authCallback +
                 ", db=" + db +
                 ", User=" + getUser() +
                 ", context=" + context +
                 '}';
+    }
+
+    @Override
+    public void onDataChange(DataSnapshot dataSnapshot) {
+        System.out.println("coutnryofficedataSnapshot = [" + dataSnapshot + "]");
+
+        SelectAreaViewModel mViewModel = ViewModelProviders.of(activity).get(SelectAreaViewModel.class);
+
+        mViewModel.getCountryJsonDataLive().observe(() -> activity.getLifecycle(), countryJsonData -> {
+
+            if (countryJsonData != null) {
+                mCountryDataList = new ArrayList<>(countryJsonData);
+
+                if (mCountryDataList.size() > 240) {
+                    String country = Constants.COUNTRIES[((int) (long) dataSnapshot.child("location").getValue())];
+                    userObj.setCountryName(country);
+                    userObj.setCountryListId(((int) (long) dataSnapshot.child("location").getValue()));
+                    saveUser(userObj);
+                    if(authCallback != null) {
+                        authCallback.onUserAuthorized(userObj);
+                    }
+                }
+            }
+
+        });
+
+    }
+
+    @Override
+    public void onCancelled(DatabaseError databaseError) {
+
+    }
+
+    public void setActivity(LoginScreen activity) {
+        this.activity = activity;
     }
 
     private class UserAuthenticationListener implements ValueEventListener {

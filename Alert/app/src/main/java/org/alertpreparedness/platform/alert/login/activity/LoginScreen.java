@@ -63,6 +63,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
         DependencyInjector.applicationComponent().inject(this);
 
+        userInfo.setActivity(this);
         progressDialog = new ProgressDialog(this);
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -124,6 +125,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onUserAuthorized(User user) {
+        progressDialog.dismiss();
         startActivity(new Intent(this, HomeScreen.class));
         finish();
     }
@@ -164,7 +166,6 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
             if (firebaseAuth.getCurrentUser()!=null) {
                 PreferHelper.putString(this, Constants.UID, firebaseAuth.getCurrentUser().getUid());
                 System.out.println(PreferHelper.getString(this, Constants.UID));
-                progressDialog.dismiss();
                 userInfo.authUser(this, PreferHelper.getString(this, Constants.UID));
             }
         }

@@ -1,10 +1,8 @@
 package org.alertpreparedness.platform.alert.dagger;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.storage.StorageReference;
 
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyBaseRef;
@@ -12,15 +10,14 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseCountryOfficeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardOtherRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ProgrammeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.TaskRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
 import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.model.User;
@@ -90,6 +87,13 @@ public class FirebaseModule {
     public DatabaseReference providePrgrammes(@BaseDatabaseRef DatabaseReference db, User user) {
         return db.child("countryOfficeProfile").child("programme").child(user.countryID).child("4WMapping");
     }
+
+    @Provides
+    @BaseCountryOfficeRef
+    public DatabaseReference provideCountryOffice(@BaseDatabaseRef DatabaseReference db) {
+        return db.child("countryOffice");
+    }
+
 
     @Provides
     @UserPublicRef
