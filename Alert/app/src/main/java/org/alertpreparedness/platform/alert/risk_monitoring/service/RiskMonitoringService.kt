@@ -76,13 +76,23 @@ object RiskMonitoringService {
     }
 
     fun getIndicators(hazardId: String): Flowable<List<ModelIndicator>> {
+        println("hazardId = ${hazardId}")
         val indicatorRef = FirebaseHelper.getIndicatorsRef(mAppStatus, hazardId)
+        println("indicatorRef = ${indicatorRef}")
         return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
             snap.children.map {
+
+                val res = snap.getValue(ModelIndicator::class.java)
+                println("res = ${res}")
+
+                println("snap.ref = ${snap.ref}")
                 val toJson = gson.toJson(it.value)
+                println("toJson = ${toJson}")
                 val reader = JsonReader(StringReader(toJson.trim()))
+                println("reader = ${reader}")
                 reader.isLenient = true
                 val fromJson = gson.fromJson<ModelIndicator>(reader, ModelIndicator::class.java)
+                println("fromJson = ${fromJson}")
                 return@map fromJson.copy(id = it.key)
             }
         })

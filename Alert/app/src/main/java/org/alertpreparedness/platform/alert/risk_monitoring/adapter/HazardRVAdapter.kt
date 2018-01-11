@@ -72,7 +72,9 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener,
 
     fun onBind(indicator: ModelIndicator) {
         indicatorTitle.text = indicator.name
-        indicatorGeo.text = Constants.INDICATOR_GEO_LOCATION[indicator.geoLocation]
+        if (indicator.geoLocation != -1) {
+            indicatorGeo.text = Constants.INDICATOR_GEO_LOCATION[indicator.geoLocation]
+        }
         val dateTime = DateTime(indicator.dueDate)
         indicatorDue.text = String.format("%s %s %s", dateTime.dayOfMonth().asText, dateTime.monthOfYear().asShortText, dateTime.year().asText)
         if (indicator.networkName != null) {
@@ -144,7 +146,8 @@ class HazardAdapter(groups: List<ExpandableGroup<ModelIndicator>>, countryLocati
 
     override fun onBindChildViewHolder(holder: IndicatorViewHolder?, flatPosition: Int, group: ExpandableGroup<*>?, childIndex: Int) {
         val indicator: ModelIndicator = group?.items?.get(childIndex) as ModelIndicator
-        holder?.onBind(indicator)
+//        println("holder = [${holder}], flatPosition = [${flatPosition}], group = [${group}], childIndex = [${childIndex}]")
+            holder?.onBind(indicator)
     }
 
     override fun onCreateGroupViewHolder(parent: ViewGroup?, viewType: Int): HazardViewHolder {

@@ -81,8 +81,10 @@ class SelectAreaActivity : BaseActivity() {
 
         mViewModel.getSelectedCountryLive().observe(this, Observer { country ->
             country?.let {
-                tvSelectCountry.text = Constants.COUNTRIES[it.location]
-                mCountrySelected = it.location
+                if(it.location != -1) {
+                    tvSelectCountry.text = Constants.COUNTRIES[it.location]
+                    mCountrySelected = it.location
+                }
             }
         })
     }

@@ -139,6 +139,9 @@ public class UserInfo implements ValueEventListener {
         PreferHelper.putInt(AlertApplication.getContext(), Constants.USER_TYPE, userType);
 
         UserRealm user = new UserRealm(userId, agencyAdmin, systemAdmin, countryId, userType, nodeName.equals("countryDirector"));
+
+        PreferHelper.putString(AlertApplication.getContext(), Constants.COUNTRY_ID, user.getCountryId());
+
         userObj = user.toUser();
         countryOffice.child(user.getAgencyAdmin()).child(user.getCountryId()).addValueEventListener(this);
 
