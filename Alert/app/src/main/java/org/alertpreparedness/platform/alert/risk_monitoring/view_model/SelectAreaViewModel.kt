@@ -45,22 +45,27 @@ class SelectAreaViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
 
 
     fun getCountryJsonData() {
-        mDisposables.add(
-                RiskMonitoringService.readJsonFile()
-                        .map { fileText ->
-                            return@map JSONObject(fileText)
-                        }
-                        .flatMap { jsonObject: JSONObject ->
-                            RiskMonitoringService.mapJasonToCountryData(jsonObject, Gson())
-                        }
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({ countryData: CountryJsonData ->
-                            Timber.d("Country id is: %s, level 1: %s", countryData.countryId, countryData.levelOneValues?.size)
-                            mCountryDataList.add(countryData)
-                            mCountryJsonDataLive.value = mCountryDataList
-                        })
-        )
+        try {
+            mDisposables.add(
+                    RiskMonitoringService.readJsonFile()
+                            .map { fileText ->
+                                return@map JSONObject(fileText)
+                            }
+                            .flatMap { jsonObject: JSONObject ->
+                                RiskMonitoringService.mapJasonToCountryData(jsonObject, Gson())
+                            }
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({ countryData: CountryJsonData ->
+                                Timber.d("Country id is: %s, level 1: %s", countryData.countryId, countryData.levelOneValues?.size)
+                                mCountryDataList.add(countryData)
+                                mCountryJsonDataLive.value = mCountryDataList
+                            })
+            )
+        }
+        catch (e : Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun getSelectedCountry() {
