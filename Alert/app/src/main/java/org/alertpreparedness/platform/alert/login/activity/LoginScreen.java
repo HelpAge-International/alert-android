@@ -63,6 +63,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
         DependencyInjector.applicationComponent().inject(this);
 
+        userInfo.setActivity(this);
         progressDialog = new ProgressDialog(this);
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -124,6 +125,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onUserAuthorized(User user) {
+        progressDialog.dismiss();
         startActivity(new Intent(this, HomeScreen.class));
         finish();
     }
@@ -148,13 +150,8 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
             String error = ((FirebaseAuthException) e).getErrorCode();
 
             SnackbarHelper.show(this, e.getMessage());
-
-            Timber.tag("signInWithEmail").w(error);
-            Timber.tag("signInWithEmail").w(e.getClass().getName());
         }
 
-        Timber.tag("signInWithEmail").w(e.getMessage());
-        Timber.tag("signInWithEmail").w(e.getClass().getName());
     }
 
     //login successful
@@ -163,10 +160,11 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
         if (task.isSuccessful()) {
             if (firebaseAuth.getCurrentUser()!=null) {
                 PreferHelper.putString(this, Constants.UID, firebaseAuth.getCurrentUser().getUid());
-
-                progressDialog.dismiss();
-                userInfo.authUser(this);
+                userInfo.authUser(this, PreferHelper.getString(this, Constants.UID));
             }
+        }
+        else {
+            SnackbarHelper.show(this, "The email address you entered is not associated with an ALERT account. Please try again.");
         }
     }
 

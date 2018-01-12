@@ -26,7 +26,6 @@ import timber.log.Timber
 /**
  * Created by fei on 08/11/2017.
  */
-class Hazard(hazardId: String, indicators: List<ModelIndicator>) : ExpandableGroup<ModelIndicator>(hazardId, indicators)
 
 class HazardViewHolder(itemView: View, location:Int) : GroupViewHolder(itemView) {
     private val hazardTitle: TextView = itemView.findViewById(R.id.tvHazardName)
@@ -73,7 +72,9 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener,
 
     fun onBind(indicator: ModelIndicator) {
         indicatorTitle.text = indicator.name
-        indicatorGeo.text = Constants.INDICATOR_GEO_LOCATION[indicator.geoLocation]
+        if (indicator.geoLocation != -1) {
+            indicatorGeo.text = Constants.INDICATOR_GEO_LOCATION[indicator.geoLocation]
+        }
         val dateTime = DateTime(indicator.dueDate)
         indicatorDue.text = String.format("%s %s %s", dateTime.dayOfMonth().asText, dateTime.monthOfYear().asShortText, dateTime.year().asText)
         if (indicator.networkName != null) {
@@ -87,7 +88,8 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener,
             Constants.TRIGGER_GREEN -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_green, AlertApplication.getContext().theme)
-                } else {
+                }
+                else {
                     indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_green)
                 }
                 indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_GREEN]
@@ -97,7 +99,8 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener,
             Constants.TRIGGER_AMBER -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_amber, AlertApplication.getContext().theme)
-                } else {
+                }
+                else {
                     indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_amber)
                 }
                 indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_AMBER]
@@ -107,7 +110,8 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener,
             else -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_red, AlertApplication.getContext().theme)
-                } else {
+                }
+                else {
                     indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_red)
                 }
                 indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_RED]
@@ -142,7 +146,8 @@ class HazardAdapter(groups: List<ExpandableGroup<ModelIndicator>>, countryLocati
 
     override fun onBindChildViewHolder(holder: IndicatorViewHolder?, flatPosition: Int, group: ExpandableGroup<*>?, childIndex: Int) {
         val indicator: ModelIndicator = group?.items?.get(childIndex) as ModelIndicator
-        holder?.onBind(indicator)
+//        println("holder = [${holder}], flatPosition = [${flatPosition}], group = [${group}], childIndex = [${childIndex}]")
+            holder?.onBind(indicator)
     }
 
     override fun onCreateGroupViewHolder(parent: ViewGroup?, viewType: Int): HazardViewHolder {

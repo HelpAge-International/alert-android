@@ -605,4 +605,5 @@ public final class Constants {
     public static final int YE = 246;
     public static final int ZM = 247;
     public static final int ZW = 248;
+    public static final String HAS_RUN_BEFORE = "has_run_before";
 }

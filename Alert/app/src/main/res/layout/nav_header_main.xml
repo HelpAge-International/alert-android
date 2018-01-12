@@ -3,17 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/view_container"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/nav_header_height"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/nav_header_height"
     android:gravity="bottom"
     android:orientation="vertical"
+    android:background="@color/colorPrimaryDark"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
-
-    <ImageView
-        android:id="@+id/img_header_bg"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitXY"
-        android:background="@color/colorPrimaryDark"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -22,24 +17,31 @@
         android:orientation="vertical"
         android:padding="@dimen/activity_horizontal_margin">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_marginBottom="4dp"
+            app:civ_circle_background_color="@color/divider_gray"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/img_profile"
-            android:layout_width="75dp"
-            android:layout_height="75dp"
-            android:paddingTop="@dimen/nav_header_vertical_spacing"
-            app:srcCompat="@android:drawable/sym_def_app_icon" />
+            android:layout_width="72dp"
+            app:srcCompat="@android:drawable/sym_def_app_icon"
+            android:layout_height="72dp"
+            app:civ_border_width="0dp" />
 
         <TextView
+            android:textColor="@color/white"
             android:id="@+id/tvUserName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/nav_header_vertical_spacing" />
 
         <TextView
+            android:layout_marginBottom="@dimen/activity_vertical_margin_half"
+            android:layout_marginTop="4dp"
+            android:textSize="12sp"
+            android:lineSpacingMultiplier="1.2"
             android:id="@+id/tvDepartment"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ERT Lead for HelpAge International Philippines" />
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 </RelativeLayout>

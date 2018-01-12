@@ -3,11 +3,21 @@ package org.alertpreparedness.platform.alert.login.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.alertpreparedness.platform.alert.BaseActivity;
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
+import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
+import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.PreferHelper;
+
+import javax.inject.Inject;
 
 public class SplashActivity extends BaseActivity {
 
@@ -18,20 +28,15 @@ public class SplashActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        String uid = getUid();
 
-        /*
-         * Showing splash screen with a timer. This will be useful when you
-         * want to show case your app logo / company
-         */
         new Handler().postDelayed(() -> {
             // This method will be executed once the timer is over
             // Start your app main activity
             AppUtils.getDatabase();
-            if (uid != null) {
-                startActivity(new Intent(SplashActivity.this, HomeScreen.class));
+            if (FirebaseAuth.getInstance().getCurrentUser() != null && new UserInfo().getUser() != null) {
+                startActivity(new Intent(this, HomeScreen.class));
             } else {
-                startActivity(new Intent(SplashActivity.this, LoginScreen.class));
+                startActivity(new Intent(this, LoginScreen.class));
             }
             finish();
         }, SPLASH_TIME_OUT);

@@ -62,22 +62,22 @@ public class ApprovalStatusAdapter extends RecyclerView.Adapter<ApprovalStatusAd
         holder.title.setText(model.permisionLevel);
 
         switch (model.status) {
-            case 0://grey
+            case 1://grey
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertGray));
                 holder.status.setText(R.string.waiting_approval);
                 holder.icon.setImageResource(R.drawable.icon_pending_grey);
                 break;
-            case 3://green
+            case 2://green
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertGreen));
                 holder.status.setText(R.string.approved);
                 holder.icon.setImageResource(R.drawable.icon_status_complete);
                 break;
-            case 2://amber
+            case 0://amber
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertAmber));
                 holder.status.setText(R.string.in_progress);
                 holder.icon.setImageResource(R.drawable.icon_pending_amber);
                 break;
-            case 1:
+            case 3:
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertRed));
                 holder.status.setText(R.string.needs_reviewing);
                 holder.icon.setImageResource(R.drawable.icon_status_needs_reviewing);

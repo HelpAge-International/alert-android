@@ -137,6 +137,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     private NetworkListener networkListener = new NetworkListener();
     private String agencyAdminId;
     private String networkLeadId;
+    private Tasks task;
 
     @Nullable
     @Override
@@ -157,7 +158,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     }
 
     private void initViews() {
-
+        System.out.println("user = " + user);
         taskRef.addChildEventListener(taskListener);
         indicatorRef.addChildEventListener(indicatorListener);
         networkRef.addValueEventListener(networkListener);
@@ -360,18 +361,12 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     private class TaskListener implements ChildEventListener {
 
         private void process(DataSnapshot dataSnapshot, String s) {
-            Tasks task;
 
             if (dataSnapshot.getRef().getParent().getParent().getKey().equals("action")) {
                 ActionModel model = dataSnapshot.getValue(ActionModel.class);
                 assert model != null;
                 if (model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null) {
-                    task = new Tasks(0, "action", model.getTask(), model.getDueDate());
-                    if(model.getType() == 0){
-                        System.out.println(" in type");
-                        task = new Tasks(0, "Faiz", model.getTask(), model.getDueDate(), 0);
-                    }
-                    addTask(task);
+                    addTask(new Tasks(0, "action", model.getTask(), model.getDueDate()));
                 }
 
             } else if (dataSnapshot.getRef().getParent().getParent().getKey().equals("indicator")) {
@@ -382,12 +377,43 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                     addTask(tasks);
                 }
             }
-
         }
+
+        private void chsProcess(DataSnapshot dataSnapshot, String s) {
+            if (dataSnapshot.getRef().getParent().getParent().getKey().equals("action")) {
+                ActionModel model = dataSnapshot.getValue(ActionModel.class);
+                String actionIDs = dataSnapshot.getKey();
+
+                if (model.getType() == 0) {
+                    dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+
+                                if (actionIDs.contains(getChild.getKey())) {
+                                    // Tasks task;
+                                    String taskNameCHS = (String) getChild.child("task").getValue();
+                                    System.out.println("taskNameCHS = " + taskNameCHS);
+                                    addTask(new Tasks(0, "action", taskNameCHS, model.getDueDate(), model.getType()));
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+        }
+
 
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             process(dataSnapshot, s);
+            //chsProcess(dataSnapshot, s);
         }
 
         @Override
@@ -436,7 +462,6 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-
             onNetworkRetrieved(dataSnapshot);
         }
 
@@ -451,4 +476,5 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         agencyRef.addListenerForSingleValueEvent(agencyListener);
         alertRef.addChildEventListener(alertListener);
     }
+
 }

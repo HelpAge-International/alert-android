@@ -31,6 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.AdvPreparednessFragment;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserEmail;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
@@ -52,6 +53,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 import io.reactivex.Observable;
 
 public class MainDrawer extends BaseActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
@@ -70,7 +72,8 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     static class HeaderViews {
         @BindView(R.id.tvUserName) TextView mUsername;
         @BindView(R.id.tvDepartment) TextView mDepartment;
-        @BindView(R.id.img_profile) ImageView logo;
+        @BindView(R.id.img_profile)
+        CircleImageView logo;
     }
 
     final HeaderViews header = new HeaderViews();
@@ -101,6 +104,9 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
 
     @Inject @AgencyRef
     DatabaseReference agencyRef;
+
+    @Inject
+    User user;
 
     @Override
     public void onCreate(Bundle saved) {
@@ -143,10 +149,17 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
         agencyRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                header.mDepartment.setText((String)dataSnapshot.child("name").getValue());
+                String res = String.format(
+                        getString(R.string.navbar_subtitle),
+                        AppUtils.getUserTypeString(user.getUserType()),
+                        dataSnapshot.child("name").getValue(String.class),
+                        user.getCountryName()
+                );
+                header.mDepartment.setText(res);
                 String urlPath = (String)dataSnapshot.child("logoPath").getValue();
                 Glide.with(MainDrawer.this)
                         .load(urlPath)
+                        .dontAnimate()
                         .placeholder(R.drawable.agency_icon_placeholder)
                         .into(header.logo);
             }
@@ -162,8 +175,8 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 try {
-                    String firstname = dataSnapshot.child("firstName").getValue().toString();
-                    String lastname = dataSnapshot.child("lastName").getValue().toString();
+                    String firstname = dataSnapshot.child("firstName").getValue(String.class);
+                    String lastname = dataSnapshot.child("lastName").getValue(String.class);
 
                     header.mUsername.setText(String.format("%s %s", firstname, lastname));
 

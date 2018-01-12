@@ -16,6 +16,9 @@ public class User implements Serializable {
     public String countryID;
     private String userID;
     private String systemAdminID;
+    private String countryName;
+    private int countryListId;
+
 
     enum UserLevel {
         STANDARD,
@@ -30,6 +33,7 @@ public class User implements Serializable {
                 ", countryID='" + countryID + '\'' +
                 ", userID='" + userID + '\'' +
                 ", systemAdminID='" + systemAdminID + '\'' +
+                ", countryName='" + countryName + '\'' +
                 ", hazardID=" + hazardID +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
@@ -137,4 +141,19 @@ public class User implements Serializable {
         isCountryDirector = countryDirector;
     }
 
+    public void setCountryName(String countryName) {
+        this.countryName = countryName;
+    }
+
+    public String getCountryName() {
+        return countryName;
+    }
+
+    public void setCountryListId(int countryListId) {
+        this.countryListId = countryListId;
+    }
+
+    public int getCountryListId() {
+        return countryListId;
+    }
 }

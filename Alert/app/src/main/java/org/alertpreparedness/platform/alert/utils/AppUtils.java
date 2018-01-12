@@ -20,6 +20,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import org.alertpreparedness.platform.alert.model.User;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -105,6 +107,21 @@ public class AppUtils {
             sDatabase = FirebaseDatabase.getInstance();
         }
         return sDatabase;
+    }
+
+    public static String getUserTypeString(int userType) {
+        switch (userType) {
+            case Constants.CountryAdmin:
+                return "Country Admin";
+            case Constants.CountryDirector:
+                return "Country Director";
+            case Constants.Ert:
+                return "ERT";
+            case Constants.ErtLeader:
+                return "ERT Lead";
+            default:
+                return "Partner";
+        }
     }
 
     //firebase storage call

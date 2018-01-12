@@ -214,7 +214,7 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                                         mHazardNameMap.put(it.id!!, Constants.HAZARD_SCENARIO_NAME[it.hazardScenario])
                                     }
                                 }
-
+                                println("it.id = ${it.id}")
                                 val disposableIndicator = RiskMonitoringService.getIndicators(it.id!!)
                                         .subscribe({ indicators ->
                                             mIndicatorMap.put(it.id!!, indicators)
