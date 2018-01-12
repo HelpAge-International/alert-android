@@ -83,7 +83,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         }
 
         private void bind(Tasks tasks) {
+            System.out.println("tasks.getActionType() = " + tasks.getActionType());
             if (tasks.getTaskType().equals("action") && DateHelper.isDueToday(tasks.dueDate)) {
+                System.out.println("tasks.getActionType() = " + tasks.getActionType());
                 txt_taskName.setText(tasks.getTaskName());
                 txt_taskStatus.setText(dueTodayString(tasks.getAlertLevel(), "action"));
                 img_task.setImageResource(R.drawable.home_task_red);

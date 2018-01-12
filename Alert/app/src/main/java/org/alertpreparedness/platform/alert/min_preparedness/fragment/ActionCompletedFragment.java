@@ -95,19 +95,19 @@ public class ActionCompletedFragment extends InProgressFragment {
             Long budget = (Long) getChild.child("budget").getValue();
             Long level =  (Long) getChild.child("level").getValue();
 
-            mAdapter.addCompletedItem(getChild.getKey(), new Action(
-                    taskName,
-                    department,
-                    assignee,
-                    isArchived,
-                    isComplete,
-                    actionType,
-                    dueDate,
-                    budget,
-                    level,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef())
-            );
+//            mAdapter.addCompletedItem(getChild.getKey(), new Action(
+//                    taskName,
+//                    department,
+//                    assignee,
+//                    isArchived,
+//                    isComplete,
+//                    actionType,
+//                    dueDate,
+//                    budget,
+//                    level,
+//                    dbAgencyRef.getRef(),
+//                    dbUserPublicRef.getRef())
+//            );
 
         }
 

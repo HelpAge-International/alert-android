@@ -141,20 +141,20 @@ public class APAInProgressFragment extends Fragment implements APActionAdapter.I
             Long dueDate = (Long) getChild.child("dueDate").getValue();
             Long budget = (Long) getChild.child("budget").getValue();
             Long level = (Long) getChild.child("level").getValue();
-
-            mAPAdapter.addInProgressItem(getChild.getKey(), new Action(
-                    taskName,
-                    department,
-                    assignee,
-                    isArchived,
-                    isComplete,
-                    actionType,
-                    dueDate,
-                    budget,
-                    level,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef())
-            );
+//
+//            mAPAdapter.addInProgressItem(getChild.getKey(), new Action(
+//                    taskName,
+//                    department,
+//                    assignee,
+//                    isArchived,
+//                    isComplete,
+//                    actionType,
+//                    dueDate,
+//                    budget,
+//                    level,
+//                    dbAgencyRef.getRef(),
+//                    dbUserPublicRef.getRef())
+//            );
 
         }
 

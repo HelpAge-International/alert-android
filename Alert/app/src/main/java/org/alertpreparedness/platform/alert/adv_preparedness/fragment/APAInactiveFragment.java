@@ -165,20 +165,20 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Long alertLevel = (Long) dataSnapshot.child("alertLevel").getValue();
-                    mAPAdapter.addInActiveItem(getChild.getKey(), new Action(
-                                    taskName,
-                                    department,
-                                    assignee,
-                                    isArchived,
-                                    isComplete,
-                                    actionType,
-                                    dueDate,
-                                    budget,
-                                    level,
-                                    dbAgencyRef.getRef(),
-                                    dbUserPublicRef.getRef()),
-                            alertLevel
-                    );
+//                    mAPAdapter.addInActiveItem(getChild.getKey(), new Action(
+//                                    taskName,
+//                                    department,
+//                                    assignee,
+//                                    isArchived,
+//                                    isComplete,
+//                                    actionType,
+//                                    dueDate,
+//                                    budget,
+//                                    level,
+//                                    dbAgencyRef.getRef(),
+//                                    dbUserPublicRef.getRef()),
+//                            alertLevel
+//                    );
 
                 }
 

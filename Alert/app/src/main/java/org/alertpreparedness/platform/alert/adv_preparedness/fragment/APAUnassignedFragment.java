@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -74,6 +75,7 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
 
     private APActionAdapter mAPAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
+    private String actionID;
 
     @Nullable
     @Override
@@ -84,6 +86,8 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
         DependencyInjector.applicationComponent().inject(this);
 
         initViews();
+
+        System.out.println("recreateview");
 
         dialog.setListener(this);
 
@@ -118,6 +122,7 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
 
     @Override
     public void onActionItemSelected(int pos, String key) {
+        this.actionID = key;
         SheetMenu.with(getContext()).setMenu(R.menu.menu_unassigned_apa).setClick(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -148,20 +153,20 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
             Long dueDate = (Long) getChild.child("dueDate").getValue();
             Long budget = (Long) getChild.child("budget").getValue();
             Long level = (Long) getChild.child("level").getValue();
-
-            mAPAdapter.addUnassignedItem(getChild.getKey(), new Action(
-                    taskName,
-                    department,
-                    assignee,
-                    isArchived,
-                    isComplete,
-                    actionType,
-                    dueDate,
-                    budget,
-                    level,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef())
-            );
+//
+//            mAPAdapter.addUnassignedItem(getChild.getKey(), new Action(
+//                    taskName,
+//                    department,
+//                    assignee,
+//                    isArchived,
+//                    isComplete,
+//                    actionType,
+//                    dueDate,
+//                    budget,
+//                    level,
+//                    dbAgencyRef.getRef(),
+//                    dbUserPublicRef.getRef())
+//            );
 
         }
 
@@ -172,9 +177,13 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
 
     }
 
-
     @Override
     public void onItemSelected(UserModel userModel) {
-        System.out.println("userModel = [" + userModel + "]");
+        long millis = System.currentTimeMillis();
+        dbActionRef.child(actionID).child("asignee").setValue(userModel.getUserID());
+        dbActionRef.child(actionID).child("updatedAt").setValue(millis);
+        mAPAdapter.removeItem(actionID);
+        mAPAdapter.notifyDataSetChanged();
     }
+
 }

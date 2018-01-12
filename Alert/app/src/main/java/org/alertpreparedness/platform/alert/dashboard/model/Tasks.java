@@ -7,6 +7,7 @@ package org.alertpreparedness.platform.alert.dashboard.model;
 public class Tasks {
 
     private int alertLevel;
+    private int actionType;
     private String taskType;
     private String taskName;
     public long dueDate;
@@ -30,6 +31,21 @@ public class Tasks {
         this.taskType = taskType;
         this.taskName = taskName;
         this.dueDate = dueDate;
+    }
+    public Tasks(int alertLevel, String taskType, String taskName, long dueDate, int actionType) {
+        this.alertLevel = alertLevel;
+        this.taskType = taskType;
+        this.taskName = taskName;
+        this.dueDate = dueDate;
+        this.actionType = actionType;
+    }
+
+    public int getActionType() {
+        return actionType;
+    }
+
+    public void setActionType(int actionType) {
+        this.actionType = actionType;
     }
 
     public int getAlertLevel() {

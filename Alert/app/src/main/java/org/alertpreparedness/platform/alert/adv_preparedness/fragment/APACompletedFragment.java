@@ -155,19 +155,19 @@ public class APACompletedFragment extends Fragment implements APActionAdapter.It
             Long budget = (Long) getChild.child("budget").getValue();
             Long level = (Long) getChild.child("level").getValue();
 
-            mAPAdapter.addCompletedItem(getChild.getKey(), new Action(
-                    taskName,
-                    department,
-                    assignee,
-                    isArchived,
-                    isComplete,
-                    actionType,
-                    dueDate,
-                    budget,
-                    level,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef())
-            );
+//            mAPAdapter.addCompletedItem(getChild.getKey(), new Action(
+//                    taskName,
+//                    department,
+//                    assignee,
+//                    isArchived,
+//                    isComplete,
+//                    actionType,
+//                    dueDate,
+//                    budget,
+//                    level,
+//                    dbAgencyRef.getRef(),
+//                    dbUserPublicRef.getRef())
+//            );
 
         }
 

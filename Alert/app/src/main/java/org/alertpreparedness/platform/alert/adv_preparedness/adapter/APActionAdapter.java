@@ -182,6 +182,13 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
         return items.get(keys.get(index));
     }
 
+    public void removeItem(String key) {
+        int index = keys.indexOf(key);
+        items.remove(keys.get(index));
+        keys.remove(index);
+        notifyItemRemoved(index);
+    }
+
     @Override
     public APActionAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
@@ -193,46 +200,52 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     public void onBindViewHolder(APActionAdapter.ViewHolder holder, int position) {
         Action action = items.get(keys.get(position));
 
-        System.out.println("action.getDepartment() = " + action.getDepartment());
-        getDepartment(action.db, action.userRef, action.getDepartment(), action.getAssignee(), holder);
-        holder.tvEmptyAction.setVisibility(View.GONE);
-        holder.tvActionType.setText(getActionType((int) action.getActionType()));
-        holder.tvActionName.setText(action.getTaskName());
-        holder.tvBudget.setText(getBudget(action.getBudget()));
-        holder.tvDueDate.setText(getDate(action.getDueDate()));
-        holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position, keys.get(position)));
+        try {
+            getDepartment(action.db, action.userRef, action.getDepartment(), action.getAssignee(), holder);
+            holder.tvEmptyAction.setVisibility(View.GONE);
+            holder.tvActionType.setText(getActionType((int) action.getActionType()));
+            holder.tvActionName.setText(action.getTaskName());
+            holder.tvBudget.setText(getBudget(action.getBudget()));
+            holder.tvDueDate.setText(getDate(action.getDueDate()));
+            holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position, keys.get(position)));
 
-        if (action.getDueDate() == null) {
-            holder.tvDueDate.setVisibility(View.GONE);
-        }
+            if (action.getDueDate() == null) {
+                holder.tvDueDate.setVisibility(View.GONE);
+            }
 
-        if (items.isEmpty()) {
-            holder.tvEmptyAction.setVisibility(View.VISIBLE);
-            holder.tvActionName.setVisibility(View.GONE);
-            holder.tvActionType.setVisibility(View.GONE);
-            holder.tvBudget.setVisibility(View.GONE);
-            holder.tvDueDate.setVisibility(View.GONE);
-            holder.tvUserName.setVisibility(View.GONE);
+            if (items.isEmpty()) {
+                holder.tvEmptyAction.setVisibility(View.VISIBLE);
+                holder.tvActionName.setVisibility(View.GONE);
+                holder.tvActionType.setVisibility(View.GONE);
+                holder.tvBudget.setVisibility(View.GONE);
+                holder.tvDueDate.setVisibility(View.GONE);
+                holder.tvUserName.setVisibility(View.GONE);
+            }
+        }catch (Exception e) {
+            System.out.println("e = " + e);
+            e.printStackTrace();
         }
 
     }
 
     private void getDepartment(DatabaseReference db, DatabaseReference userRef, String departmentID, String assignee, APActionAdapter.ViewHolder holder) {
 
-        db.addListenerForSingleValueEvent(new ValueEventListener() {
+        
+            db.addListenerForSingleValueEvent(new ValueEventListener() {
 
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String department = (String) dataSnapshot.child("departments").child(departmentID).child("name").getValue();
-                setUser(holder, userRef, assignee, department);
-            }
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    System.out.println("dataSnapshot = " + dataSnapshot);
+                    String department = (String) dataSnapshot.child("departments").child(departmentID).child("name").getValue();
+                    setUser(holder, userRef, assignee, department);
+                }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-            }
-        });
-
+                }
+            });
+        
     }
 
     private void setUser(APActionAdapter.ViewHolder holder, DatabaseReference userRef, String assignee, String department) {
@@ -291,12 +304,32 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
+        Action action = dataSnapshot.getValue(Action.class);
+        if (keys.indexOf(dataSnapshot.getKey()) == -1) {
+            if (action.getComplete() != null && action.getComplete() && action.getDueDate() != null) {
+                keys.add(dataSnapshot.getKey());
+                items.put(dataSnapshot.getKey(), action);
+                notifyItemInserted(keys.size() - 1);
+            }
+        } else {
+            items.put(dataSnapshot.getKey(), action);
+            notifyItemChanged(keys.indexOf(dataSnapshot.getKey()));
+        }
     }
 
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+        Action action = dataSnapshot.getValue(Action.class);
+        if (keys.indexOf(dataSnapshot.getKey()) == -1) {
+            if (action.getComplete() != null && action.getComplete() && action.getDueDate() != null) {
+                keys.add(dataSnapshot.getKey());
+                items.put(dataSnapshot.getKey(), action);
+                notifyItemInserted(keys.size() - 1);
+            }
+        } else {
+            items.put(dataSnapshot.getKey(), action);
+            notifyItemChanged(keys.indexOf(dataSnapshot.getKey()));
+        }
     }
 
     @Override

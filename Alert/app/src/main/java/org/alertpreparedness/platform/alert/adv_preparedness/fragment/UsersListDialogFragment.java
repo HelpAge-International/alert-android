@@ -42,7 +42,7 @@ public class UsersListDialogFragment extends DialogFragment implements UserListA
 
     private Unbinder unbinder;
     private UserListAdapter mAdapter;
-    private ArrayList <UserModel> userList;
+    private ArrayList<UserModel> userList;
     private int mPosition = 0;
 
     @Nullable
@@ -71,20 +71,10 @@ public class UsersListDialogFragment extends DialogFragment implements UserListA
         dbUserPublicRef.addValueEventListener(this);
 
         builder.setView(v)
-                .setSingleChoiceItems((ListAdapter) userList, mPosition, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                      //  System.out.println("mPosition = " + mPosition);
-                        System.out.println("userList = " + userList.size());
-                    }
-                })
-                .setPositiveButton(R.string.save, (dialog, id) ->{
+                .setPositiveButton(R.string.save, (dialog, id) -> {
                     listener.onItemSelected(mUser);
-
-                    System.out.println("mPosition = " + mPosition);
                 })
                 .setNegativeButton(R.string.close, (dialog, id) -> {
-                    // User cancelled the dialog
                 });
 
         return builder.create();
@@ -103,8 +93,7 @@ public class UsersListDialogFragment extends DialogFragment implements UserListA
             String lastname = (String) dataSnapshot.child(getChild.getKey()).child("lastName").getValue();
             String fullname = String.format("%s %s", firstname, lastname);
 
-            mAdapter.addUsers(getChild.getKey(), new UserModel(fullname));
-
+            mAdapter.addUsers(getChild.getKey(), new UserModel(getChild.getKey(), fullname));
         }
     }
 
@@ -115,13 +104,13 @@ public class UsersListDialogFragment extends DialogFragment implements UserListA
 
     @Override
     public void onActionItemSelected(UserModel user) {
-        System.out.println("user = [" + user + "]");
-            this.mUser = user;
+        this.mUser = user;
     }
 
     public void setListener(ItemSelectedListener listener) {
         this.listener = listener;
     }
+
 
     public interface ItemSelectedListener {
         void onItemSelected(UserModel model);

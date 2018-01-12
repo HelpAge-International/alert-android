@@ -217,10 +217,10 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
                         startActivityForResult(intent, 0);
                         break;
                     case R.id.take_video:
-
+                        //TODO allow video files
                         break;
                     case R.id.select_file:
-
+                        //TODO allow select files
                         break;
                 }
                 return false;

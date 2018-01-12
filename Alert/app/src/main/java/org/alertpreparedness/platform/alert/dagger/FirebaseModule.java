@@ -5,6 +5,7 @@ import android.content.Context;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.StorageReference;
 
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionCHSRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionStorageRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyBaseRef;
@@ -131,7 +132,12 @@ public class FirebaseModule {
         return db.child("note").child(user.countryID);
     }
 
-
+    @Provides
+    @Singleton
+    @ActionCHSRef
+    public DatabaseReference provideCHSRef(@BaseDatabaseRef DatabaseReference db, User user) {
+        return db.child("actionCHS").child(user.getSystemAdminID());
+    }
 //    @Provides
 //    @Singleton
 //    @TaskRef

@@ -1,6 +1,5 @@
 package org.alertpreparedness.platform.alert.dagger;
 
-import com.squareup.haha.perflib.Main;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;

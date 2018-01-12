@@ -95,19 +95,19 @@ public class ActionUnassignedFragment extends InProgressFragment{
             Long budget = (Long) getChild.child("budget").getValue();
             Long level =  (Long) getChild.child("level").getValue();
 
-            mUnassignedAdapter.addUnassignedItem(getChild.getKey(), new Action(
-                    taskName,
-                    department,
-                    assignee,
-                    isArchived,
-                    isComplete,
-                    actionType,
-                    dueDate,
-                    budget,
-                    level,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef())
-            );
+//            mUnassignedAdapter.addUnassignedItem(getChild.getKey(), new Action(
+//                    taskName,
+//                    department,
+//                    assignee,
+//                    isArchived,
+//                    isComplete,
+//                    actionType,
+//                    dueDate,
+//                    budget,
+//                    level,
+//                    dbAgencyRef.getRef(),
+//                    dbUserPublicRef.getRef())
+//            );
 
         }
 

@@ -57,10 +57,10 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
                     && action.getLevel() == Constants.MPA
                     && action.getDueDate() != null
                     && !DateHelper.itWasDue(action.getDueDate())
-                    && action.getTaskName() != null) {
+                    && action.getTaskName() != null || action.getCHS()) {
                 keys.add(key);
                 items.put(key, action);
-                notifyItemInserted(keys.size() - 1);
+                notifyItemInserted(keys.size()-1);
             }
         } else {
             items.put(key, action);
@@ -143,6 +143,20 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
         }
     }
 
+    public void addCHSAction(String key, Action action) {
+        if (keys.indexOf(key) == -1) {
+           if(action.getCHS() && action.getTaskName() == null && action.getLevel() == null){
+                keys.add(key);
+                items.put(key, action);
+                notifyItemInserted(keys.size()-1);
+            }
+        } else {
+            items.put(key, action);
+            notifyItemChanged(keys.indexOf(key));
+        }
+    }
+
+
     public ActionAdapter(Context context, DatabaseReference dbRef, ItemSelectedListener listener) {
         this.context = context;
         this.items = new HashMap<>();
@@ -155,6 +169,13 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     public Action getItem(int index) {
         return items.get(keys.get(index));
+    }
+
+    public void removeItem(String key) {
+        int index = keys.indexOf(key);
+        items.remove(keys.get(index));
+        keys.remove(index);
+        notifyItemRemoved(index);
     }
 
     @Override
@@ -279,7 +300,6 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
             default:
                 return "";
         }
-
     }
 
     @Override
@@ -293,7 +313,9 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
         Action action = dataSnapshot.getValue(Action.class);
+
         if (keys.indexOf(dataSnapshot.getKey()) == -1) {
             if (action.getComplete() != null && action.getComplete() && action.getDueDate() != null) {
                 keys.add(dataSnapshot.getKey());

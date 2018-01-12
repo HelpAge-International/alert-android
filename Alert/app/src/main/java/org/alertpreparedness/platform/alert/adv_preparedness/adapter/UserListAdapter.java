@@ -62,7 +62,6 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
 
         @OnClick(R.id.rbUsers)
         void onCLick(View v) {
-            System.out.println("getAdapterPosition() = " + getAdapterPosition());
             listener.onActionItemSelected(getItem(getAdapterPosition()));
         }
     }

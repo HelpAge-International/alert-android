@@ -24,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionCHSRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
@@ -65,10 +66,15 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     DatabaseReference dbAgencyRef;
 
     @Inject
+    @ActionCHSRef
+    DatabaseReference dbCHSRef;
+
+    @Inject
     @UserPublicRef
     DatabaseReference dbUserPublicRef;
 
     private ActionAdapter mAdapter;
+    private Boolean isCHS = false;
 
     @Nullable
     @Override
@@ -99,7 +105,6 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     protected ActionAdapter getmAdapter() {
         return new ActionAdapter(getContext(), dbActionRef, this);
     }
-
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -138,7 +143,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
         for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-
+            String actionIDs = getChild.getKey();
             String taskName = (String) getChild.child("task").getValue();
             String department = (String) getChild.child("department").getValue();
             String assignee = (String) getChild.child("asignee").getValue();
@@ -155,6 +160,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                     assignee,
                     isArchived,
                     isComplete,
+                    isCHS,
                     actionType,
                     dueDate,
                     budget,
@@ -162,6 +168,39 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                     dbAgencyRef.getRef(),
                     dbUserPublicRef.getRef())
             );
+
+            dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+                        if (actionIDs.contains(getChild.getKey())) {
+                            String taskNameCHS = (String) getChild.child("task").getValue();
+                            isCHS = true;
+                            mAdapter.addInProgressItem(getChild.getKey(), new Action(
+                                    taskNameCHS,
+                                    department,
+                                    assignee,
+                                    isArchived,
+                                    isComplete,
+                                    isCHS,
+                                    actionType,
+                                    dueDate,
+                                    budget,
+                                    level,
+                                    dbAgencyRef.getRef(),
+                                    dbUserPublicRef.getRef())
+                            );
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
 
         }
 

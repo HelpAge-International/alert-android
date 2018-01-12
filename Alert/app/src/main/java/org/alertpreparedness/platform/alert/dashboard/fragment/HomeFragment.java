@@ -28,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionCHSRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
@@ -62,7 +63,7 @@ import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetai
  * Created by Tj on 13/12/2017.
  */
 
-public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemClickedListener, FirebaseAuth.AuthStateListener, NestedScrollView.OnScrollChangeListener {
+public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItemClickedListener, FirebaseAuth.AuthStateListener, NestedScrollView.OnScrollChangeListener {
 
     @BindView(R.id.tasks_list_view)
     RecyclerView myTaskRecyclerView;
@@ -90,7 +91,8 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     @AgencyRef
     DatabaseReference agencyRef;
 
-    @Inject @AlertRef
+    @Inject
+    @AlertRef
     DatabaseReference alertRef;
 
     @Inject
@@ -108,6 +110,10 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     @Inject
     @NetworkRef
     DatabaseReference networkRef;
+
+    @Inject
+    @ActionCHSRef
+    DatabaseReference dbCHSRef;
 
     @Inject
     User user;
@@ -141,7 +147,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
 
         DependencyInjector.applicationComponent().inject(this);
 
-        ((MainDrawer)getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.ALERT, R.string.green_alert_level, R.drawable.alert_green);
+        ((MainDrawer) getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.ALERT, R.string.green_alert_level, R.drawable.alert_green);
 
         initViews();
 
@@ -240,7 +246,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
         boolean noAlerts = false;
 
         updateTitle(R.string.green_alert_level, R.drawable.alert_green);
-        for(String a: alertAdapter.getAlerts()){
+        for (String a : alertAdapter.getAlerts()) {
             AlertModel model = alertAdapter.getModel(a);
             switch (model.getAlertLevel()) {
                 case 2:
@@ -255,14 +261,13 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
             }
         }
 
-        if(!redPresent &&  !amberPresent && noAlerts){
+        if (!redPresent && !amberPresent && noAlerts) {
             updateTitle(R.string.green_alert_level, R.drawable.alert_green);
         }
 
-        if (redPresent){
-            updateTitle( R.string.red_alert_level, R.drawable.alert_red_main);
-        }
-        else {
+        if (redPresent) {
+            updateTitle(R.string.red_alert_level, R.drawable.alert_red_main);
+        } else {
             updateTitle(R.string.amber_alert_level, R.drawable.alert_amber_main);
         }
     }
@@ -271,8 +276,8 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
     public void updateTitle(int stringResource, int backgroundResource) {
         try {
             ((MainDrawer) getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.ALERT, stringResource, backgroundResource);
+        } catch (Exception e) {
         }
-        catch (Exception e){}
     }
 
     @Override
@@ -280,15 +285,14 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
         Rect rectf = new Rect();
         mTaskText.getGlobalVisibleRect(rectf);
         Rect rectf2 = new Rect();
-        ((MainDrawer)getActivity()).alertToolbar.getGlobalVisibleRect(rectf2);
+        ((MainDrawer) getActivity()).alertToolbar.getGlobalVisibleRect(rectf2);
 
-        if(rectf.top <= rectf2.bottom) {
+        if (rectf.top <= rectf2.bottom) {
             mPinnedHeader.setVisibility(View.VISIBLE);
-            ((MainDrawer)getActivity()).removeActionbarElevation();
-        }
-        else {
+            ((MainDrawer) getActivity()).removeActionbarElevation();
+        } else {
             mPinnedHeader.setVisibility(View.GONE);
-            ((MainDrawer)getActivity()).showActionbarElevation();
+            ((MainDrawer) getActivity()).showActionbarElevation();
         }
 
     }
@@ -309,12 +313,11 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
             model.setKey(dataSnapshot.getKey());
             model.setParentKey(dataSnapshot.getRef().getParent().getKey());
 
-            if(!isNetworkAlert) {
+            if (!isNetworkAlert) {
                 if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
                     updateAlert(dataSnapshot.getKey(), model);
                 }
-            }
-            else if(!model.hasNetworkApproval()) {
+            } else if (!model.hasNetworkApproval()) {
 
                 model.setLeadAgencyId(networkLeadId);
                 model.setAgencyAdminId(agencyAdminId);
@@ -359,15 +362,19 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
         private void process(DataSnapshot dataSnapshot, String s) {
             Tasks task;
 
-            if(dataSnapshot.getRef().getParent().getParent().getKey().equals("action")) {
+            if (dataSnapshot.getRef().getParent().getParent().getKey().equals("action")) {
                 ActionModel model = dataSnapshot.getValue(ActionModel.class);
                 assert model != null;
                 if (model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null) {
                     task = new Tasks(0, "action", model.getTask(), model.getDueDate());
+                    if(model.getType() == 0){
+                        System.out.println(" in type");
+                        task = new Tasks(0, "Faiz", model.getTask(), model.getDueDate(), 0);
+                    }
                     addTask(task);
                 }
-            }
-            else if(dataSnapshot.getRef().getParent().getParent().getKey().equals("indicator")) {
+
+            } else if (dataSnapshot.getRef().getParent().getParent().getKey().equals("indicator")) {
                 IndicatorModel model = dataSnapshot.getValue(IndicatorModel.class);
                 assert model != null;
                 if (model.getAssignee() != null && model.getAssignee().equals(user.getUserID()) && model.getDueDate() != null) {
@@ -375,6 +382,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
                     addTask(tasks);
                 }
             }
+
         }
 
         @Override
@@ -410,7 +418,7 @@ public class HomeFragment extends Fragment implements IHomeActivity,OnAlertItemC
             HashMap<String, Boolean> networks = (HashMap<String, Boolean>) dataSnapshot.child("networks").getValue();
             agencyAdminId = dataSnapshot.child("adminId").getValue(String.class);
 
-            if(networks != null) {
+            if (networks != null) {
                 for (String id : networks.keySet()) {
                     DatabaseReference ref = baseAlertRef.child(id);
                     ref.addChildEventListener(networkAlertListener);

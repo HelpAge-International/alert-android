@@ -120,20 +120,20 @@ public class ActionExpiredFragment extends InProgressFragment {
             Long budget = (Long) getChild.child("budget").getValue();
             Long level =  (Long) getChild.child("level").getValue();
 
-            System.out.println("dataSnapshot = " + dataSnapshot);
-            mExpiredAdapter.addExpiredItem(getChild.getKey(), new Action(
-                    taskName,
-                    department,
-                    assignee,
-                    isArchived,
-                    isComplete,
-                    actionType,
-                    dueDate,
-                    budget,
-                    level,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef())
-            );
+//            System.out.println("dataSnapshot = " + dataSnapshot);
+//            mExpiredAdapter.addExpiredItem(getChild.getKey(), new Action(
+//                    taskName,
+//                    department,
+//                    assignee,
+//                    isArchived,
+//                    isComplete,
+//                    actionType,
+//                    dueDate,
+//                    budget,
+//                    level,
+//                    dbAgencyRef.getRef(),
+//                    dbUserPublicRef.getRef())
+//            );
 
         }
 
