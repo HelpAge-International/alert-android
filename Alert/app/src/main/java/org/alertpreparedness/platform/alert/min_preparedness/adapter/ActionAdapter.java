@@ -54,10 +54,13 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
         System.out.println("keys.indexOf(key) = " + key);
         if (keys.indexOf(key) == -1) {
             if (action.getLevel() != null
+                    && action.getAssignee() != null
                     && action.getLevel() == Constants.MPA
                     && action.getDueDate() != null
                     && !DateHelper.itWasDue(action.getDueDate())
-                    && action.getTaskName() != null || action.getCHS()) {
+                    && action.getTaskName() != null
+                    || (action.getCHS() && action.getAssignee() != null)
+                    || (action.getMandated()) && action.getAssignee() != null){
                 keys.add(key);
                 items.put(key, action);
                 notifyItemInserted(keys.size()-1);
@@ -94,13 +97,12 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
                     && action.getLevel() == Constants.MPA
                     && action.getAssignee() == null
                     && action.getTaskName() != null
-                    && action.getDueDate() == null) {
-                if (action.getActionType() == Constants.MANDATED
-                        || action.getActionType() == Constants.CUSTOM) {
+                    || (action.getMandated() && action.getAssignee() == null)) {
+
                     keys.add(key);
                     items.put(key, action);
                     notifyItemInserted(keys.size());
-                }
+
             }
         } else {
             items.put(key, action);
@@ -114,8 +116,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
             if (action.getLevel() != null
                     && action.getLevel() == Constants.MPA
                     && action.getComplete() != null
-                    && action.getComplete()
-                    && action.getDueDate() != null) {
+                    && action.getComplete()) {
                 keys.add(key);
                 items.put(key, action);
                 notifyItemInserted(keys.size());

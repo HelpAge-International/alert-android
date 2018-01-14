@@ -11,10 +11,8 @@ import com.google.firebase.database.DatabaseReference;
 public class Action {
     private Boolean isArchived;
     private Boolean isComplete;
-
-
-
     private Boolean isCHS;
+    private Boolean isMandated;
     private String taskName;
     private String department;
     private String assignee;
@@ -34,19 +32,28 @@ public class Action {
         this.path = path;
     }
 
-    public Action(String taskName, String department, String assignee, Boolean isArchived, Boolean isComplete, Boolean isCHS, Long actionType, Long dueDate, Long budget, Long level, DatabaseReference db, DatabaseReference userRef) {
+    public Action(String taskName, String department, String assignee, Boolean isArchived, Boolean isComplete, Boolean isCHS, Boolean isMandated, Long actionType, Long dueDate, Long budget, Long level, DatabaseReference db, DatabaseReference userRef) {
         this.taskName = taskName;
         this.department = department;
         this.assignee = assignee;
         this.isArchived = isArchived;
         this.isComplete = isComplete;
         this.isCHS = isCHS;
+        this.isMandated = isMandated;
         this.actionType = actionType;
         this.dueDate = dueDate;
         this.budget = budget;
         this.level = level;
         this.db = db;
         this.userRef = userRef;
+    }
+
+    public Boolean getMandated() {
+        return isMandated;
+    }
+
+    public void setMandated(Boolean mandated) {
+        isMandated = mandated;
     }
 
     public Boolean getCHS() {

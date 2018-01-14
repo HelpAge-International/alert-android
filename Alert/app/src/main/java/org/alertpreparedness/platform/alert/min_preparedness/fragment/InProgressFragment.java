@@ -25,6 +25,7 @@ import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionCHSRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
@@ -70,11 +71,16 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     DatabaseReference dbCHSRef;
 
     @Inject
+    @ActionMandatedRef
+    DatabaseReference dbMandatedRef;
+
+    @Inject
     @UserPublicRef
     DatabaseReference dbUserPublicRef;
 
     private ActionAdapter mAdapter;
     private Boolean isCHS = false;
+    private Boolean isMandated = false;
 
     @Nullable
     @Override
@@ -161,6 +167,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                     isArchived,
                     isComplete,
                     isCHS,
+                    isMandated,
                     actionType,
                     dueDate,
                     budget,
@@ -169,21 +176,58 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                     dbUserPublicRef.getRef())
             );
 
+            //CHS
             dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-
                     for (DataSnapshot getChild : dataSnapshot.getChildren()) {
                         if (actionIDs.contains(getChild.getKey())) {
-                            String taskNameCHS = (String) getChild.child("task").getValue();
+                            String taskNameMandated = (String) getChild.child("task").getValue();
                             isCHS = true;
                             mAdapter.addInProgressItem(getChild.getKey(), new Action(
-                                    taskNameCHS,
+                                    taskNameMandated,
                                     department,
                                     assignee,
                                     isArchived,
                                     isComplete,
                                     isCHS,
+                                    isMandated,
+                                    actionType,
+                                    dueDate,
+                                    budget,
+                                    level,
+                                    dbAgencyRef.getRef(),
+                                    dbUserPublicRef.getRef())
+                            );
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+
+            //Mandated
+            dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+                        if (actionIDs.contains(getChild.getKey())) {
+                            String taskNameMandated = (String) getChild.child("task").getValue();
+                            String departmentMandated = (String) getChild.child("department").getValue();
+                            isCHS = false;
+                            isMandated = true;
+                            mAdapter.addInProgressItem(getChild.getKey(), new Action(
+                                    taskNameMandated,
+                                    departmentMandated,
+                                    assignee,
+                                    isArchived,
+                                    isComplete,
+                                    isCHS,
+                                    isMandated,
                                     actionType,
                                     dueDate,
                                     budget,

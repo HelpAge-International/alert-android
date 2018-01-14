@@ -24,6 +24,8 @@ import com.google.firebase.database.ValueEventListener;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionCHSRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
@@ -74,10 +76,20 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
     DatabaseReference dbAlertRef;
 
     @Inject
+    @ActionCHSRef
+    DatabaseReference dbCHSRef;
+
+    @Inject
+    @ActionMandatedRef
+    DatabaseReference dbMandatedRef;
+
+    @Inject
     @UserPublicRef
     DatabaseReference dbUserPublicRef;
 
     private APActionAdapter mAPAdapter;
+    private Boolean isCHS = false;
+    private Boolean isMandated = false;
 
     @Nullable
     @Override
@@ -150,7 +162,7 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
         for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-
+            String actionIDs = getChild.getKey();
             String taskName = (String) getChild.child("task").getValue();
             String department = (String) getChild.child("department").getValue();
             String assignee = (String) getChild.child("asignee").getValue();
@@ -165,20 +177,92 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Long alertLevel = (Long) dataSnapshot.child("alertLevel").getValue();
-//                    mAPAdapter.addInActiveItem(getChild.getKey(), new Action(
-//                                    taskName,
-//                                    department,
-//                                    assignee,
-//                                    isArchived,
-//                                    isComplete,
-//                                    actionType,
-//                                    dueDate,
-//                                    budget,
-//                                    level,
-//                                    dbAgencyRef.getRef(),
-//                                    dbUserPublicRef.getRef()),
-//                            alertLevel
-//                    );
+                    mAPAdapter.addInActiveItem(getChild.getKey(), new Action(
+                                    taskName,
+                                    department,
+                                    assignee,
+                                    isArchived,
+                                    isComplete,
+                                    isCHS,
+                                    isMandated,
+                                    actionType,
+                                    dueDate,
+                                    budget,
+                                    level,
+                                    dbAgencyRef.getRef(),
+                                    dbUserPublicRef.getRef()),
+                            alertLevel
+                    );
+
+                    //CHS
+                    dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+                                if (actionIDs.contains(getChild.getKey())) {
+                                    String taskNameMandated = (String) getChild.child("task").getValue();
+                                    isCHS = true;
+                                    mAPAdapter.addInActiveItem(getChild.getKey(), new Action(
+                                            taskNameMandated,
+                                            department,
+                                            assignee,
+                                            isArchived,
+                                            isComplete,
+                                            isCHS,
+                                            isMandated,
+                                            actionType,
+                                            dueDate,
+                                            budget,
+                                            level,
+                                            dbAgencyRef.getRef(),
+                                            dbUserPublicRef.getRef()),
+                                            alertLevel
+                                    );
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    //Mandated
+                    dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+                                if (actionIDs.contains(getChild.getKey())) {
+                                    String taskNameMandated = (String) getChild.child("task").getValue();
+                                    String departmentMandated = (String) getChild.child("department").getValue();
+                                    isCHS = false;
+                                    isMandated = true;
+                                    mAPAdapter.addInActiveItem(getChild.getKey(), new Action(
+                                            taskNameMandated,
+                                            departmentMandated,
+                                            assignee,
+                                            isArchived,
+                                            isComplete,
+                                            isCHS,
+                                            isMandated,
+                                            actionType,
+                                            dueDate,
+                                            budget,
+                                            level,
+                                            dbAgencyRef.getRef(),
+                                            dbUserPublicRef.getRef()),
+                                            alertLevel
+                                    );
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
 
                 }
 

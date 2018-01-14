@@ -132,8 +132,7 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
             if (action.getLevel() != null
                     && action.getLevel() == Constants.APA
                     && action.getComplete() != null
-                    && action.getComplete()
-                    && action.getDueDate() != null) {
+                    && action.getComplete()) {
                 keys.add(key);
                 items.put(key, action);
                 notifyItemInserted(keys.size() - 1);
