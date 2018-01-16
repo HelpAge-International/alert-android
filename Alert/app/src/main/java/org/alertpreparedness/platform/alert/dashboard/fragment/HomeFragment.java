@@ -473,6 +473,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
     private void onNetworkRetrieved(DataSnapshot snapshot) {
         networkLeadId = snapshot.child("leadAgencyId").getValue(String.class);
+
         agencyRef.addListenerForSingleValueEvent(agencyListener);
         alertRef.addChildEventListener(alertListener);
     }

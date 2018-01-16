@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Created by Tj on 09/01/2018.
  */
 
-public class ProgrammeModel implements Parcelable{
+public class ProgrammeModel implements Parcelable {
 
     private String key;
     private String agencyId;

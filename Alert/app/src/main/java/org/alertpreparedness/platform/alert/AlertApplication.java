@@ -64,12 +64,14 @@ public class AlertApplication extends Application {
         ACRA.init(this);
 
         if(!PreferHelper.getBoolean(this, Constants.HAS_RUN_BEFORE)) {
+            System.out.println("PreferHelper.getString(this, Constants.HAS_RUN_BEFORE) = " + PreferHelper.getString(this, Constants.HAS_RUN_BEFORE));
             FirebaseAuth.getInstance().signOut();
+            PreferHelper.deleteString(this, Constants.UID);
             PreferHelper.putBoolean(this, Constants.HAS_RUN_BEFORE, true);
         }
 
         // Live-Only additions
-        if (!IS_LIVE) {
+        if (!IS_LIVE && CURRENT_STATUS != APP_STATUS.TESTING) {
             // Leak Canary
             if (LeakCanary.isInAnalyzerProcess(this)) {
                 // This process is dedicated to LeakCanary for heap analysis.

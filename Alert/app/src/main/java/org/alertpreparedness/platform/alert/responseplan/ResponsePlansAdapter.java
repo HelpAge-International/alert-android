@@ -60,8 +60,6 @@ public class ResponsePlansAdapter extends RecyclerView.Adapter<ResponsePlansAdap
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
         //handled by activity
         boolean a = (boolean)dataSnapshot.child("isActive").getValue();
-        System.out.println("a = " + a);
-        System.out.println("shouldBeActive = " + shouldBeActive);
         if(a != shouldBeActive) {
             removeItem(dataSnapshot);
         }
@@ -74,9 +72,11 @@ public class ResponsePlansAdapter extends RecyclerView.Adapter<ResponsePlansAdap
 
     private void removeItem(DataSnapshot dataSnapshot) {
         int index = keys.indexOf(dataSnapshot.getKey());
-        items.remove(dataSnapshot.getKey());
-        keys.remove(index);
-        notifyItemRemoved(index);
+        if(index != -1) {
+            notifyItemRemoved(index);
+            items.remove(dataSnapshot.getKey());
+            keys.remove(index);
+        }
     }
 
     @Override
@@ -122,7 +122,6 @@ public class ResponsePlansAdapter extends RecyclerView.Adapter<ResponsePlansAdap
     public ResponsePlansAdapter(Context context, DatabaseReference responsePlans, boolean shouldBeActive, ResponseAdapterListener listner) {
         this.context = context;
         this.shouldBeActive = shouldBeActive;
-        System.out.println("shouldBeActive = " + shouldBeActive);
         this.items = new HashMap<>();
         this.keys = new ArrayList<>(items.keySet());
         this.responsePlans = responsePlans;
@@ -143,7 +142,7 @@ public class ResponsePlansAdapter extends RecyclerView.Adapter<ResponsePlansAdap
         ResponsePlanObj model = items.get(keys.get(position));
 
         holder.description.setText(model.description);
-        holder.percentComplete.setText(String.format(context.getString(R.string.complete), model.completePercentage));
+        holder.percentComplete.setText(String.format(context.getString(R.string.complete), (Integer.parseInt(model.completePercentage) * 10)));
         holder.hazardType.setText(model.hazardType);
         holder.lastUpdated.setText(String.format(context.getString(R.string.last_updated_f), DateFormat.getDateInstance(DateFormat.SHORT).format(model.lastUpdated)));
         switch (model.status) {

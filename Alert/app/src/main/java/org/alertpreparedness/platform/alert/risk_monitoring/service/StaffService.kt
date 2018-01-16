@@ -25,13 +25,14 @@ object StaffService {
                 }
     }
 
-    fun getCountryAdmin(): Flowable<List<String>> {
-        val admins = AppUtils.getDatabase().getReference(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS)).child("directorCountry")
-
-        return RxFirebaseDatabase.observeValueEvent(admins)
-                .map { snap ->
-                    snap.children.map { it.value as String }
-                }
+    fun getCountryAdmin(): Flowable<ModelUserPublic> {
+        val userDetail = FirebaseHelper.getUserDetail(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), PreferHelper.getString(AlertApplication.getContext(), Constants.COUNTRY_ID))
+        println("userDetail = ${userDetail}")
+        return RxFirebaseDatabase.observeValueEvent(userDetail, ModelUserPublic::class.java)
+                .map({ model: ModelUserPublic ->
+                    model.id = PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS)
+                    return@map model
+                })
     }
 
     fun getUserDetail(userId: String): Flowable<ModelUserPublic> {

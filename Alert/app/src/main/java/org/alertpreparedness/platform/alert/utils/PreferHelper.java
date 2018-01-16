@@ -65,4 +65,8 @@ public class PreferHelper {
         PreferHelper.getInstance(context).edit().putStringSet(key, stringSet).apply();
     }
 
+    public static void deleteString(Context context, String key) {
+        PreferHelper.getInstance(context).edit().remove(key).apply();
+    }
+
 }

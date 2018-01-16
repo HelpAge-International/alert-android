@@ -33,7 +33,11 @@ public class SplashActivity extends BaseActivity {
             // This method will be executed once the timer is over
             // Start your app main activity
             AppUtils.getDatabase();
-            if (FirebaseAuth.getInstance().getCurrentUser() != null && new UserInfo().getUser() != null) {
+            System.out.println("FirebaseAuth.getInstance().getCurrentUser() = " + FirebaseAuth.getInstance().getCurrentUser());
+            System.out.println("new UserInfo().getUser() = " + new UserInfo().getUser());
+            System.out.println("PreferHelper.getString(this, Constants.UID) = " + PreferHelper.getString(this, Constants.UID));
+
+            if (FirebaseAuth.getInstance().getCurrentUser() != null && new UserInfo().getUser() != null && !PreferHelper.getString(this, Constants.UID).equals("")) {
                 startActivity(new Intent(this, HomeScreen.class));
             } else {
                 startActivity(new Intent(this, LoginScreen.class));

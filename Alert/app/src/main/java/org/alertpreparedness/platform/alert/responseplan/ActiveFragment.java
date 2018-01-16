@@ -22,7 +22,9 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
 import org.alertpreparedness.platform.alert.model.User;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -82,12 +84,19 @@ public class ActiveFragment extends Fragment implements ResponsePlansAdapter.Res
         if(mAdapter.getItem(pos).status > 0) {
             ApprovalStatusDialog dialog = new ApprovalStatusDialog();
             Bundle data = new Bundle();
-            ApprovalStatusObj[] items = new ApprovalStatusObj[]{
-                    new ApprovalStatusObj("Country Director", mAdapter.getItem(pos).countryApproval),
-                    new ApprovalStatusObj("Regional Director", mAdapter.getItem(pos).regionalApproval),
-                    new ApprovalStatusObj("Global Director", mAdapter.getItem(pos).globalApproval)
-            };
-            data.putParcelableArray(ApprovalStatusDialog.APPROVAL_STATUSES, items);
+            List<ApprovalStatusObj> items = new ArrayList<>();
+
+            if (mAdapter.getItem(pos).countryApproval != -1) {
+                items.add(new ApprovalStatusObj("Country Director", mAdapter.getItem(pos).countryApproval));
+
+            }
+            if(mAdapter.getItem(pos).regionalApproval != -1) {
+                items.add(new ApprovalStatusObj("Regional Director", mAdapter.getItem(pos).regionalApproval));
+            }
+            if(mAdapter.getItem(pos).globalApproval != -1) {
+                items.add(new ApprovalStatusObj("Global Director", mAdapter.getItem(pos).globalApproval));
+            }
+            data.putParcelableArray(ApprovalStatusDialog.APPROVAL_STATUSES, items.toArray(new ApprovalStatusObj[items.size()]));
             dialog.setArguments(data);
             dialog.show(getActivity().getSupportFragmentManager(), "alert_level");
         }
@@ -140,7 +149,7 @@ public class ActiveFragment extends Fragment implements ResponsePlansAdapter.Res
                 }
             }
         }
-        return 0;
+        return -1;//does not contain ref
     }
 
     @Override
