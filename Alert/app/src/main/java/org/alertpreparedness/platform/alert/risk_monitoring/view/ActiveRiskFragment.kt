@@ -44,27 +44,31 @@ class ActiveRiskFragment : Fragment(), OnIndicatorSelectedListener {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         mViewModel = ViewModelProviders.of(this).get(ActiveRiskViewModel::class.java)
+        val view = inflater?.inflate(R.layout.fragment_active_risk, container, false)
+        val rvRiskActive: RecyclerView? = view?.find(R.id.rvRiskActive)
+
         mViewModel.getLiveCountryModel().observe(this, Observer<ModelCountry> { country ->
             country?.location?.let {
                 mCountryLocation = it
             }
+
+            mViewModel.getLiveNetworkMap().observe(this, Observer { map ->
+                mNetworkCountryMap = map
+            })
+            // Inflate the layout for this fragment
+
+            rvRiskActive?.layoutManager = LinearLayoutManager(AlertApplication.getContext())
+            val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
+            rvRiskActive?.addItemDecoration(decoration)
+            mViewModel.getLiveGroups(true).observe(this, Observer<MutableList<ExpandableGroup<ModelIndicator>>> {
+                val size = it?.size ?: 0
+                if (size > 0) {
+                    pbLoading?.hide()
+                }
+                rvRiskActive?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, mCountryLocation, this, mNetworkCountryMap)
+            })
         })
-        mViewModel.getLiveNetworkMap().observe(this, Observer { map ->
-            mNetworkCountryMap = map
-        })
-        // Inflate the layout for this fragment
-        val view = inflater?.inflate(R.layout.fragment_active_risk, container, false)
-        val rvRiskActive: RecyclerView? = view?.find(R.id.rvRiskActive)
-        rvRiskActive?.layoutManager = LinearLayoutManager(AlertApplication.getContext())
-        val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
-        rvRiskActive?.addItemDecoration(decoration)
-        mViewModel.getLiveGroups(true).observe(this, Observer<MutableList<ExpandableGroup<ModelIndicator>>> {
-            val size = it?.size ?: 0
-            if (size > 0) {
-                pbLoading?.hide()
-            }
-            rvRiskActive?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, mCountryLocation, this, mNetworkCountryMap)
-        })
+
         return view
     }
 

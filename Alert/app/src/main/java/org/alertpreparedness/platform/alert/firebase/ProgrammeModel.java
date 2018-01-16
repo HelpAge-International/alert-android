@@ -16,7 +16,7 @@ public class ProgrammeModel implements Parcelable {
     private int sector;
     private String toWho;
     private String what;
-    private long where;
+//    private String where;
     private long when;
 
     public ProgrammeModel(){}
@@ -29,7 +29,7 @@ public class ProgrammeModel implements Parcelable {
         sector = in.readInt();
         toWho = in.readString();
         what = in.readString();
-        where = in.readLong();
+//        where = in.readString();
         when = in.readLong();
     }
 
@@ -85,13 +85,13 @@ public class ProgrammeModel implements Parcelable {
         this.what = what;
     }
 
-    public Long getWhere() {
-        return where;
-    }
-
-    public void setWhere(Long where) {
-        this.where = where;
-    }
+//    public String getWhere() {
+//        return where;
+//    }
+//
+//    public void setWhere(String where) {
+//        this.where = where;
+//    }
 
     public long getWhen() {
         return when;
@@ -122,7 +122,7 @@ public class ProgrammeModel implements Parcelable {
         parcel.writeInt(sector);
         parcel.writeString(toWho);
         parcel.writeString(what);
-        parcel.writeLong(where);
+//        parcel.writeString(where);
         parcel.writeLong(when);
     }
 

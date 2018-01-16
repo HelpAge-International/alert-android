@@ -42,6 +42,7 @@ import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
+import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
@@ -366,7 +367,9 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                 ActionModel model = dataSnapshot.getValue(ActionModel.class);
                 assert model != null;
                 if (model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null) {
-                    addTask(new Tasks(0, "action", model.getTask(), model.getDueDate()));
+                    if (DateHelper.isDueInWeek(model.getDueDate()) || DateHelper.itWasDue(model.getDueDate())) {
+                        addTask(new Tasks(0, "action", model.getTask(), model.getDueDate()));
+                    }
                 }
 
             } else if (dataSnapshot.getRef().getParent().getParent().getKey().equals("indicator")) {
@@ -374,7 +377,9 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                 assert model != null;
                 if (model.getAssignee() != null && model.getAssignee().equals(user.getUserID()) && model.getDueDate() != null) {
                     Tasks tasks = new Tasks(model.getTriggerSelected().intValue(), "indicator", model.getName(), model.getDueDate());
-                    addTask(tasks);
+                    if (DateHelper.isDueInWeek(tasks.dueDate) || DateHelper.itWasDue(tasks.dueDate)) {
+                        addTask(tasks);
+                    }
                 }
             }
         }

@@ -348,10 +348,11 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
             ProgrammeModel model = snapshot.getValue(ProgrammeModel.class);
             assert model != null;
             model.setKey(snapshot.getKey());
-            assert filter.getLevel1() != null;
-            boolean hasLevel2 = filter.getLevel2() != null;
+//            assert filter.getLevel1() != null;
+            boolean hasLevel1 = filter.getLevel1() != null && filter.getLevel1() != -1;
+            boolean hasLevel2 = filter.getLevel2() != null && filter.getLevel2() != -1;
 
-            if(filter.getLevel1() == model.getLevel1() && (!hasLevel2 || filter.getLevel2().toString().equals(model.getLevel2()))) {
+            if((!hasLevel1 || filter.getLevel1() == model.getLevel1()) && (!hasLevel2 || filter.getLevel2().toString().equals(model.getLevel2()))) {
                 ArrayList<ProgrammeModel> models = programmes.get(model.getAgencyId());
 
                 if (programmes.get(model.getAgencyId()) == null) {
@@ -363,8 +364,13 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
             }
         }
 
-        for (String id : agencyRequests.keySet()) {
-            agencyRef.child(id).addValueEventListener(new AgencyListener());
+        if(agencyRequests.size() > 0) {
+            System.out.println("agencyRequests = " + agencyRequests);
+            for (String id : agencyRequests.keySet()) {
+                if(id != null) {
+                    agencyRef.child(id).addValueEventListener(new AgencyListener());
+                }
+            }
         }
 
     }

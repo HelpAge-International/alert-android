@@ -240,22 +240,24 @@ public class MyCountryFragment extends Fragment implements OnCountrySelectedList
         if(mCountrySelected.getValue() == null) {
             SnackbarHelper.show(getActivity(), getString(R.string.select_country_error));
         }
-        else if(mLevel1Selected.getValue() == null && mHasLevel1) {
-            SnackbarHelper.show(getActivity(), getString(R.string.select_level_1_error));
-        }
-        else if(mLevel2Selected.getValue() == null && mHasLevel2) {
-            SnackbarHelper.show(getActivity(), getString(R.string.select_level_2_error));
-        }
+//        else if(mLevel1Selected.getValue() == null && mHasLevel1) {
+//            SnackbarHelper.show(getActivity(), getString(R.string.select_level_1_error));
+//        }
+//        else if(mLevel2Selected.getValue() == null && mHasLevel2) {
+//            SnackbarHelper.show(getActivity(), getString(R.string.select_level_2_error));
+//        }
         else {
-            int level2 = mLevel2Selected.getValue() == null ? 0 : mLevel2Selected.getValue().getId();
-            int level1 = mLevel1Selected.getValue() == null ? 0 : mLevel1Selected.getValue().getId();
+            int level2 = mLevel2Selected.getValue() == null ? -1 : mLevel2Selected.getValue().getId();
+            int level1 = mLevel1Selected.getValue() == null ? -1 : mLevel1Selected.getValue().getId();
 
             ModelIndicatorLocation modelArea = new ModelIndicatorLocation(mCountrySelected.getValue(), level1, level2);
 
             Intent intent = new Intent(getContext(), ProgramResultsActivity.class);
             intent.putExtra(ProgramResultsActivity.BUNDLE_FILTER, modelArea);
-            intent.putExtra(ProgramResultsActivity.TITLE_1, Constants.COUNTRIES[mCountrySelected.getValue()]);
-            if(mLevel1Selected.getValue() != null) {
+//            if(level1 != -1) {
+                intent.putExtra(ProgramResultsActivity.TITLE_1, Constants.COUNTRIES[mCountrySelected.getValue()]);
+//            }
+            if(mLevel1Selected.getValue() != null && level1 != -1) {
                 intent.putExtra(ProgramResultsActivity.TITLE_2, mLevel1Selected.getValue().getValue());
             }
             startActivity(intent);
