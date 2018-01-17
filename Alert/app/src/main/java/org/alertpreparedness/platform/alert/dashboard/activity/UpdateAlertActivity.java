@@ -222,8 +222,10 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     ArrayList<AffectedAreaModel> areas = (ArrayList<AffectedAreaModel>) dataSnapshot.getValue();
-                    areas.remove(position);
-                    db.setValue(areas);
+                    if (areas != null) {
+                        areas.remove(position);
+                        db.setValue(areas);
+                    }
                 }
 
                 @Override

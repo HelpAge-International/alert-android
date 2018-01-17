@@ -136,7 +136,7 @@ object RiskMonitoringService {
         Timber.d("actual ids: %s, %s", hazardId, indicatorId)
         val indicatorRef = FirebaseHelper.getIndicatorRef(mAppStatus, hazardId, indicatorId)
         return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
-            Timber.d(snap.value.toString())
+            println("getIndicatorModelsnap = [${snap.ref}]")
             val toJson = gson.toJson(snap.value)
             val jsonReader = JsonReader(StringReader(toJson))
             jsonReader.isLenient = true

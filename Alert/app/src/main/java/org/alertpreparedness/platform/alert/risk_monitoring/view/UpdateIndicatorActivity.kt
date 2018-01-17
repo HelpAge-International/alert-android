@@ -80,10 +80,10 @@ class UpdateIndicatorActivity : BaseActivity() {
 
     private fun initListeners() {
         tvUpdateIndicatorLevelGreen.setOnClickListener {
-            if (mIndicatorModel.triggerSelected == GREEN_TRIGGER_POSITION) {
-                Toasty.info(this, "Already in Green level").show()
-                return@setOnClickListener
-            }
+//            if (mIndicatorModel.triggerSelected == GREEN_TRIGGER_POSITION) {
+//                Toasty.info(this, "Already in Green level").show()
+//                return@setOnClickListener
+//            }
             alert("Are you sure you want to update to Green?", "Update Level",
                     {
                         yesButton { updateIndicatorLevelTo(GREEN_TRIGGER_POSITION) }
@@ -93,10 +93,10 @@ class UpdateIndicatorActivity : BaseActivity() {
         }
 
         tvUpdateIndicatorLevelAmber.setOnClickListener {
-            if (mIndicatorModel.triggerSelected == AMBER_TRIGGER_POSITION) {
-                Toasty.info(this, "Already in Amber level").show()
-                return@setOnClickListener
-            }
+//            if (mIndicatorModel.triggerSelected == AMBER_TRIGGER_POSITION) {
+//                Toasty.info(this, "Already in Amber level").show()
+//                return@setOnClickListener
+//            }
             alert("Are you sure you want to update to Amber?", "Update Level",
                     {
                         yesButton { updateIndicatorLevelTo(AMBER_TRIGGER_POSITION) }
@@ -106,10 +106,10 @@ class UpdateIndicatorActivity : BaseActivity() {
         }
 
         tvUpdateIndicatorLevelRed.setOnClickListener {
-            if (mIndicatorModel.triggerSelected == RED_TRIGGER_POSITION) {
-                Toasty.info(this, "Already in Red level").show()
-                return@setOnClickListener
-            }
+//            if (mIndicatorModel.triggerSelected == RED_TRIGGER_POSITION) {
+//                Toasty.info(this, "Already in Red level").show()
+//                return@setOnClickListener
+//            }
             alert("Are you sure you want to update to Red?", "Update Level",
                     {
                         yesButton { updateIndicatorLevelTo(RED_TRIGGER_POSITION) }

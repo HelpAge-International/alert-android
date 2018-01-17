@@ -57,7 +57,7 @@
     <string name="update_every">Update every</string>
     <string name="_0">0</string>
     <string name="frequency">Frequency</string>
-    <string name="geographical_location_of_indicator_monitoring">Geographical location of indicator monitoring</string>
+    <string name="geographical_location_of_indicator_monitoring">Please select geographical location of indicator monitoring</string>
     <string name="source_name">Source Name</string>
     <string name="link_to_source_optional">Link to source (optional)</string>
     <string name="assign_to">Assign to</string>
