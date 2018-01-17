@@ -32,8 +32,11 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ActionCHSRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.HazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity;
@@ -117,6 +120,20 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     DatabaseReference dbCHSRef;
 
     @Inject
+    @HazardRef
+    DatabaseReference hazardRef;
+
+
+    @Inject
+    @BaseIndicatorRef
+    DatabaseReference baseIndicatorRef;
+
+
+    @Inject
+    @BaseActionRef
+    DatabaseReference baseActionRef;
+
+    @Inject
     User user;
 
     @BindView(R.id.networkTitle)
@@ -135,7 +152,9 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     private AlertListener networkAlertListener = new AlertListener(true);
     private TaskListener taskListener = new TaskListener();
     private TaskListener indicatorListener = new TaskListener();
+    private TaskListener hazardTaskListener = new TaskListener();
     private NetworkListener networkListener = new NetworkListener();
+    private HazardListener hazardListener = new HazardListener();
     private String agencyAdminId;
     private String networkLeadId;
     private Tasks task;
@@ -163,7 +182,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         taskRef.addChildEventListener(taskListener);
         indicatorRef.addChildEventListener(indicatorListener);
         networkRef.addValueEventListener(networkListener);
-
+        hazardRef.addChildEventListener(hazardListener);
         alertRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager alertlayoutManager = new LinearLayoutManager(getContext());
         alertRecyclerView.setLayoutManager(alertlayoutManager);
@@ -229,10 +248,6 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     @Override
     public void onStop() {
         super.onStop();
-        alertRef.removeEventListener(alertListener);
-        agencyRef.removeEventListener(agencyListener);
-        taskRef.removeEventListener(taskListener);
-        indicatorRef.removeEventListener(taskListener);
     }
 
     @Override
@@ -299,6 +314,39 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
     }
 
+    private class HazardListener implements ChildEventListener {
+
+        private void process(DataSnapshot datasnapshot) {
+            baseActionRef.child(datasnapshot.getKey()).addChildEventListener(hazardTaskListener);
+            baseIndicatorRef.child(datasnapshot.getKey()).addChildEventListener(hazardTaskListener);
+        }
+
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            process(dataSnapshot);
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            process(dataSnapshot);
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    }
+
     private class AlertListener implements ChildEventListener {
 
         private boolean isNetworkAlert;
@@ -324,7 +372,6 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                 model.setLeadAgencyId(networkLeadId);
                 model.setAgencyAdminId(agencyAdminId);
                 if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
-                    System.out.println("updatednetworkalert");
                     updateNetworkAlert(model.getKey(), model);
                 }
 
@@ -333,13 +380,11 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            System.out.println("onChildAdded = [" + dataSnapshot + "], s = [" + s + "]");
             proccess(dataSnapshot, s);
         }
 
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            System.out.println("onChildChanged = [" + dataSnapshot + "], s = [" + s + "]");
             proccess(dataSnapshot, s);
         }
 
@@ -362,19 +407,28 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     private class TaskListener implements ChildEventListener {
 
         private void process(DataSnapshot dataSnapshot, String s) {
-
             if (dataSnapshot.getRef().getParent().getParent().getKey().equals("action")) {
                 ActionModel model = dataSnapshot.getValue(ActionModel.class);
+
                 assert model != null;
+                boolean shouldAdd = model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null;
+
+                System.out.println("shouldAdd = " + shouldAdd);
+
                 if (model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null) {
+
                     if (DateHelper.isDueInWeek(model.getDueDate()) || DateHelper.itWasDue(model.getDueDate())) {
                         addTask(new Tasks(0, "action", model.getTask(), model.getDueDate()));
                     }
                 }
 
             } else if (dataSnapshot.getRef().getParent().getParent().getKey().equals("indicator")) {
+
                 IndicatorModel model = dataSnapshot.getValue(IndicatorModel.class);
+
                 assert model != null;
+                boolean shouldAdd = model.getAssignee() != null && model.getAssignee().equals(user.getUserID()) && model.getDueDate() != null;
+                System.out.println("shouldAdd = " + shouldAdd);
                 if (model.getAssignee() != null && model.getAssignee().equals(user.getUserID()) && model.getDueDate() != null) {
                     Tasks tasks = new Tasks(model.getTriggerSelected().intValue(), "indicator", model.getName(), model.getDueDate());
                     if (DateHelper.isDueInWeek(tasks.dueDate) || DateHelper.itWasDue(tasks.dueDate)) {
@@ -451,7 +505,9 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
             if (networks != null) {
                 for (String id : networks.keySet()) {
+                    System.out.println("networkidid = " + id);
                     DatabaseReference ref = baseAlertRef.child(id);
+
                     ref.addChildEventListener(networkAlertListener);
                 }
             }

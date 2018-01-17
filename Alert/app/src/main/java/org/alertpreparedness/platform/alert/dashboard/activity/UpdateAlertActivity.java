@@ -3,6 +3,7 @@ package org.alertpreparedness.platform.alert.dashboard.activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.view.Window;
 
 import com.google.firebase.database.DataSnapshot;
@@ -216,7 +217,10 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
                @Override
                public void onDataChange(DataSnapshot dataSnapshot) {
 
-                   db.child("alertLevel").setValue(alertLevel).addOnCompleteListener(task -> backToDetailView());
+                   db.child("alertLevel").setValue(alertLevel).addOnCompleteListener(task -> {
+                       finishAffinity();
+                       startActivity(new Intent(UpdateAlertActivity.this, HomeScreen.class));
+                   });
 
                    for (int i = 0; i < areas.size(); i++) {
                        db.child("affectedAreas").child(String.valueOf(i))

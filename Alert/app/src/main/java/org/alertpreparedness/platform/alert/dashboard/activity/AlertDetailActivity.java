@@ -112,8 +112,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
         countryID = user.countryID;
         isCountryDirector = user.isCountryDirector();
-//        isCountryDirector = true;
-
+        System.out.println("user = " + user);
         toolbar = (Toolbar) findViewById(R.id.action_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -170,6 +169,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void parseAlert(DataSnapshot dataSnapshot) {
+        System.out.println("dataSnapshot = " + dataSnapshot);
         if (dataSnapshot.child("alertLevel").getValue() != null) {
             long alertLevel = (long) dataSnapshot.child("alertLevel").getValue();
             String id = dataSnapshot.getKey();
@@ -233,14 +233,23 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                     for(AffectedAreaModel m : alert.getAffectedAreas()) {
                         try {
                             List<String> list = ExtensionHelperKt.getLevel1Values(m.getCountry(), mCountryDataList);
+                            List<String> level2List = ExtensionHelperKt.getLevel2Values(m.getCountry(), m.getLevel1(), mCountryDataList);
                             res.append(Constants.COUNTRIES[m.getCountry()]);
-                            if (list != null && m.getLevel1() != null && list.get(m.getLevel1()) != null) {
-                                m.setLevel1Name(list.get(m.getLevel1()));
-                                res.append(", ").append(list.get(m.getLevel1()));
+                            if (list != null) {
+                                if(m.getLevel1() != null && m.getLevel1() != -1  && list.get(m.getLevel1()) != null) {
+                                    m.setLevel1Name(list.get(m.getLevel1()));
+                                    res.append(", ").append(list.get(m.getLevel1()));
+                                }
+                                if(m.getLevel2() != null && m.getLevel2() != -1 && level2List != null && level2List.get(m.getLevel2()) != null) {
+                                    m.setLevel2Name(level2List.get(m.getLevel2()));
+                                    res.append(", ").append(m.getLevel2Name());
+                                }
                             }
                             res.append("\n");
                         }
-                        catch (Exception e){}
+                        catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
                     txtAffectedArea.setText(res.toString());
                     imgUpdate.setOnClickListener(this);
@@ -384,8 +393,8 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         if (view == imgUpdate) {
             Intent intent = new Intent(AlertDetailActivity.this, UpdateAlertActivity.class);
             intent.putExtra(EXTRA_ALERT, alert);
-            System.out.println("alertintent = " + alert);
             startActivity(intent);
+            finish();
         }
 
         if (view == btnApprove) {

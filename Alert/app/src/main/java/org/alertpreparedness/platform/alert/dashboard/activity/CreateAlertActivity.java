@@ -129,7 +129,6 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
         }
     }
 
-    @CallSuper
     @OnClick(R.id.btnSaveChanges)
     public void onSaveClicked(View v) {
 
