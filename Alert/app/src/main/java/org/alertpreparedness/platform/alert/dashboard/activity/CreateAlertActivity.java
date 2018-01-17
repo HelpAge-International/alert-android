@@ -124,8 +124,10 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
 
     @Override
     public void onSubItemRemoved(int positionInParent, int position) {
-        if(positionInParent == 3) {//affected areas
-
+        if(positionInParent == getIndex(mFieldsAdapter.isRedAlert(), 3)) {//affected areas
+            if(mCurrentAffectedAreas.get(position) != null) {
+                mCurrentAffectedAreas.remove(position);
+            }
         }
     }
 

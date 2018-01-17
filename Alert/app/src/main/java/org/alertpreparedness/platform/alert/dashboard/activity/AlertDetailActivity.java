@@ -248,7 +248,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                             res.append("\n");
                         }
                         catch (Exception e){
-                            e.printStackTrace();
+//                            e.printStackTrace();
                         }
                     }
                     txtAffectedArea.setText(res.toString());
