@@ -5,6 +5,7 @@ import android.content.Context;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionCHSRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyBaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
@@ -160,6 +161,12 @@ public class FirebaseModule {
         return db.child("actionCHS").child(user.getSystemAdminID());
     }
 
+    @Provides
+    @Singleton
+    @ActionMandatedRef
+    public DatabaseReference provideMandatedRef(@BaseDatabaseRef DatabaseReference db, User user) {
+        return db.child("actionMandated").child(user.getAgencyAdminID());
+    }
 
 //    @Provides
 //    @Singleton

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/toolbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <include
+            layout="@layout/actionbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/actionBarSize" />
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="@dimen/space_56"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <EditText
+            android:id="@+id/etNotes"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginLeft="@dimen/space_16"
+            android:layout_marginRight="@dimen/space_16"
+            android:layout_marginTop="@dimen/space_20"
+            android:backgroundTint="@android:color/transparent"
+            android:ems="10"
+            android:gravity="left|top"
+            android:hint="@string/txt_needs_done"
+            android:inputType="text|textMultiLine|textCapSentences"
+            android:lines="2"
+            android:maxLines="4"
+            android:minLines="2"
+            android:padding="0dp"
+            android:singleLine="false" />
+
+        <EditText
+            android:id="@+id/etHazardAssociation"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_margin="@dimen/space_16"
+            android:backgroundTint="@android:color/transparent"
+            android:ems="10"
+            android:gravity="center_vertical"
+            android:hint="@string/txt_hazard_association"
+            android:padding="0dp"
+            android:focusable="false"/>
+
+        <EditText
+            android:id="@+id/etDepartment"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="@dimen/space_16"
+            android:layout_marginRight="@dimen/space_16"
+            android:backgroundTint="@android:color/transparent"
+            android:ems="10"
+            android:gravity="center_vertical"
+            android:hint="@string/txt_department"
+            android:padding="0dp"
+            android:focusable="false"/>
+
+        <EditText
+            android:id="@+id/etAssignTo"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_margin="@dimen/space_16"
+            android:backgroundTint="@android:color/transparent"
+            android:ems="10"
+            android:gravity="center_vertical"
+            android:hint="@string/txt_assign_to"
+            android:padding="0dp"
+            android:focusable="false"/>
+
+        <EditText
+            android:id="@+id/etBudget"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="@dimen/space_16"
+            android:layout_marginRight="@dimen/space_16"
+            android:backgroundTint="@android:color/transparent"
+            android:drawableLeft="@drawable/ic_money_black_24px"
+            android:ems="10"
+            android:gravity="center_vertical"
+            android:hint="@string/txt_budget"
+            android:inputType="text"
+            android:padding="0dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/space_20"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/space_16"
+                android:text="@string/txt_doc_required"
+                android:textColor="@color/light_blue"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <RadioButton
+                android:id="@+id/rbtYesDoc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/space_16"
+                android:layout_marginTop="@dimen/space_16"
+                android:ems="10"
+                android:text="Yes" />
+
+            <RadioButton
+                android:id="@+id/rbtNoDoc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/space_16"
+                android:layout_marginTop="@dimen/space_16"
+                android:ems="10"
+                android:text="No" />
+
+        </LinearLayout>
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

@@ -11,21 +11,21 @@ import com.google.firebase.database.DatabaseReference;
 public class Action {
     private Boolean isArchived;
     private Boolean isComplete;
-
-
-
-    private Boolean isCHS;
+    private Boolean isInProgress;
     private String taskName;
     private String department;
     private String assignee;
+    private Integer frequencyValue;
+    private Long frequencyBase;
     private Long actionType;
     private Long dueDate;
     private Long budget;
     private Long level;
+    private Long createdAt;
+    private Long updatedAt;
     private Uri path;
     public DatabaseReference db;
     public DatabaseReference userRef;
-
 
     public Action() {
     }
@@ -34,27 +34,67 @@ public class Action {
         this.path = path;
     }
 
-    public Action(String taskName, String department, String assignee, Boolean isArchived, Boolean isComplete, Boolean isCHS, Long actionType, Long dueDate, Long budget, Long level, DatabaseReference db, DatabaseReference userRef) {
+    public Action(Boolean isInProgress) {
+        this.isInProgress = isInProgress;
+    }
+
+    public Action(String taskName, String department, String assignee, Boolean isArchived, Boolean isComplete, Long createdAt, Long updatedAt,
+                  Long actionType, Long dueDate, Long budget, Long level, Long frequencyBase, Integer frequencyValue, DatabaseReference db, DatabaseReference userRef) {
         this.taskName = taskName;
         this.department = department;
         this.assignee = assignee;
         this.isArchived = isArchived;
         this.isComplete = isComplete;
-        this.isCHS = isCHS;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.actionType = actionType;
         this.dueDate = dueDate;
         this.budget = budget;
         this.level = level;
+        this.frequencyBase = frequencyBase;
+        this.frequencyValue = frequencyValue;
         this.db = db;
         this.userRef = userRef;
     }
 
-    public Boolean getCHS() {
-        return isCHS;
+    public Boolean getInProgress() {
+        return isInProgress;
     }
 
-    public void setCHS(Boolean CHS) {
-        isCHS = CHS;
+    public void setInProgress(Boolean inProgress) {
+        isInProgress = inProgress;
+    }
+
+    public Integer getFrequencyValue() {
+        return frequencyValue;
+    }
+
+    public void setFrequencyValue(Integer frequencyValue) {
+        this.frequencyValue = frequencyValue;
+    }
+
+    public Long getFrequencyBase() {
+        return frequencyBase;
+    }
+
+    public void setFrequencyBase(Long frequencyBase) {
+        this.frequencyBase = frequencyBase;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Long updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public String getTaskName() {

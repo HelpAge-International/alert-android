@@ -32,9 +32,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:windowSoftInputMode="adjustPan|adjustResize"
             android:name=".login.activity.LoginScreen"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|adjustResize" />
         <activity
             android:name=".dashboard.activity.HomeScreen"
             android:launchMode="singleTask"
@@ -113,8 +113,12 @@
         <activity
             android:name=".min_preparedness.activity.CompleteActionActivity"
             android:label="@string/txt_complete_action" />
-        <activity android:name=".min_preparedness.activity.AddNotesActivity"
+        <activity
+            android:name=".min_preparedness.activity.AddNotesActivity"
             android:label="Notes" />
+        <activity
+            android:name=".adv_preparedness.activity.CreateAPAActivity"
+            android:label="@string/txt_create_apa" />
     </application>
 
 </manifest>

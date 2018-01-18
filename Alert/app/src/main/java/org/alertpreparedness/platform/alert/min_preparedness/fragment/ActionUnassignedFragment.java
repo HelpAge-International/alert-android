@@ -1,8 +1,10 @@
 package org.alertpreparedness.platform.alert.min_preparedness.fragment;
 
 import android.app.Fragment;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,13 +16,22 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
+import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
+import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.Constants;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,7 +40,7 @@ import butterknife.ButterKnife;
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionUnassignedFragment extends InProgressFragment{
+public class ActionUnassignedFragment extends InProgressFragment {
 
     @Nullable
     @BindView(R.id.rvMinAction)
@@ -43,7 +54,17 @@ public class ActionUnassignedFragment extends InProgressFragment{
     @BindView(R.id.imgStatus)
     ImageView imgUnassigned;
 
+    @Inject
+    User user;
+
     private ActionAdapter mUnassignedAdapter;
+    private Boolean isCHS = false;
+    private Boolean isCHSAssigned = false;
+    private Boolean isMandated = false;
+    private Boolean isMandatedAssigned = false;
+    private Boolean isInProgress = false;
+    private int freqBase = 0;
+    private int freqValue = 0;
 
     @Nullable
     @Override
@@ -65,7 +86,7 @@ public class ActionUnassignedFragment extends InProgressFragment{
         tvActionUnassigned.setText("Unassigned");
         tvActionUnassigned.setTextColor(getResources().getColor(R.color.alertRed));
 
-        mUnassignedAdapter= getmAdapter();
+        mUnassignedAdapter = getmAdapter();
         mActionRV.setAdapter(mUnassignedAdapter);
         mActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
         mActionRV.setItemAnimator(new DefaultItemAnimator());
@@ -84,32 +105,150 @@ public class ActionUnassignedFragment extends InProgressFragment{
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
         for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+            String actionIDs = getChild.getKey();
+            DataModel model = getChild.getValue(DataModel.class);
 
-            String taskName = (String) getChild.child("task").getValue();
-            String department = (String) getChild.child("department").getValue();
-            String assignee = (String) getChild.child("asignee").getValue();
-            Boolean isArchived = (Boolean) getChild.child("isArchived").getValue();
-            Boolean isComplete = (Boolean) getChild.child("isComplete").getValue();
-            Long actionType = (Long) getChild.child("type").getValue();
-            Long dueDate = (Long) getChild.child("dueDate").getValue();
-            Long budget = (Long) getChild.child("budget").getValue();
-            Long level =  (Long) getChild.child("level").getValue();
+            if (getChild.child("frequencyBase").getValue() != null) {
+                model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
+            }
+            if (getChild.child("frequencyValue").getValue() != null) {
+                model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
+            }
 
-//            mUnassignedAdapter.addUnassignedItem(getChild.getKey(), new Action(
-//                    taskName,
-//                    department,
-//                    assignee,
-//                    isArchived,
-//                    isComplete,
-//                    actionType,
-//                    dueDate,
-//                    budget,
-//                    level,
-//                    dbAgencyRef.getRef(),
-//                    dbUserPublicRef.getRef())
-//            );
+            if (model.getType() == 0) {
+                getCHS(model, actionIDs);
+            } else if (model.getType() == 1) {
+                getMandated(model, actionIDs);
+            } else {
+                getCustom(model, getChild);
+            }
 
         }
+    }
+
+    private void getCustom(DataModel model, DataSnapshot getChild) {
+
+        if (model.getLevel() != null //MPA CUSTOM UNASSIGNED // NO USERS.
+                && model.getLevel() == Constants.MPA
+                && model.getAsignee() == null
+                && model.getTask() != null) {
+
+            txtNoAction.setVisibility(View.GONE);
+            mUnassignedAdapter.addUnassignedItem(getChild.getKey(), new Action(
+                    model.getTask(),
+                    model.getDepartment(),
+                    model.getAsignee(),
+                    model.getIsArchived(),
+                    model.getIsComplete(),
+                    model.getCreatedAt(),
+                    model.getUpdatedAt(),
+                    model.getType(),
+                    model.getDueDate(),
+                    model.getBudget(),
+                    model.getLevel(),
+                    model.getFrequencyBase(),
+                    freqValue,
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef())
+            );
+        }
+    }
+
+    private void getCHS(DataModel model, String actionIDs) {
+        dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+
+                    if (!actionIDs.equals(getChild.getKey())) {
+                        System.out.println("getChild CHS = " + getChild);
+                        isCHS = true;
+                        isCHSAssigned = false;
+                        String CHSTaskName = (String) getChild.child("task").getValue();
+                        Long CHSlevel = (Long) getChild.child("level").getValue();
+                        Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
+
+                        txtNoAction.setVisibility(View.GONE);
+                        mUnassignedAdapter.addUnassignedItem(getChild.getKey(), new Action(
+                                CHSTaskName,
+                                null,
+                                null,
+                                null,
+                                null,
+                                CHSCreatedAt,
+                                null,
+                                (long) 0, //CHS always 0
+                                null,
+                                null,
+                                CHSlevel,
+                                null,
+                                null,
+                                dbAgencyRef.getRef(),
+                                dbUserPublicRef.getRef())
+                        );
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void getMandated(DataModel model, String actionIDs) {
+        dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+                    if (!actionIDs.contains(getChild.getKey())) {
+                        isMandated = true;
+                        isMandatedAssigned = false;
+
+                        try {
+                            String taskNameMandated = (String) getChild.child("task").getValue();
+                            String departmentMandated = (String) getChild.child("department").getValue();
+                            Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
+                            Long manLevel = (Long) getChild.child("level").getValue();
+
+                            txtNoAction.setVisibility(View.GONE);
+                            mUnassignedAdapter.addUnassignedItem(getChild.getKey(), new Action(
+                                    taskNameMandated,
+                                    departmentMandated,
+                                    null,
+                                    null,
+                                    null,
+                                    manCreatedAt,
+                                    null,
+                                    (long) 1, //Mandated always 1
+                                    null,
+                                    null,
+                                    manLevel,
+                                    null,
+                                    null,
+                                    dbAgencyRef.getRef(),
+                                    dbUserPublicRef.getRef())
+                            );
+
+                        } catch (Exception exception) {
+                            System.out.println("exception = " + exception);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
+
+    @Override
+    public void onCancelled(DatabaseError databaseError) {
+
+    }
+
 }

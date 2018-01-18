@@ -37,8 +37,10 @@ import com.google.firebase.storage.UploadTask;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseStorageRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
+import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertFieldsAdapter;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
@@ -84,6 +86,10 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     @Inject
     @NoteRef
     DatabaseReference dbNoteRef;
+
+    @Inject
+    @ActionRef
+    DatabaseReference dbActionRef;
 
     ArrayList<String> imgList = new ArrayList<>();
     ArrayList<String> pathList = new ArrayList<>();
@@ -199,8 +205,12 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
             Long millis = System.currentTimeMillis();
 
             Notes notes = new Notes(texts, millis, userID);
+            dbActionRef.child(key).child("isComplete").setValue(true);
+            dbActionRef.child(key).child("isCompleteAt").setValue(millis);
             dbNoteRef.child(key).child(id).setValue(notes);
 
+            Intent intent = new Intent(CompleteActionActivity.this, HomeScreen.class);
+            startActivity(intent);
         } else {
             SnackbarHelper.show(this, getString(R.string.txt_note_not_empty));
         }
@@ -266,6 +276,11 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 
     @Override

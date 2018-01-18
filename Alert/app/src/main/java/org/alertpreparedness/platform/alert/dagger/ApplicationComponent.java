@@ -2,6 +2,7 @@ package org.alertpreparedness.platform.alert.dagger;
 
 
 import org.alertpreparedness.platform.alert.MainDrawer;
+import org.alertpreparedness.platform.alert.adv_preparedness.activity.CreateAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.APAArchivedFragment;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.APACompletedFragment;
@@ -82,4 +83,5 @@ public interface ApplicationComponent {
     void inject(APActionAdapter adapter);
     void inject(UsersListDialogFragment fragment);
     void inject(SplashActivity splashActivity);
+    void inject(CreateAPAActivity activity);
 }
