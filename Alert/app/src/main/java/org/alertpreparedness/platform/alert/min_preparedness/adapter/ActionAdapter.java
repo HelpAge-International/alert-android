@@ -62,31 +62,15 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
         }
     }
 
-    public void addExpiredItem(String key, Action action, Boolean isCHS, Boolean isMandated, Boolean isCHSAssigned, Boolean isMandatedAssigned) {
+    public void addExpiredItem(String key, Action action) {
         if (keys.indexOf(key) == -1) {
-            if (currentUser.equals(action.getAssignee()) //MPA CUSTOM assigned and EXPIRED for logged in user.
-                    && action.getLevel() != null
-                    && action.getLevel() == Constants.MPA
-                    && action.getDueDate() != null
-                    && DateHelper.itWasDue(action.getDueDate())
-                    && action.getTaskName() != null
-                    || (currentUser.equals(action.getAssignee()) //MPA CHS assigned and EXPIRED for logged in user.
-                    && isCHSAssigned && isCHS
-                    && action.getLevel() != null
-                    && action.getLevel() == Constants.MPA
-                    && action.getDueDate() != null
-                    && DateHelper.itWasDue(action.getDueDate())
-                    && action.getTaskName() != null)) {
-                //TODO Mandated
-                keys.add(key);
-                items.put(key, action);
-                notifyItemInserted(keys.size());
-            }
+            keys.add(key);
+            items.put(key, action);
+            notifyItemInserted(keys.size());
         } else {
             items.put(key, action);
             notifyItemChanged(keys.indexOf(key));
         }
-
     }
 
     public void addUnassignedItem(String key, Action action) {
@@ -100,50 +84,22 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
         }
     }
 
-    public void addCompletedItem(String key, Action action, Boolean isCHS, Boolean isMandated, Boolean isCHSAssigned, Boolean isMandatedAssigned) {
+    public void addCompletedItem(String key, Action action) {
         if (keys.indexOf(key) == -1) {
-            if (currentUser.equals(action.getAssignee()) //MPA CUSTOM assigned and COMPLETED for logged in user.
-                    && action.getLevel() != null
-                    && action.getLevel() == Constants.MPA
-                    && action.getComplete() != null
-                    && action.getComplete()
-                    || (isCHSAssigned && isCHS  //MPA CHS assigned and COMPLETED for logged in user.
-                    && currentUser.equals(action.getAssignee())
-                    && action.getLevel() != null
-                    && action.getLevel() == Constants.MPA
-                    && action.getComplete() != null
-                    && action.getComplete())) {
-                //TODO Mandated
-                keys.add(key);
-                items.put(key, action);
-                notifyItemInserted(keys.size());
-            }
+            keys.add(key);
+            items.put(key, action);
+            notifyItemInserted(keys.size());
         } else {
             items.put(key, action);
             notifyItemChanged(keys.indexOf(key));
         }
     }
 
-    public void addArchivedItem(String key, Action action, Boolean isCHS, Boolean isMandated, Boolean isCHSAssigned, Boolean isMandatedAssigned) {
+    public void addArchivedItem(String key, Action action) {
         if (keys.indexOf(key) == -1) {
-            if (currentUser.equals(action.getAssignee()) //MPA CUSTOM assigned and ARCHIVED for logged in user.
-                    && action.getLevel() != null
-                    && action.getLevel() == Constants.MPA
-                    && action.getArchived() != null
-                    && action.getArchived()
-                    && action.getDueDate() != null
-                    || (isCHSAssigned && isCHS
-                    && currentUser.equals(action.getAssignee()) //MPA CUSTOM assigned and ARCHIVED for logged in user.
-                    && action.getLevel() != null
-                    && action.getLevel() == Constants.MPA
-                    && action.getArchived() != null
-                    && action.getArchived()
-                    && action.getDueDate() != null)) {
-                //TODO Mandated
                 keys.add(key);
                 items.put(key, action);
                 notifyItemInserted(keys.size());
-            }
         } else {
             items.put(key, action);
             notifyItemChanged(keys.indexOf(key));

@@ -203,12 +203,18 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                 Long value = (Long) dataSnapshot.child("value").getValue();
 
                 if (value != null) {
-                    if (model.getCreatedAt() != null && durationType != null && durationType == Constants.DUE_WEEK) {
+                    if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_WEEK) {
                         isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), Math.toIntExact(value));
-                    } else if (model.getCreatedAt() != null && durationType != null && durationType == Constants.DUE_MONTH) {
+                    } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_WEEK) {
+                        isInProgress = DateHelper.isInProgressWeek(model.getUpdatedAt(), Math.toIntExact(value));
+                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_MONTH) {
                         isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), Math.toIntExact(value));
-                    } else if (model.getCreatedAt() != null && durationType != null && durationType == Constants.DUE_YEAR) {
+                    } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_MONTH) {
+                        isInProgress = DateHelper.isInProgressMonth(model.getUpdatedAt(), Math.toIntExact(value));
+                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_YEAR) {
                         isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), Math.toIntExact(value));
+                    } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_YEAR) {
+                        isInProgress = DateHelper.isInProgressYear(model.getUpdatedAt(), Math.toIntExact(value));
                     }
                 }
 
@@ -216,18 +222,23 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                     freqValue = Math.toIntExact(model.getFrequencyValue());
                     freqBase = Math.toIntExact(model.getFrequencyBase());
 
-                    if (model.getCreatedAt() != null && freqBase == Constants.DUE_WEEK) {
+                    if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_WEEK) {
                         isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), Math.toIntExact(freqValue));
-                    } else if (model.getCreatedAt() != null && freqBase == Constants.DUE_MONTH) {
+                    } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_WEEK) {
+                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), Math.toIntExact(freqValue));
+                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_MONTH) {
                         isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), Math.toIntExact(freqValue));
-                    } else if (model.getCreatedAt() != null && freqBase == Constants.DUE_YEAR) {
+                    } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_MONTH) {
+                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), Math.toIntExact(freqValue));
+                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_YEAR) {
+                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), Math.toIntExact(freqValue));
+                    } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_YEAR) {
                         isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), Math.toIntExact(freqValue));
                     }
                 }
 
                 if (isInProgress) {
                     addObjects(model.getTask(),
-                            model.getDepartment(),
                             model.getCreatedAt(),
                             model.getLevel(),
                             model,
@@ -267,12 +278,18 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                                 Long value = (Long) dataSnapshot.child("value").getValue();
 
                                 if (value != null) {
-                                    if (model.getCreatedAt() != null && durationType != null && durationType == Constants.DUE_WEEK) {
+                                    if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_WEEK) {
                                         isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), Math.toIntExact(value));
-                                    } else if (model.getCreatedAt() != null && durationType != null && durationType == Constants.DUE_MONTH) {
+                                    } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_WEEK) {
+                                        isInProgress = DateHelper.isInProgressWeek(model.getUpdatedAt(), Math.toIntExact(value));
+                                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_MONTH) {
                                         isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), Math.toIntExact(value));
-                                    } else if (model.getCreatedAt() != null && durationType != null && durationType == Constants.DUE_YEAR) {
+                                    } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_MONTH) {
+                                        isInProgress = DateHelper.isInProgressMonth(model.getUpdatedAt(), Math.toIntExact(value));
+                                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_YEAR) {
                                         isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), Math.toIntExact(value));
+                                    } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_YEAR) {
+                                        isInProgress = DateHelper.isInProgressYear(model.getUpdatedAt(), Math.toIntExact(value));
                                     }
                                 }
 
@@ -280,18 +297,23 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                                     freqValue = Math.toIntExact(model.getFrequencyValue());
                                     freqBase = Math.toIntExact(model.getFrequencyBase());
 
-                                    if (model.getCreatedAt() != null && freqBase == Constants.DUE_WEEK) {
+                                    if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_WEEK) {
                                         isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), Math.toIntExact(freqValue));
-                                    } else if (model.getCreatedAt() != null && freqBase == Constants.DUE_MONTH) {
+                                    } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_WEEK) {
+                                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), Math.toIntExact(freqValue));
+                                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_MONTH) {
                                         isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), Math.toIntExact(freqValue));
-                                    } else if (model.getCreatedAt() != null && freqBase == Constants.DUE_YEAR) {
+                                    } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_MONTH) {
+                                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), Math.toIntExact(freqValue));
+                                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_YEAR) {
+                                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), Math.toIntExact(freqValue));
+                                    } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_YEAR) {
                                         isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), Math.toIntExact(freqValue));
                                     }
                                 }
 
                                 if (isInProgress) {
                                     addObjects(CHSTaskName,
-                                            model.getDepartment(),
                                             CHSCreatedAt,
                                             CHSlevel,
                                             model,
@@ -327,7 +349,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                 for (DataSnapshot getChild : dataSnapshot.getChildren()) {
                     if (actionIDs.contains(getChild.getKey())) {
                         String taskNameMandated = (String) getChild.child("task").getValue();
-                        String departmentMandated = (String) getChild.child("department").getValue();
+                        //String departmentMandated = (String) getChild.child("department").getValue();
                         Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
                         Long manLevel = (Long) getChild.child("level").getValue();
 
@@ -338,7 +360,6 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
 
                         if (isInProgress) {
                             addObjects(taskNameMandated,
-                                    departmentMandated,
                                     manCreatedAt,
                                     manLevel,
                                     model,
@@ -357,10 +378,9 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
 
             }
         });
-
     }
 
-    private void addObjects(String name, String department, Long createdAt, Long level,
+    private void addObjects(String name, Long createdAt, Long level,
                             DataModel model, DataSnapshot getChild, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
 
         if (user.getUserID().equals(model.getAsignee()) //MPA Custom assigned and in-progress for logged in user.
@@ -368,33 +388,31 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                 && level != null
                 && level == Constants.MPA
                 && model.getDueDate() != null
-                && model.getComplete() == null
+                && (model.getIsCompleteAt() == null && model.getIsComplete() == null || model.getIsCompleteAt() != null && !model.getIsComplete()) // isComplete can be set to false :D
                 && name != null
                 || (isCHS && isCHSAssigned //MPA CHS assigned and in-progress for logged in user.
                 && user.getUserID().equals(model.getAsignee())
                 && model.getAsignee() != null
                 && level != null
                 && level == Constants.MPA
-                && model.getDueDate() != null
-                && model.getComplete() == null
+                && !model.getIsComplete()
                 && name != null)
                 || (isMandated && isMandatedAssigned //MPA Mandated assigned and in-progress for logged in user.
                 && user.getUserID().equals(model.getAsignee())
                 && model.getAsignee() != null
                 && level != null
                 && level == Constants.MPA
-                && model.getDueDate() != null
-                && model.getComplete() == null
+                && !model.getIsComplete()
                 && name != null)) {
 
             txtNoAction.setVisibility(View.GONE);
 
             mAdapter.addInProgressItem(getChild.getKey(), new Action(
                     name,
-                    department,
+                    model.getDepartment(),
                     model.getAsignee(),
-                    model.getArchived(),
-                    model.getComplete(),
+                    model.getIsArchived(),
+                    model.getIsComplete(),
                     createdAt,
                     model.getUpdatedAt(),
                     model.getType(),

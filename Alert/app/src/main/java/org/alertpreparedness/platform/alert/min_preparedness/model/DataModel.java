@@ -11,7 +11,6 @@ import com.google.firebase.database.Exclude;
 
 public class DataModel {
 
-
     private Boolean isArchived;
     private Boolean isComplete;
     private Boolean requireDoc;
@@ -22,6 +21,7 @@ public class DataModel {
     private Long frequencyValue;
     @Exclude
     private Long frequencyBase;
+    private Long isCompleteAt;
     private Long type;
     private Long dueDate;
     private Long budget;
@@ -40,6 +40,7 @@ public class DataModel {
                 ", asignee='" + asignee + '\'' +
                 ", frequencyValue=" + frequencyValue +
                 ", frequencyBase=" + frequencyBase +
+                ", isCompleteAt=" + isCompleteAt +
                 ", type=" + type +
                 ", dueDate=" + dueDate +
                 ", budget=" + budget +
@@ -59,19 +60,27 @@ public class DataModel {
     public DataModel() {
     }
 
-    public Boolean getArchived() {
+    public Long getIsCompleteAt() {
+        return isCompleteAt;
+    }
+
+    public void setIsCompleteAt(Long isCompleteAt) {
+        this.isCompleteAt = isCompleteAt;
+    }
+
+    public Boolean getIsArchived() {
         return isArchived;
     }
 
-    public void setArchived(Boolean archived) {
+    public void setIsArchived(Boolean archived) {
         isArchived = archived;
     }
 
-    public Boolean getComplete() {
+    public Boolean getIsComplete() {
         return isComplete;
     }
 
-    public void setComplete(Boolean complete) {
+    public void setIsComplete(Boolean complete) {
         isComplete = complete;
     }
 
