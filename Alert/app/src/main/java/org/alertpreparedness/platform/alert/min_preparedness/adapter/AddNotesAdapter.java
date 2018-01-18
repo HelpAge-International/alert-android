@@ -96,7 +96,6 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
         Notes note = dataSnapshot.getValue(Notes.class);
-        System.out.println("dataSnapshot = " + dataSnapshot);
         if(keys.indexOf(dataSnapshot.getKey()) == -1) {
             keys.add(dataSnapshot.getKey());
         }
@@ -107,15 +106,12 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
         Notes note = dataSnapshot.getValue(Notes.class);
-        System.out.println("dataSnapshochanged = " + dataSnapshot);
         if(keys.indexOf(dataSnapshot.getKey()) == -1) {
-            System.out.println("herererererere");
             keys.add(dataSnapshot.getKey());
         }
         items.put(dataSnapshot.getKey(), note);
         System.out.println("keys = " + keys);
         System.out.println("items = " + items);
-//      notifyItemChanged(keys.indexOf(dataSnapshot.getKey()));
         notifyDataSetChanged();
     }
 

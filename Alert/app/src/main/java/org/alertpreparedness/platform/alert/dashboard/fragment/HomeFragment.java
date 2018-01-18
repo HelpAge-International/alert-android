@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -87,6 +88,9 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     @BindView(R.id.rvNetworkAlerts)
     RecyclerView networkAlertList;
 
+    @BindView(R.id.network_tasks)
+    RecyclerView networkTaskList;
+
     @Inject
     @BaseDatabaseRef
     DatabaseReference database;
@@ -151,6 +155,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     private AlertListener alertListener = new AlertListener(false);
     private AlertListener networkAlertListener = new AlertListener(true);
     private TaskListener taskListener = new TaskListener();
+    private TaskListener networkTaskListener = new NetworkTaskListener();
     private TaskListener indicatorListener = new TaskListener();
     private TaskListener hazardTaskListener = new TaskListener();
     private NetworkListener networkListener = new NetworkListener();
@@ -158,6 +163,8 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     private String agencyAdminId;
     private String networkLeadId;
     private Tasks task;
+    private ArrayList<Tasks> networkTasksList;
+    private TaskAdapter networkTaskAdapter;
 
     @Nullable
     @Override
@@ -184,8 +191,8 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         networkRef.addValueEventListener(networkListener);
         hazardRef.addChildEventListener(hazardListener);
         alertRecyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager alertlayoutManager = new LinearLayoutManager(getContext());
-        alertRecyclerView.setLayoutManager(alertlayoutManager);
+
+        alertRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         alertRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         networkAlertList.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -196,15 +203,21 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         networkAlertAdapter = new AlertAdapter(getContext(), this);
         networkAlertList.setAdapter(networkAlertAdapter);
 
-        myTaskRecyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        myTaskRecyclerView.setLayoutManager(layoutManager);
+        myTaskRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         myTaskRecyclerView.setItemAnimator(new DefaultItemAnimator());
         myTaskRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+
+        networkTaskList.setLayoutManager(new LinearLayoutManager(getContext()));
+        networkTaskList.setItemAnimator(new DefaultItemAnimator());
+        networkTaskList.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
         tasksList = new ArrayList<>();
         taskAdapter = new TaskAdapter(tasksList);
         myTaskRecyclerView.setAdapter(taskAdapter);
+
+        networkTasksList = new ArrayList<>();
+        networkTaskAdapter = new TaskAdapter(networkTasksList);
+        networkTaskList.setAdapter(networkTaskAdapter);
 
         scroller.setNestedScrollingEnabled(false);
         ViewCompat.setNestedScrollingEnabled(alertRecyclerView, false);
@@ -223,9 +236,12 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         taskAdapter.add(task);
     }
 
+    private void addNetworkTask(Tasks tasks) {
+        networkTaskAdapter.add(tasks);
+    }
+
     @Override
     public void onAlertItemClicked(AlertModel alert) {
-        System.out.println("alert = [" + alert + "]");
         Intent intent = new Intent(getActivity(), AlertDetailActivity.class);
         intent.putExtra(EXTRA_ALERT, alert);
         startActivity(intent);
@@ -406,16 +422,14 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
     private class TaskListener implements ChildEventListener {
 
-        private void process(DataSnapshot dataSnapshot, String s) {
+        protected void process(DataSnapshot dataSnapshot, String s) {
             if (dataSnapshot.getRef().getParent().getParent().getKey().equals("action")) {
                 ActionModel model = dataSnapshot.getValue(ActionModel.class);
 
                 assert model != null;
                 boolean shouldAdd = model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null;
 
-                System.out.println("shouldAdd = " + shouldAdd);
-
-                if (model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null) {
+                if (shouldAdd) {
 
                     if (DateHelper.isDueInWeek(model.getDueDate()) || DateHelper.itWasDue(model.getDueDate())) {
                         addTask(new Tasks(0, "action", model.getTask(), model.getDueDate()));
@@ -509,6 +523,8 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                     DatabaseReference ref = baseAlertRef.child(id);
 
                     ref.addChildEventListener(networkAlertListener);
+                    baseActionRef.child(id).addChildEventListener(networkTaskListener);
+                    baseIndicatorRef.child(id).addChildEventListener(networkTaskListener);
                 }
             }
         }
@@ -529,6 +545,36 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         @Override
         public void onCancelled(DatabaseError databaseError) {
 
+        }
+    }
+
+    private class NetworkTaskListener extends TaskListener {
+        @Override
+        protected void process(DataSnapshot dataSnapshot, String s) {
+            if (dataSnapshot.getRef().getParent().getParent().getKey().equals("action")) {
+                ActionModel model = dataSnapshot.getValue(ActionModel.class);
+
+                assert model != null;
+                boolean shouldAdd = model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null;
+                if (shouldAdd) {
+                    if (DateHelper.isDueInWeek(model.getDueDate()) || DateHelper.itWasDue(model.getDueDate())) {
+                        addNetworkTask(new Tasks(0, "action", model.getTask(), model.getDueDate()));
+                    }
+                }
+
+            } else if (dataSnapshot.getRef().getParent().getParent().getKey().equals("indicator")) {
+
+                IndicatorModel model = dataSnapshot.getValue(IndicatorModel.class);
+
+                assert model != null;
+                boolean shouldAdd = model.getAssignee() != null && model.getAssignee().equals(user.getUserID()) && model.getDueDate() != null;
+                if (shouldAdd) {
+                    Tasks tasks = new Tasks(model.getTriggerSelected().intValue(), "indicator", model.getName(), model.getDueDate());
+                    if (DateHelper.isDueInWeek(tasks.dueDate) || DateHelper.itWasDue(tasks.dueDate)) {
+                        addNetworkTask(tasks);
+                    }
+                }
+            }
         }
     }
 
