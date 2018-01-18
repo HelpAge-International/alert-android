@@ -91,6 +91,12 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     @BindView(R.id.network_tasks)
     RecyclerView networkTaskList;
 
+    @BindView(R.id.taskTypeTitle)
+    TextView taskTypeTitle;
+
+    @BindView(R.id.noNetworkTasks)
+    TextView noNetworkTasks;
+
     @Inject
     @BaseDatabaseRef
     DatabaseReference database;
@@ -145,6 +151,13 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
     @BindView(R.id.countryTitle)
     TextView countryTitle;
+
+
+    @BindView(R.id.countryTasks)
+    TextView countryTastsTitle;
+
+    @BindView(R.id.networkTasks)
+    TextView networkTasksTitle;
 
     public TaskAdapter taskAdapter;
     public List<Tasks> tasksList;
@@ -237,6 +250,8 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     }
 
     private void addNetworkTask(Tasks tasks) {
+        networkTaskList.setVisibility(View.VISIBLE);
+        noNetworkTasks.setVisibility(View.GONE);
         networkTaskAdapter.add(tasks);
     }
 
@@ -323,10 +338,40 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         if (rectf.top <= rectf2.bottom) {
             mPinnedHeader.setVisibility(View.VISIBLE);
             ((MainDrawer) getActivity()).removeActionbarElevation();
-        } else {
+        }
+        else {
             mPinnedHeader.setVisibility(View.GONE);
             ((MainDrawer) getActivity()).showActionbarElevation();
         }
+
+        checkCountryTasks(v,scrollX, scrollY, oldScrollX, oldScrollY);
+
+    }
+
+    private void checkCountryTasks(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+        Rect rectf = new Rect();
+        countryTitle.getGlobalVisibleRect(rectf);
+
+        Rect rectf2 = new Rect();
+        mPinnedHeader.getGlobalVisibleRect(rectf2);
+
+        Rect rectf3 = new Rect();
+        networkTitle.getGlobalVisibleRect(rectf3);
+
+        //TODO
+//        System.out.println("rectf3 = " + rectf3.bottom);
+//        System.out.println("rectf2 = " + rectf2.bottom);
+//        System.out.println("rectf3 = " + Math.abs(rectf3.bottom));
+//        System.out.println("scrollY = " + (scrollY - 60));
+//
+//        if (Math.abs(rectf3.bottom) >= scrollY - 60) {
+//            taskTypeTitle.setText(getString(R.string.network));
+//            ((MainDrawer) getActivity()).removeActionbarElevation();
+//        }
+//        else if (Math.abs(rectf.bottom) >= scrollY - 60) {
+//            taskTypeTitle.setText(getString(R.string.country));
+//            ((MainDrawer) getActivity()).removeActionbarElevation();
+//        }
 
     }
 
