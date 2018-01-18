@@ -104,7 +104,8 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
     }
 
     private void getData(String key) {
-        dbNoteRef.child(key).addListenerForSingleValueEvent(this);
+        System.out.println("key = " + key);
+        dbNoteRef.child(key).addValueEventListener(this);
     }
 
     protected AddNotesAdapter getmAdapter(String key) {
@@ -113,7 +114,8 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
 
     private void initView(String key) {
         addNotesAdapter = getmAdapter(key);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setAdapter(addNotesAdapter);
@@ -126,7 +128,6 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
             String name = (String) getChild.child("uploadBy").getValue();
             String content = (String) getChild.child("content").getValue();
             Long time = (Long) getChild.child("time").getValue();
-
             setDataToAdapter(name, content, time, getChild.getKey());
         }
     }
@@ -180,6 +181,7 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
         if(view == submitNote){
             String texts = etNotes.getText().toString().trim();
             saveNote(texts);
+            etNotes.setText("");
         }
     }
 
@@ -192,5 +194,10 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
     @Override
     public void onNoteItemSelected(int pos) {
 
+    }
+
+    @Override
+    public void onNewITemAdded() {
+        recyclerView.smoothScrollToPosition(addNotesAdapter.getItemCount()-1);
     }
 }

@@ -86,6 +86,7 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
             keys.add(key);
             items.put(key, notes);
             notifyItemInserted(keys.size() - 1);
+            listener.onNewITemAdded();
         } else {
             items.put(key, notes);
             notifyItemChanged(keys.indexOf(key));
@@ -160,6 +161,7 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
 
     public interface ItemSelectedListener {
         void onNoteItemSelected(int pos);
+        void onNewITemAdded();
     }
 
 }
