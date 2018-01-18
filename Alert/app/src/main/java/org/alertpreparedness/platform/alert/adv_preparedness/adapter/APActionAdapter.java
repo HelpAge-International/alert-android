@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -51,6 +52,7 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     private APActionAdapter.ItemSelectedListener listener;
     private String dateFormat = "MMM dd,yyyy";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
+    private String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -81,64 +83,111 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
 
     //In progress
-    public void addInProgressItem(String key, Action action) {
-        if (keys.indexOf(key) == -1) {
-            if (action.getLevel() != null
-                    && action.getLevel() == Constants.APA
+    public void addInProgressItem(String key, Action action, Boolean isCHS, Boolean isMandated, Boolean isCHSAssigned, Boolean isMandatedAssigned) {
+        if (keys.indexOf(key) == -1 && action.getFrequencyBase() == null && action.getFrequencyValue() == null) {
+            if (currentUser.equals(action.getAssignee())//MPA Custom assigned and in-progress for logged in user.
+                    && action.getAssignee() != null
+                    && action.getLevel() != null
+                    && action.getLevel() == Constants.MPA
                     && action.getDueDate() != null
                     && !DateHelper.itWasDue(action.getDueDate())
-                    && action.getTaskName() != null) {
+                    && action.getComplete() == null
+                    && action.getTaskName() != null
+                    || (isCHS && isCHSAssigned //MPA CHS assigned and in-progress for logged in user.
+                    && currentUser.equals(action.getAssignee())
+                    && action.getAssignee() != null
+                    && action.getLevel() != null
+                    && action.getLevel() == Constants.MPA
+                    && action.getDueDate() != null
+                    && !DateHelper.itWasDue(action.getDueDate())
+                    && action.getComplete() == null
+                    && action.getTaskName() != null)) {
+                //TODO Mandated
                 keys.add(key);
                 items.put(key, action);
                 notifyItemInserted(keys.size() - 1);
             }
+        } else {
+            items.put(key, action);
+            notifyItemChanged(keys.indexOf(key));
         }
     }
 
-    public void addExpiredItem(String key, Action action) {
-        if (keys.indexOf(key) == -1) {
-            if (action.getLevel() != null
-                    && action.getLevel() == Constants.APA
+    public void addExpiredItem(String key, Action action, Boolean isCHS, Boolean isMandated, Boolean isCHSAssigned, Boolean isMandatedAssigned) {
+        if (keys.indexOf(key) == -1 && action.getFrequencyBase() == null && action.getFrequencyValue() == null) {
+            if (currentUser.equals(action.getAssignee()) //MPA CUSTOM assigned and EXPIRED for logged in user.
+                    && action.getLevel() != null
+                    && action.getLevel() == Constants.MPA
                     && action.getDueDate() != null
                     && DateHelper.itWasDue(action.getDueDate())
-                    && action.getTaskName() != null) {
+                    && action.getTaskName() != null
+                    || (currentUser.equals(action.getAssignee()) //MPA CHS assigned and EXPIRED for logged in user.
+                    && isCHSAssigned && isCHS
+                    && action.getLevel() != null
+                    && action.getLevel() == Constants.MPA
+                    && action.getDueDate() != null
+                    && DateHelper.itWasDue(action.getDueDate())
+                    && action.getTaskName() != null)) {
+                //TODO Mandated
                 keys.add(key);
                 items.put(key, action);
-                notifyItemInserted(keys.size() - 1);
+                notifyItemInserted(keys.size());
             }
+        } else {
+            items.put(key, action);
+            notifyItemChanged(keys.indexOf(key));
         }
+
     }
 
-    public void addUnassignedItem(String key, Action action) {
-        System.out.println("keys = " + keys.indexOf(key));
-        if (keys.indexOf(key) == -1) {
-            if (action.getLevel() != null
-                    && action.getLevel() == Constants.APA
+    public void addUnassignedItem(String key, Action action, Boolean isCHS, Boolean isMandated, Boolean isCHSAssigned, Boolean isMandatedAssigned) {
+        if (keys.indexOf(key) == -1 && action.getFrequencyBase() == null && action.getFrequencyValue() == null) {
+            if (action.getLevel() != null //MPA CUSTOM UNASSIGNED // NO USERS.
+                    && action.getLevel() == Constants.MPA
                     && action.getAssignee() == null
                     && action.getTaskName() != null
-                    && action.getDueDate() == null) {
-                if (action.getActionType() == Constants.MANDATED
-                        || action.getActionType() == Constants.CUSTOM) {
-                    keys.add(key);
-                    items.put(key, action);
-                    notifyItemInserted(keys.size() - 1);
-                }
+                    || (!isCHSAssigned && isCHS //MPA CHS UNASSIGNED // NO USERS.
+                    && action.getLevel() != null
+                    && action.getLevel() == Constants.MPA
+                    && action.getDepartment() == null
+                    && action.getArchived() == null
+                    && action.getComplete() == null)) {
+                //TODO Mandated
+                keys.add(key);
+                items.put(key, action);
+                notifyItemInserted(keys.size());
             }
+        } else {
+            items.put(key, action);
+            notifyItemChanged(keys.indexOf(key));
+        }
+
+    }
+
+    public void addCompletedItem(String key, Action action, Boolean isCHS, Boolean isMandated, Boolean isCHSAssigned, Boolean isMandatedAssigned) {
+        if (keys.indexOf(key) == -1 && action.getFrequencyBase() == null && action.getFrequencyValue() == null) {
+            if (currentUser.equals(action.getAssignee()) //MPA CUSTOM assigned and COMPLETED for logged in user.
+                    && action.getLevel() != null
+                    && action.getLevel() == Constants.MPA
+                    && action.getComplete() != null
+                    && action.getComplete()
+                    || (isCHSAssigned && isCHS  //MPA CHS assigned and COMPLETED for logged in user.
+                    && currentUser.equals(action.getAssignee())
+                    && action.getLevel() != null
+                    && action.getLevel() == Constants.MPA
+                    && action.getComplete() != null
+                    && action.getComplete())) {
+                //TODO Mandated
+                keys.add(key);
+                items.put(key, action);
+                notifyItemInserted(keys.size());
+            }
+        } else {
+            items.put(key, action);
+            notifyItemChanged(keys.indexOf(key));
         }
     }
 
-    public void addCompletedItem(String key, Action action) {
-        if (keys.indexOf(key) == -1) {
-            if (action.getLevel() != null
-                    && action.getLevel() == Constants.APA
-                    && action.getComplete() != null
-                    && action.getComplete()) {
-                keys.add(key);
-                items.put(key, action);
-                notifyItemInserted(keys.size() - 1);
-            }
-        }
-    }
 
     public void addInActiveItem(String key, Action action, Long alertLevel) {
         if (keys.indexOf(key) == -1) {
@@ -153,17 +202,29 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
         }
     }
 
-    public void addArchivedItem(String key, Action action) {
-        if (keys.indexOf(key) == -1) {
-            if (action.getLevel() != null
-                    && action.getLevel() == Constants.APA
+    public void addArchivedItem(String key, Action action, Boolean isCHS, Boolean isMandated, Boolean isCHSAssigned, Boolean isMandatedAssigned) {
+        if (keys.indexOf(key) == -1 && action.getFrequencyBase() == null && action.getFrequencyValue() == null) {
+            if (currentUser.equals(action.getAssignee()) //MPA CUSTOM assigned and ARCHIVED for logged in user.
+                    && action.getLevel() != null
+                    && action.getLevel() == Constants.MPA
                     && action.getArchived() != null
                     && action.getArchived()
-                    && action.getDueDate() != null) {
+                    && action.getDueDate() != null
+                    || (isCHSAssigned && isCHS
+                    && currentUser.equals(action.getAssignee()) //MPA CUSTOM assigned and ARCHIVED for logged in user.
+                    && action.getLevel() != null
+                    && action.getLevel() == Constants.MPA
+                    && action.getArchived() != null
+                    && action.getArchived()
+                    && action.getDueDate() != null)) {
+                //TODO Mandated
                 keys.add(key);
                 items.put(key, action);
-                notifyItemInserted(keys.size() - 1);
+                notifyItemInserted(keys.size());
             }
+        } else {
+            items.put(key, action);
+            notifyItemChanged(keys.indexOf(key));
         }
     }
 

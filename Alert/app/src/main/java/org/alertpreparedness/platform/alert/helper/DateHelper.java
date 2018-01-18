@@ -35,4 +35,60 @@ public class DateHelper {
         return dueDate.before(today);
     }
 
+    public static boolean isInProgressWeek(Long milliseconds, int i) {
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(milliseconds);
+        date.add(Calendar.DAY_OF_YEAR, i*7);
+        date.set(Calendar.HOUR, 24);
+        date.set(Calendar.MINUTE, 00);
+        Calendar now = Calendar.getInstance();
+
+        return date.after(now);
+    }
+
+    public static boolean isInProgressMonth(Long milliseconds, int i) {
+        Calendar date = Calendar.getInstance();
+        int month = 31;
+        date.setTimeInMillis(milliseconds);
+        date.add(Calendar.DAY_OF_YEAR, i*month);
+        date.set(Calendar.HOUR, 0);
+        date.set(Calendar.MINUTE, 0);
+        Calendar now = Calendar.getInstance();
+
+        return date.after(now);
+    }
+
+    public static Boolean isInProgressYear(Long milliseconds, int i) {
+        Calendar date = Calendar.getInstance();
+        int year = 365;
+        date.setTimeInMillis(milliseconds);
+        date.add(Calendar.DAY_OF_YEAR, i*year);
+        date.set(Calendar.HOUR, 0);
+        date.set(Calendar.MINUTE, 0);
+        Calendar now = Calendar.getInstance();
+
+        return date.after(now);
+    }
+
+    public static Boolean isInProgressDay(Long milliseconds, int i) {
+        Calendar date = Calendar.getInstance();
+        int day = 1;
+        date.setTimeInMillis(milliseconds);
+        date.add(Calendar.DAY_OF_YEAR, i*day);
+        date.set(Calendar.HOUR, 0);
+        date.set(Calendar.MINUTE, 0);
+        Calendar now = Calendar.getInstance();
+
+        return date.after(now);
+    }
+
+    public static Boolean isInProgressHour(Long milliseconds, int i) {
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(milliseconds);
+        date.set(Calendar.HOUR, i);
+        date.set(Calendar.MINUTE, 0);
+        Calendar now = Calendar.getInstance();
+
+        return date.after(now);
+    }
 }

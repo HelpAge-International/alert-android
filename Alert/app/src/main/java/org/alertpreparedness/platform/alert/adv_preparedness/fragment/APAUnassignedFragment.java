@@ -87,7 +87,9 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
     private String actionID;
     private Boolean isCHS = false;
+    private Boolean isCHSAssigned = false;
     private Boolean isMandated = false;
+    private Boolean isMandatedAssigned = false;
 
     @Nullable
     @Override
@@ -163,90 +165,147 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
             Long dueDate = (Long) getChild.child("dueDate").getValue();
             Long budget = (Long) getChild.child("budget").getValue();
             Long level = (Long) getChild.child("level").getValue();
+            Long createdAt = (Long) getChild.child("createdAt").getValue();
+            Long updatedAt = (Long) getChild.child("updatedAt").getValue();
 
-            mAPAdapter.addUnassignedItem(getChild.getKey(), new Action(
-                    taskName,
-                    department,
-                    assignee,
-                    isArchived,
-                    isComplete,
-                    isCHS,
-                    isMandated,
-                    actionType,
-                    dueDate,
-                    budget,
-                    level,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef())
-            );
+            if (actionType == 0) {
+                //CHS
+                dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+                            if (actionIDs.contains(getChild.getKey())) {
+                                String CHSTaskName = (String) getChild.child("task").getValue();
+                                Long CHSlevel = (Long) getChild.child("level").getValue();
+                                Long createdAt = (Long) getChild.child("createdAt").getValue();
 
-            //CHS
-            dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                        if (actionIDs.contains(getChild.getKey())) {
-                            String taskNameMandated = (String) getChild.child("task").getValue();
-                            isCHS = true;
-                            mAPAdapter.addUnassignedItem(getChild.getKey(), new Action(
-                                    taskNameMandated,
-                                    department,
-                                    assignee,
-                                    isArchived,
-                                    isComplete,
-                                    isCHS,
-                                    isMandated,
-                                    actionType,
-                                    dueDate,
-                                    budget,
-                                    level,
-                                    dbAgencyRef.getRef(),
-                                    dbUserPublicRef.getRef())
-                            );
+                                isCHS = true;
+                                isCHSAssigned = true;
+                                mAPAdapter.addUnassignedItem(getChild.getKey(), new Action(
+                                                CHSTaskName,
+                                                department,
+                                                assignee,
+                                                isArchived,
+                                                isComplete,
+                                                createdAt,
+                                                updatedAt,
+                                                actionType,
+                                                dueDate,
+                                                budget,
+                                                CHSlevel,
+                                                null,
+                                                null,
+                                                dbAgencyRef.getRef(),
+                                                dbUserPublicRef.getRef()),
+                                        isCHS,
+                                        isMandated,
+                                        isCHSAssigned,
+                                        isMandatedAssigned
+                                );
+                            } else {
+                                isCHSAssigned = false;
+                                String CHSTaskName = (String) getChild.child("task").getValue();
+                                Long CHSlevel = (Long) getChild.child("level").getValue();
+                                Long createdAt = (Long) getChild.child("createdAt").getValue();
+
+                                mAPAdapter.addUnassignedItem(getChild.getKey(), new Action(
+                                                CHSTaskName,
+                                                null,
+                                                null,
+                                                null,
+                                                null,
+                                                createdAt,
+                                                null,
+                                                (long) 0,
+                                                null,
+                                                null,
+                                                CHSlevel,
+                                                null,
+                                                null,
+                                                dbAgencyRef.getRef(),
+                                                dbUserPublicRef.getRef()),
+                                        isCHS,
+                                        isMandated,
+                                        isCHSAssigned,
+                                        isMandatedAssigned
+                                );
+                            }
                         }
                     }
-                }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                }
-            });
+                    }
+                });
+            } else if (actionType == 1) {
 
-            //Mandated
-            dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                        if (actionIDs.contains(getChild.getKey())) {
-                            String taskNameMandated = (String) getChild.child("task").getValue();
-                            String departmentMandated = (String) getChild.child("department").getValue();
-                            isCHS = false;
-                            isMandated = true;
-                            mAPAdapter.addUnassignedItem(getChild.getKey(), new Action(
-                                    taskNameMandated,
-                                    departmentMandated,
-                                    assignee,
-                                    isArchived,
-                                    isComplete,
-                                    isCHS,
-                                    isMandated,
-                                    actionType,
-                                    dueDate,
-                                    budget,
-                                    level,
-                                    dbAgencyRef.getRef(),
-                                    dbUserPublicRef.getRef())
-                            );
+                //Mandated
+                dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+                            if (actionIDs.contains(getChild.getKey())) {
+                                String taskNameMandated = (String) getChild.child("task").getValue();
+                                String departmentMandated = (String) getChild.child("department").getValue();
+                                Long createdAt = (Long) getChild.child("createdAt").getValue();
+
+                                isCHS = false;
+                                isMandated = true;
+                                mAPAdapter.addUnassignedItem(getChild.getKey(), new Action(
+                                                taskNameMandated,
+                                                departmentMandated,
+                                                assignee,
+                                                isArchived,
+                                                isComplete,
+                                                createdAt,
+                                                updatedAt,
+                                                actionType,
+                                                dueDate,
+                                                budget,
+                                                level,
+                                                null,
+                                                null,
+                                                dbAgencyRef.getRef(),
+                                                dbUserPublicRef.getRef()),
+                                        isCHS,
+                                        isMandated,
+                                        isCHSAssigned,
+                                        isMandatedAssigned
+                                );
+                            }
                         }
                     }
-                }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                }
-            });
+                    }
+                });
+
+            } else {
+                mAPAdapter.addUnassignedItem(getChild.getKey(), new Action(
+                                taskName,
+                                department,
+                                assignee,
+                                isArchived,
+                                isComplete,
+                                createdAt,
+                                updatedAt,
+                                actionType,
+                                dueDate,
+                                budget,
+                                level,
+                                null,
+                                null,
+                                dbAgencyRef.getRef(),
+                                dbUserPublicRef.getRef()),
+                        isCHS,
+                        isMandated,
+                        isCHSAssigned,
+                        isMandatedAssigned
+                );
+            }
         }
 
     }

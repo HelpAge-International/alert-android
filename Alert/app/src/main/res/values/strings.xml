@@ -189,4 +189,11 @@
     <string name="txt_assign_action">Assign action</string>
     <string name="txt_edit_action">Edit action</string>
     <string name="navbar_subtitle">%s for %s, %s</string>
+    <string name="txt_needs_done">What needs to be done?</string>
+    <string name="txt_hazard_association">Hazard Association</string>
+    <string name="txt_department">Department</string>
+    <string name="txt_assign_to">Assign to</string>
+    <string name="txt_budget">Budget</string>
+    <string name="txt_doc_required">Is a document required for completion?</string>
+    <string name="txt_create_apa">Create APA</string>
 </resources>

@@ -38,6 +38,11 @@ public final class Constants {
     public static final int MONTH = 3;
     public static final int YEAR = 4;
 
+    //action duration
+    public static final int DUE_WEEK = 0;
+    public static final int DUE_MONTH = 1;
+    public static final int DUE_YEAR = 2;
+
     //indicator-geo-location
     public static final int NATIONAL = 0;
     public static final int SUBNATIONAL = 1;

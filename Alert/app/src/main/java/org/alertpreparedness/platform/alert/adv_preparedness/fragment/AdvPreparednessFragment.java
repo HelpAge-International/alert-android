@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.adv_preparedness.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,9 +10,14 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.adv_preparedness.activity.CreateAPAActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -20,9 +26,12 @@ import butterknife.ButterKnife;
  * Created by faizmohideen on 05/01/2018.
  */
 
-public class AdvPreparednessFragment extends Fragment {
+public class AdvPreparednessFragment extends Fragment implements View.OnClickListener{
     @BindView(R.id.action_pager)
     ViewPager mPager;
+
+    @BindView(R.id.fabAddAPA)
+    android.support.design.widget.FloatingActionButton fabCreateAPA;
 
     @Nullable
     @Override
@@ -40,7 +49,16 @@ public class AdvPreparednessFragment extends Fragment {
     }
 
     private void initViews() {
+        fabCreateAPA.setOnClickListener(this);
         mPager.setAdapter(new AdvPreparednessFragment.PagerAdapter(getFragmentManager()));
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view == fabCreateAPA){
+            Intent intent = new Intent(getActivity(), CreateAPAActivity.class);
+            startActivity(intent);
+        }
     }
 
     private class PagerAdapter extends FragmentStatePagerAdapter {
