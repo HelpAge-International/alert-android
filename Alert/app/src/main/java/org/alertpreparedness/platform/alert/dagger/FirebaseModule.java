@@ -82,7 +82,6 @@ public class FirebaseModule {
         return db.child("hazard").child(user.countryID);
     }
 
-
     @Provides
     @IndicatorRef
     public DatabaseReference provideIndicatorRef(@BaseDatabaseRef DatabaseReference db, User user) {
@@ -95,10 +94,9 @@ public class FirebaseModule {
         return db.child("indicator");
     }
 
-
     @Provides
     @BaseActionRef
-    public DatabaseReference provideBaseActionRef(@BaseDatabaseRef DatabaseReference db, User user) {
+    public DatabaseReference provideBaseActionRef(@BaseDatabaseRef DatabaseReference db) {
         return db.child("action");
     }
 

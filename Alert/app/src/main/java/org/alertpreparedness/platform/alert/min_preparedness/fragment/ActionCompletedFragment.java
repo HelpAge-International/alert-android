@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -129,7 +130,7 @@ public class ActionCompletedFragment extends InProgressFragment {
                 && model.getIsComplete()) {
 
             txtNoAction.setVisibility(View.GONE);
-            mAdapter.addCompletedItem(getChild.getKey(), new Action(
+            mAdapter.addItems(getChild.getKey(), new Action(
                     model.getTask(),
                     model.getDepartment(),
                     model.getAsignee(),
@@ -170,7 +171,7 @@ public class ActionCompletedFragment extends InProgressFragment {
                                 && model.getIsComplete()) {
 
                             txtNoAction.setVisibility(View.GONE);
-                            mAdapter.addCompletedItem(getChild.getKey(), new Action(
+                            mAdapter.addItems(getChild.getKey(), new Action(
                                     CHSTaskName,
                                     model.getDepartment(),
                                     model.getAsignee(),
@@ -224,7 +225,7 @@ public class ActionCompletedFragment extends InProgressFragment {
                                 && model.getIsComplete()) {
 
                             txtNoAction.setVisibility(View.GONE);
-                            mAdapter.addCompletedItem(getChild.getKey(), new Action(
+                            mAdapter.addItems(getChild.getKey(), new Action(
                                     taskNameMandated,
                                     model.getDepartment(),
                                     model.getAsignee(),
@@ -252,5 +253,10 @@ public class ActionCompletedFragment extends InProgressFragment {
             }
         });
 
+    }
+
+    @Override
+    public void onActionItemSelected(int pos, String key) {
+        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Currently under development!", Snackbar.LENGTH_LONG).show();
     }
 }

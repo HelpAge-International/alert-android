@@ -345,7 +345,7 @@ public class ActionExpiredFragment extends InProgressFragment {
 
             txtNoAction.setVisibility(View.GONE);
 
-            mExpiredAdapter.addExpiredItem(getChild.getKey(), new Action(
+            mExpiredAdapter.addItems(getChild.getKey(), new Action(
                     name,
                     department,
                     model.getAsignee(),
@@ -383,7 +383,9 @@ public class ActionExpiredFragment extends InProgressFragment {
                         Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
                         break;
                     case R.id.action_notes:
-
+                        Intent intent = new Intent(getActivity(), AddNotesActivity.class);
+                        intent.putExtra("ACTION_KEY", key);
+                        startActivity(intent);
                         break;
                     case R.id.attachments:
                         Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
@@ -408,8 +410,10 @@ public class ActionExpiredFragment extends InProgressFragment {
                 try {
                     Date mDate = sdf.parse(givenDateString);
                     long timeInMilliseconds = mDate.getTime();
+                    long millis = System.currentTimeMillis();
 
                     dbActionRef.child(key).child("dueDate").setValue(timeInMilliseconds);//save due date in milliSec.
+                    dbActionRef.child(key).child("updatedAt").setValue(millis);
 
                 } catch (ParseException e) {
                     e.printStackTrace();

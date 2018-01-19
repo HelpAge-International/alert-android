@@ -161,17 +161,17 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-            String actionIDs = getChild.getKey();
-            String taskName = (String) getChild.child("task").getValue();
-            String department = (String) getChild.child("department").getValue();
-            String assignee = (String) getChild.child("asignee").getValue();
-            Boolean isArchived = (Boolean) getChild.child("isArchived").getValue();
-            Boolean isComplete = (Boolean) getChild.child("isComplete").getValue();
-            Long actionType = (Long) getChild.child("type").getValue();
-            Long dueDate = (Long) getChild.child("dueDate").getValue();
-            Long budget = (Long) getChild.child("budget").getValue();
-            Long level = (Long) getChild.child("level").getValue();
+//        for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+//            String actionIDs = getChild.getKey();
+//            String taskName = (String) getChild.child("task").getValue();
+//            String department = (String) getChild.child("department").getValue();
+//            String assignee = (String) getChild.child("asignee").getValue();
+//            Boolean isArchived = (Boolean) getChild.child("isArchived").getValue();
+//            Boolean isComplete = (Boolean) getChild.child("isComplete").getValue();
+//            Long actionType = (Long) getChild.child("type").getValue();
+//            Long dueDate = (Long) getChild.child("dueDate").getValue();
+//            Long budget = (Long) getChild.child("budget").getValue();
+//            Long level = (Long) getChild.child("level").getValue();
 
 //            dbAlertRef.addListenerForSingleValueEvent(new ValueEventListener() {
 //                @Override
@@ -270,7 +270,7 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
 //                }
 //            });
 
-        }
+  //      }
 
     }
 

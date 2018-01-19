@@ -80,7 +80,16 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
         }
     }
 
-
+    public void addItems(String key, Action action) {
+        if (keys.indexOf(key) == -1 && action.getFrequencyBase() == null && action.getFrequencyValue() == null) {
+            keys.add(key);
+            items.put(key, action);
+            notifyItemInserted(keys.size() - 1);
+        } else {
+            items.put(key, action);
+            notifyItemChanged(keys.indexOf(key));
+        }
+    }
 
     //In progress
     public void addInProgressItem(String key, Action action, Boolean isCHS, Boolean isMandated, Boolean isCHSAssigned, Boolean isMandatedAssigned) {
@@ -281,7 +290,7 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
                 holder.tvDueDate.setVisibility(View.GONE);
                 holder.tvUserName.setVisibility(View.GONE);
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("e = " + e);
             e.printStackTrace();
         }
@@ -290,22 +299,22 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
     private void getDepartment(DatabaseReference db, DatabaseReference userRef, String departmentID, String assignee, APActionAdapter.ViewHolder holder) {
 
-        
-            db.addListenerForSingleValueEvent(new ValueEventListener() {
 
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    System.out.println("dataSnapshot = " + dataSnapshot);
-                    String department = (String) dataSnapshot.child("departments").child(departmentID).child("name").getValue();
-                    setUser(holder, userRef, assignee, department);
-                }
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                System.out.println("dataSnapshot = " + dataSnapshot);
+                String department = (String) dataSnapshot.child("departments").child(departmentID).child("name").getValue();
+                setUser(holder, userRef, assignee, department);
+            }
 
-                }
-            });
-        
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     private void setUser(APActionAdapter.ViewHolder holder, DatabaseReference userRef, String assignee, String department) {
@@ -325,7 +334,7 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
                 }
             });
         } else {
-            holder.tvUserName.setText("Unassigned, "+department);
+            holder.tvUserName.setText("Unassigned, " + department);
         }
 
     }
@@ -335,9 +344,9 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     }
 
     private String getDate(Long date) {
-        if(date != null) {
+        if (date != null) {
             return "Due: " + format.format(new Date(date));
-        }else {
+        } else {
             return "Not Assigned";
         }
     }

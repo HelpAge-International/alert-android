@@ -33,7 +33,7 @@ import timber.log.Timber;
 @AcraMailSender(mailTo = "tj@rolleragency.co.uk")
 public class AlertApplication extends Application {
 
-    public static final boolean IS_LIVE = false;
+    public static final boolean IS_LIVE = true;
 
 //    public static final String API_KEY = "";
 
