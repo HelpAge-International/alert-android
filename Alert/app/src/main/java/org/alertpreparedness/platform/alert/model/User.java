@@ -16,6 +16,8 @@ public class User implements Serializable {
     public String countryID;
     private String userID;
     private String systemAdminID;
+    private String localNetworkID;
+    private String networkID;
     private String countryName;
     private int countryListId;
 
@@ -52,7 +54,7 @@ public class User implements Serializable {
     private boolean isCountryDirector;
     public String networkCountryID;
 
-    public User(String userID, int userType, String agencyAdminID, String countryID, String systemAdminID, String networkCountryID, List<String> hazardID,  boolean isCountryDirector) {
+    public User(String userID, int userType, String agencyAdminID, String countryID, String systemAdminID, String networkCountryID, String localNetworkID, String networkID, List<String> hazardID,  boolean isCountryDirector) {
         this.userID = userID;
         this.userType = userType;
         this.agencyAdminID = agencyAdminID;
@@ -61,6 +63,8 @@ public class User implements Serializable {
         this.hazardID = hazardID;
         this.isCountryDirector = isCountryDirector;
         this.networkCountryID = networkCountryID;
+        this.localNetworkID = localNetworkID;
+        this.networkID = networkID;
     }
 
     public User(String firstName, String lastName, String email) {
@@ -155,5 +159,21 @@ public class User implements Serializable {
 
     public int getCountryListId() {
         return countryListId;
+    }
+
+    public String getLocalNetworkID() {
+        return localNetworkID;
+    }
+
+    public void setLocalNetworkID(String localNetworkID) {
+        this.localNetworkID = localNetworkID;
+    }
+
+    public String getNetworkID() {
+        return networkID;
+    }
+
+    public void setNetworkID(String networkID) {
+        this.networkID = networkID;
     }
 }

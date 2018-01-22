@@ -33,7 +33,7 @@ import timber.log.Timber;
 @AcraMailSender(mailTo = "tj@rolleragency.co.uk")
 public class AlertApplication extends Application {
 
-    public static final boolean IS_LIVE = true;
+    public static final boolean IS_LIVE = false;
 
 //    public static final String API_KEY = "";
 
@@ -44,7 +44,7 @@ public class AlertApplication extends Application {
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.SAND;
 
     @SuppressLint("StaticFieldLeak")
     private static Context sContext;

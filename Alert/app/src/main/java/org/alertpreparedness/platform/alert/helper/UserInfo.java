@@ -138,11 +138,54 @@ public class UserInfo implements ValueEventListener {
 
         PreferHelper.putInt(AlertApplication.getContext(), Constants.USER_TYPE, userType);
 
-        UserRealm user = new UserRealm(userId, agencyAdmin, systemAdmin, countryId, userType, nodeName.equals("countryDirector"));
+        UserRealm user = new UserRealm(userId, agencyAdmin, systemAdmin, countryId, null, null, null, userType, nodeName.equals("countryDirector"));
 
-        PreferHelper.putString(AlertApplication.getContext(), Constants.COUNTRY_ID, user.getCountryId());
+        //PreferHelper.putString(AlertApplication.getContext(), Constants.COUNTRY_ID, user.getCountryId());
 
-        userObj = user.toUser();
+       // userObj = user.toUser();
+        //countryOffice.child(user.getAgencyAdmin()).child(user.getCountryId()).addValueEventListener(this);
+
+        getNetworkIDs(user, agencyAdmin, systemAdmin, countryId, userType, nodeName);
+
+    }
+
+    private void getNetworkIDs(UserRealm user, String agencyAdmin, String systemAdmin, String countryId, int userType, String nodeName) {
+        countryOffice.child(user.getAgencyAdmin()).child(user.getCountryId()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String localNetworkID = "";
+                String networkID = "";
+                String networkCountryID = "";
+
+                if(dataSnapshot.child("localNetworks").hasChildren()) {
+                    localNetworkID = dataSnapshot.child("localNetworks").getChildren().iterator().next().getKey();
+                    PreferHelper.putString(AlertApplication.getContext(), Constants.LOCAL_NETWORK_ID, localNetworkID);
+                    System.out.println("localNetworkID NN= " + localNetworkID);
+                }
+
+                if(dataSnapshot.child("networks").hasChildren()) {
+                    networkID = dataSnapshot.child("networks").getChildren().iterator().next().getKey();
+                    PreferHelper.putString(AlertApplication.getContext(), Constants.NETWORK_ID, networkID);
+                    System.out.println("NetworkID NN= " + networkID);
+
+                    networkCountryID = (String) dataSnapshot.child("networks").child(networkID).child("networkCountryId").getValue();
+                    PreferHelper.putString(AlertApplication.getContext(), Constants.NETWORK_COUNTRY_ID, networkCountryID);
+                    System.out.println("NetworkCountryID NN= " + networkCountryID);
+                }
+
+              //  UserRealm user = new UserRealm(localNetworkID, networkID, networkCountryID);
+                UserRealm user = new UserRealm(userId, agencyAdmin, systemAdmin, countryId, localNetworkID, networkID, networkCountryID, userType, nodeName.equals("countryDirector"));
+
+                PreferHelper.putString(AlertApplication.getContext(), Constants.COUNTRY_ID, user.getCountryId());
+
+                userObj = user.toUser();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         countryOffice.child(user.getAgencyAdmin()).child(user.getCountryId()).addValueEventListener(this);
 
     }

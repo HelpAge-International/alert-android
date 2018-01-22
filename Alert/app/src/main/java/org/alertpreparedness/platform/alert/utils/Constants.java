@@ -18,6 +18,9 @@ public final class Constants {
     public static final String COUNTRY_ID = "country_id";
     public static final String AGENCY_ID = "agency_id";
     public static final String SYSTEM_ID = "system_id";
+    public static final String LOCAL_NETWORK_ID = "local_network_id";
+    public static final String NETWORK_ID = "network_id";
+    public static final String NETWORK_COUNTRY_ID = "network_country_id";
     public static final String USER_TYPE = "user_type";
     public static final String FIRST_NAME = "first_name";
     public static final String LAST_NAME = "last_name";

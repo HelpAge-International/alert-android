@@ -170,7 +170,10 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
         for (DataSnapshot getChild : dataSnapshot.getChildren()) {
             String actionIDs = getChild.getKey();
 
+           // System.out.println("user.getCountryID() = " + user.getCountryID());
             System.out.println("user.getNetworkCountryID() = " + user.getNetworkCountryID());
+            System.out.println("user.getLocalNetworkID() = " + user.getLocalNetworkID());
+            System.out.println("user.getNetworkID() = " + user.getNetworkID());
             DataModel model = getChild.getValue(DataModel.class);
 
             if (getChild.child("frequencyBase").getValue() != null) {
@@ -188,13 +191,11 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                 System.out.println("model = " + model);
                 getCustom(model, getChild);
             }
-
         }
     }
 
     private void getCustom(DataModel model, DataSnapshot getChild) {
-        System.out.println("user.agencyAdminID = " + user.agencyAdminID);
-        System.out.println("user.countryID = " + user.countryID);
+
         countryOffice.child(user.agencyAdminID).child(user.countryID).child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
