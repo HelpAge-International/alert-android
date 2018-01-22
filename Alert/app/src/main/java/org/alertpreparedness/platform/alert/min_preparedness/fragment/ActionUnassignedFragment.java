@@ -65,12 +65,6 @@ public class ActionUnassignedFragment extends InProgressFragment {
     User user;
 
     private ActionAdapter mUnassignedAdapter;
-    private Boolean isCHS = false;
-    private Boolean isCHSAssigned = false;
-    private Boolean isMandated = false;
-    private Boolean isMandatedAssigned = false;
-    private Boolean isInProgress = false;
-    private int freqBase = 0;
     private int freqValue = 0;
 
     @Nullable
@@ -173,13 +167,11 @@ public class ActionUnassignedFragment extends InProgressFragment {
 
                     if (!actionIDs.equals(getChild.getKey())) {
                         System.out.println("getChild.getKey() = " + getChild.getKey());
-                        isCHS = true;
-                        isCHSAssigned = false;
+
                         String CHSTaskName = (String) getChild.child("task").getValue();
                         Long CHSlevel = (Long) getChild.child("level").getValue();
                         Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
 
-                        if (!isCHSAssigned) {
                             txtNoAction.setVisibility(View.GONE);
                             mUnassignedAdapter.addItems(getChild.getKey(), new Action(
                                     CHSTaskName,
@@ -198,7 +190,7 @@ public class ActionUnassignedFragment extends InProgressFragment {
                                     dbAgencyRef.getRef(),
                                     dbUserPublicRef.getRef())
                             );
-                        }
+
                     }
                 }
             }
@@ -216,8 +208,6 @@ public class ActionUnassignedFragment extends InProgressFragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot getChild : dataSnapshot.getChildren()) {
                     if (!actionIDs.contains(getChild.getKey())) {
-                        isMandated = true;
-                        isMandatedAssigned = false;
 
                         try {
                             String taskNameMandated = (String) getChild.child("task").getValue();
@@ -264,8 +254,6 @@ public class ActionUnassignedFragment extends InProgressFragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    isMandated = true;
-                    isMandatedAssigned = false;
 
                     try {
                         String taskNameMandated = (String) getChild.child("task").getValue();
@@ -312,8 +300,6 @@ public class ActionUnassignedFragment extends InProgressFragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot getChild : dataSnapshot.getChildren()) {
 
-                    isCHS = true;
-                    isCHSAssigned = false;
                     String CHSTaskName = (String) getChild.child("task").getValue();
                     Long CHSlevel = (Long) getChild.child("level").getValue();
                     Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
