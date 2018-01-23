@@ -173,7 +173,6 @@ public class UserInfo implements ValueEventListener {
                     System.out.println("NetworkCountryID NN= " + networkCountryID);
                 }
 
-              //  UserRealm user = new UserRealm(localNetworkID, networkID, networkCountryID);
                 UserRealm user = new UserRealm(userId, agencyAdmin, systemAdmin, countryId, localNetworkID, networkID, networkCountryID, userType, nodeName.equals("countryDirector"));
 
                 PreferHelper.putString(AlertApplication.getContext(), Constants.COUNTRY_ID, user.getCountryId());

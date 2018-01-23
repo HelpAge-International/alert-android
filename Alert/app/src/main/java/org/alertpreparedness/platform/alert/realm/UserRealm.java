@@ -52,12 +52,6 @@ public class UserRealm extends RealmObject {
         this.isCountryDirector = isCountryDirector;
     }
 
-    public UserRealm(String localNetworkId, String networkId, String networkCountryId) {
-        this.localNetworkId = localNetworkId;
-        this.networkId = networkId;
-        this.networkCountryId = networkCountryId;
-    }
-
     public String getAgencyAdmin() {
         return agencyAdmin;
     }

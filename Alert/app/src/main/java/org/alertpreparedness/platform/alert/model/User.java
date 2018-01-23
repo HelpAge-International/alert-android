@@ -20,7 +20,13 @@ public class User implements Serializable {
     private String networkID;
     private String countryName;
     private int countryListId;
-
+    public List <String> hazardID;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private int userType;
+    private boolean isCountryDirector;
+    public String networkCountryID;
 
     enum UserLevel {
         STANDARD,
@@ -35,7 +41,10 @@ public class User implements Serializable {
                 ", countryID='" + countryID + '\'' +
                 ", userID='" + userID + '\'' +
                 ", systemAdminID='" + systemAdminID + '\'' +
+                ", localNetworkID='" + localNetworkID + '\'' +
+                ", networkID='" + networkID + '\'' +
                 ", countryName='" + countryName + '\'' +
+                ", countryListId=" + countryListId +
                 ", hazardID=" + hazardID +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
@@ -45,14 +54,6 @@ public class User implements Serializable {
                 ", networkCountryID='" + networkCountryID + '\'' +
                 '}';
     }
-
-    public List <String> hazardID;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private int userType;
-    private boolean isCountryDirector;
-    public String networkCountryID;
 
     public User(String userID, int userType, String agencyAdminID, String countryID, String systemAdminID, String networkCountryID, String localNetworkID, String networkID, List<String> hazardID,  boolean isCountryDirector) {
         this.userID = userID;

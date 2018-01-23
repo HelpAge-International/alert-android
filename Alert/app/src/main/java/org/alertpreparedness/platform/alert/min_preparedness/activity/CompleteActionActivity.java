@@ -30,15 +30,21 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseStorageRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.DocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
@@ -47,7 +53,10 @@ import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.AttachmentAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.MinPreparednessFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
+import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
+import org.alertpreparedness.platform.alert.min_preparedness.model.FileInfo;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Notes;
+import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SimpleAdapter;
@@ -91,8 +100,16 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     @ActionRef
     DatabaseReference dbActionRef;
 
+    @Inject
+    @DocumentRef
+    DatabaseReference dbDocRef;
+
+    @Inject
+    User user;
+
     ArrayList<String> imgList = new ArrayList<>();
     ArrayList<String> pathList = new ArrayList<>();
+    private static final long KB = 1024;
 
     SimpleAdapter simpleAdapter;
 
@@ -153,6 +170,35 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
         }
     }
 
+    public void bottomSheet() {
+        SheetMenu.with(this).setTitle("Add attachment").setMenu(R.menu.menu_add_attachment).setClick(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.take_photo:
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(intent, 0);
+                        break;
+                    case R.id.take_video:
+                        //TODO allow video files
+                        break;
+                    case R.id.select_file:
+                        //TODO allow select files
+                        showFileChooser();
+                        break;
+                }
+                return false;
+            }
+        }).show();
+    }
+
+    private void showFileChooser() {
+//        Intent intent = new Intent();
+//        intent.setType("")
+
+
+    }
+
     private void confirmActionComplete() {
         String notes = editTextNote.getText().toString().trim();
 
@@ -161,9 +207,9 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
             return;
         }
 
-        if (imgList.size() == 0) {
-            SnackbarHelper.show(this, getString(R.string.txt_err_add_attachments));
-        }
+//        if (imgList.size() == 0) {
+//            SnackbarHelper.show(this, getString(R.string.txt_err_add_attachments));
+//        }
 
         saveData(notes);
     }
@@ -171,30 +217,61 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     private void saveData(String texts) {
         Intent intent = getIntent();
         String key = intent.getStringExtra("ACTION_KEY");
-        String userID = PreferHelper.getString(getApplicationContext(), Constants.AGENCY_ID);
-
-        saveNote(texts, key);
-        StorageReference riversRef = mStorageRef.child("documents/" + userID + "/" + key + "/images/");
 
         for (int i = 0; i < pathList.size(); i++) {
-            System.out.println("Uri.parse(pathList.get(i)) = " + Uri.parse(pathList.get(i)));
-            final int finalI = i;
-            riversRef.putFile(Uri.parse("file://" + pathList.get(i)))
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            Toast.makeText(getApplicationContext(), "Action completed successfully", Toast.LENGTH_LONG).show();
-                            editTextNote.setText("");
-                            imgList.remove(finalI);
-                            simpleAdapter.notifyDataSetChanged();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            System.out.println("exception = " + exception);
-                        }
-                    });
+
+            DatabaseReference ref = dbActionRef.child(key).child("documents").push();
+
+            ref.setValue(true);
+            saveNote(texts, key);
+
+            int finalI = i;
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    String documentID = dataSnapshot.getKey();
+                    System.out.println("user.getUserID() = " + user.getUserID());
+                    System.out.println("documentID = " + documentID);
+
+
+                    StorageReference riversRef = mStorageRef.child("documents/" + user.getCountryID() + "/" + documentID + "/" + imgList.get(finalI));
+                    System.out.println("Uri.parse(pathList.get(i)) = " + Uri.parse(pathList.get(finalI)));
+
+
+                    riversRef.putFile(Uri.parse("file://" + pathList.get(finalI)))
+                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    Toast.makeText(getApplicationContext(), "Action completed successfully", Toast.LENGTH_LONG).show();
+                                    editTextNote.setText("");
+                                    imgList.remove(finalI);
+                                    simpleAdapter.notifyDataSetChanged();
+
+                                    String title = taskSnapshot.getMetadata().getName();
+                                    String downloadUri = taskSnapshot.getMetadata().getDownloadUrl().toString();
+                                    Long size = taskSnapshot.getMetadata().getSizeBytes();
+                                    double sizeInKb = size / KB;
+                                    Long time = System.currentTimeMillis();
+
+                                    FileInfo info = new FileInfo(title, downloadUri, Long.valueOf(0), sizeInKb, Long.valueOf(0), time, title, user.getUserID());
+                                    dbDocRef.child(documentID).setValue(info);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    System.out.println("exception = " + exception);
+                                }
+                            });
+                }
+
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
         }
     }
 
@@ -216,27 +293,6 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
         }
     }
 
-
-    public void bottomSheet() {
-        SheetMenu.with(this).setTitle("Add attachment").setMenu(R.menu.menu_add_attachment).setClick(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.take_photo:
-                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        startActivityForResult(intent, 0);
-                        break;
-                    case R.id.take_video:
-                        //TODO allow video files
-                        break;
-                    case R.id.select_file:
-                        //TODO allow select files
-                        break;
-                }
-                return false;
-            }
-        }).show();
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
