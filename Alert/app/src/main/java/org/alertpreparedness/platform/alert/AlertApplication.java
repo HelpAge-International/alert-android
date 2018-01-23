@@ -44,7 +44,7 @@ public class AlertApplication extends Application {
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.SAND;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING;
 
     @SuppressLint("StaticFieldLeak")
     private static Context sContext;
@@ -71,7 +71,7 @@ public class AlertApplication extends Application {
         }
 
         // Live-Only additions
-        if (!IS_LIVE && CURRENT_STATUS != APP_STATUS.TESTING) {
+        if (!IS_LIVE && CURRENT_STATUS != APP_STATUS.SAND) {
             // Leak Canary
             if (LeakCanary.isInAnalyzerProcess(this)) {
                 // This process is dedicated to LeakCanary for heap analysis.

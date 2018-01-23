@@ -22,7 +22,7 @@ import java.io.StringReader
 
 object RiskMonitoringService {
 
-    private val gson: Gson = Gson()
+    public val gson: Gson = Gson()
     private val mAppStatus = PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS)
 
     fun readJsonFile(): Observable<String> {
@@ -59,6 +59,7 @@ object RiskMonitoringService {
                     val reader = JsonReader(StringReader(toJson.trim()))
                     reader.isLenient = true
                     val fromJson = gson.fromJson<ModelHazard>(reader, ModelHazard::class.java)
+                    println("fromJson = ${fromJson}")
                     return@map fromJson.copy(id = it.key)
                 }
             } else {

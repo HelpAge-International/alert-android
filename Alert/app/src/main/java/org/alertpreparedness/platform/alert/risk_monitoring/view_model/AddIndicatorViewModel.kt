@@ -117,31 +117,34 @@ class AddIndicatorViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
     }
 
     private fun getStaff() {
+        println("getStaff")
         val users = mutableListOf<ModelUserPublic>()
 
         StaffService.getCountryAdmin().doOnSubscribe { }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ user ->
+                    println("*********************user = ${user}")
                     users.add(user)
                     mStaff.value = users
+
+                    mDisposables.add(StaffService.getCountryStaff(countryId)
+//                .doOnSubscribe { users.clear() }
+                            .flatMap({ ids ->
+                                return@flatMap Flowable.fromIterable(ids)
+                            })
+                            .flatMap({ id ->
+                                return@flatMap StaffService.getUserDetail(id)
+                            })
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({ user ->
+                                users.add(user)
+                                mStaff.value = users
+                            })
+                    )
                 })
 
-        mDisposables.add(StaffService.getCountryStaff(countryId)
-                .doOnSubscribe { users.clear() }
-                .flatMap({ ids ->
-                    return@flatMap Flowable.fromIterable(ids)
-                })
-                .flatMap({ id ->
-                    return@flatMap StaffService.getUserDetail(id)
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ user ->
-                    users.add(user)
-                    mStaff.value = users
-                })
-        )
 
     }
 
@@ -155,7 +158,7 @@ class AddIndicatorViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
         )
     }
 
-    fun addIndicator(indicator: ModelIndicator, countryContext:Boolean) = RiskMonitoringService.addIndicatorToHazard(indicator, countryContext)
+    fun addIndicator(indicator: ModelIndicator, countryContext: Boolean) = RiskMonitoringService.addIndicatorToHazard(indicator, countryContext)
 
     override fun onCleared() {
         super.onCleared()

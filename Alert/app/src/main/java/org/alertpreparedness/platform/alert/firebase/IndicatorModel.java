@@ -15,7 +15,6 @@ public class IndicatorModel {
 
     }
 
-
     @Override
     public String toString() {
         return "IndicatorModel{" +
