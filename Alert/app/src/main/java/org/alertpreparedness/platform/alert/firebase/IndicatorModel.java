@@ -16,6 +16,16 @@ public class IndicatorModel {
     }
 
 
+    @Override
+    public String toString() {
+        return "IndicatorModel{" +
+                "assignee='" + assignee + '\'' +
+                ", name='" + name + '\'' +
+                ", triggerSelected=" + triggerSelected +
+                ", dueDate=" + dueDate +
+                '}';
+    }
+
     public String getAssignee() {
         return assignee;
     }
