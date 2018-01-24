@@ -17,6 +17,9 @@ public class UserRealm extends RealmObject {
     private String agencyAdmin;
     private String systemAdmin;
     private String countryId;
+    private String localNetworkId;
+    private String networkId;
+    private String networkCountryId;
     private Integer userType;
     private boolean isCountryDirector;
 
@@ -29,20 +32,25 @@ public class UserRealm extends RealmObject {
                 ", agencyAdmin='" + agencyAdmin + '\'' +
                 ", systemAdmin='" + systemAdmin + '\'' +
                 ", countryId='" + countryId + '\'' +
+                ", localNetworkId='" + localNetworkId + '\'' +
+                ", networkId='" + networkId + '\'' +
+                ", networkCountryId='" + networkCountryId + '\'' +
                 ", userType=" + userType +
                 ", isCountryDirector=" + isCountryDirector +
                 '}';
     }
 
-    public UserRealm(String userId, String agencyAdmin, String systemAdmin, String countryId, Integer userType, boolean isCountryDirector) {
+    public UserRealm(String userId, String agencyAdmin, String systemAdmin, String countryId, String localNetworkId, String networkId, String networkCountryId, Integer userType, boolean isCountryDirector) {
         this.userId = userId;
         this.agencyAdmin = agencyAdmin;
         this.systemAdmin = systemAdmin;
         this.countryId = countryId;
+        this.localNetworkId = localNetworkId;
+        this.networkId = networkId;
+        this.networkCountryId = networkCountryId;
         this.userType = userType;
         this.isCountryDirector = isCountryDirector;
     }
-
 
     public String getAgencyAdmin() {
         return agencyAdmin;
@@ -92,8 +100,32 @@ public class UserRealm extends RealmObject {
         this.userId = userId;
     }
 
+    public String getLocalNetworkId() {
+        return localNetworkId;
+    }
+
+    public void setLocalNetworkId(String localNetworkId) {
+        this.localNetworkId = localNetworkId;
+    }
+
+    public String getNetworkId() {
+        return networkId;
+    }
+
+    public void setNetworkId(String networkId) {
+        this.networkId = networkId;
+    }
+
+    public String getNetworkCountryId() {
+        return networkCountryId;
+    }
+
+    public void setNetworkCountryId(String networkCountryId) {
+        this.networkCountryId = networkCountryId;
+    }
+
     public User toUser() {
-        return new User(userId,userType,agencyAdmin,countryId,systemAdmin,null,null, isCountryDirector);
+        return new User(userId,userType,agencyAdmin,countryId,systemAdmin, networkCountryId, localNetworkId, networkId, null, isCountryDirector);
     }
 
     public UserRealm getByPrimaryKey(Realm realm, String id) {

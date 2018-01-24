@@ -57,7 +57,7 @@ public class AlertApplication extends Application implements ValueEventListener 
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.SAND;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING;
 
     @SuppressLint("StaticFieldLeak")
     private static Context sContext;
@@ -72,7 +72,6 @@ public class AlertApplication extends Application implements ValueEventListener 
         Realm.init(this);
         // JODA
         JodaTimeAndroid.init(this);
-
 
         ACRA.init(this);
 

@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,19 +29,18 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseCountryOfficeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
-import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.interfaces.OnItemsChangedListener;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
-
-import java.util.Calendar;
 
 import javax.inject.Inject;
 
@@ -53,7 +51,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class InProgressFragment extends Fragment implements ActionAdapter.ItemSelectedListener, ValueEventListener {
+public class InProgressFragment extends Fragment implements ActionAdapter.ItemSelectedListener, OnItemsChangedListener, ValueEventListener {
 
     private DataModel model;
 
@@ -86,6 +84,10 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     DatabaseReference dbMandatedRef;
 
     @Inject
+    @BaseActionRef
+    DatabaseReference dbActionBaseRef;
+
+    @Inject
     @UserPublicRef
     DatabaseReference dbUserPublicRef;
 
@@ -104,6 +106,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     private Boolean isInProgress = false;
     private int freqBase = 0;
     private int freqValue = 0;
+    String ids[] = {};
 
     @Nullable
     @Override
@@ -170,10 +173,19 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-            String actionIDs = getChild.getKey();
-            System.out.println("getChild = " + getChild);
-            DataModel model = getChild.getValue(DataModel.class);
+//        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
+//
+//        for(String id: ids) {
+
+          //  System.out.println("GET NETWORK ACTION " + dataSnapshot.child(id).getValue());
+            for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+                String actionIDs = getChild.getKey();
+
+                // System.out.println("user.getCountryID() = " + user.getCountryID());
+                System.out.println("user.getNetworkCountryID() = " + user.getNetworkCountryID());
+                System.out.println("user.getLocalNetworkID() = " + user.getLocalNetworkID());
+                System.out.println("user.getNetworkID() = " + user.getNetworkID());
+                DataModel model = getChild.getValue(DataModel.class);
 
             if (getChild.child("frequencyBase").getValue() != null) {
                 model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
@@ -187,9 +199,10 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
             } else if (model.getType() == 1) {
                 getMandated(model, actionIDs);
             } else {
+                System.out.println("model = " + model);
                 getCustom(model, getChild);
             }
-
+          //  }
         }
     }
 
@@ -217,7 +230,6 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                         isInProgress = DateHelper.isInProgressYear(model.getUpdatedAt(), value.intValue());
                     }
                 }
-
                 if (model.getFrequencyValue() != null && model.getFrequencyBase() != null) {
                     freqValue = model.getFrequencyValue().intValue();
                     freqBase = model.getFrequencyBase().intValue();
@@ -235,20 +247,19 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                     } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_YEAR) {
                         isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), freqValue);
                     }
-                }
+                    if (isInProgress) {
+                        addObjects(model.getTask(),
+                                model.getCreatedAt(),
+                                model.getLevel(),
+                                model,
+                                getChild,
+                                isCHS,
+                                isCHSAssigned,
+                                isMandated,
+                                isMandatedAssigned);
+                    }
 
-                if (isInProgress) {
-                    addObjects(model.getTask(),
-                            model.getCreatedAt(),
-                            model.getLevel(),
-                            model,
-                            getChild,
-                            isCHS,
-                            isCHSAssigned,
-                            isMandated,
-                            isMandatedAssigned);
                 }
-
             }
 
             @Override
@@ -256,6 +267,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
 
             }
         });
+
     }
 
     private void getCHS(DataModel model, String actionIDs) {
@@ -382,32 +394,34 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
 
     private void addObjects(String name, Long createdAt, Long level,
                             DataModel model, DataSnapshot getChild, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
-
+        System.out.println("model.getTask() = " + model.getTask());
         if (user.getUserID().equals(model.getAsignee()) //MPA Custom assigned and in-progress for logged in user.
                 && model.getAsignee() != null
                 && level != null
                 && level == Constants.MPA
                 && model.getDueDate() != null
-                && (model.getIsCompleteAt() == null && model.getIsComplete() == null || model.getIsCompleteAt() != null && !model.getIsComplete()) // isComplete can be set to false :D
+                && (model.getIsCompleteAt() == null && model.getIsComplete() == null || model.getIsCompleteAt() == null && !model.getIsComplete()) // isComplete can be set to false :D, and when it's false, isCreatedAt will disappear.
                 && name != null
                 || (isCHS && isCHSAssigned //MPA CHS assigned and in-progress for logged in user.
                 && user.getUserID().equals(model.getAsignee())
                 && model.getAsignee() != null
                 && level != null
                 && level == Constants.MPA
-                && !model.getIsComplete()
+                && model.getDueDate() != null
+                && (model.getIsCompleteAt() == null && model.getIsComplete() == null || model.getIsCompleteAt() == null && !model.getIsComplete())
                 && name != null)
                 || (isMandated && isMandatedAssigned //MPA Mandated assigned and in-progress for logged in user.
                 && user.getUserID().equals(model.getAsignee())
                 && model.getAsignee() != null
                 && level != null
                 && level == Constants.MPA
-                && !model.getIsComplete()
+                && model.getDueDate() != null
+                && (model.getIsCompleteAt() == null && model.getIsComplete() == null || model.getIsCompleteAt() == null && !model.getIsComplete())
                 && name != null)) {
 
             txtNoAction.setVisibility(View.GONE);
 
-            mAdapter.addInProgressItem(getChild.getKey(), new Action(
+            mAdapter.addItems(getChild.getKey(), new Action(
                     name,
                     model.getDepartment(),
                     model.getAsignee(),
@@ -432,4 +446,26 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
 
     }
 
+    @Override
+    public void onItemChanged(DataSnapshot getChild) {
+//        String actionIDs = getChild.getKey();
+//        System.out.println("CHANGED");
+//        DataModel model = getChild.getValue(DataModel.class);
+//
+//        if (getChild.child("frequencyBase").getValue() != null) {
+//            model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
+//        }
+//        if (getChild.child("frequencyValue").getValue() != null) {
+//            model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
+//        }
+//
+//        if (model.getType() == 0) {
+//            getCHS(model, actionIDs);
+//        } else if (model.getType() == 1) {
+//            getMandated(model, actionIDs);
+//        } else {
+//            getCustom(model, getChild);
+//        }
+
+    }
 }

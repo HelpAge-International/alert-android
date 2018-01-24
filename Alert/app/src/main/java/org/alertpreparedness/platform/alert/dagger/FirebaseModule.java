@@ -17,6 +17,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseCountryOfficeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseUserRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.DocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardOtherRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
@@ -58,7 +59,6 @@ public class FirebaseModule {
         return db.child(user.countryID);
     }
 
-
     @Provides
     @Singleton
     @BaseAlertRef
@@ -85,7 +85,6 @@ public class FirebaseModule {
         return db.child("hazard").child(user.countryID);
     }
 
-
     @Provides
     @IndicatorRef
     public DatabaseReference provideIndicatorRef(@BaseDatabaseRef DatabaseReference db, User user) {
@@ -98,10 +97,9 @@ public class FirebaseModule {
         return db.child("indicator");
     }
 
-
     @Provides
     @BaseActionRef
-    public DatabaseReference provideBaseActionRef(@BaseDatabaseRef DatabaseReference db, User user) {
+    public DatabaseReference provideBaseActionRef(@BaseDatabaseRef DatabaseReference db) {
         return db.child("action");
     }
 
@@ -209,6 +207,12 @@ public class FirebaseModule {
             default: //Constants.PartnerUser:
                 return db.child("partner").child(user.getUserID()).child("permissions");
         }
+    }
+
+    @Provides
+    @DocumentRef
+    public DatabaseReference provideDocRef(@BaseDatabaseRef DatabaseReference db, User user) {
+        return db.child("document").child(user.countryID);
     }
 
 //    @Provides

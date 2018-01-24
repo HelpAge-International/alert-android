@@ -1,8 +1,10 @@
 package org.alertpreparedness.platform.alert.adv_preparedness.fragment;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -30,10 +32,13 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
-import org.alertpreparedness.platform.alert.firebase.AlertModel;
+import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
+import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
+import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.Constants;
 
 import javax.inject.Inject;
 
@@ -63,6 +68,10 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
     @BindView(R.id.tvStatus)
     TextView tvActionInactive;
 
+    @Nullable
+    @BindView(R.id.tvAPANoAction)
+    TextView txtNoAction;
+
     @Inject
     @ActionRef
     DatabaseReference dbActionRef;
@@ -87,9 +96,18 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
     @UserPublicRef
     DatabaseReference dbUserPublicRef;
 
+    @Inject
+    User user;
+
     private APActionAdapter mAPAdapter;
     private Boolean isCHS = false;
+    private Boolean isCHSAssigned = false;
     private Boolean isMandated = false;
+    private Boolean isMandatedAssigned = false;
+    private Boolean isInProgress = false;
+    private int freqBase = 0;
+    private int freqValue = 0;
+
 
     @Nullable
     @Override
@@ -158,120 +176,206 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
         }).show();
     }
 
+
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
         for (DataSnapshot getChild : dataSnapshot.getChildren()) {
             String actionIDs = getChild.getKey();
-            String taskName = (String) getChild.child("task").getValue();
-            String department = (String) getChild.child("department").getValue();
-            String assignee = (String) getChild.child("asignee").getValue();
-            Boolean isArchived = (Boolean) getChild.child("isArchived").getValue();
-            Boolean isComplete = (Boolean) getChild.child("isComplete").getValue();
-            Long actionType = (Long) getChild.child("type").getValue();
-            Long dueDate = (Long) getChild.child("dueDate").getValue();
-            Long budget = (Long) getChild.child("budget").getValue();
-            Long level = (Long) getChild.child("level").getValue();
 
-//            dbAlertRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    Long alertLevel = (Long) dataSnapshot.child("alertLevel").getValue();
-//                    mAPAdapter.addInActiveItem(getChild.getKey(), new Action(
-//                                    taskName,
-//                                    department,
-//                                    assignee,
-//                                    isArchived,
-//                                    isComplete,
-//                                    isCHS,
-//                                    isMandated,
-//                                    actionType,
-//                                    dueDate,
-//                                    budget,
-//                                    level,
-//                                    dbAgencyRef.getRef(),
-//                                    dbUserPublicRef.getRef()),
-//                            alertLevel
-//                    );
-//
-//                    //CHS
-//                    dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                        @Override
-//                        public void onDataChange(DataSnapshot dataSnapshot) {
-//                            for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-//                                String taskNameMandated = (String) getChild.child("task").getValue();
-//                                isCHS = true;
-//                                mAPAdapter.addInActiveItem(getChild.getKey(), new Action(
-//                                                taskNameMandated,
-//                                                department,
-//                                                assignee,
-//                                                isArchived,
-//                                                isComplete,
-//                                                isCHS,
-//                                                isMandated,
-//                                                actionType,
-//                                                dueDate,
-//                                                budget,
-//                                                level,
-//                                                dbAgencyRef.getRef(),
-//                                                dbUserPublicRef.getRef()),
-//                                        alertLevel
-//                                );
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onCancelled(DatabaseError databaseError) {
-//
-//                        }
-//                    });
-//
-//                    //Mandated
-//                    dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                        @Override
-//                        public void onDataChange(DataSnapshot dataSnapshot) {
-//                            for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-//                                if (actionIDs.contains(getChild.getKey())) {
-//                                    String taskNameMandated = (String) getChild.child("task").getValue();
-//                                    String departmentMandated = (String) getChild.child("department").getValue();
-//                                    isCHS = false;
-//                                    isMandated = true;
-//                                    mAPAdapter.addInActiveItem(getChild.getKey(), new Action(
-//                                                    taskNameMandated,
-//                                                    departmentMandated,
-//                                                    assignee,
-//                                                    isArchived,
-//                                                    isComplete,
-//                                                    isCHS,
-//                                                    isMandated,
-//                                                    actionType,
-//                                                    dueDate,
-//                                                    budget,
-//                                                    level,
-//                                                    dbAgencyRef.getRef(),
-//                                                    dbUserPublicRef.getRef()),
-//                                            alertLevel
-//                                    );
-//                                }
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onCancelled(DatabaseError databaseError) {
-//
-//                        }
-//                    });
-//
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
+            DataModel model = getChild.getValue(DataModel.class);
+
+            if (getChild.child("frequencyBase").getValue() != null) {
+                model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
+            }
+            if (getChild.child("frequencyValue").getValue() != null) {
+                model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
+            }
+
+            if (model.getType() == 0) {
+                getCHS(model, actionIDs);
+            } else if (model.getType() == 1) {
+                getMandated(model, actionIDs);
+            } else {
+                System.out.println("model = " + model);
+                getCustom(model, getChild);
+            }
 
         }
+    }
 
+    private void getCustom(DataModel model, DataSnapshot getChild) {
+        dbAlertRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Long alertLevel = (Long) dataSnapshot.child("alertLevel").getValue();
+
+                if (isInProgress) {
+                    addObjects(model.getTask(),
+                            model.getCreatedAt(),
+                            model.getLevel(),
+                            model,
+                            alertLevel,
+                            getChild,
+                            isCHS,
+                            isCHSAssigned,
+                            isMandated,
+                            isMandatedAssigned);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void getCHS(DataModel model, String actionIDs) {
+        dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+                    if (actionIDs.contains(getChild.getKey())) {
+                        String CHSTaskName = (String) getChild.child("task").getValue();
+                        Long CHSlevel = (Long) getChild.child("level").getValue();
+                        Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
+                        isCHS = true;
+                        isCHSAssigned = true;
+
+                        dbAlertRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                Long alertLevel = (Long) dataSnapshot.child("alertLevel").getValue();
+
+                                if (isInProgress) {
+                                    addObjects(CHSTaskName,
+                                            CHSCreatedAt,
+                                            CHSlevel,
+                                            model,
+                                            alertLevel,
+                                            getChild,
+                                            isCHS,
+                                            isCHSAssigned,
+                                            isMandated,
+                                            isMandatedAssigned);
+
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void getMandated(DataModel model, String actionIDs) {
+        dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+                    if (actionIDs.contains(getChild.getKey())) {
+                        String taskNameMandated = (String) getChild.child("task").getValue();
+                        //String departmentMandated = (String) getChild.child("department").getValue();
+                        Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
+                        Long manLevel = (Long) getChild.child("level").getValue();
+
+                        isMandated = true;
+                        isMandatedAssigned = true;
+                        isCHS = false;
+                        isCHSAssigned = false;
+
+                        dbAlertRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                Long alertLevel = (Long) dataSnapshot.child("alertLevel").getValue();
+
+                                if (isInProgress) {
+                                    addObjects(taskNameMandated,
+                                            manCreatedAt,
+                                            manLevel,
+                                            model,
+                                            alertLevel,
+                                            getChild,
+                                            isCHS,
+                                            isCHSAssigned,
+                                            isMandated,
+                                            isMandatedAssigned);
+
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void addObjects(String name, Long createdAt, Long level,
+                            DataModel model, Long alertLevel, DataSnapshot getChild, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
+        System.out.println("model.getTask() = " + model.getTask());
+        if (user.getUserID().equals(model.getAsignee()) //APA Custom inactive for logged in user.
+                && model.getLevel() != null
+                && alertLevel != null
+                && model.getLevel() == Constants.APA
+                && alertLevel == Constants.TRIGGER_RED
+                || (isCHS && isCHSAssigned //APA CHS inactive for logged in user.
+                && user.getUserID().equals(model.getAsignee())
+                && model.getLevel() != null
+                && alertLevel != null
+                && model.getLevel() == Constants.APA
+                && alertLevel == Constants.TRIGGER_RED)
+                || (isMandated && isMandatedAssigned //APA Mandated inactive for logged in user.
+                && user.getUserID().equals(model.getAsignee())
+                && model.getLevel() != null
+                && alertLevel != null
+                && model.getLevel() == Constants.APA
+                && alertLevel == Constants.TRIGGER_RED)) {
+
+            txtNoAction.setVisibility(View.GONE);
+
+            mAPAdapter.addItems(getChild.getKey(), new Action(
+                    name,
+                    model.getDepartment(),
+                    model.getAsignee(),
+                    model.getIsArchived(),
+                    model.getIsComplete(),
+                    createdAt,
+                    model.getUpdatedAt(),
+                    model.getType(),
+                    model.getDueDate(),
+                    model.getBudget(),
+                    level,
+                    model.getFrequencyBase(),
+                    freqValue,
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef())
+            );
+        }
     }
 
     @Override

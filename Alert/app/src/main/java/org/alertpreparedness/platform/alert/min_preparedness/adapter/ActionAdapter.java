@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -16,10 +15,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
-import org.alertpreparedness.platform.alert.helper.DateHelper;
-import org.alertpreparedness.platform.alert.helper.UserInfo;
+import org.alertpreparedness.platform.alert.min_preparedness.fragment.InProgressFragment;
+import org.alertpreparedness.platform.alert.min_preparedness.interfaces.OnItemsChangedListener;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,63 +42,19 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     private HashMap<String, Action> items;
     private DatabaseReference dbRef;
     private ItemSelectedListener listener;
+    private OnItemsChangedListener changedListener;
     private String dateFormat = "MMM dd,yyyy";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
-    private String currentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
     @Inject
     @AgencyRef
     DatabaseReference dbAgencyRef;
 
-    //In progress
-    public void addInProgressItem(String key, Action action) {
+    public void addItems(String key, Action action) {
         if (keys.indexOf(key) == -1) {
             keys.add(key);
             items.put(key, action);
             notifyItemInserted(keys.size() - 1);
-        } else {
-            items.put(key, action);
-            notifyItemChanged(keys.indexOf(key));
-        }
-    }
-
-    public void addExpiredItem(String key, Action action) {
-        if (keys.indexOf(key) == -1) {
-            keys.add(key);
-            items.put(key, action);
-            notifyItemInserted(keys.size());
-        } else {
-            items.put(key, action);
-            notifyItemChanged(keys.indexOf(key));
-        }
-    }
-
-    public void addUnassignedItem(String key, Action action) {
-        if (keys.indexOf(key) == -1) {
-            keys.add(key);
-            items.put(key, action);
-            notifyItemInserted(keys.size());
-        } else {
-            items.put(key, action);
-            notifyItemChanged(keys.indexOf(key));
-        }
-    }
-
-    public void addCompletedItem(String key, Action action) {
-        if (keys.indexOf(key) == -1) {
-            keys.add(key);
-            items.put(key, action);
-            notifyItemInserted(keys.size());
-        } else {
-            items.put(key, action);
-            notifyItemChanged(keys.indexOf(key));
-        }
-    }
-
-    public void addArchivedItem(String key, Action action) {
-        if (keys.indexOf(key) == -1) {
-                keys.add(key);
-                items.put(key, action);
-                notifyItemInserted(keys.size());
         } else {
             items.put(key, action);
             notifyItemChanged(keys.indexOf(key));
@@ -207,6 +162,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     }
 
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.tv_action_type)
@@ -263,13 +219,11 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-
     }
 
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-
+      //  changedListener.onItemChanged(dataSnapshot);
     }
 
     @Override
@@ -290,5 +244,6 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     public interface ItemSelectedListener {
         void onActionItemSelected(int pos, String key);
     }
+
 
 }

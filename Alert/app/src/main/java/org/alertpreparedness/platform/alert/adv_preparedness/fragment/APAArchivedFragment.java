@@ -31,7 +31,11 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
+import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
+import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
+import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.Constants;
 
 import javax.inject.Inject;
 
@@ -61,6 +65,10 @@ public class APAArchivedFragment extends Fragment implements APActionAdapter.Ite
     @BindView(R.id.tvStatus)
     TextView tvActionArchived;
 
+    @Nullable
+    @BindView(R.id.tvAPANoAction)
+    TextView txtNoAction;
+
     @Inject
     @ActionRef
     DatabaseReference dbActionRef;
@@ -81,11 +89,17 @@ public class APAArchivedFragment extends Fragment implements APActionAdapter.Ite
     @UserPublicRef
     DatabaseReference dbUserPublicRef;
 
+    @Inject
+    User user;
+
     private APActionAdapter mAPAdapter;
     private Boolean isCHS = false;
     private Boolean isCHSAssigned = false;
     private Boolean isMandated = false;
     private Boolean isMandatedAssigned = false;
+    private Boolean isInProgress = false;
+    private int freqBase = 0;
+    private int freqValue = 0;
 
     @Nullable
     @Override
@@ -127,190 +141,169 @@ public class APAArchivedFragment extends Fragment implements APActionAdapter.Ite
         super.onViewCreated(view, savedInstanceState);
     }
 
-    @Override
-    public void onActionItemSelected(int pos, String key) {
-        SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress).setClick(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.complete_action:
-                        Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
-                        startActivity(intent);
-                        break;
-                    case R.id.reassign_action:
-                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
-                        break;
-                    case R.id.action_notes:
-                        intent = new Intent(getActivity(), AddNotesActivity.class);
-                        intent.putExtra("ACTION_KEY", key);
-                        startActivity(intent);
-                        break;
-                    case R.id.attachments:
-                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
-                        break;
-                }
-                return false;
-            }
-        }).show();
-    }
-
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
         for (DataSnapshot getChild : dataSnapshot.getChildren()) {
             String actionIDs = getChild.getKey();
-            String taskName = (String) getChild.child("task").getValue();
-            String department = (String) getChild.child("department").getValue();
-            String assignee = (String) getChild.child("asignee").getValue();
-            Boolean isArchived = (Boolean) getChild.child("isArchived").getValue();
-            Boolean isComplete = (Boolean) getChild.child("isComplete").getValue();
-            Long actionType = (Long) getChild.child("type").getValue();
-            Long dueDate = (Long) getChild.child("dueDate").getValue();
-            Long budget = (Long) getChild.child("budget").getValue();
-            Long level = (Long) getChild.child("level").getValue();
-            Long createdAt = (Long) getChild.child("createdAt").getValue();
-            Long updatedAt = (Long) getChild.child("updatedAt").getValue();
+            System.out.println("getChild = " + getChild);
+            DataModel model = getChild.getValue(DataModel.class);
 
-            if (actionType == 0) {
-                //CHS
-                dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                            if (actionIDs.contains(getChild.getKey())) {
-                                String CHSTaskName = (String) getChild.child("task").getValue();
-                                Long CHSlevel = (Long) getChild.child("level").getValue();
-                                Long createdAt = (Long) getChild.child("createdAt").getValue();
+            if (getChild.child("frequencyBase").getValue() != null) {
+                model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
+            }
+            if (getChild.child("frequencyValue").getValue() != null) {
+                model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
+            }
 
-                                isCHS = true;
-                                isCHSAssigned = true;
-                                mAPAdapter.addArchivedItem(getChild.getKey(), new Action(
-                                                CHSTaskName,
-                                                department,
-                                                assignee,
-                                                isArchived,
-                                                isComplete,
-                                                createdAt,
-                                                updatedAt,
-                                                actionType,
-                                                dueDate,
-                                                budget,
-                                                CHSlevel,
-                                                null,
-                                                null,
-                                                dbAgencyRef.getRef(),
-                                                dbUserPublicRef.getRef()),
-                                        isCHS,
-                                        isMandated,
-                                        isCHSAssigned,
-                                        isMandatedAssigned
-                                );
-                            } else {
-                                isCHSAssigned = false;
-                                String CHSTaskName = (String) getChild.child("task").getValue();
-                                Long CHSlevel = (Long) getChild.child("level").getValue();
-                                Long createdAt = (Long) getChild.child("createdAt").getValue();
-
-                                mAPAdapter.addArchivedItem(getChild.getKey(), new Action(
-                                                CHSTaskName,
-                                                null,
-                                                null,
-                                                null,
-                                                null,
-                                                createdAt,
-                                                null,
-                                                (long) 0,
-                                                null,
-                                                null,
-                                                CHSlevel,
-                                                null,
-                                                null,
-                                                dbAgencyRef.getRef(),
-                                                dbUserPublicRef.getRef()),
-                                        isCHS,
-                                        isMandated,
-                                        isCHSAssigned,
-                                        isMandatedAssigned
-                                );
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-            } else if (actionType == 1) {
-
-                //Mandated
-                dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                            if (actionIDs.contains(getChild.getKey())) {
-                                String taskNameMandated = (String) getChild.child("task").getValue();
-                                String departmentMandated = (String) getChild.child("department").getValue();
-                                Long createdAt = (Long) getChild.child("createdAt").getValue();
-
-                                isCHS = false;
-                                isMandated = true;
-                                mAPAdapter.addArchivedItem(getChild.getKey(), new Action(
-                                                taskNameMandated,
-                                                departmentMandated,
-                                                assignee,
-                                                isArchived,
-                                                isComplete,
-                                                createdAt,
-                                                updatedAt,
-                                                actionType,
-                                                dueDate,
-                                                budget,
-                                                level,
-                                                null,
-                                                null,
-                                                dbAgencyRef.getRef(),
-                                                dbUserPublicRef.getRef()),
-                                        isCHS,
-                                        isMandated,
-                                        isCHSAssigned,
-                                        isMandatedAssigned
-                                );
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
+            if (model.getType() == 0) {
+                getCHS(model, actionIDs);
+            } else if (model.getType() == 1) {
+                getMandated(model, actionIDs);
             } else {
-                mAPAdapter.addArchivedItem(getChild.getKey(), new Action(
-                                taskName,
-                                department,
-                                assignee,
-                                isArchived,
-                                isComplete,
-                                createdAt,
-                                updatedAt,
-                                actionType,
-                                dueDate,
-                                budget,
-                                level,
-                                null,
-                                null,
-                                dbAgencyRef.getRef(),
-                                dbUserPublicRef.getRef()),
-                        isCHS,
-                        isMandated,
-                        isCHSAssigned,
-                        isMandatedAssigned
-                );
+                getCustom(model, getChild);
             }
         }
+    }
 
+    private void getCustom(DataModel model, DataSnapshot getChild) {
+        System.out.println("model = " + model);
+        if (user.getUserID().equals(model.getAsignee()) //APA CUSTOM assigned and ARCHIVED for logged in user.
+                && model.getLevel() != null
+                && model.getLevel() == Constants.APA
+                && model.getIsArchived() != null
+                && model.getIsArchived()
+                && model.getDueDate() != null) {
+
+            txtNoAction.setVisibility(View.GONE);
+            mAPAdapter.addItems(getChild.getKey(), new Action(
+                    model.getTask(),
+                    model.getDepartment(),
+                    model.getAsignee(),
+                    model.getIsArchived(),
+                    model.getIsComplete(),
+                    model.getCreatedAt(),
+                    model.getUpdatedAt(),
+                    model.getType(),
+                    model.getDueDate(),
+                    model.getBudget(),
+                    model.getLevel(),
+                    model.getFrequencyBase(),
+                    freqValue,
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef())
+            );
+        }
+    }
+
+    private void getCHS(DataModel model, String actionIDs) {
+        dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+                    if (actionIDs.contains(getChild.getKey())) {
+                        String CHSTaskName = (String) getChild.child("task").getValue();
+                        Long CHSlevel = (Long) getChild.child("level").getValue();
+                        Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
+                        isCHS = true;
+                        isCHSAssigned = true;
+
+                        if (isCHSAssigned && isCHS
+                                && user.getUserID().equals(model.getAsignee()) //APA CHS assigned and ARCHIVED for logged in user.
+                                && model.getLevel() != null
+                                && model.getLevel() == Constants.APA
+                                && model.getIsArchived() != null
+                                && model.getIsArchived()
+                                && model.getDueDate() != null) {
+
+                            txtNoAction.setVisibility(View.GONE);
+                            mAPAdapter.addItems(getChild.getKey(), new Action(
+                                    CHSTaskName,
+                                    model.getDepartment(),
+                                    model.getAsignee(),
+                                    model.getIsArchived(),
+                                    model.getIsComplete(),
+                                    CHSCreatedAt,
+                                    model.getUpdatedAt(),
+                                    model.getType(),
+                                    model.getDueDate(),
+                                    model.getBudget(),
+                                    CHSlevel,
+                                    model.getFrequencyBase(),
+                                    freqValue,
+                                    dbAgencyRef.getRef(),
+                                    dbUserPublicRef.getRef())
+                            );
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void getMandated(DataModel model, String actionIDs) {
+        dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+                    if (actionIDs.contains(getChild.getKey())) {
+                        String taskNameMandated = (String) getChild.child("task").getValue();
+                        //String departmentMandated = (String) getChild.child("department").getValue();
+                        Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
+                        Long manLevel = (Long) getChild.child("level").getValue();
+
+                        isMandated = true;
+                        isMandatedAssigned = true;
+                        isCHS = false;
+                        isCHSAssigned = false;
+
+                        if (isMandated && isMandatedAssigned
+                                && user.getUserID().equals(model.getAsignee()) //APA Mandated assigned and ARCHIVED for logged in user.
+                                && model.getLevel() != null
+                                && model.getLevel() == Constants.APA
+                                && model.getIsArchived() != null
+                                && model.getIsArchived()
+                                && model.getDueDate() != null) {
+
+                            txtNoAction.setVisibility(View.GONE);
+                            mAPAdapter.addItems(getChild.getKey(), new Action(
+                                    taskNameMandated,
+                                    model.getDepartment(),
+                                    model.getAsignee(),
+                                    model.getIsArchived(),
+                                    model.getIsComplete(),
+                                    manCreatedAt,
+                                    model.getUpdatedAt(),
+                                    model.getType(),
+                                    model.getDueDate(),
+                                    model.getBudget(),
+                                    manLevel,
+                                    model.getFrequencyBase(),
+                                    freqValue,
+                                    dbAgencyRef.getRef(),
+                                    dbUserPublicRef.getRef())
+                            );
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    @Override
+    public void onActionItemSelected(int pos, String key) {
+        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Currently under development!", Snackbar.LENGTH_LONG).show();
     }
 
     @Override

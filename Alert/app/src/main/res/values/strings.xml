@@ -197,4 +197,6 @@
     <string name="txt_budget">Budget</string>
     <string name="txt_doc_required">Is a document required for completion?</string>
     <string name="txt_create_apa">Create APA</string>
+    <string name="title_choose_file">Choose a file</string>
+    <string name="internal_storage">Internal storage</string>
 </resources>
