@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.alert.dagger;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import com.google.firebase.database.DatabaseReference;
 
@@ -15,11 +16,13 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseCountryOfficeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseUserRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.DocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardOtherRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.PermissionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ProgrammeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
@@ -164,6 +167,46 @@ public class FirebaseModule {
     @ActionMandatedRef
     public DatabaseReference provideMandatedRef(@BaseDatabaseRef DatabaseReference db, User user) {
         return db.child("actionMandated").child(user.getAgencyAdminID());
+    }
+
+    @Provides
+    @BaseUserRef
+    public DatabaseReference provideBaseUserRef(@BaseDatabaseRef DatabaseReference db, User user) {
+        String nodeName;
+        switch (user.getUserType()) {
+            case Constants.ErtLeader:
+                nodeName = "ertLeader";
+                break;
+            case Constants.CountryAdmin:
+                nodeName = "administratorCountry";
+                break;
+            case Constants.CountryDirector:
+                nodeName = "countryDirector";
+                break;
+            case Constants.PartnerUser:
+                nodeName = "partner";
+                break;
+            default:
+                nodeName = "ert";
+                break;
+        }
+        return db.child(nodeName).child(user.getUserID());
+    }
+
+
+    @Provides
+    @PermissionRef
+    public DatabaseReference providePermissionRef(@BaseDatabaseRef DatabaseReference db, User user) {
+        System.out.println("db = [" + db + "], providePermissionRef = [" + user + "]");
+        switch (user.getUserType()) {
+            case Constants.ErtLeader:
+            case Constants.CountryAdmin:
+            case Constants.CountryDirector:
+            case Constants.Ert:
+                return db.child("countryOffice").child(user.countryID).child("permissionSettings");
+            default: //Constants.PartnerUser:
+                return db.child("partner").child(user.getUserID()).child("permissions");
+        }
     }
 
     @Provides

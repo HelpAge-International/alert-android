@@ -20,10 +20,12 @@ import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,15 +36,15 @@ import javax.inject.Inject;
  */
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> implements Comparable<Tasks> {
-    private List<Tasks> listArray;
+    private HashMap<String, Tasks> items = new HashMap<>();
     private String dateFormat = "MMM dd,yyyy";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
+    private List<String> keys = new ArrayList<>();
 
     @Inject
     User user;
 
-    public TaskAdapter(List<Tasks> List) {
-        this.listArray = List;
+    public TaskAdapter() {
         DependencyInjector.applicationComponent().inject(this);
     }
 
@@ -54,7 +56,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
 
     @Override
     public void onBindViewHolder(TaskAdapter.ViewHolder holder, int position) {
-        Tasks tasks = listArray.get(position);
+        Tasks tasks = items.get(keys.get(position));
         holder.bind(tasks);
     }
 
@@ -64,10 +66,25 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         return Integer.compare(dueDate, dueDate);
     }
 
-    public void add(Tasks task) {
-        listArray.add(task);
-        Collections.sort(listArray, (o1, o2) -> Long.compare(o1.getDueDate(), o2.getDueDate()));
-        notifyDataSetChanged();
+    public void add(String key, Tasks task) {
+        items.put(key, task);
+        int index = keys.indexOf(key);
+        if(index == -1) {
+            keys.add(key);
+            notifyItemInserted(keys.size()-1);
+        }
+        else {
+            notifyItemChanged(index);
+        }
+    }
+
+    public void tryRemove(String key) {
+        int index = keys.indexOf(key);
+        if(index != -1) {
+            items.remove(keys.get(index));
+            keys.remove(index);
+            notifyItemRemoved(index);
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -127,7 +144,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
 
     @Override
     public int getItemCount() {
-        return listArray.size();
+        return keys.size();
     }
 
     private String getLevelAsString(int level){

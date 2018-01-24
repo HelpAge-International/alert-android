@@ -147,6 +147,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         mAreas = mutableListOf()
 //        mStaff.add()
         mViewModel.getStaffLive().observe(this, Observer { users ->
+            println("users = ${users}")
             mStaff = ArrayList(users)
         })
         mViewModel.getCountryJsonDataLive().observe(this, Observer { countryList ->
@@ -405,7 +406,10 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         tvAssignTo.setOnClickListener {
             val bundle = Bundle()
             bundle.putInt(ASSIGN_POSITION, mSelectedAssignPosition)
-            mStaff?.let { bundle.putSerializable(STAFF_SELECTION, mStaff) }
+            mStaff?.let {
+                println("mStaff = ${mStaff}")
+                bundle.putSerializable(STAFF_SELECTION, mStaff) }
+            println("bundle = ${bundle}")
             mDialogAssign.arguments = bundle
             mDialogAssign.show(supportFragmentManager, "dialog_assign")
         }

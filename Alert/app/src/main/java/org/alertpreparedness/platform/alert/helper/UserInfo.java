@@ -221,7 +221,6 @@ public class UserInfo implements ValueEventListener {
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        System.out.println("coutnryofficedataSnapshot = [" + dataSnapshot + "]");
 
         SelectAreaViewModel mViewModel = ViewModelProviders.of(activity).get(SelectAreaViewModel.class);
 

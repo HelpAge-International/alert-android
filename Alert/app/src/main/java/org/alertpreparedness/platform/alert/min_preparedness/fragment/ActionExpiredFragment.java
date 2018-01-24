@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
@@ -154,36 +155,36 @@ public class ActionExpiredFragment extends InProgressFragment {
 
                 if (value != null) {
                     if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_WEEK) {
-                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), Math.toIntExact(value));
+                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), value.intValue());
                     } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_WEEK) {
-                        isInProgress = DateHelper.isInProgressWeek(model.getUpdatedAt(), Math.toIntExact(value));
+                        isInProgress = DateHelper.isInProgressWeek(model.getUpdatedAt(), value.intValue());
                     } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_MONTH) {
-                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), Math.toIntExact(value));
+                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), value.intValue());
                     } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_MONTH) {
-                        isInProgress = DateHelper.isInProgressMonth(model.getUpdatedAt(), Math.toIntExact(value));
+                        isInProgress = DateHelper.isInProgressMonth(model.getUpdatedAt(), value.intValue());
                     } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_YEAR) {
-                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), Math.toIntExact(value));
+                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), value.intValue());
                     } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_YEAR) {
-                        isInProgress = DateHelper.isInProgressYear(model.getUpdatedAt(), Math.toIntExact(value));
+                        isInProgress = DateHelper.isInProgressYear(model.getUpdatedAt(), value.intValue());
                     }
                 }
 
                 if (model.getFrequencyValue() != null && model.getFrequencyBase() != null) {
-                    freqValue = Math.toIntExact(model.getFrequencyValue());
-                    freqBase = Math.toIntExact(model.getFrequencyBase());
+                    freqValue = model.getFrequencyValue().intValue();
+                    freqBase = model.getFrequencyBase().intValue();
 
                     if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_WEEK) {
-                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), Math.toIntExact(freqValue));
+                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), freqValue);
                     } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_WEEK) {
-                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), Math.toIntExact(freqValue));
+                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), freqValue);
                     } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_MONTH) {
-                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), Math.toIntExact(freqValue));
+                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), freqValue);
                     } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_MONTH) {
-                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), Math.toIntExact(freqValue));
+                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), freqValue);
                     } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_YEAR) {
-                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), Math.toIntExact(freqValue));
+                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), freqValue);
                     } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_YEAR) {
-                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), Math.toIntExact(freqValue));
+                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), freqValue);
                     }
                 }
 
@@ -230,24 +231,24 @@ public class ActionExpiredFragment extends InProgressFragment {
 
                                 if (value != null) {
                                     if (model.getCreatedAt() != null && durationType != null && durationType == Constants.DUE_WEEK) {
-                                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), Math.toIntExact(value));
+                                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), value.intValue());
                                     } else if (model.getCreatedAt() != null && durationType != null && durationType == Constants.DUE_MONTH) {
-                                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), Math.toIntExact(value));
+                                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), value.intValue());
                                     } else if (model.getCreatedAt() != null && durationType != null && durationType == Constants.DUE_YEAR) {
-                                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), Math.toIntExact(value));
+                                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), value.intValue());
                                     }
                                 }
 
                                 if (model.getFrequencyValue() != null && model.getFrequencyBase() != null) {
-                                    freqValue = Math.toIntExact(model.getFrequencyValue());
-                                    freqBase = Math.toIntExact(model.getFrequencyBase());
+                                    freqValue = model.getFrequencyValue().intValue();
+                                    freqBase = model.getFrequencyBase().intValue();
 
                                     if (model.getCreatedAt() != null && freqBase == Constants.DUE_WEEK) {
-                                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), Math.toIntExact(freqValue));
+                                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), freqValue);
                                     } else if (model.getCreatedAt() != null && freqBase == Constants.DUE_MONTH) {
-                                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), Math.toIntExact(freqValue));
+                                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), freqValue);
                                     } else if (model.getCreatedAt() != null && freqBase == Constants.DUE_YEAR) {
-                                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), Math.toIntExact(freqValue));
+                                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), freqValue);
                                     }
                                 }
 
@@ -274,6 +275,8 @@ public class ActionExpiredFragment extends InProgressFragment {
                     }
                 }
             }
+
+
 
             @Override
             public void onCancelled(DatabaseError databaseError) {

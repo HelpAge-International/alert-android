@@ -21,8 +21,10 @@ import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseStorageRef;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.realm.SettingsRealm;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
+import org.alertpreparedness.platform.alert.utils.SettingsFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -114,5 +116,16 @@ public class ApplicationModule {
         catch (NullPointerException e) {
             return null;
         }
+    }
+
+    @Provides
+    public SettingsRealm providePermissions(User user) {
+        return SettingsFactory.getSettings(user);
+    }
+
+    @Provides
+    @Singleton
+    public SettingsFactory provideSettingsFactory(User user) {
+        return new SettingsFactory(user);
     }
 }

@@ -160,7 +160,6 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     TextView networkTasksTitle;
 
     public TaskAdapter taskAdapter;
-    public List<Tasks> tasksList;
     public AlertAdapter alertAdapter;
     public AlertAdapter networkAlertAdapter;
 
@@ -176,7 +175,6 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     private String agencyAdminId;
     private String networkLeadId;
     private Tasks task;
-    private ArrayList<Tasks> networkTasksList;
     private TaskAdapter networkTaskAdapter;
 
     @Nullable
@@ -217,19 +215,15 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         networkAlertList.setAdapter(networkAlertAdapter);
 
         myTaskRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        myTaskRecyclerView.setItemAnimator(new DefaultItemAnimator());
         myTaskRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
         networkTaskList.setLayoutManager(new LinearLayoutManager(getContext()));
-        networkTaskList.setItemAnimator(new DefaultItemAnimator());
         networkTaskList.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        tasksList = new ArrayList<>();
-        taskAdapter = new TaskAdapter(tasksList);
+        taskAdapter = new TaskAdapter();
         myTaskRecyclerView.setAdapter(taskAdapter);
 
-        networkTasksList = new ArrayList<>();
-        networkTaskAdapter = new TaskAdapter(networkTasksList);
+        networkTaskAdapter = new TaskAdapter();
         networkTaskList.setAdapter(networkTaskAdapter);
 
         scroller.setNestedScrollingEnabled(false);
@@ -245,14 +239,14 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     }
 
     @Override
-    public void addTask(Tasks task) {
-        taskAdapter.add(task);
+    public void addTask(String key, Tasks task) {
+        taskAdapter.add(key, task);
     }
 
-    private void addNetworkTask(Tasks tasks) {
+    private void addNetworkTask(String key, Tasks tasks) {
         networkTaskList.setVisibility(View.VISIBLE);
         noNetworkTasks.setVisibility(View.GONE);
-        networkTaskAdapter.add(tasks);
+        networkTaskAdapter.add(key, tasks);
     }
 
     @Override
@@ -475,9 +469,11 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                 boolean shouldAdd = model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null;
 
                 if (shouldAdd) {
-
                     if (DateHelper.isDueInWeek(model.getDueDate()) || DateHelper.itWasDue(model.getDueDate())) {
-                        addTask(new Tasks(0, "action", model.getTask(), model.getDueDate()));
+                        addTask(dataSnapshot.getKey(), new Tasks(0, "action", model.getTask(), model.getDueDate()));
+                    }
+                    else {
+                        taskAdapter.tryRemove(dataSnapshot.getKey());
                     }
                 }
 
@@ -491,7 +487,10 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                 if (model.getAssignee() != null && model.getAssignee().equals(user.getUserID()) && model.getDueDate() != null) {
                     Tasks tasks = new Tasks(model.getTriggerSelected().intValue(), "indicator", model.getName(), model.getDueDate());
                     if (DateHelper.isDueInWeek(tasks.dueDate) || DateHelper.itWasDue(tasks.dueDate)) {
-                        addTask(tasks);
+                        addTask(dataSnapshot.getKey(), tasks);
+                    }
+                    else {
+                        taskAdapter.tryRemove(dataSnapshot.getKey());
                     }
                 }
             }
@@ -513,7 +512,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                                     // Tasks task;
                                     String taskNameCHS = (String) getChild.child("task").getValue();
                                     System.out.println("taskNameCHS = " + taskNameCHS);
-                                    addTask(new Tasks(0, "action", taskNameCHS, model.getDueDate(), model.getType()));
+                                    addTask(dataSnapshot.getKey(), new Tasks(0, "action", taskNameCHS, model.getDueDate(), model.getType()));
                                 }
                             }
                         }
@@ -603,20 +602,25 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                 boolean shouldAdd = model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null;
                 if (shouldAdd) {
                     if (DateHelper.isDueInWeek(model.getDueDate()) || DateHelper.itWasDue(model.getDueDate())) {
-                        addNetworkTask(new Tasks(0, "action", model.getTask(), model.getDueDate()));
+                        addNetworkTask(dataSnapshot.getKey(), new Tasks(0, "action", model.getTask(), model.getDueDate()));
+                    }
+                    else {
+                        networkTaskAdapter.tryRemove(dataSnapshot.getKey());
                     }
                 }
 
             } else if (dataSnapshot.getRef().getParent().getParent().getKey().equals("indicator")) {
 
                 IndicatorModel model = dataSnapshot.getValue(IndicatorModel.class);
-
                 assert model != null;
                 boolean shouldAdd = model.getAssignee() != null && model.getAssignee().equals(user.getUserID()) && model.getDueDate() != null;
                 if (shouldAdd) {
                     Tasks tasks = new Tasks(model.getTriggerSelected().intValue(), "indicator", model.getName(), model.getDueDate());
                     if (DateHelper.isDueInWeek(tasks.dueDate) || DateHelper.itWasDue(tasks.dueDate)) {
-                        addNetworkTask(tasks);
+                        addNetworkTask(dataSnapshot.getKey(), tasks);
+                    }
+                    else {
+                        networkTaskAdapter.tryRemove(dataSnapshot.getKey());
                     }
                 }
             }

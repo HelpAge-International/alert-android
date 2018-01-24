@@ -31,6 +31,8 @@ import com.google.firebase.database.ValueEventListener;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.AdvPreparednessFragment;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseUserRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.PermissionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserEmail;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
@@ -108,6 +110,10 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     @Inject
     User user;
 
+    @Inject
+    @PermissionRef
+    DatabaseReference permissionsRef;
+
     @Override
     public void onCreate(Bundle saved) {
         super.onCreate(saved);
@@ -131,6 +137,8 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
         drawerToggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
+
+        ((AlertApplication)getApplicationContext()).startPermissionListeners(permissionsRef, user);
     }
 
     public void removeActionbarElevation() {

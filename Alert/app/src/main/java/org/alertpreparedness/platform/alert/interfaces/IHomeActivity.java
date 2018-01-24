@@ -11,6 +11,6 @@ import org.alertpreparedness.platform.alert.firebase.AlertModel;
 public interface IHomeActivity {
     void updateAlert(String id, AlertModel alert);
     void removeAlert(String id);
-    void addTask(Tasks tasks);
+    void addTask(String key, Tasks tasks);
     void updateTitle(int stringResource, int backgroundResource);
 }

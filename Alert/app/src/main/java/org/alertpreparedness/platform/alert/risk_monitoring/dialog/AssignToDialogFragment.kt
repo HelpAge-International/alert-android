@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter
 import org.alertpreparedness.platform.alert.R
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelUserPublic
 import org.alertpreparedness.platform.alert.risk_monitoring.view.AddIndicatorActivity
+import org.alertpreparedness.platform.alert.utils.Constants
 import timber.log.Timber
 import java.util.*
 
@@ -25,9 +26,11 @@ class AssignToDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): AlertDialog {
         if (arguments != null) {
             defaultPosition = arguments.getInt(AddIndicatorActivity.ASSIGN_POSITION)
-            mStaff = arguments.getSerializable(AddIndicatorActivity.STAFF_SELECTION) as ArrayList<ModelUserPublic>
-            if (mStaff?.first()?.firstName != "Unassigned") {
-                mStaff!!.add(0, ModelUserPublic(firstName = "Unassigned"))
+            if (arguments.getSerializable(AddIndicatorActivity.STAFF_SELECTION) != null) {
+                mStaff = arguments.getSerializable(AddIndicatorActivity.STAFF_SELECTION) as ArrayList<ModelUserPublic>
+                if (mStaff?.first()?.firstName != "Unassigned") {
+                    mStaff!!.add(0, ModelUserPublic(firstName = "Unassigned"))
+                }
             }
         }
         val adapter = if (mStaff != null) ArrayAdapter<String>(activity, android.R.layout.simple_list_item_single_choice, mStaff?.map { it.firstName + " " + it.lastName }) else ArrayAdapter<ModelUserPublic>(activity, android.R.layout.simple_list_item_single_choice, emptyArray())
