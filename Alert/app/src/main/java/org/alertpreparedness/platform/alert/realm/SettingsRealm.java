@@ -78,7 +78,7 @@ public class SettingsRealm extends RealmObject {
 
     }
 
-    public boolean isCanAssignCHS() {
+    public boolean canAssignCHS() {
         return canAssignCHS;
     }
 
@@ -86,7 +86,7 @@ public class SettingsRealm extends RealmObject {
         this.canAssignCHS = canAssignCHS;
     }
 
-    public boolean isCanCompleteCHS() {
+    public boolean canCompleteCHS() {
         return canCompleteCHS;
     }
 
@@ -94,7 +94,7 @@ public class SettingsRealm extends RealmObject {
         this.canCompleteCHS = canCompleteCHS;
     }
 
-    public boolean isCanViewCHS() {
+    public boolean canViewCHS() {
         return canViewCHS;
     }
 
@@ -102,7 +102,7 @@ public class SettingsRealm extends RealmObject {
         this.canViewCHS = canViewCHS;
     }
 
-    public boolean isCanCreateMPA() {
+    public boolean canCreateMPA() {
         return canCreateMPA;
     }
 
@@ -110,7 +110,7 @@ public class SettingsRealm extends RealmObject {
         this.canCreateMPA = canCreateMPA;
     }
 
-    public boolean isCanEditMPA() {
+    public boolean canEditMPA() {
         return canEditMPA;
     }
 
@@ -118,7 +118,7 @@ public class SettingsRealm extends RealmObject {
         this.canEditMPA = canEditMPA;
     }
 
-    public boolean isCanAssignMPA() {
+    public boolean canAssignMPA() {
         return canAssignMPA;
     }
 
@@ -126,7 +126,7 @@ public class SettingsRealm extends RealmObject {
         this.canAssignMPA = canAssignMPA;
     }
 
-    public boolean isCanDeleteMPA() {
+    public boolean canDeleteMPA() {
         return canDeleteMPA;
     }
 
@@ -134,7 +134,7 @@ public class SettingsRealm extends RealmObject {
         this.canDeleteMPA = canDeleteMPA;
     }
 
-    public boolean isCanCompleteMPA() {
+    public boolean canCompleteMPA() {
         return canCompleteMPA;
     }
 
@@ -142,7 +142,7 @@ public class SettingsRealm extends RealmObject {
         this.canCompleteMPA = canCompleteMPA;
     }
 
-    public boolean isCanViewMPA() {
+    public boolean canViewMPA() {
         return canViewMPA;
     }
 
@@ -150,7 +150,7 @@ public class SettingsRealm extends RealmObject {
         this.canViewMPA = canViewMPA;
     }
 
-    public boolean isCanCreateCustomMPA() {
+    public boolean canCreateCustomMPA() {
         return canCreateCustomMPA;
     }
 
@@ -158,7 +158,7 @@ public class SettingsRealm extends RealmObject {
         this.canCreateCustomMPA = canCreateCustomMPA;
     }
 
-    public boolean isCanEditCustomMPA() {
+    public boolean canEditCustomMPA() {
         return canEditCustomMPA;
     }
 
@@ -166,7 +166,7 @@ public class SettingsRealm extends RealmObject {
         this.canEditCustomMPA = canEditCustomMPA;
     }
 
-    public boolean isCanAssignCustomMPA() {
+    public boolean canAssignCustomMPA() {
         return canAssignCustomMPA;
     }
 
@@ -174,7 +174,7 @@ public class SettingsRealm extends RealmObject {
         this.canAssignCustomMPA = canAssignCustomMPA;
     }
 
-    public boolean isCanDeleteCustomMPA() {
+    public boolean canDeleteCustomMPA() {
         return canDeleteCustomMPA;
     }
 
@@ -182,7 +182,7 @@ public class SettingsRealm extends RealmObject {
         this.canDeleteCustomMPA = canDeleteCustomMPA;
     }
 
-    public boolean isCanCompleteCustomMPA() {
+    public boolean canCompleteCustomMPA() {
         return canCompleteCustomMPA;
     }
 
@@ -190,7 +190,7 @@ public class SettingsRealm extends RealmObject {
         this.canCompleteCustomMPA = canCompleteCustomMPA;
     }
 
-    public boolean isCanViewCustomMPA() {
+    public boolean canViewCustomMPA() {
         return canViewCustomMPA;
     }
 
@@ -198,7 +198,7 @@ public class SettingsRealm extends RealmObject {
         this.canViewCustomMPA = canViewCustomMPA;
     }
 
-    public boolean isCanCreateMandatedAPA() {
+    public boolean canCreateMandatedAPA() {
         return canCreateMandatedAPA;
     }
 
@@ -206,7 +206,7 @@ public class SettingsRealm extends RealmObject {
         this.canCreateMandatedAPA = canCreateMandatedAPA;
     }
 
-    public boolean isCanEditMandatedAPA() {
+    public boolean canEditMandatedAPA() {
         return canEditMandatedAPA;
     }
 
@@ -214,7 +214,7 @@ public class SettingsRealm extends RealmObject {
         this.canEditMandatedAPA = canEditMandatedAPA;
     }
 
-    public boolean isCanAssignMandatedAPA() {
+    public boolean canAssignMandatedAPA() {
         return canAssignMandatedAPA;
     }
 
@@ -222,7 +222,7 @@ public class SettingsRealm extends RealmObject {
         this.canAssignMandatedAPA = canAssignMandatedAPA;
     }
 
-    public boolean isCanDeleteMandatedAPA() {
+    public boolean canDeleteMandatedAPA() {
         return canDeleteMandatedAPA;
     }
 
@@ -230,7 +230,7 @@ public class SettingsRealm extends RealmObject {
         this.canDeleteMandatedAPA = canDeleteMandatedAPA;
     }
 
-    public boolean isCanCompleteMandatedAPA() {
+    public boolean canCompleteMandatedAPA() {
         return canCompleteMandatedAPA;
     }
 
@@ -238,7 +238,7 @@ public class SettingsRealm extends RealmObject {
         this.canCompleteMandatedAPA = canCompleteMandatedAPA;
     }
 
-    public boolean isCanViewMandatedAPA() {
+    public boolean canViewMandatedAPA() {
         return canViewMandatedAPA;
     }
 
@@ -246,7 +246,7 @@ public class SettingsRealm extends RealmObject {
         this.canViewMandatedAPA = canViewMandatedAPA;
     }
 
-    public boolean isCanCreateCustomAPA() {
+    public boolean canCreateCustomAPA() {
         return canCreateCustomAPA;
     }
 
@@ -254,7 +254,7 @@ public class SettingsRealm extends RealmObject {
         this.canCreateCustomAPA = canCreateCustomAPA;
     }
 
-    public boolean isCanEditCustomAPA() {
+    public boolean canEditCustomAPA() {
         return canEditCustomAPA;
     }
 
@@ -262,7 +262,7 @@ public class SettingsRealm extends RealmObject {
         this.canEditCustomAPA = canEditCustomAPA;
     }
 
-    public boolean isCanAssignCustomAPA() {
+    public boolean canAssignCustomAPA() {
         return canAssignCustomAPA;
     }
 
@@ -270,7 +270,7 @@ public class SettingsRealm extends RealmObject {
         this.canAssignCustomAPA = canAssignCustomAPA;
     }
 
-    public boolean isCanDeleteCustomAPA() {
+    public boolean canDeleteCustomAPA() {
         return canDeleteCustomAPA;
     }
 
@@ -278,7 +278,7 @@ public class SettingsRealm extends RealmObject {
         this.canDeleteCustomAPA = canDeleteCustomAPA;
     }
 
-    public boolean isCanCompleteCustomAPA() {
+    public boolean canCompleteCustomAPA() {
         return canCompleteCustomAPA;
     }
 
@@ -286,7 +286,7 @@ public class SettingsRealm extends RealmObject {
         this.canCompleteCustomAPA = canCompleteCustomAPA;
     }
 
-    public boolean isCanViewCustomAPA() {
+    public boolean canViewCustomAPA() {
         return canViewCustomAPA;
     }
 
@@ -294,7 +294,7 @@ public class SettingsRealm extends RealmObject {
         this.canViewCustomAPA = canViewCustomAPA;
     }
 
-    public boolean isCanCreateHazard() {
+    public boolean canCreateHazard() {
         return canCreateHazard;
     }
 
@@ -302,7 +302,7 @@ public class SettingsRealm extends RealmObject {
         this.canCreateHazard = canCreateHazard;
     }
 
-    public boolean isCanEditHazard() {
+    public boolean canEditHazard() {
         return canEditHazard;
     }
 
@@ -310,7 +310,7 @@ public class SettingsRealm extends RealmObject {
         this.canEditHazard = canEditHazard;
     }
 
-    public boolean isCanAssignHazard() {
+    public boolean canAssignHazard() {
         return canAssignHazard;
     }
 
@@ -318,7 +318,7 @@ public class SettingsRealm extends RealmObject {
         this.canAssignHazard = canAssignHazard;
     }
 
-    public boolean isCanDeleteHazard() {
+    public boolean canDeleteHazard() {
         return canDeleteHazard;
     }
 
@@ -326,7 +326,7 @@ public class SettingsRealm extends RealmObject {
         this.canDeleteHazard = canDeleteHazard;
     }
 
-    public boolean isCanArchiveHazard() {
+    public boolean canArchiveHazard() {
         return canArchiveHazard;
     }
 
@@ -334,7 +334,7 @@ public class SettingsRealm extends RealmObject {
         this.canArchiveHazard = canArchiveHazard;
     }
 
-    public boolean isCanViewHazard() {
+    public boolean canViewHazard() {
         return canViewHazard;
     }
 
@@ -342,7 +342,7 @@ public class SettingsRealm extends RealmObject {
         this.canViewHazard = canViewHazard;
     }
 
-    public boolean isCanCreateHazardIndicators() {
+    public boolean canCreateHazardIndicators() {
         return canCreateHazardIndicators;
     }
 
@@ -350,7 +350,7 @@ public class SettingsRealm extends RealmObject {
         this.canCreateHazardIndicators = canCreateHazardIndicators;
     }
 
-    public boolean isCanEditHazardIndicators() {
+    public boolean canEditHazardIndicators() {
         return canEditHazardIndicators;
     }
 
@@ -358,7 +358,7 @@ public class SettingsRealm extends RealmObject {
         this.canEditHazardIndicators = canEditHazardIndicators;
     }
 
-    public boolean isCanAssignHazardIndicators() {
+    public boolean canAssignHazardIndicators() {
         return canAssignHazardIndicators;
     }
 
@@ -366,7 +366,7 @@ public class SettingsRealm extends RealmObject {
         this.canAssignHazardIndicators = canAssignHazardIndicators;
     }
 
-    public boolean isCanDeleteHazardIndicators() {
+    public boolean canDeleteHazardIndicators() {
         return canDeleteHazardIndicators;
     }
 
@@ -374,7 +374,7 @@ public class SettingsRealm extends RealmObject {
         this.canDeleteHazardIndicators = canDeleteHazardIndicators;
     }
 
-    public boolean isCanArchiveHazardIndicators() {
+    public boolean canArchiveHazardIndicators() {
         return canArchiveHazardIndicators;
     }
 
@@ -382,7 +382,7 @@ public class SettingsRealm extends RealmObject {
         this.canArchiveHazardIndicators = canArchiveHazardIndicators;
     }
 
-    public boolean isCanViewHazardIndicators() {
+    public boolean canViewHazardIndicators() {
         return canViewHazardIndicators;
     }
 
@@ -390,7 +390,7 @@ public class SettingsRealm extends RealmObject {
         this.canViewHazardIndicators = canViewHazardIndicators;
     }
 
-    public boolean isCanViewAgencyCountryOffices() {
+    public boolean canViewAgencyCountryOffices() {
         return canViewAgencyCountryOffices;
     }
 
@@ -398,7 +398,7 @@ public class SettingsRealm extends RealmObject {
         this.canViewAgencyCountryOffices = canViewAgencyCountryOffices;
     }
 
-    public boolean isCanCopyAgencyCountryOffices() {
+    public boolean canCopyAgencyCountryOffices() {
         return canCopyAgencyCountryOffices;
     }
 
@@ -406,7 +406,7 @@ public class SettingsRealm extends RealmObject {
         this.canCopyAgencyCountryOffices = canCopyAgencyCountryOffices;
     }
 
-    public boolean isCanViewOtherAgencies() {
+    public boolean canViewOtherAgencies() {
         return canViewOtherAgencies;
     }
 
@@ -414,7 +414,7 @@ public class SettingsRealm extends RealmObject {
         this.canViewOtherAgencies = canViewOtherAgencies;
     }
 
-    public boolean isCanCopyOtherAgencies() {
+    public boolean canCopyOtherAgencies() {
         return canCopyOtherAgencies;
     }
 
@@ -422,7 +422,7 @@ public class SettingsRealm extends RealmObject {
         this.canCopyOtherAgencies = canCopyOtherAgencies;
     }
 
-    public boolean isCanCreateCountryContacts() {
+    public boolean canCreateCountryContacts() {
         return canCreateCountryContacts;
     }
 
@@ -430,7 +430,7 @@ public class SettingsRealm extends RealmObject {
         this.canCreateCountryContacts = canCreateCountryContacts;
     }
 
-    public boolean isCanEditCountryContacts() {
+    public boolean canEditCountryContacts() {
         return canEditCountryContacts;
     }
 
@@ -438,7 +438,7 @@ public class SettingsRealm extends RealmObject {
         this.canEditCountryContacts = canEditCountryContacts;
     }
 
-    public boolean isCanDeleteCountryContacts() {
+    public boolean canDeleteCountryContacts() {
         return canDeleteCountryContacts;
     }
 
@@ -446,7 +446,7 @@ public class SettingsRealm extends RealmObject {
         this.canDeleteCountryContacts = canDeleteCountryContacts;
     }
 
-    public boolean isCanDownloadDocuments() {
+    public boolean canDownloadDocuments() {
         return canDownloadDocuments;
     }
 
@@ -454,7 +454,7 @@ public class SettingsRealm extends RealmObject {
         this.canDownloadDocuments = canDownloadDocuments;
     }
 
-    public boolean isCanCreateNotes() {
+    public boolean canCreateNotes() {
         return canCreateNotes;
     }
 
@@ -462,7 +462,7 @@ public class SettingsRealm extends RealmObject {
         this.canCreateNotes = canCreateNotes;
     }
 
-    public boolean isCanEditNotes() {
+    public boolean canEditNotes() {
         return canEditNotes;
     }
 
@@ -470,7 +470,7 @@ public class SettingsRealm extends RealmObject {
         this.canEditNotes = canEditNotes;
     }
 
-    public boolean isCanDeleteNotes() {
+    public boolean canDeleteNotes() {
         return canDeleteNotes;
     }
 
@@ -478,7 +478,7 @@ public class SettingsRealm extends RealmObject {
         this.canDeleteNotes = canDeleteNotes;
     }
 
-    public boolean isCanViewNotes() {
+    public boolean canViewNotes() {
         return canViewNotes;
     }
 

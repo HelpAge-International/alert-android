@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
@@ -274,6 +275,8 @@ public class ActionExpiredFragment extends InProgressFragment {
                     }
                 }
             }
+
+
 
             @Override
             public void onCancelled(DatabaseError databaseError) {

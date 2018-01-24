@@ -4,10 +4,16 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.leakcanary.LeakCanary;
 
 import net.danlew.android.joda.JodaTimeAndroid;
@@ -18,11 +24,17 @@ import org.acra.config.CoreConfigurationBuilder;
 import org.acra.config.MailSenderConfiguration;
 import org.acra.data.StringFormat;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseUserRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.PermissionRef;
+import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
+import org.alertpreparedness.platform.alert.utils.SettingsFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import io.realm.Realm;
 import timber.log.Timber;
@@ -31,9 +43,10 @@ import timber.log.Timber;
  * Created by fei on 06/11/2017.
  */
 @AcraMailSender(mailTo = "tj@rolleragency.co.uk")
-public class AlertApplication extends Application {
+public class AlertApplication extends Application implements ValueEventListener {
 
     public static final boolean IS_LIVE = false;
+    private User user;
 
 //    public static final String API_KEY = "";
 
@@ -44,7 +57,7 @@ public class AlertApplication extends Application {
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.SAND;
 
     @SuppressLint("StaticFieldLeak")
     private static Context sContext;
@@ -109,5 +122,28 @@ public class AlertApplication extends Application {
             throw new IllegalArgumentException("Context is null!!");
         }
         return sContext;
+    }
+
+    public void startPermissionListeners(@PermissionRef DatabaseReference permissionsRef, User user) {
+        if(permissionsRef != null) {
+            this.user = user;
+            permissionsRef.addValueEventListener(this);
+        }
+    }
+
+
+    @Override
+    public void onDataChange(DataSnapshot dataSnapshot) {
+        if(dataSnapshot.getKey().equals("permissionSettings")) {
+            SettingsFactory.processCountryLevelSettings(dataSnapshot, user);
+        }
+        else {
+            SettingsFactory.proccessPartnerSettings(dataSnapshot);
+        }
+    }
+
+    @Override
+    public void onCancelled(DatabaseError databaseError) {
+
     }
 }

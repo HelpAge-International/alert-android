@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 
+import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
@@ -33,8 +34,10 @@ import org.alertpreparedness.platform.alert.helper.RightDrawableOnTouchListener;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.interfaces.AuthCallback;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.settings.SettingsFragment;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
+import org.alertpreparedness.platform.alert.utils.SettingsFactory;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import javax.inject.Inject;
@@ -54,6 +57,9 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
     @Inject
     UserInfo userInfo;
+
+    @Inject
+    SettingsFactory settingsFactory;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -126,6 +132,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onUserAuthorized(User user) {
         progressDialog.dismiss();
+        SettingsFactory.tryMakeBaseSettings(user);
         startActivity(new Intent(this, HomeScreen.class));
         finish();
     }
