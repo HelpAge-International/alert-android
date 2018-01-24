@@ -61,7 +61,7 @@ public class AlertApplication extends Application {
         JodaTimeAndroid.init(this);
 
 
-        ACRA.init(this);
+//        ACRA.init(this);
 
         if(!PreferHelper.getBoolean(this, Constants.HAS_RUN_BEFORE)) {
             System.out.println("PreferHelper.getString(this, Constants.HAS_RUN_BEFORE) = " + PreferHelper.getString(this, Constants.HAS_RUN_BEFORE));

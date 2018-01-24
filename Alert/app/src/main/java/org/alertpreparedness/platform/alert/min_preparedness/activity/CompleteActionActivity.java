@@ -1,5 +1,8 @@
 package org.alertpreparedness.platform.alert.min_preparedness.activity;
 
+import android.content.ActivityNotFoundException;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -18,6 +21,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -52,6 +56,8 @@ import org.alertpreparedness.platform.alert.dashboard.adapter.AlertFieldsAdapter
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.AttachmentAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.MinPreparednessFragment;
+import org.alertpreparedness.platform.alert.min_preparedness.helper.FileUtils;
+import org.alertpreparedness.platform.alert.min_preparedness.helper.RealPathUtil;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.min_preparedness.model.FileInfo;
@@ -65,6 +71,7 @@ import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,6 +80,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.whalemare.sheetmenu.SheetMenu;
+import timber.log.Timber;
 
 public class CompleteActionActivity extends AppCompatActivity implements SimpleAdapter.RemoveListener, View.OnClickListener {
 
@@ -109,7 +117,11 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
 
     ArrayList<String> imgList = new ArrayList<>();
     ArrayList<String> pathList = new ArrayList<>();
+    private Cursor cursor;
     private static final long KB = 1024;
+    private static final int REQUEST_CODE = 6384;
+    private static final int VIDEO_REQUEST_CODE = 104;
+    private static final int IMG_REQUEST_CODE = 0;
 
     SimpleAdapter simpleAdapter;
 
@@ -180,10 +192,10 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
                         startActivityForResult(intent, 0);
                         break;
                     case R.id.take_video:
-                        //TODO allow video files
+                        intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                        startActivityForResult(intent, VIDEO_REQUEST_CODE);
                         break;
                     case R.id.select_file:
-                        //TODO allow select files
                         showFileChooser();
                         break;
                 }
@@ -192,87 +204,125 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
         }).show();
     }
 
-    private void showFileChooser() {
-//        Intent intent = new Intent();
-//        intent.setType("")
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //   super.onActivityResult(requestCode, resultCode, data);
 
+        switch (requestCode) {
+            case IMG_REQUEST_CODE:
+                Bitmap photo = (Bitmap) data.getExtras().get("data");
 
-    }
+                Uri tempUri = getImageUri(getApplicationContext(), photo);
+                System.out.println("tempUri = " + tempUri);
 
-    private void confirmActionComplete() {
-        String notes = editTextNote.getText().toString().trim();
+                Action action = new Action(tempUri);
 
-        if (TextUtils.isEmpty(notes)) {
-            SnackbarHelper.show(this, getString(R.string.txt_err_complete_action_note));
-            return;
+                File finalFile = new File(getRealPathFromURI(action.getPath()));
+
+                String path = finalFile.toString();
+                System.out.println("path = " + path);
+
+                String filename = path.substring(path.lastIndexOf("/") + 1);
+
+                pathList.add(path);
+                imgList.add(filename);
+                simpleAdapter.notifyDataSetChanged();
+                break;
+            case REQUEST_CODE:
+                // If the file selection was successful
+                if (resultCode == RESULT_OK) {
+                    if (data != null) {
+                        addFileToList(data);
+                    }
+                }
+                break;
+            case VIDEO_REQUEST_CODE:
+                // If the file selection was successful
+                if (resultCode == RESULT_OK) {
+                    if (data != null) {
+                        addFileToList(data);
+                    }
+                }
+                break;
         }
 
-//        if (imgList.size() == 0) {
-//            SnackbarHelper.show(this, getString(R.string.txt_err_add_attachments));
-//        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
-        saveData(notes);
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void addFileToList(Intent data) {
+        // Get the URI of the selected file
+        final Uri uri = data.getData();
+        System.out.println("uri = " + uri);
+        try {
+            // Get the file path from the URI
+            final String path = FileUtils.getPath(this, uri);
+            Toast.makeText(CompleteActionActivity.this,
+                    "File Selected: " + path, Toast.LENGTH_LONG).show();
+
+            String filename = path.substring(path.lastIndexOf("/") + 1);
+            System.out.println("filename = " + filename);
+            pathList.add(path);
+            imgList.add(filename);
+            simpleAdapter.notifyDataSetChanged();
+        } catch (Exception e) {
+            System.out.println("exceptional = " + e);
+        }
+    }
+
+    private void showFileChooser() {
+        // Use the GET_CONTENT intent from the utility class
+        Intent target = FileUtils.createGetContentIntent();
+        // Create the chooser Intent
+        Intent intent = Intent.createChooser(
+                target, getString(R.string.title_choose_file));
+        try {
+            startActivityForResult(intent, REQUEST_CODE);
+        } catch (ActivityNotFoundException e) {
+            // The reason for the existence of aFileChooser
+        }
     }
 
     private void saveData(String texts) {
         Intent intent = getIntent();
         String key = intent.getStringExtra("ACTION_KEY");
+        saveNote(texts, key);
+        System.out.println("imgList.size() = " + imgList.size());
+        System.out.println("imgList = " + imgList);
 
-        for (int i = 0; i < pathList.size(); i++) {
-
+        for (int i = 0; i < imgList.size(); i++) {
             DatabaseReference ref = dbActionRef.child(key).child("documents").push();
-
+            System.out.println("ref = " + ref);
             ref.setValue(true);
-            saveNote(texts, key);
+            StorageReference riversRef = mStorageRef.child("documents/" + user.getCountryID() + "/" + ref.getKey() + "/" + imgList.get(i));
 
-            int finalI = i;
-            ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+            System.out.println("riversRef = " + riversRef);
+            System.out.println("saveimgList = " + imgList);
+            riversRef.putFile(Uri.parse("file://" + pathList.get(i)))
+                    .addOnSuccessListener(taskSnapshot -> {
 
-                    String documentID = dataSnapshot.getKey();
-                    System.out.println("user.getUserID() = " + user.getUserID());
-                    System.out.println("documentID = " + documentID);
+                        String title = taskSnapshot.getMetadata().getName();
+                        String downloadUri = taskSnapshot.getMetadata().getDownloadUrl().toString();
+                        System.out.println("downloadUri = " + downloadUri);
+                        Long size = taskSnapshot.getMetadata().getSizeBytes();
+                        double sizeInKb = size / KB;
+                        Long time = System.currentTimeMillis();
 
-
-                    StorageReference riversRef = mStorageRef.child("documents/" + user.getCountryID() + "/" + documentID + "/" + imgList.get(finalI));
-                    System.out.println("Uri.parse(pathList.get(i)) = " + Uri.parse(pathList.get(finalI)));
-
-
-                    riversRef.putFile(Uri.parse("file://" + pathList.get(finalI)))
-                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    Toast.makeText(getApplicationContext(), "Action completed successfully", Toast.LENGTH_LONG).show();
-                                    editTextNote.setText("");
-                                    imgList.remove(finalI);
-                                    simpleAdapter.notifyDataSetChanged();
-
-                                    String title = taskSnapshot.getMetadata().getName();
-                                    String downloadUri = taskSnapshot.getMetadata().getDownloadUrl().toString();
-                                    Long size = taskSnapshot.getMetadata().getSizeBytes();
-                                    double sizeInKb = size / KB;
-                                    Long time = System.currentTimeMillis();
-
-                                    FileInfo info = new FileInfo(title, downloadUri, Long.valueOf(0), sizeInKb, Long.valueOf(0), time, title, user.getUserID());
-                                    dbDocRef.child(documentID).setValue(info);
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
-                                    System.out.println("exception = " + exception);
-                                }
-                            });
-                }
-
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
+                        FileInfo info = new FileInfo(title, downloadUri, Long.valueOf(0), sizeInKb, Long.valueOf(0), time, title, user.getUserID());
+                        dbDocRef.child(ref.getKey()).setValue(info);
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            exception.printStackTrace();
+                        }
+                    });
         }
+
+        imgList.clear();
+        editTextNote.setText("");
+        simpleAdapter.notifyDataSetChanged();
     }
 
     public void saveNote(String texts, String key) {
@@ -286,34 +336,13 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
             dbActionRef.child(key).child("isCompleteAt").setValue(millis);
             dbNoteRef.child(key).child(id).setValue(notes);
 
-            Intent intent = new Intent(CompleteActionActivity.this, HomeScreen.class);
-            startActivity(intent);
+//            Intent intent = new Intent(CompleteActionActivity.this, HomeScreen.class);
+//            startActivity(intent);
         } else {
             SnackbarHelper.show(this, getString(R.string.txt_note_not_empty));
         }
     }
 
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Bitmap photo = (Bitmap) data.getExtras().get("data");
-
-        Uri tempUri = getImageUri(getApplicationContext(), photo);
-
-        System.out.println("tempUri = " + tempUri);
-
-        Action action = new Action(tempUri);
-
-        File finalFile = new File(getRealPathFromURI(action.getPath()));
-
-        String path = finalFile.toString();
-
-        String filename = path.substring(path.lastIndexOf("/") + 1);
-
-        pathList.add(path);
-        imgList.add(filename);
-    }
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -323,20 +352,34 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     }
 
     public String getRealPathFromURI(Uri uri) {
-        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        cursor = getContentResolver().query(uri, null, null, null, null);
         cursor.moveToFirst();
         int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
         return cursor.getString(idx);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    public String getFilePathFromURI(Uri uri) {
+        String result;
+        cursor = getContentResolver().query(uri, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            result = uri.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+            result = cursor.getString(idx);
+            cursor.close();
+        }
+        return result;
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
+    private void confirmActionComplete() {
+        String notes = editTextNote.getText().toString().trim();
+
+        if (TextUtils.isEmpty(notes)) {
+            SnackbarHelper.show(this, getString(R.string.txt_err_complete_action_note));
+            return;
+        }
+        saveData(notes);
     }
 
     @Override
@@ -350,4 +393,16 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
         return super.onOptionsItemSelected(item);
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
 }
+
