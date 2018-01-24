@@ -262,7 +262,10 @@ public class SettingsFactory {
 
     private static SettingsRealm mandatedMpaSettings(int type, SettingsRealm settings) {
         switch (type) {
-            case Constants.Ert | Constants.ErtLeader | Constants.CountryDirector | Constants.CountryAdmin:
+            case Constants.Ert:
+            case Constants.ErtLeader:
+            case Constants.CountryDirector:
+            case Constants.CountryAdmin:
                 settings.setCanAssignMPA(true);
                 settings.setCanCompleteMPA(true);
                 break;

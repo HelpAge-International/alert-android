@@ -199,8 +199,12 @@ public class FirebaseModule {
     @Provides
     @PermissionRef
     public DatabaseReference providePermissionRef(@BaseDatabaseRef DatabaseReference db, User user) {
+        System.out.println("db = [" + db + "], providePermissionRef = [" + user + "]");
         switch (user.getUserType()) {
-            case Constants.ErtLeader | Constants.CountryAdmin | Constants.CountryDirector | Constants.Ert:
+            case Constants.ErtLeader:
+            case Constants.CountryAdmin:
+            case Constants.CountryDirector:
+            case Constants.Ert:
                 return db.child("countryOffice").child(user.countryID).child("permissionSettings");
             default: //Constants.PartnerUser:
                 return db.child("partner").child(user.getUserID()).child("permissions");

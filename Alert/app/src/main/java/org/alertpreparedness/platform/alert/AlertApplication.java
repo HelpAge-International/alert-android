@@ -134,11 +134,12 @@ public class AlertApplication extends Application implements ValueEventListener 
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
+        System.out.println("permissionSettings = " + dataSnapshot.getRef());
         if(dataSnapshot.getKey().equals("permissionSettings")) {
             SettingsFactory.processCountryLevelSettings(dataSnapshot, user);
         }
         else {
-            SettingsFactory.proccessPartnerSettings(dataSnapshot);
+            SettingsFactory.proccessPartnerSettings(dataSnapshot, user);
         }
     }
 
