@@ -51,7 +51,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class InProgressFragment extends Fragment implements ActionAdapter.ItemSelectedListener, OnItemsChangedListener, ValueEventListener {
+public class InProgressFragment extends Fragment implements ActionAdapter.ItemSelectedListener, ValueEventListener {
 
     private DataModel model;
 
@@ -173,11 +173,11 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-//        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
-//
-//        for(String id: ids) {
+        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
 
-          //  System.out.println("GET NETWORK ACTION " + dataSnapshot.child(id).getValue());
+        for (String id : ids) {
+            System.out.println("id = " + id);
+            System.out.println("GET NETWORK ACTION " + dataSnapshot.child(id).getValue());
             for (DataSnapshot getChild : dataSnapshot.getChildren()) {
                 String actionIDs = getChild.getKey();
 
@@ -187,88 +187,88 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                 System.out.println("user.getNetworkID() = " + user.getNetworkID());
                 DataModel model = getChild.getValue(DataModel.class);
 
-            if (getChild.child("frequencyBase").getValue() != null) {
-                model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
-            }
-            if (getChild.child("frequencyValue").getValue() != null) {
-                model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
-            }
+                if (getChild.child("frequencyBase").getValue() != null) {
+                    model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
+                }
+                if (getChild.child("frequencyValue").getValue() != null) {
+                    model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
+                }
 
-            if (model.getType() == 0) {
-                getCHS(model, actionIDs);
-            } else if (model.getType() == 1) {
-                getMandated(model, actionIDs);
-            } else {
-                System.out.println("model = " + model);
-                getCustom(model, getChild);
+                if (model.getType() == 0) {
+                    getCHS(model, actionIDs);
+                } else if (model.getType() == 1) {
+                    getMandated(model, actionIDs);
+                } else {
+                    System.out.println("model = " + model);
+                    getCustom(model, getChild);
+                }
             }
-          //  }
         }
     }
 
     private void getCustom(DataModel model, DataSnapshot getChild) {
 
-            countryOffice.child(user.agencyAdminID).child(user.countryID).child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ValueEventListener() {
-                @RequiresApi(api = Build.VERSION_CODES.N)
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    Long durationType = (Long) dataSnapshot.child("durationType").getValue();
-                    Long value = (Long) dataSnapshot.child("value").getValue();
+        countryOffice.child(user.agencyAdminID).child(user.countryID).child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Long durationType = (Long) dataSnapshot.child("durationType").getValue();
+                Long value = (Long) dataSnapshot.child("value").getValue();
 
-                    if (value != null) {
-                        if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_WEEK) {
-                            isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), Math.toIntExact(value));
-                        } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_WEEK) {
-                            isInProgress = DateHelper.isInProgressWeek(model.getUpdatedAt(), Math.toIntExact(value));
-                        } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_MONTH) {
-                            isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), Math.toIntExact(value));
-                        } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_MONTH) {
-                            isInProgress = DateHelper.isInProgressMonth(model.getUpdatedAt(), Math.toIntExact(value));
-                        } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_YEAR) {
-                            isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), Math.toIntExact(value));
-                        } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_YEAR) {
-                            isInProgress = DateHelper.isInProgressYear(model.getUpdatedAt(), Math.toIntExact(value));
-                        }
+                if (value != null) {
+                    if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_WEEK) {
+                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), Math.toIntExact(value));
+                    } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_WEEK) {
+                        isInProgress = DateHelper.isInProgressWeek(model.getUpdatedAt(), Math.toIntExact(value));
+                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_MONTH) {
+                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), Math.toIntExact(value));
+                    } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_MONTH) {
+                        isInProgress = DateHelper.isInProgressMonth(model.getUpdatedAt(), Math.toIntExact(value));
+                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_YEAR) {
+                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), Math.toIntExact(value));
+                    } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_YEAR) {
+                        isInProgress = DateHelper.isInProgressYear(model.getUpdatedAt(), Math.toIntExact(value));
                     }
-
-                    if (model.getFrequencyValue() != null && model.getFrequencyBase() != null) {
-                        freqValue = Math.toIntExact(model.getFrequencyValue());
-                        freqBase = Math.toIntExact(model.getFrequencyBase());
-
-                        if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_WEEK) {
-                            isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), Math.toIntExact(freqValue));
-                        } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_WEEK) {
-                            isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), Math.toIntExact(freqValue));
-                        } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_MONTH) {
-                            isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), Math.toIntExact(freqValue));
-                        } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_MONTH) {
-                            isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), Math.toIntExact(freqValue));
-                        } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_YEAR) {
-                            isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), Math.toIntExact(freqValue));
-                        } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_YEAR) {
-                            isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), Math.toIntExact(freqValue));
-                        }
-                    }
-
-                    if (isInProgress) {
-                        addObjects(model.getTask(),
-                                model.getCreatedAt(),
-                                model.getLevel(),
-                                model,
-                                getChild,
-                                isCHS,
-                                isCHSAssigned,
-                                isMandated,
-                                isMandatedAssigned);
-                    }
-
                 }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+                if (model.getFrequencyValue() != null && model.getFrequencyBase() != null) {
+                    freqValue = Math.toIntExact(model.getFrequencyValue());
+                    freqBase = Math.toIntExact(model.getFrequencyBase());
 
+                    if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_WEEK) {
+                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), Math.toIntExact(freqValue));
+                    } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_WEEK) {
+                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), Math.toIntExact(freqValue));
+                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_MONTH) {
+                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), Math.toIntExact(freqValue));
+                    } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_MONTH) {
+                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), Math.toIntExact(freqValue));
+                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_YEAR) {
+                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), Math.toIntExact(freqValue));
+                    } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_YEAR) {
+                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), Math.toIntExact(freqValue));
+                    }
                 }
-            });
+
+                if (isInProgress) {
+                    addObjects(model.getTask(),
+                            model.getCreatedAt(),
+                            model.getLevel(),
+                            model,
+                            getChild,
+                            isCHS,
+                            isCHSAssigned,
+                            isMandated,
+                            isMandatedAssigned);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -448,26 +448,4 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
 
     }
 
-    @Override
-    public void onItemChanged(DataSnapshot getChild) {
-//        String actionIDs = getChild.getKey();
-//        System.out.println("CHANGED");
-//        DataModel model = getChild.getValue(DataModel.class);
-//
-//        if (getChild.child("frequencyBase").getValue() != null) {
-//            model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
-//        }
-//        if (getChild.child("frequencyValue").getValue() != null) {
-//            model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
-//        }
-//
-//        if (model.getType() == 0) {
-//            getCHS(model, actionIDs);
-//        } else if (model.getType() == 1) {
-//            getMandated(model, actionIDs);
-//        } else {
-//            getCustom(model, getChild);
-//        }
-
-    }
 }

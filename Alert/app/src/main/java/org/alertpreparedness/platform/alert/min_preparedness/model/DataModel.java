@@ -17,6 +17,9 @@ public class DataModel {
     private String task;
     private String department;
     private String asignee;
+    private String createdByAgencyId;
+    private String createdByCountryId;
+    private String networkId;
     @Exclude
     private Long frequencyValue;
     @Exclude
@@ -28,6 +31,9 @@ public class DataModel {
     private Long level;
     private Long createdAt;
     private Long updatedAt;
+    private Uri path;
+    public DatabaseReference db;
+    public DatabaseReference userRef;
 
     @Override
     public String toString() {
@@ -38,6 +44,9 @@ public class DataModel {
                 ", task='" + task + '\'' +
                 ", department='" + department + '\'' +
                 ", asignee='" + asignee + '\'' +
+                ", createdByAgencyId='" + createdByAgencyId + '\'' +
+                ", createdByCountryId='" + createdByCountryId + '\'' +
+                ", networkId='" + networkId + '\'' +
                 ", frequencyValue=" + frequencyValue +
                 ", frequencyBase=" + frequencyBase +
                 ", isCompleteAt=" + isCompleteAt +
@@ -53,11 +62,31 @@ public class DataModel {
                 '}';
     }
 
-    private Uri path;
-    public DatabaseReference db;
-    public DatabaseReference userRef;
-
     public DataModel() {
+    }
+
+    public String getCreatedByAgencyId() {
+        return createdByAgencyId;
+    }
+
+    public void setCreatedByAgencyId(String createdByAgencyId) {
+        this.createdByAgencyId = createdByAgencyId;
+    }
+
+    public String getCreatedByCountryId() {
+        return createdByCountryId;
+    }
+
+    public void setCreatedByCountryId(String createdByCountryId) {
+        this.createdByCountryId = createdByCountryId;
+    }
+
+    public String getNetworkId() {
+        return networkId;
+    }
+
+    public void setNetworkId(String networkId) {
+        this.networkId = networkId;
     }
 
     public Long getIsCompleteAt() {
