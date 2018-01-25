@@ -81,13 +81,14 @@ public class ActionCompletedFragment extends InProgressFragment {
         tvActionCompleted.setTextColor(getResources().getColor(R.color.alertGreen));
 
         mAdapter = getmAdapter();
+        assert mActionRV != null;
         mActionRV.setAdapter(mAdapter);
 
         mActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionRef.addValueEventListener(this);
+        dbActionRef.addChildEventListener(this);
     }
 
     @Override
@@ -97,27 +98,26 @@ public class ActionCompletedFragment extends InProgressFragment {
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
-        for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-            String actionIDs = getChild.getKey();
-            System.out.println("getChild = " + getChild);
-            DataModel model = getChild.getValue(DataModel.class);
+    public void process(DataSnapshot dataSnapshot) {
+        String actionIDs = dataSnapshot.getKey();
+        System.out.println("getChild = " + dataSnapshot);
+        DataModel model = dataSnapshot.getValue(DataModel.class);
 
-            if (getChild.child("frequencyBase").getValue() != null) {
-                model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
-            }
-            if (getChild.child("frequencyValue").getValue() != null) {
-                model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
-            }
-
-            if (model.getType() == 0) {
-                getCHS(model, actionIDs);
-            } else if (model.getType() == 1) {
-                getMandated(model, actionIDs);
-            } else {
-                getCustom(model, getChild);
-            }
+        if (dataSnapshot.child("frequencyBase").getValue() != null) {
+            model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
         }
+        if (dataSnapshot.child("frequencyValue").getValue() != null) {
+            model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
+        }
+
+        if (model.getType() == 0) {
+            getCHS(model, actionIDs);
+        } else if (model.getType() == 1) {
+            getMandated(model, actionIDs);
+        } else {
+            getCustom(model, dataSnapshot);
+        }
+
     }
 
     private void getCustom(DataModel model, DataSnapshot getChild) {
@@ -147,6 +147,9 @@ public class ActionCompletedFragment extends InProgressFragment {
                     dbAgencyRef.getRef(),
                     dbUserPublicRef.getRef())
             );
+        }
+        else {
+            mAdapter.removeItem(getChild.getKey());
         }
     }
 
@@ -188,6 +191,9 @@ public class ActionCompletedFragment extends InProgressFragment {
                                     dbAgencyRef.getRef(),
                                     dbUserPublicRef.getRef())
                             );
+                        }
+                        else {
+                            mAdapter.removeItem(getChild.getKey());
                         }
                     }
                 }
@@ -242,6 +248,9 @@ public class ActionCompletedFragment extends InProgressFragment {
                                     dbAgencyRef.getRef(),
                                     dbUserPublicRef.getRef())
                             );
+                        }
+                        else {
+                            mAdapter.removeItem(getChild.getKey());
                         }
                     }
                 }

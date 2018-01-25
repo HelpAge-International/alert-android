@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -51,7 +52,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class InProgressFragment extends Fragment implements ActionAdapter.ItemSelectedListener, OnItemsChangedListener, ValueEventListener {
+public class InProgressFragment extends Fragment implements ActionAdapter.ItemSelectedListener, OnItemsChangedListener, ChildEventListener {
 
     private DataModel model;
 
@@ -130,7 +131,8 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionRef.addValueEventListener(this);
+        dbActionRef.addChildEventListener(this);
+        System.out.println("dbActionRef = " + dbActionRef);
     }
 
     protected ActionAdapter getmAdapter() {
@@ -144,66 +146,27 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
 
     @Override
     public void onActionItemSelected(int pos, String key) {
-        SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress).setClick(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.complete_action:
-                        Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
-                        intent.putExtra("ACTION_KEY", key);
-                        startActivity(intent);
-                        break;
-                    case R.id.reassign_action:
-                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
-                        break;
-                    case R.id.action_notes:
-                        intent = new Intent(getActivity(), AddNotesActivity.class);
-                        intent.putExtra("ACTION_KEY", key);
-                        startActivity(intent);
-                        break;
-                    case R.id.attachments:
-                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
-                        break;
-                }
-                return false;
+        SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress).setClick(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.complete_action:
+                    Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
+                    intent.putExtra("ACTION_KEY", key);
+                    startActivity(intent);
+                    break;
+                case R.id.reassign_action:
+                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
+                    break;
+                case R.id.action_notes:
+                    intent = new Intent(getActivity(), AddNotesActivity.class);
+                    intent.putExtra("ACTION_KEY", key);
+                    startActivity(intent);
+                    break;
+                case R.id.attachments:
+                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
+                    break;
             }
+            return false;
         }).show();
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
-//        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
-//
-//        for(String id: ids) {
-
-          //  System.out.println("GET NETWORK ACTION " + dataSnapshot.child(id).getValue());
-            for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                String actionIDs = getChild.getKey();
-
-                // System.out.println("user.getCountryID() = " + user.getCountryID());
-                System.out.println("user.getNetworkCountryID() = " + user.getNetworkCountryID());
-                System.out.println("user.getLocalNetworkID() = " + user.getLocalNetworkID());
-                System.out.println("user.getNetworkID() = " + user.getNetworkID());
-                DataModel model = getChild.getValue(DataModel.class);
-
-            if (getChild.child("frequencyBase").getValue() != null) {
-                model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
-            }
-            if (getChild.child("frequencyValue").getValue() != null) {
-                model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
-            }
-
-            if (model.getType() == 0) {
-                getCHS(model, actionIDs);
-            } else if (model.getType() == 1) {
-                getMandated(model, actionIDs);
-            } else {
-                System.out.println("model = " + model);
-                getCustom(model, getChild);
-            }
-          //  }
-        }
     }
 
     private void getCustom(DataModel model, DataSnapshot getChild) {
@@ -258,6 +221,9 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                                 isMandated,
                                 isMandatedAssigned);
                     }
+                    else {
+                        mAdapter.removeItem(dataSnapshot.getKey());
+                    }
 
                 }
             }
@@ -283,7 +249,6 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                         isCHSAssigned = true;
 
                         countryOffice.child(user.agencyAdminID).child(user.countryID).child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @RequiresApi(api = Build.VERSION_CODES.N)
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 Long durationType = (Long) dataSnapshot.child("durationType").getValue();
@@ -335,6 +300,9 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                                             isMandated,
                                             isMandatedAssigned);
                                 }
+                                else {
+                                    mAdapter.removeItem(dataSnapshot.getKey());
+                                }
 
                             }
 
@@ -380,6 +348,9 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                                     isCHSAssigned,
                                     isMandated,
                                     isMandatedAssigned);
+                        }
+                        else {
+                            mAdapter.removeItem(dataSnapshot.getKey());
                         }
                     }
                 }
@@ -442,9 +413,56 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     }
 
     @Override
+    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+        process(dataSnapshot);
+    }
+
+    @Override
+    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+        process(dataSnapshot);
+    }
+
+    @Override
+    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+    }
+
+    @Override
+    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+    }
+
+    @Override
     public void onCancelled(DatabaseError databaseError) {
 
     }
+
+    protected void process(DataSnapshot dataSnapshot) {
+
+        String actionIDs = dataSnapshot.getKey();
+        DataModel model = dataSnapshot.getValue(DataModel.class);
+
+        if (dataSnapshot.child("frequencyBase").getValue() != null) {
+            assert model != null;
+            model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
+        }
+        if (dataSnapshot.child("frequencyValue").getValue() != null) {
+            assert model != null;
+            model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
+        }
+
+        assert model != null;
+        if (model.getType() == 0) {
+            getCHS(model, actionIDs);
+        } else if (model.getType() == 1) {
+            getMandated(model, actionIDs);
+        } else {
+            System.out.println("model = " + model);
+            getCustom(model, dataSnapshot);
+        }
+
+    }
+
 
     @Override
     public void onItemChanged(DataSnapshot getChild) {

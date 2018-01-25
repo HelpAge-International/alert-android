@@ -77,9 +77,11 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     public void removeItem(String key) {
         int index = keys.indexOf(key);
-        items.remove(keys.get(index));
-        keys.remove(index);
-        notifyItemRemoved(index);
+        if(index != -1) {
+            items.remove(keys.get(index));
+            keys.remove(index);
+            notifyItemRemoved(index);
+        }
     }
 
     @Override
@@ -223,7 +225,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-      //  changedListener.onItemChanged(dataSnapshot);
+
     }
 
     @Override

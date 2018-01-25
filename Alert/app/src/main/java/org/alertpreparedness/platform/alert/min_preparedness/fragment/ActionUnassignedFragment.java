@@ -93,7 +93,7 @@ public class ActionUnassignedFragment extends InProgressFragment {
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionRef.addValueEventListener(this);
+        dbActionRef.addChildEventListener(this);
     }
 
 
@@ -104,17 +104,17 @@ public class ActionUnassignedFragment extends InProgressFragment {
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
+    public void process(DataSnapshot dataSnapshot) {
+        System.out.println("processdataSnapshot = " + dataSnapshot);
         if (dataSnapshot.getValue() != null) {
-            for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                String actionIDs = getChild.getKey();
-                DataModel model = getChild.getValue(DataModel.class);
+                String actionIDs = dataSnapshot.getKey();
+                DataModel model = dataSnapshot.getValue(DataModel.class);
 
-                if (getChild.child("frequencyBase").getValue() != null) {
-                    model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
+                if (dataSnapshot.child("frequencyBase").getValue() != null) {
+                    model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
                 }
-                if (getChild.child("frequencyValue").getValue() != null) {
-                    model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
+                if (dataSnapshot.child("frequencyValue").getValue() != null) {
+                    model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
                 }
 
                 //if (model.getType() == 0) {
@@ -122,10 +122,11 @@ public class ActionUnassignedFragment extends InProgressFragment {
                 //  } else if (model.getType() == 1) {
                 getMandated(model, actionIDs);
                 //  } else {
-                getCustom(model, getChild);
+                getCustom(model, dataSnapshot);
                 // }
-            }
-        } else {
+
+        }
+        else {
             getCHSForNewUser();
             getMandatedForNewUser();
         }
@@ -156,6 +157,9 @@ public class ActionUnassignedFragment extends InProgressFragment {
                     dbAgencyRef.getRef(),
                     dbUserPublicRef.getRef())
             );
+        }
+        else {
+            mUnassignedAdapter.removeItem(getChild.getKey());
         }
     }
 
@@ -191,6 +195,9 @@ public class ActionUnassignedFragment extends InProgressFragment {
                                     dbUserPublicRef.getRef())
                             );
 
+                    }
+                    else {
+                        mUnassignedAdapter.removeItem(getChild.getKey());
                     }
                 }
             }
@@ -235,8 +242,12 @@ public class ActionUnassignedFragment extends InProgressFragment {
                             );
 
                         } catch (Exception exception) {
+                                mUnassignedAdapter.removeItem(getChild.getKey());
                             System.out.println("exception = " + exception);
                         }
+                    }
+                    else {
+                        mUnassignedAdapter.removeItem(getChild.getKey());
                     }
                 }
             }
@@ -281,9 +292,11 @@ public class ActionUnassignedFragment extends InProgressFragment {
                         );
 
                     } catch (Exception exception) {
+                        mUnassignedAdapter.removeItem(getChild.getKey());
                         System.out.println("exception = " + exception);
                     }
                 }
+
             }
 
             @Override
