@@ -123,9 +123,4 @@ public class ApplicationModule {
         return SettingsFactory.getSettings(user);
     }
 
-    @Provides
-    @Singleton
-    public SettingsFactory provideSettingsFactory(User user) {
-        return new SettingsFactory(user);
-    }
 }

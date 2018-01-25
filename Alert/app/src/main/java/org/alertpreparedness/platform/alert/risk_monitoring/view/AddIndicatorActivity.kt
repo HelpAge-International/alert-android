@@ -36,10 +36,12 @@ import org.alertpreparedness.platform.alert.utils.Constants
 import org.alertpreparedness.platform.alert.utils.FirebaseHelper
 import org.alertpreparedness.platform.alert.utils.PreferHelper
 import org.joda.time.DateTime
+import shortbread.Shortcut
 import timber.log.Timber
 import java.lang.IllegalArgumentException
 import java.util.*
 
+@Shortcut(id = "addIndicator", icon = R.drawable.fab_add, shortLabel = "Add Indicator")
 class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDeleteListener {
 
     private lateinit var mPopupMenu: PopupMenu
