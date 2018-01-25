@@ -37,6 +37,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.realm.Realm;
+import shortbread.Shortbread;
 import timber.log.Timber;
 
 /**
@@ -57,7 +58,7 @@ public class AlertApplication extends Application implements ValueEventListener 
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.SAND;
 
     @SuppressLint("StaticFieldLeak")
     private static Context sContext;
@@ -69,6 +70,8 @@ public class AlertApplication extends Application implements ValueEventListener 
         FirebaseApp.initializeApp(this);
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 //        FirebaseAuth.getInstance().signOut();
+        Shortbread.create(this);
+
         Realm.init(this);
         // JODA
         JodaTimeAndroid.init(this);
@@ -133,7 +136,6 @@ public class AlertApplication extends Application implements ValueEventListener 
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        System.out.println("permissionSettings = " + dataSnapshot.getRef());
         if(dataSnapshot.getKey().equals("permissionSettings")) {
             SettingsFactory.processCountryLevelSettings(dataSnapshot, user);
         }

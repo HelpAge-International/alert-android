@@ -152,7 +152,6 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     @BindView(R.id.countryTitle)
     TextView countryTitle;
 
-
     @BindView(R.id.countryTasks)
     TextView countryTastsTitle;
 

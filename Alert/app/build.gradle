@@ -100,6 +100,8 @@ dependencies {
     compile 'com.github.whalemare:sheetmenu:1.3.3'
 
 
+    compile 'com.github.matthiasrobbers:shortbread:1.0.2'
+    annotationProcessor 'com.github.matthiasrobbers:shortbread-compiler:1.0.2'
     compile('com.github.ozodrukh:CircularReveal:1.1.1@aar') {
         transitive = true;
     }

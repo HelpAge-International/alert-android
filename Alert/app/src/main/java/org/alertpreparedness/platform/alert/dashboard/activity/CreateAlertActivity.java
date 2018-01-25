@@ -36,7 +36,9 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import shortbread.Shortcut;
 
+@Shortcut(id = "createAlert", icon = R.drawable.fab_add, shortLabel = "Create Alert")
 public class CreateAlertActivity extends AppCompatActivity implements AlertFieldsAdapter.ClickListener, AlertLevelDialog.TypeSelectedListener {
 
     public static final int EFFECTED_AREA_REQUEST = 9002;

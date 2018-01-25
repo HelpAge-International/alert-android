@@ -58,9 +58,6 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     @Inject
     UserInfo userInfo;
 
-    @Inject
-    SettingsFactory settingsFactory;
-
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
