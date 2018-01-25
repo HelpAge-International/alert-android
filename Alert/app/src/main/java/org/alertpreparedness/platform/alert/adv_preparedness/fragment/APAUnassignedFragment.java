@@ -191,23 +191,23 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
                 && model.getTask() != null) {
 
             txtNoAction.setVisibility(View.GONE);
-            mAPAdapter.addItems(getChild.getKey(), new Action(
-                    model.getTask(),
-                    model.getDepartment(),
-                    model.getAsignee(),
-                    model.getIsArchived(),
-                    model.getIsComplete(),
-                    model.getCreatedAt(),
-                    model.getUpdatedAt(),
-                    model.getType(),
-                    model.getDueDate(),
-                    model.getBudget(),
-                    model.getLevel(),
-                    model.getFrequencyBase(),
-                    freqValue,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef())
-            );
+//            mAPAdapter.addItems(getChild.getKey(), new Action(
+//                    model.getTask(),
+//                    model.getDepartment(),
+//                    model.getAsignee(),
+//                    model.getIsArchived(),
+//                    model.getIsComplete(),
+//                    model.getCreatedAt(),
+//                    model.getUpdatedAt(),
+//                    model.getType(),
+//                    model.getDueDate(),
+//                    model.getBudget(),
+//                    model.getLevel(),
+//                    model.getFrequencyBase(),
+//                    freqValue,
+//                    dbAgencyRef.getRef(),
+//                    dbUserPublicRef.getRef())
+//            );
         }
     }
 
@@ -224,23 +224,23 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
                         Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
 
                             txtNoAction.setVisibility(View.GONE);
-                            mAPAdapter.addItems(getChild.getKey(), new Action(
-                                    CHSTaskName,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    CHSCreatedAt,
-                                    null,
-                                    (long) 0, //CHS always 0
-                                    null,
-                                    null,
-                                    CHSlevel,
-                                    null,
-                                    null,
-                                    dbAgencyRef.getRef(),
-                                    dbUserPublicRef.getRef())
-                            );
+//                            mAPAdapter.addItems(getChild.getKey(), new Action(
+//                                    CHSTaskName,
+//                                    null,
+//                                    null,
+//                                    null,
+//                                    null,
+//                                    CHSCreatedAt,
+//                                    null,
+//                                    (long) 0, //CHS always 0
+//                                    null,
+//                                    null,
+//                                    CHSlevel,
+//                                    null,
+//                                    null,
+//                                    dbAgencyRef.getRef(),
+//                                    dbUserPublicRef.getRef())
+//                            );
 
                     }
                 }
@@ -267,23 +267,23 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
                             Long manLevel = (Long) getChild.child("level").getValue();
 
                             txtNoAction.setVisibility(View.GONE);
-                            mAPAdapter.addItems(getChild.getKey(), new Action(
-                                    taskNameMandated,
-                                    departmentMandated,
-                                    null,
-                                    null,
-                                    null,
-                                    manCreatedAt,
-                                    null,
-                                    (long) 1, //Mandated always 1
-                                    null,
-                                    null,
-                                    manLevel,
-                                    null,
-                                    null,
-                                    dbAgencyRef.getRef(),
-                                    dbUserPublicRef.getRef())
-                            );
+//                            mAPAdapter.addItems(getChild.getKey(), new Action(
+//                                    taskNameMandated,
+//                                    departmentMandated,
+//                                    null,
+//                                    null,
+//                                    null,
+//                                    manCreatedAt,
+//                                    null,
+//                                    (long) 1, //Mandated always 1
+//                                    null,
+//                                    null,
+//                                    manLevel,
+//                                    null,
+//                                    null,
+//                                    dbAgencyRef.getRef(),
+//                                    dbUserPublicRef.getRef())
+//                            );
 
                         } catch (Exception exception) {
                             System.out.println("exception = " + exception);
@@ -313,23 +313,23 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
                         Long manLevel = (Long) getChild.child("level").getValue();
 
                         txtNoAction.setVisibility(View.GONE);
-                        mAPAdapter.addItems(getChild.getKey(), new Action(
-                                taskNameMandated,
-                                departmentMandated,
-                                null,
-                                null,
-                                null,
-                                manCreatedAt,
-                                null,
-                                (long) 1, //Mandated always 1
-                                null,
-                                null,
-                                manLevel,
-                                null,
-                                null,
-                                dbAgencyRef.getRef(),
-                                dbUserPublicRef.getRef())
-                        );
+//                        mAPAdapter.addItems(getChild.getKey(), new Action(
+//                                taskNameMandated,
+//                                departmentMandated,
+//                                null,
+//                                null,
+//                                null,
+//                                manCreatedAt,
+//                                null,
+//                                (long) 1, //Mandated always 1
+//                                null,
+//                                null,
+//                                manLevel,
+//                                null,
+//                                null,
+//                                dbAgencyRef.getRef(),
+//                                dbUserPublicRef.getRef())
+//                        );
 
                     } catch (Exception exception) {
                         System.out.println("exception = " + exception);
@@ -356,23 +356,23 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
                     Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
 
                     txtNoAction.setVisibility(View.GONE);
-                    mAPAdapter.addItems(getChild.getKey(), new Action(
-                            CHSTaskName,
-                            null,
-                            null,
-                            null,
-                            null,
-                            CHSCreatedAt,
-                            null,
-                            (long) 0, //CHS always 0
-                            null,
-                            null,
-                            CHSlevel,
-                            null,
-                            null,
-                            dbAgencyRef.getRef(),
-                            dbUserPublicRef.getRef())
-                    );
+//                    mAPAdapter.addItems(getChild.getKey(), new Action(
+//                            CHSTaskName,
+//                            null,
+//                            null,
+//                            null,
+//                            null,
+//                            CHSCreatedAt,
+//                            null,
+//                            (long) 0, //CHS always 0
+//                            null,
+//                            null,
+//                            CHSlevel,
+//                            null,
+//                            null,
+//                            dbAgencyRef.getRef(),
+//                            dbUserPublicRef.getRef())
+//                    );
                 }
             }
 

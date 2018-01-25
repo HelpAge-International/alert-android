@@ -15,6 +15,9 @@ public class Action {
     private String taskName;
     private String department;
     private String assignee;
+    private String createdByAgencyId;
+    private String createdByCountryId;
+    private String networkId;
     private Integer frequencyValue;
     private Long frequencyBase;
     private Long actionType;
@@ -38,11 +41,14 @@ public class Action {
         this.isInProgress = isInProgress;
     }
 
-    public Action(String taskName, String department, String assignee, Boolean isArchived, Boolean isComplete, Long createdAt, Long updatedAt,
+    public Action(String taskName, String department, String assignee, String createdByAgencyId, String createdByCountryId, String networkId, Boolean isArchived, Boolean isComplete, Long createdAt, Long updatedAt,
                   Long actionType, Long dueDate, Long budget, Long level, Long frequencyBase, Integer frequencyValue, DatabaseReference db, DatabaseReference userRef) {
         this.taskName = taskName;
         this.department = department;
         this.assignee = assignee;
+        this.createdByAgencyId = createdByAgencyId;
+        this.createdByCountryId = createdByCountryId;
+        this.networkId = networkId;
         this.isArchived = isArchived;
         this.isComplete = isComplete;
         this.createdAt = createdAt;
@@ -55,6 +61,30 @@ public class Action {
         this.frequencyValue = frequencyValue;
         this.db = db;
         this.userRef = userRef;
+    }
+
+    public String getCreatedByAgencyId() {
+        return createdByAgencyId;
+    }
+
+    public void setCreatedByAgencyId(String createdByAgencyId) {
+        this.createdByAgencyId = createdByAgencyId;
+    }
+
+    public String getCreatedByCountryId() {
+        return createdByCountryId;
+    }
+
+    public void setCreatedByCountryId(String createdByCountryId) {
+        this.createdByCountryId = createdByCountryId;
+    }
+
+    public String getNetworkId() {
+        return networkId;
+    }
+
+    public void setNetworkId(String networkId) {
+        this.networkId = networkId;
     }
 
     public Boolean getInProgress() {
@@ -182,14 +212,24 @@ public class Action {
         return "Action{" +
                 "isArchived=" + isArchived +
                 ", isComplete=" + isComplete +
+                ", isInProgress=" + isInProgress +
                 ", taskName='" + taskName + '\'' +
                 ", department='" + department + '\'' +
                 ", assignee='" + assignee + '\'' +
+                ", createdByAgencyId='" + createdByAgencyId + '\'' +
+                ", createdByCountryId='" + createdByCountryId + '\'' +
+                ", networkId='" + networkId + '\'' +
+                ", frequencyValue=" + frequencyValue +
+                ", frequencyBase=" + frequencyBase +
                 ", actionType=" + actionType +
                 ", dueDate=" + dueDate +
                 ", budget=" + budget +
                 ", level=" + level +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", path=" + path +
                 ", db=" + db +
+                ", userRef=" + userRef +
                 '}';
     }
 }

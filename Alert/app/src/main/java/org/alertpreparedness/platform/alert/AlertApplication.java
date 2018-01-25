@@ -57,7 +57,7 @@ public class AlertApplication extends Application implements ValueEventListener 
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.SAND;
 
     @SuppressLint("StaticFieldLeak")
     private static Context sContext;

@@ -92,7 +92,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     @Override
     public void onBindViewHolder(ActionAdapter.ViewHolder holder, int position) {
         Action action = items.get(keys.get(position));
-        getDepartment(action.db, action.userRef, action.getDepartment(), action.getAssignee(), holder);
+        getDepartment(action.db, action.userRef, action.getDepartment(), action.getNetworkId(), action.getAssignee(), holder);
         holder.tvActionType.setText(getActionType((int) action.getActionType()));
         holder.tvActionName.setText(action.getTaskName());
         holder.tvBudget.setText(getBudget(action.getBudget()));
@@ -117,7 +117,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     }
 
-    private void getDepartment(DatabaseReference db, DatabaseReference userRef, String departmentID, String assignee, ActionAdapter.ViewHolder holder) {
+    private void getDepartment(DatabaseReference db, DatabaseReference userRef, String departmentID, String networkID, String assignee, ActionAdapter.ViewHolder holder) {
 
         db.addListenerForSingleValueEvent(new ValueEventListener() {
 
@@ -126,6 +126,8 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
                 if (departmentID != null) {
                     String department = (String) dataSnapshot.child("departments").child(departmentID).child("name").getValue();
                     setUser(holder, userRef, assignee, department);
+                } else if (networkID != null){
+
                 } else {
                     setUser(holder, userRef, assignee, null);
                 }

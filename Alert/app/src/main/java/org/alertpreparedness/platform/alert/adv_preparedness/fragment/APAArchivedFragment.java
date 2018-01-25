@@ -176,23 +176,23 @@ public class APAArchivedFragment extends Fragment implements APActionAdapter.Ite
                 && model.getDueDate() != null) {
 
             txtNoAction.setVisibility(View.GONE);
-            mAPAdapter.addItems(getChild.getKey(), new Action(
-                    model.getTask(),
-                    model.getDepartment(),
-                    model.getAsignee(),
-                    model.getIsArchived(),
-                    model.getIsComplete(),
-                    model.getCreatedAt(),
-                    model.getUpdatedAt(),
-                    model.getType(),
-                    model.getDueDate(),
-                    model.getBudget(),
-                    model.getLevel(),
-                    model.getFrequencyBase(),
-                    freqValue,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef())
-            );
+//            mAPAdapter.addItems(getChild.getKey(), new Action(
+//                    model.getTask(),
+//                    model.getDepartment(),
+//                    model.getAsignee(),
+//                    model.getIsArchived(),
+//                    model.getIsComplete(),
+//                    model.getCreatedAt(),
+//                    model.getUpdatedAt(),
+//                    model.getType(),
+//                    model.getDueDate(),
+//                    model.getBudget(),
+//                    model.getLevel(),
+//                    model.getFrequencyBase(),
+//                    freqValue,
+//                    dbAgencyRef.getRef(),
+//                    dbUserPublicRef.getRef())
+//            );
         }
     }
 
@@ -217,23 +217,23 @@ public class APAArchivedFragment extends Fragment implements APActionAdapter.Ite
                                 && model.getDueDate() != null) {
 
                             txtNoAction.setVisibility(View.GONE);
-                            mAPAdapter.addItems(getChild.getKey(), new Action(
-                                    CHSTaskName,
-                                    model.getDepartment(),
-                                    model.getAsignee(),
-                                    model.getIsArchived(),
-                                    model.getIsComplete(),
-                                    CHSCreatedAt,
-                                    model.getUpdatedAt(),
-                                    model.getType(),
-                                    model.getDueDate(),
-                                    model.getBudget(),
-                                    CHSlevel,
-                                    model.getFrequencyBase(),
-                                    freqValue,
-                                    dbAgencyRef.getRef(),
-                                    dbUserPublicRef.getRef())
-                            );
+//                            mAPAdapter.addItems(getChild.getKey(), new Action(
+//                                    CHSTaskName,
+//                                    model.getDepartment(),
+//                                    model.getAsignee(),
+//                                    model.getIsArchived(),
+//                                    model.getIsComplete(),
+//                                    CHSCreatedAt,
+//                                    model.getUpdatedAt(),
+//                                    model.getType(),
+//                                    model.getDueDate(),
+//                                    model.getBudget(),
+//                                    CHSlevel,
+//                                    model.getFrequencyBase(),
+//                                    freqValue,
+//                                    dbAgencyRef.getRef(),
+//                                    dbUserPublicRef.getRef())
+//                            );
                         }
                     }
                 }
@@ -271,23 +271,23 @@ public class APAArchivedFragment extends Fragment implements APActionAdapter.Ite
                                 && model.getDueDate() != null) {
 
                             txtNoAction.setVisibility(View.GONE);
-                            mAPAdapter.addItems(getChild.getKey(), new Action(
-                                    taskNameMandated,
-                                    model.getDepartment(),
-                                    model.getAsignee(),
-                                    model.getIsArchived(),
-                                    model.getIsComplete(),
-                                    manCreatedAt,
-                                    model.getUpdatedAt(),
-                                    model.getType(),
-                                    model.getDueDate(),
-                                    model.getBudget(),
-                                    manLevel,
-                                    model.getFrequencyBase(),
-                                    freqValue,
-                                    dbAgencyRef.getRef(),
-                                    dbUserPublicRef.getRef())
-                            );
+//                            mAPAdapter.addItems(getChild.getKey(), new Action(
+//                                    taskNameMandated,
+//                                    model.getDepartment(),
+//                                    model.getAsignee(),
+//                                    model.getIsArchived(),
+//                                    model.getIsComplete(),
+//                                    manCreatedAt,
+//                                    model.getUpdatedAt(),
+//                                    model.getType(),
+//                                    model.getDueDate(),
+//                                    model.getBudget(),
+//                                    manLevel,
+//                                    model.getFrequencyBase(),
+//                                    freqValue,
+//                                    dbAgencyRef.getRef(),
+//                                    dbUserPublicRef.getRef())
+//                            );
                         }
                     }
                 }

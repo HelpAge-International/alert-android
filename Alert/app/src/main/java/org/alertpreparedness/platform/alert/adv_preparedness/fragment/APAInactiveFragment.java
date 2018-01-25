@@ -358,23 +358,23 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
 
             txtNoAction.setVisibility(View.GONE);
 
-            mAPAdapter.addItems(getChild.getKey(), new Action(
-                    name,
-                    model.getDepartment(),
-                    model.getAsignee(),
-                    model.getIsArchived(),
-                    model.getIsComplete(),
-                    createdAt,
-                    model.getUpdatedAt(),
-                    model.getType(),
-                    model.getDueDate(),
-                    model.getBudget(),
-                    level,
-                    model.getFrequencyBase(),
-                    freqValue,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef())
-            );
+//            mAPAdapter.addItems(getChild.getKey(), new Action(
+//                    name,
+//                    model.getDepartment(),
+//                    model.getAsignee(),
+//                    model.getIsArchived(),
+//                    model.getIsComplete(),
+//                    createdAt,
+//                    model.getUpdatedAt(),
+//                    model.getType(),
+//                    model.getDueDate(),
+//                    model.getBudget(),
+//                    level,
+//                    model.getFrequencyBase(),
+//                    freqValue,
+//                    dbAgencyRef.getRef(),
+//                    dbUserPublicRef.getRef())
+//            );
         }
     }
 

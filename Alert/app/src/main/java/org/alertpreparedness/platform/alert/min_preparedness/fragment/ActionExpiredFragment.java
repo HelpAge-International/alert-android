@@ -348,23 +348,23 @@ public class ActionExpiredFragment extends InProgressFragment {
 
             txtNoAction.setVisibility(View.GONE);
 
-            mExpiredAdapter.addItems(getChild.getKey(), new Action(
-                    name,
-                    department,
-                    model.getAsignee(),
-                    model.getIsArchived(),
-                    model.getIsComplete(),
-                    createdAt,
-                    model.getUpdatedAt(),
-                    model.getType(),
-                    model.getDueDate(),
-                    model.getBudget(),
-                    level,
-                    model.getFrequencyBase(),
-                    freqValue,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef())
-            );
+//            mExpiredAdapter.addItems(getChild.getKey(), new Action(
+//                    name,
+//                    department,
+//                    model.getAsignee(),
+//                    model.getIsArchived(),
+//                    model.getIsComplete(),
+//                    createdAt,
+//                    model.getUpdatedAt(),
+//                    model.getType(),
+//                    model.getDueDate(),
+//                    model.getBudget(),
+//                    level,
+//                    model.getFrequencyBase(),
+//                    freqValue,
+//                    dbAgencyRef.getRef(),
+//                    dbUserPublicRef.getRef())
+//            );
         }
     }
 

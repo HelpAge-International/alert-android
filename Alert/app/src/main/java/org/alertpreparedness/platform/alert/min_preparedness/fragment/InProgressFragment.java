@@ -2,6 +2,7 @@ package org.alertpreparedness.platform.alert.min_preparedness.fragment;
 
 
 import android.content.Intent;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -130,11 +131,11 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionRef.addValueEventListener(this);
+        dbActionBaseRef.addValueEventListener(this);
     }
 
     protected ActionAdapter getmAdapter() {
-        return new ActionAdapter(getContext(), dbActionRef, this);
+        return new ActionAdapter(getContext(), dbActionBaseRef, this);
     }
 
     @Override
@@ -170,21 +171,25 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
         }).show();
     }
 
+
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
         ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
 
         for (String id : ids) {
+
             System.out.println("id = " + id);
             System.out.println("GET NETWORK ACTION " + dataSnapshot.child(id).getValue());
-            for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+
+            for (DataSnapshot getChild : dataSnapshot.child(id).getChildren()) {
+
                 String actionIDs = getChild.getKey();
 
                 // System.out.println("user.getCountryID() = " + user.getCountryID());
-                System.out.println("user.getNetworkCountryID() = " + user.getNetworkCountryID());
-                System.out.println("user.getLocalNetworkID() = " + user.getLocalNetworkID());
-                System.out.println("user.getNetworkID() = " + user.getNetworkID());
+//                System.out.println("user.getNetworkCountryID() = " + user.getNetworkCountryID());
+//                System.out.println("user.getLocalNetworkID() = " + user.getLocalNetworkID());
+//                System.out.println("user.getNetworkID() = " + user.getNetworkID());
                 DataModel model = getChild.getValue(DataModel.class);
 
                 if (getChild.child("frequencyBase").getValue() != null) {
@@ -194,11 +199,11 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                     model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
                 }
 
-                if (model.getType() == 0) {
+                if (model.getType() != null && model.getType() == 0) {
                     getCHS(model, actionIDs);
-                } else if (model.getType() == 1) {
+                } else if (model.getType() != null && model.getType() == 1) {
                     getMandated(model, actionIDs);
-                } else {
+                } else if (model.getType() != null && model.getType() == 2){
                     System.out.println("model = " + model);
                     getCustom(model, getChild);
                 }
@@ -217,17 +222,24 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
 
                 if (value != null) {
                     if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_WEEK) {
+                        System.out.println("value 1 = " + value);
                         isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), value.intValue());
                     } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_WEEK) {
+                        System.out.println("value 2 = " + value);
                         isInProgress = DateHelper.isInProgressWeek(model.getUpdatedAt(), value.intValue());
                     } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_MONTH) {
+                        System.out.println("value 3 = " + value);
                         isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), value.intValue());
                     } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_MONTH) {
+                        System.out.println("value 4 = " + value);
                         isInProgress = DateHelper.isInProgressMonth(model.getUpdatedAt(), value.intValue());
                     } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_YEAR) {
+                        System.out.println("value 5 = " + value);
                         isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), value.intValue());
                     } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_YEAR) {
+                        System.out.println("value 6 = " + value);
                         isInProgress = DateHelper.isInProgressYear(model.getUpdatedAt(), value.intValue());
+                        System.out.println("isInProgress = " + isInProgress);
                     }
                 }
                 if (model.getFrequencyValue() != null && model.getFrequencyBase() != null) {
@@ -247,19 +259,20 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                     } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_YEAR) {
                         isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), freqValue);
                     }
-                    if (isInProgress) {
-                        addObjects(model.getTask(),
-                                model.getCreatedAt(),
-                                model.getLevel(),
-                                model,
-                                getChild,
-                                isCHS,
-                                isCHSAssigned,
-                                isMandated,
-                                isMandatedAssigned);
-                    }
 
                 }
+                if (isInProgress) {
+                    addObjects(model.getTask(),
+                            model.getCreatedAt(),
+                            model.getLevel(),
+                            model,
+                            getChild,
+                            isCHS,
+                            isCHSAssigned,
+                            isMandated,
+                            isMandatedAssigned);
+                }
+
             }
 
             @Override
@@ -425,6 +438,9 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                     name,
                     model.getDepartment(),
                     model.getAsignee(),
+                    model.getCreatedByAgencyId(),
+                    model.getCreatedByCountryId(),
+                    model.getNetworkId(),
                     model.getIsArchived(),
                     model.getIsComplete(),
                     createdAt,
@@ -445,5 +461,6 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     public void onCancelled(DatabaseError databaseError) {
 
     }
+
 
 }
