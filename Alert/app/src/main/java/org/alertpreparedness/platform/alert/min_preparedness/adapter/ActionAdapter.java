@@ -158,12 +158,12 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
                 }
             });
-        } else {
+        }
+        else {
             holder.tvUserName.setText("Unassigned");
         }
 
     }
-
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -195,7 +195,8 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     private String getDate(Long date) {
         if (date != null) {
             return "Due: " + format.format(new Date(date));
-        } else {
+        }
+        else {
             return "Not Assigned";
         }
     }
