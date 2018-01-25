@@ -82,6 +82,7 @@ public class ActionExpiredFragment extends InProgressFragment {
     private Boolean isInProgress = false;
     private int freqBase = 0;
     private int freqValue = 0;
+    private String ids[] = {};
 
     @Nullable
     @Override
@@ -110,41 +111,46 @@ public class ActionExpiredFragment extends InProgressFragment {
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionRef.addValueEventListener(this);
+        dbActionBaseRef.addValueEventListener(this);
     }
 
 
     public ActionAdapter getmAdapter() {
-        return new ActionAdapter(getContext(), dbActionRef, this);
+        return new ActionAdapter(getContext(), dbActionBaseRef, this);
     }
 
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-            String actionIDs = getChild.getKey();
-            System.out.println("getChild = " + getChild);
-            DataModel model = getChild.getValue(DataModel.class);
+        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
 
-            if (getChild.child("frequencyBase").getValue() != null) {
-                model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
-            }
-            if (getChild.child("frequencyValue").getValue() != null) {
-                model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
-            }
+        for (String id : ids) {
+            System.out.println("id Expired= " + id);
+            for (DataSnapshot getChild : dataSnapshot.child(id).getChildren()) {
+                String actionIDs = getChild.getKey();
+                System.out.println("getChild Expired= " + getChild);
+                DataModel model = getChild.getValue(DataModel.class);
 
-            if (model.getType() == 0) {
-                getCHS(model, actionIDs);
-            } else if (model.getType() == 1) {
-                getMandated(model, actionIDs);
-            } else {
-                getCustom(model, getChild);
-            }
+                if (getChild.child("frequencyBase").getValue() != null) {
+                    model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
+                }
+                if (getChild.child("frequencyValue").getValue() != null) {
+                    model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
+                }
 
+                if (model.getType() == 0) {
+                    getCHS(model, actionIDs, id);
+                } else if (model.getType() == 1) {
+                    getMandated(model, actionIDs, id);
+                } else {
+                    getCustom(model, getChild, id);
+                }
+
+            }
         }
     }
 
-    private void getCustom(DataModel model, DataSnapshot getChild) {
+    private void getCustom(DataModel model, DataSnapshot getChild, String id) {
 
         countryOffice.child(user.agencyAdminID).child(user.countryID).child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -152,6 +158,7 @@ public class ActionExpiredFragment extends InProgressFragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Long durationType = (Long) dataSnapshot.child("durationType").getValue();
                 Long value = (Long) dataSnapshot.child("value").getValue();
+                System.out.println("model Custom Action = " + model);
 
                 if (value != null) {
                     if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_WEEK) {
@@ -188,13 +195,17 @@ public class ActionExpiredFragment extends InProgressFragment {
                     }
                 }
 
+                System.out.println("isInProgress = " + isInProgress);
+
                 if (!isInProgress) {
+                    System.out.println("model isInProgress= " + model);
                     addObjects(model.getTask(),
                             model.getDepartment(),
                             model.getCreatedAt(),
                             model.getLevel(),
                             model,
                             getChild,
+                            id,
                             isCHS,
                             isCHSAssigned,
                             isMandated,
@@ -210,7 +221,7 @@ public class ActionExpiredFragment extends InProgressFragment {
         });
     }
 
-    private void getCHS(DataModel model, String actionIDs) {
+    private void getCHS(DataModel model, String actionIDs, String id) {
         dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -259,6 +270,7 @@ public class ActionExpiredFragment extends InProgressFragment {
                                             CHSlevel,
                                             model,
                                             getChild,
+                                            id,
                                             isCHS,
                                             isCHSAssigned,
                                             isMandated,
@@ -285,7 +297,7 @@ public class ActionExpiredFragment extends InProgressFragment {
         });
     }
 
-    private void getMandated(DataModel model, String actionIDs) {
+    private void getMandated(DataModel model, String actionIDs, String id) {
         dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -308,6 +320,7 @@ public class ActionExpiredFragment extends InProgressFragment {
                                     manLevel,
                                     model,
                                     getChild,
+                                    id,
                                     isCHS,
                                     isCHSAssigned,
                                     isMandated,
@@ -326,7 +339,7 @@ public class ActionExpiredFragment extends InProgressFragment {
     }
 
     private void addObjects(String name, String department, Long createdAt, Long level,
-                            DataModel model, DataSnapshot getChild, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
+                            DataModel model, DataSnapshot getChild, String id, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
 
         if (user.getUserID().equals(model.getAsignee()) //MPA CUSTOM assigned and EXPIRED for logged in user.
                 && model.getLevel() != null
@@ -348,23 +361,29 @@ public class ActionExpiredFragment extends InProgressFragment {
 
             txtNoAction.setVisibility(View.GONE);
 
-//            mExpiredAdapter.addItems(getChild.getKey(), new Action(
-//                    name,
-//                    department,
-//                    model.getAsignee(),
-//                    model.getIsArchived(),
-//                    model.getIsComplete(),
-//                    createdAt,
-//                    model.getUpdatedAt(),
-//                    model.getType(),
-//                    model.getDueDate(),
-//                    model.getBudget(),
-//                    level,
-//                    model.getFrequencyBase(),
-//                    freqValue,
-//                    dbAgencyRef.getRef(),
-//                    dbUserPublicRef.getRef())
-//            );
+            mExpiredAdapter.addItems(getChild.getKey(), new Action(
+                    id,
+                    name,
+                    department,
+                    model.getAsignee(),
+                    model.getCreatedByAgencyId(),
+                    model.getCreatedByCountryId(),
+                    model.getNetworkId(),
+                    model.getIsArchived(),
+                    model.getIsComplete(),
+                    createdAt,
+                    model.getUpdatedAt(),
+                    model.getType(),
+                    model.getDueDate(),
+                    model.getBudget(),
+                    level,
+                    model.getFrequencyBase(),
+                    freqValue,
+                    user,
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef(),
+                    dbNetworkRef)
+            );
         }
     }
 

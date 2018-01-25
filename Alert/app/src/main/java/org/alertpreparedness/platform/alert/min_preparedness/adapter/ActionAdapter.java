@@ -19,6 +19,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.fragment.InProgress
 import org.alertpreparedness.platform.alert.min_preparedness.interfaces.OnItemsChangedListener;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
+import org.alertpreparedness.platform.alert.model.User;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -92,7 +93,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     @Override
     public void onBindViewHolder(ActionAdapter.ViewHolder holder, int position) {
         Action action = items.get(keys.get(position));
-        getDepartment(action.db, action.userRef, action.getDepartment(), action.getNetworkId(), action.getAssignee(), holder);
+        getDepartment(action.db, action.userRef, action.networkRef, action.user, action.getId(), action.getDepartment(), action.getNetworkId(), action.getAssignee(), holder);
         holder.tvActionType.setText(getActionType((int) action.getActionType()));
         holder.tvActionName.setText(action.getTaskName());
         holder.tvBudget.setText(getBudget(action.getBudget()));
@@ -117,7 +118,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     }
 
-    private void getDepartment(DatabaseReference db, DatabaseReference userRef, String departmentID, String networkID, String assignee, ActionAdapter.ViewHolder holder) {
+    private void getDepartment(DatabaseReference db, DatabaseReference userRef, DatabaseReference networkRef, User user, String id, String departmentID, String networkID, String assignee, ActionAdapter.ViewHolder holder) {
 
         db.addListenerForSingleValueEvent(new ValueEventListener() {
 
@@ -127,9 +128,13 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
                     String department = (String) dataSnapshot.child("departments").child(departmentID).child("name").getValue();
                     setUser(holder, userRef, assignee, department);
                 } else if (networkID != null){
-
-                } else {
-                    setUser(holder, userRef, assignee, null);
+                    System.out.println("networkID = " + networkID);
+                    setNetworkUser(holder, userRef, networkRef, assignee, networkID, user);
+                } else if (id.equals(user.getLocalNetworkID())){
+                    setLocalNetworkUser(holder, userRef, networkRef, assignee, id, user);
+                }
+                else {
+                    setUser(holder, userRef, null, null);
                 }
             }
 
@@ -138,6 +143,69 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
             }
         });
+
+    }
+
+    private void setLocalNetworkUser(ViewHolder holder, DatabaseReference userRef, DatabaseReference networkRef, String assignee, String id, User user) {
+        networkRef.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String name = (String) dataSnapshot.child("name").getValue();
+                System.out.println("name IN LOCAL = " + name);
+                userRef.child(assignee).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String firstname = (String) dataSnapshot.child("firstName").getValue();
+                        String lastname = (String) dataSnapshot.child("lastName").getValue();
+                        String fullname = String.format("%s %s", firstname, lastname);
+                        holder.tvUserName.setText(fullname + ", " + name);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void setNetworkUser(ViewHolder holder, DatabaseReference userRef, DatabaseReference networkRef, String assignee, String networkID, User user) {
+        if (assignee != null && networkID != null) {
+            //System.out.println("user.getLocalNetworkID() = " + user.getLocalNetworkID());
+            networkRef.child(networkID).addListenerForSingleValueEvent(new ValueEventListener() {
+
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String name = (String) dataSnapshot.child("name").getValue();
+
+                    userRef.child(assignee).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            String firstname = (String) dataSnapshot.child("firstName").getValue();
+                            String lastname = (String) dataSnapshot.child("lastName").getValue();
+                            String fullname = String.format("%s %s", firstname, lastname);
+                            holder.tvUserName.setText(fullname + ", " + name);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
 
     }
 
@@ -158,9 +226,10 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
                 }
             });
-        } else {
-            holder.tvUserName.setText("Unassigned");
         }
+//        else {
+//            holder.tvUserName.setText("Unassigned");
+//        }
 
     }
 

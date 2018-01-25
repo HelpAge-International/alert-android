@@ -32,6 +32,7 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseCountryOfficeRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
@@ -67,6 +68,10 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     @Nullable
     @BindView(R.id.tvNoAction)
     TextView txtNoAction;
+
+    @Inject
+    @NetworkRef
+    DatabaseReference dbNetworkRef;
 
     @Inject
     @ActionRef
@@ -107,7 +112,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     private Boolean isInProgress = false;
     private int freqBase = 0;
     private int freqValue = 0;
-    String ids[] = {};
+    private String ids[] = {};
 
     @Nullable
     @Override
@@ -178,18 +183,13 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
         ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
 
         for (String id : ids) {
-
-            System.out.println("id = " + id);
+            System.out.println("iddddddddd = " + id);
             System.out.println("GET NETWORK ACTION " + dataSnapshot.child(id).getValue());
 
             for (DataSnapshot getChild : dataSnapshot.child(id).getChildren()) {
 
                 String actionIDs = getChild.getKey();
-
-                // System.out.println("user.getCountryID() = " + user.getCountryID());
-//                System.out.println("user.getNetworkCountryID() = " + user.getNetworkCountryID());
-//                System.out.println("user.getLocalNetworkID() = " + user.getLocalNetworkID());
-//                System.out.println("user.getNetworkID() = " + user.getNetworkID());
+                
                 DataModel model = getChild.getValue(DataModel.class);
 
                 if (getChild.child("frequencyBase").getValue() != null) {
@@ -200,18 +200,18 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                 }
 
                 if (model.getType() != null && model.getType() == 0) {
-                    getCHS(model, actionIDs);
+                    getCHS(model, actionIDs, id);
                 } else if (model.getType() != null && model.getType() == 1) {
-                    getMandated(model, actionIDs);
+                    getMandated(model, actionIDs, id);
                 } else if (model.getType() != null && model.getType() == 2){
                     System.out.println("model = " + model);
-                    getCustom(model, getChild);
+                    getCustom(model, getChild, id);
                 }
             }
         }
     }
 
-    private void getCustom(DataModel model, DataSnapshot getChild) {
+    private void getCustom(DataModel model, DataSnapshot getChild, String id) {
 
         countryOffice.child(user.agencyAdminID).child(user.countryID).child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -267,6 +267,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                             model.getLevel(),
                             model,
                             getChild,
+                            id,
                             isCHS,
                             isCHSAssigned,
                             isMandated,
@@ -283,7 +284,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
 
     }
 
-    private void getCHS(DataModel model, String actionIDs) {
+    private void getCHS(DataModel model, String actionIDs, String id) {
         dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -343,6 +344,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                                             CHSlevel,
                                             model,
                                             getChild,
+                                            id,
                                             isCHS,
                                             isCHSAssigned,
                                             isMandated,
@@ -367,7 +369,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
         });
     }
 
-    private void getMandated(DataModel model, String actionIDs) {
+    private void getMandated(DataModel model, String actionIDs, String id) {
         dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -389,6 +391,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                                     manLevel,
                                     model,
                                     getChild,
+                                    id,
                                     isCHS,
                                     isCHSAssigned,
                                     isMandated,
@@ -406,7 +409,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     }
 
     private void addObjects(String name, Long createdAt, Long level,
-                            DataModel model, DataSnapshot getChild, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
+                            DataModel model, DataSnapshot getChild, String id, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
         System.out.println("model.getTask() = " + model.getTask());
         if (user.getUserID().equals(model.getAsignee()) //MPA Custom assigned and in-progress for logged in user.
                 && model.getAsignee() != null
@@ -432,9 +435,11 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                 && (model.getIsCompleteAt() == null && model.getIsComplete() == null || model.getIsCompleteAt() == null && !model.getIsComplete())
                 && name != null)) {
 
+            System.out.println("name = " + name);
             txtNoAction.setVisibility(View.GONE);
 
             mAdapter.addItems(getChild.getKey(), new Action(
+                    id,
                     name,
                     model.getDepartment(),
                     model.getAsignee(),
@@ -451,8 +456,10 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                     level,
                     model.getFrequencyBase(),
                     freqValue,
+                    user,
                     dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef())
+                    dbUserPublicRef.getRef(),
+                    dbNetworkRef.getRef())
             );
         }
     }

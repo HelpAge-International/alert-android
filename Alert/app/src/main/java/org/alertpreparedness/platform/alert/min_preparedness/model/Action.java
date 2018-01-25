@@ -4,11 +4,14 @@ import android.net.Uri;
 
 import com.google.firebase.database.DatabaseReference;
 
+import org.alertpreparedness.platform.alert.model.User;
+
 /**
  * Created by faizmohideen on 13/12/2017.
  */
 
 public class Action {
+    private String id;
     private Boolean isArchived;
     private Boolean isComplete;
     private Boolean isInProgress;
@@ -27,8 +30,10 @@ public class Action {
     private Long createdAt;
     private Long updatedAt;
     private Uri path;
+    public User user;
     public DatabaseReference db;
     public DatabaseReference userRef;
+    public DatabaseReference networkRef;
 
     public Action() {
     }
@@ -41,8 +46,9 @@ public class Action {
         this.isInProgress = isInProgress;
     }
 
-    public Action(String taskName, String department, String assignee, String createdByAgencyId, String createdByCountryId, String networkId, Boolean isArchived, Boolean isComplete, Long createdAt, Long updatedAt,
-                  Long actionType, Long dueDate, Long budget, Long level, Long frequencyBase, Integer frequencyValue, DatabaseReference db, DatabaseReference userRef) {
+    public Action(String id, String taskName, String department, String assignee, String createdByAgencyId, String createdByCountryId, String networkId, Boolean isArchived, Boolean isComplete, Long createdAt, Long updatedAt,
+                  Long actionType, Long dueDate, Long budget, Long level, Long frequencyBase, Integer frequencyValue, User user, DatabaseReference db, DatabaseReference userRef, DatabaseReference networkRef) {
+        this.id = id;
         this.taskName = taskName;
         this.department = department;
         this.assignee = assignee;
@@ -59,8 +65,18 @@ public class Action {
         this.level = level;
         this.frequencyBase = frequencyBase;
         this.frequencyValue = frequencyValue;
+        this.user = user;
         this.db = db;
         this.userRef = userRef;
+        this.networkRef = networkRef;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getCreatedByAgencyId() {
@@ -207,10 +223,27 @@ public class Action {
         this.path = path;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public DatabaseReference getNetworkRef() {
+        return networkRef;
+    }
+
+    public void setNetworkRef(DatabaseReference networkRef) {
+        this.networkRef = networkRef;
+    }
+
     @Override
     public String toString() {
         return "Action{" +
-                "isArchived=" + isArchived +
+                "id='" + id + '\'' +
+                ", isArchived=" + isArchived +
                 ", isComplete=" + isComplete +
                 ", isInProgress=" + isInProgress +
                 ", taskName='" + taskName + '\'' +
@@ -230,6 +263,7 @@ public class Action {
                 ", path=" + path +
                 ", db=" + db +
                 ", userRef=" + userRef +
+                ", networkRef=" + networkRef +
                 '}';
     }
 }

@@ -61,11 +61,9 @@ public class ActionUnassignedFragment extends InProgressFragment {
     @BaseActionRef
     DatabaseReference baseActionRef;
 
-    @Inject
-    User user;
-
     private ActionAdapter mUnassignedAdapter;
     private int freqValue = 0;
+    private String ids[] = {};
 
     @Nullable
     @Override
@@ -93,45 +91,46 @@ public class ActionUnassignedFragment extends InProgressFragment {
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionRef.addValueEventListener(this);
+        dbActionBaseRef.addValueEventListener(this);
     }
-
 
     @Override
     protected ActionAdapter getmAdapter() {
-        return new ActionAdapter(getContext(), dbActionRef, this);
+        return new ActionAdapter(getContext(), dbActionBaseRef, this);
     }
 
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        if (dataSnapshot.getValue() != null) {
-            for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                String actionIDs = getChild.getKey();
-                DataModel model = getChild.getValue(DataModel.class);
+       // System.out.println("user = " + user);
+        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
 
-                if (getChild.child("frequencyBase").getValue() != null) {
-                    model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
-                }
-                if (getChild.child("frequencyValue").getValue() != null) {
-                    model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
-                }
+        for (String id : ids) {
+            if (dataSnapshot.getValue() != null && id != null) {
+                for (DataSnapshot getChild : dataSnapshot.child(id).getChildren()) {
+                    String actionIDs = getChild.getKey();
+                    DataModel model = getChild.getValue(DataModel.class);
 
-                //if (model.getType() == 0) {
-                getCHS(model, actionIDs);
-                //  } else if (model.getType() == 1) {
-                getMandated(model, actionIDs);
-                //  } else {
-                getCustom(model, getChild);
-                // }
+                    if (getChild.child("frequencyBase").getValue() != null) {
+                        model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
+                    }
+
+                    if (getChild.child("frequencyValue").getValue() != null) {
+                        model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
+                    }
+
+                    getCHS(model, actionIDs, id);
+                    getMandated(model, actionIDs, id);
+                    getCustom(model, getChild, id);
+                }
+            } else {
+                getCHSForNewUser(id);
+                getMandatedForNewUser(id);
             }
-        } else {
-            getCHSForNewUser();
-            getMandatedForNewUser();
         }
     }
 
-    private void getCustom(DataModel model, DataSnapshot getChild) {
+    private void getCustom(DataModel model, DataSnapshot getChild, String id) {
 
         if (model.getLevel() != null //MPA CUSTOM UNASSIGNED // NO USERS.
                 && model.getLevel() == Constants.MPA
@@ -139,57 +138,68 @@ public class ActionUnassignedFragment extends InProgressFragment {
                 && model.getTask() != null) {
 
             txtNoAction.setVisibility(View.GONE);
-//            mUnassignedAdapter.addItems(getChild.getKey(), new Action(
-//                    model.getTask(),
-//                    model.getDepartment(),
-//                    model.getAsignee(),
-//                    model.getIsArchived(),
-//                    model.getIsComplete(),
-//                    model.getCreatedAt(),
-//                    model.getUpdatedAt(),
-//                    model.getType(),
-//                    model.getDueDate(),
-//                    model.getBudget(),
-//                    model.getLevel(),
-//                    model.getFrequencyBase(),
-//                    freqValue,
-//                    dbAgencyRef.getRef(),
-//                    dbUserPublicRef.getRef())
-//            );
+            mUnassignedAdapter.addItems(getChild.getKey(), new Action(
+                    id,
+                    model.getTask(),
+                    model.getDepartment(),
+                    model.getAsignee(),
+                    model.getCreatedByAgencyId(),
+                    model.getCreatedByCountryId(),
+                    model.getNetworkId(),
+                    model.getIsArchived(),
+                    model.getIsComplete(),
+                    model.getCreatedAt(),
+                    model.getUpdatedAt(),
+                    model.getType(),
+                    model.getDueDate(),
+                    model.getBudget(),
+                    model.getLevel(),
+                    model.getFrequencyBase(),
+                    freqValue,
+                    user,
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef(),
+                    dbNetworkRef)
+            );
         }
     }
 
-    private void getCHS(DataModel model, String actionIDs) {
+    private void getCHS(DataModel model, String actionIDs, String id) {
         dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot getChild : dataSnapshot.getChildren()) {
 
                     if (!actionIDs.equals(getChild.getKey())) {
-                        System.out.println("getChild.getKey() = " + getChild.getKey());
 
                         String CHSTaskName = (String) getChild.child("task").getValue();
                         Long CHSlevel = (Long) getChild.child("level").getValue();
                         Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
 
                             txtNoAction.setVisibility(View.GONE);
-//                            mUnassignedAdapter.addItems(getChild.getKey(), new Action(
-//                                    CHSTaskName,
-//                                    null,
-//                                    null,
-//                                    null,
-//                                    null,
-//                                    CHSCreatedAt,
-//                                    null,
-//                                    (long) 0, //CHS always 0
-//                                    null,
-//                                    null,
-//                                    CHSlevel,
-//                                    null,
-//                                    null,
-//                                    dbAgencyRef.getRef(),
-//                                    dbUserPublicRef.getRef())
-//                            );
+                            mUnassignedAdapter.addItems(getChild.getKey(), new Action(
+                                    id,
+                                    CHSTaskName,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    CHSCreatedAt,
+                                    null,
+                                    (long) 0, //CHS always 0
+                                    null,
+                                    null,
+                                    CHSlevel,
+                                    null,
+                                    null,
+                                    user,
+                                    dbAgencyRef.getRef(),
+                                    dbUserPublicRef.getRef(),
+                                    dbNetworkRef)
+                            );
 
                     }
                 }
@@ -202,7 +212,7 @@ public class ActionUnassignedFragment extends InProgressFragment {
         });
     }
 
-    private void getMandated(DataModel model, String actionIDs) {
+    private void getMandated(DataModel model, String actionIDs, String id) {
         dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -216,23 +226,29 @@ public class ActionUnassignedFragment extends InProgressFragment {
                             Long manLevel = (Long) getChild.child("level").getValue();
 
                             txtNoAction.setVisibility(View.GONE);
-//                            mUnassignedAdapter.addItems(getChild.getKey(), new Action(
-//                                    taskNameMandated,
-//                                    departmentMandated,
-//                                    null,
-//                                    null,
-//                                    null,
-//                                    manCreatedAt,
-//                                    null,
-//                                    (long) 1, //Mandated always 1
-//                                    null,
-//                                    null,
-//                                    manLevel,
-//                                    null,
-//                                    null,
-//                                    dbAgencyRef.getRef(),
-//                                    dbUserPublicRef.getRef())
-//                            );
+                            mUnassignedAdapter.addItems(getChild.getKey(), new Action(
+                                    id,
+                                    taskNameMandated,
+                                    departmentMandated,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    manCreatedAt,
+                                    null,
+                                    (long) 1, //Mandated always 1
+                                    null,
+                                    null,
+                                    manLevel,
+                                    null,
+                                    null,
+                                    user,
+                                    dbAgencyRef.getRef(),
+                                    dbUserPublicRef.getRef(),
+                                    dbNetworkRef)
+                            );
 
                         } catch (Exception exception) {
                             System.out.println("exception = " + exception);
@@ -249,7 +265,7 @@ public class ActionUnassignedFragment extends InProgressFragment {
 
     }
 
-    private void getMandatedForNewUser() {
+    private void getMandatedForNewUser(String id) {
         dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -262,23 +278,29 @@ public class ActionUnassignedFragment extends InProgressFragment {
                         Long manLevel = (Long) getChild.child("level").getValue();
 
                         txtNoAction.setVisibility(View.GONE);
-//                        mUnassignedAdapter.addItems(getChild.getKey(), new Action(
-//                                taskNameMandated,
-//                                departmentMandated,
-//                                null,
-//                                null,
-//                                null,
-//                                manCreatedAt,
-//                                null,
-//                                (long) 1, //Mandated always 1
-//                                null,
-//                                null,
-//                                manLevel,
-//                                null,
-//                                null,
-//                                dbAgencyRef.getRef(),
-//                                dbUserPublicRef.getRef())
-//                        );
+                        mUnassignedAdapter.addItems(getChild.getKey(), new Action(
+                                id,
+                                taskNameMandated,
+                                departmentMandated,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                manCreatedAt,
+                                null,
+                                (long) 1, //Mandated always 1
+                                null,
+                                null,
+                                manLevel,
+                                null,
+                                null,
+                                user,
+                                dbAgencyRef.getRef(),
+                                dbUserPublicRef.getRef(),
+                                dbNetworkRef)
+                        );
 
                     } catch (Exception exception) {
                         System.out.println("exception = " + exception);
@@ -294,7 +316,7 @@ public class ActionUnassignedFragment extends InProgressFragment {
 
     }
 
-    private void getCHSForNewUser() {
+    private void getCHSForNewUser(String id) {
         dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -305,23 +327,29 @@ public class ActionUnassignedFragment extends InProgressFragment {
                     Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
 
                     txtNoAction.setVisibility(View.GONE);
-//                    mUnassignedAdapter.addItems(getChild.getKey(), new Action(
-//                            CHSTaskName,
-//                            null,
-//                            null,
-//                            null,
-//                            null,
-//                            CHSCreatedAt,
-//                            null,
-//                            (long) 0, //CHS always 0
-//                            null,
-//                            null,
-//                            CHSlevel,
-//                            null,
-//                            null,
-//                            dbAgencyRef.getRef(),
-//                            dbUserPublicRef.getRef())
-//                    );
+                    mUnassignedAdapter.addItems(getChild.getKey(), new Action(
+                            id,
+                            CHSTaskName,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            CHSCreatedAt,
+                            null,
+                            (long) 0, //CHS always 0
+                            null,
+                            null,
+                            CHSlevel,
+                            null,
+                            null,
+                            user,
+                            dbAgencyRef.getRef(),
+                            dbUserPublicRef.getRef(),
+                            dbNetworkRef)
+                    );
                 }
             }
 
