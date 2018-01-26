@@ -47,6 +47,7 @@ import com.google.firebase.storage.UploadTask;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseStorageRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.DocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
@@ -109,6 +110,10 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     DatabaseReference dbActionRef;
 
     @Inject
+    @BaseActionRef
+    DatabaseReference dbActionBaseRef;
+
+    @Inject
     @DocumentRef
     DatabaseReference dbDocRef;
 
@@ -122,6 +127,8 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     private static final int REQUEST_CODE = 6384;
     private static final int VIDEO_REQUEST_CODE = 104;
     private static final int IMG_REQUEST_CODE = 0;
+    private DatabaseReference ref;
+    private StorageReference riversRef;
 
     SimpleAdapter simpleAdapter;
 
@@ -287,15 +294,34 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     private void saveData(String texts) {
         Intent intent = getIntent();
         String key = intent.getStringExtra("ACTION_KEY");
-        saveNote(texts, key);
+        String userTypeID = intent.getStringExtra("USER_KEY");
+        System.out.println("userTypeID = " + userTypeID);
+        saveNote(texts, key, userTypeID);
         System.out.println("imgList.size() = " + imgList.size());
         System.out.println("imgList = " + imgList);
 
         for (int i = 0; i < imgList.size(); i++) {
-            DatabaseReference ref = dbActionRef.child(key).child("documents").push();
+
+            if(userTypeID.equals(user.getCountryID())) {
+                ref = dbActionRef.child(key).child("documents").push();
+                ref.setValue(true);
+                riversRef = mStorageRef.child("documents/" + user.getCountryID() + "/" + ref.getKey() + "/" + imgList.get(i));
+            } else if(userTypeID.equals(user.getLocalNetworkID())){
+                ref = dbActionBaseRef.child(user.getLocalNetworkID()).child(key).child("documents").push();
+                ref.setValue(true);
+                riversRef = mStorageRef.child("documents/" + user.getLocalNetworkID() + "/" + ref.getKey() + "/" + imgList.get(i));
+            } else if(userTypeID.equals(user.getNetworkID())){
+                ref = dbActionBaseRef.child(user.getNetworkID()).child(key).child("documents").push();
+                ref.setValue(true);
+                riversRef = mStorageRef.child("documents/" + user.getNetworkID() + "/" + ref.getKey() + "/" + imgList.get(i));
+            }  else if (userTypeID.equals(user.getNetworkCountryID())){
+                ref = dbActionBaseRef.child(user.getNetworkCountryID()).child(key).child("documents").push();
+                ref.setValue(true);
+                riversRef = mStorageRef.child("documents/" + user.getNetworkCountryID() + "/" + ref.getKey() + "/" + imgList.get(i));
+            }
+
             System.out.println("ref = " + ref);
-            ref.setValue(true);
-            StorageReference riversRef = mStorageRef.child("documents/" + user.getCountryID() + "/" + ref.getKey() + "/" + imgList.get(i));
+
 
             System.out.println("riversRef = " + riversRef);
             System.out.println("saveimgList = " + imgList);
@@ -308,7 +334,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
                         Long size = taskSnapshot.getMetadata().getSizeBytes();
                         double sizeInKb = size / KB;
                         Long time = System.currentTimeMillis();
-
+                        //TODO Bug fix: Documents must be saved to the right node under document/[userTypeID]/actionID/.setValue(info);
                         FileInfo info = new FileInfo(title, downloadUri, Long.valueOf(0), sizeInKb, Long.valueOf(0), time, title, user.getUserID());
                         dbDocRef.child(ref.getKey()).setValue(info);
                     })
@@ -325,15 +351,27 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
         simpleAdapter.notifyDataSetChanged();
     }
 
-    public void saveNote(String texts, String key) {
+    public void saveNote(String texts, String key, String userTypeID) {
         if (!TextUtils.isEmpty(texts)) {
             String id = dbNoteRef.child(key).push().getKey();
             String userID = PreferHelper.getString(getApplicationContext(), Constants.AGENCY_ID);
             Long millis = System.currentTimeMillis();
 
             Notes notes = new Notes(texts, millis, userID);
-            dbActionRef.child(key).child("isComplete").setValue(true);
-            dbActionRef.child(key).child("isCompleteAt").setValue(millis);
+
+            if(userTypeID.equals(user.getCountryID())) {
+                dbActionRef.child(key).child("isComplete").setValue(true);
+                dbActionRef.child(key).child("isCompleteAt").setValue(millis);
+            }else if (userTypeID.equals(user.getNetworkID())) {
+                dbActionBaseRef.child(user.getNetworkID()).child(key).child("isComplete").setValue(true);
+                dbActionBaseRef.child(user.getNetworkID()).child(key).child("isCompleteAt").setValue(millis);
+            }else if (userTypeID.equals(user.getNetworkCountryID())){
+                dbActionBaseRef.child(user.getNetworkCountryID()).child(key).child("isComplete").setValue(true);
+                dbActionBaseRef.child(user.getNetworkCountryID()).child(key).child("isCompleteAt").setValue(millis);
+            }else if (userTypeID.equals(user.getLocalNetworkID())){
+                dbActionBaseRef.child(user.getLocalNetworkID()).child(key).child("isComplete").setValue(true);
+                dbActionBaseRef.child(user.getLocalNetworkID()).child(key).child("isCompleteAt").setValue(millis);
+            }
             dbNoteRef.child(key).child(id).setValue(notes);
 
 //            Intent intent = new Intent(CompleteActionActivity.this, HomeScreen.class);

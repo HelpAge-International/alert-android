@@ -58,6 +58,7 @@ public class ActionCompletedFragment extends InProgressFragment {
     private Boolean isInProgress = false;
     private int freqBase = 0;
     private int freqValue = 0;
+    private String ids[] = {};
 
     @Nullable
     @Override
@@ -81,46 +82,51 @@ public class ActionCompletedFragment extends InProgressFragment {
         tvActionCompleted.setTextColor(getResources().getColor(R.color.alertGreen));
 
         mAdapter = getmAdapter();
+        assert mActionRV != null;
         mActionRV.setAdapter(mAdapter);
 
         mActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionRef.addValueEventListener(this);
+        dbActionBaseRef.addValueEventListener(this);
     }
 
     @Override
     protected ActionAdapter getmAdapter() {
-        return new ActionAdapter(getContext(), dbActionRef, this);
+        return new ActionAdapter(getContext(), dbActionBaseRef, this);
     }
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
-        for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-            String actionIDs = getChild.getKey();
-            System.out.println("getChild = " + getChild);
-            DataModel model = getChild.getValue(DataModel.class);
+    public void process(DataSnapshot dataSnapshot) {
+        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
 
-            if (getChild.child("frequencyBase").getValue() != null) {
-                model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
-            }
-            if (getChild.child("frequencyValue").getValue() != null) {
-                model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
-            }
+        for (String id : ids) {
+            for (DataSnapshot getChild : dataSnapshot.child(id).getChildren()) {
+                String actionIDs = getChild.getKey();
+                DataModel model = getChild.getValue(DataModel.class);
 
-            if (model.getType() == 0) {
-                getCHS(model, actionIDs);
-            } else if (model.getType() == 1) {
-                getMandated(model, actionIDs);
-            } else {
-                getCustom(model, getChild);
+                if (getChild.child("frequencyBase").getValue() != null) {
+                    model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
+                }
+                if (getChild.child("frequencyValue").getValue() != null) {
+                    model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
+                }
+
+                if (model.getType() != null && model.getType() == 0) {
+                    getCHS(model, actionIDs, id);
+                } else if (model.getType() != null && model.getType() == 1) {
+                    getMandated(model, actionIDs, id);
+                } else if (model.getType() != null && model.getType() == 2){
+                    System.out.println("model = " + model);
+                    getCustom(model, getChild, id);
+                }
             }
         }
     }
 
-    private void getCustom(DataModel model, DataSnapshot getChild) {
+    private void getCustom(DataModel model, DataSnapshot getChild, String id) {
         System.out.println("model = " + model);
         if (user.getUserID().equals(model.getAsignee()) //MPA CUSTOM assigned and COMPLETED for logged in user.
                 && model.getLevel() != null
@@ -130,27 +136,36 @@ public class ActionCompletedFragment extends InProgressFragment {
                 && model.getIsComplete()) {
 
             txtNoAction.setVisibility(View.GONE);
-//            mAdapter.addItems(getChild.getKey(), new Action(
-//                    model.getTask(),
-//                    model.getDepartment(),
-//                    model.getAsignee(),
-//                    model.getIsArchived(),
-//                    model.getIsComplete(),
-//                    model.getCreatedAt(),
-//                    model.getUpdatedAt(),
-//                    model.getType(),
-//                    model.getDueDate(),
-//                    model.getBudget(),
-//                    model.getLevel(),
-//                    model.getFrequencyBase(),
-//                    freqValue,
-//                    dbAgencyRef.getRef(),
-//                    dbUserPublicRef.getRef())
-//            );
+            mAdapter.addItems(getChild.getKey(), new Action(
+                    id,
+                    model.getTask(),
+                    model.getDepartment(),
+                    model.getAsignee(),
+                    model.getCreatedByAgencyId(),
+                    model.getCreatedByCountryId(),
+                    model.getNetworkId(),
+                    model.getIsArchived(),
+                    model.getIsComplete(),
+                    model.getCreatedAt(),
+                    model.getUpdatedAt(),
+                    model.getType(),
+                    model.getDueDate(),
+                    model.getBudget(),
+                    model.getLevel(),
+                    model.getFrequencyBase(),
+                    freqValue,
+                    user,
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef(),
+                    dbNetworkRef)
+            );
+        }
+        else {
+            mAdapter.removeItem(getChild.getKey());
         }
     }
 
-    private void getCHS(DataModel model, String actionIDs) {
+    private void getCHS(DataModel model, String actionIDs, String id) {
         dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -171,23 +186,32 @@ public class ActionCompletedFragment extends InProgressFragment {
                                 && model.getIsComplete()) {
 
                             txtNoAction.setVisibility(View.GONE);
-//                            mAdapter.addItems(getChild.getKey(), new Action(
-//                                    CHSTaskName,
-//                                    model.getDepartment(),
-//                                    model.getAsignee(),
-//                                    model.getIsArchived(),
-//                                    model.getIsComplete(),
-//                                    CHSCreatedAt,
-//                                    model.getUpdatedAt(),
-//                                    model.getType(),
-//                                    model.getDueDate(),
-//                                    model.getBudget(),
-//                                    CHSlevel,
-//                                    model.getFrequencyBase(),
-//                                    freqValue,
-//                                    dbAgencyRef.getRef(),
-//                                    dbUserPublicRef.getRef())
-//                            );
+                            mAdapter.addItems(getChild.getKey(), new Action(
+                                    id,
+                                    CHSTaskName,
+                                    model.getDepartment(),
+                                    model.getAsignee(),
+                                    model.getCreatedByAgencyId(),
+                                    model.getCreatedByCountryId(),
+                                    model.getNetworkId(),
+                                    model.getIsArchived(),
+                                    model.getIsComplete(),
+                                    CHSCreatedAt,
+                                    model.getUpdatedAt(),
+                                    model.getType(),
+                                    model.getDueDate(),
+                                    model.getBudget(),
+                                    CHSlevel,
+                                    model.getFrequencyBase(),
+                                    freqValue,
+                                    user,
+                                    dbAgencyRef.getRef(),
+                                    dbUserPublicRef.getRef(),
+                                    dbNetworkRef)
+                            );
+                        }
+                        else {
+                            mAdapter.removeItem(getChild.getKey());
                         }
                     }
                 }
@@ -200,7 +224,7 @@ public class ActionCompletedFragment extends InProgressFragment {
         });
     }
 
-    private void getMandated(DataModel model, String actionIDs) {
+    private void getMandated(DataModel model, String actionIDs, String id) {
         dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -225,23 +249,32 @@ public class ActionCompletedFragment extends InProgressFragment {
                                 && model.getIsComplete()) {
 
                             txtNoAction.setVisibility(View.GONE);
-//                            mAdapter.addItems(getChild.getKey(), new Action(
-//                                    taskNameMandated,
-//                                    model.getDepartment(),
-//                                    model.getAsignee(),
-//                                    model.getIsArchived(),
-//                                    model.getIsComplete(),
-//                                    manCreatedAt,
-//                                    model.getUpdatedAt(),
-//                                    model.getType(),
-//                                    model.getDueDate(),
-//                                    model.getBudget(),
-//                                    manLevel,
-//                                    model.getFrequencyBase(),
-//                                    freqValue,
-//                                    dbAgencyRef.getRef(),
-//                                    dbUserPublicRef.getRef())
-//                            );
+                            mAdapter.addItems(getChild.getKey(), new Action(
+                                    id,
+                                    taskNameMandated,
+                                    model.getDepartment(),
+                                    model.getAsignee(),
+                                    model.getCreatedByAgencyId(),
+                                    model.getCreatedByCountryId(),
+                                    model.getNetworkId(),
+                                    model.getIsArchived(),
+                                    model.getIsComplete(),
+                                    manCreatedAt,
+                                    model.getUpdatedAt(),
+                                    model.getType(),
+                                    model.getDueDate(),
+                                    model.getBudget(),
+                                    manLevel,
+                                    model.getFrequencyBase(),
+                                    freqValue,
+                                    user,
+                                    dbAgencyRef.getRef(),
+                                    dbUserPublicRef.getRef(),
+                                    dbNetworkRef)
+                            );
+                        }
+                        else {
+                            mAdapter.removeItem(getChild.getKey());
                         }
                     }
                 }
@@ -256,7 +289,7 @@ public class ActionCompletedFragment extends InProgressFragment {
     }
 
     @Override
-    public void onActionItemSelected(int pos, String key) {
+    public void onActionItemSelected(int pos, String key, String userTypeID) {
         Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Currently under development!", Snackbar.LENGTH_LONG).show();
     }
 }

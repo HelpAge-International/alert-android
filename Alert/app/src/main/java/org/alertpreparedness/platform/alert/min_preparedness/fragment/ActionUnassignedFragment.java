@@ -101,10 +101,12 @@ public class ActionUnassignedFragment extends InProgressFragment {
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
-       // System.out.println("user = " + user);
+    public void process(DataSnapshot dataSnapshot) {
         ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
-
+        System.out.println("user.getNetworkCountryID() = " + user.getNetworkCountryID());
+        System.out.println("user.getLocalNetworkID() = " + user.getLocalNetworkID());
+        System.out.println("user.getNetworkID() = " + user.getNetworkID());
+        System.out.println("user.getCountryID() = " + user.getCountryID());
         for (String id : ids) {
             if (dataSnapshot.getValue() != null && id != null) {
                 for (DataSnapshot getChild : dataSnapshot.child(id).getChildren()) {
@@ -114,16 +116,23 @@ public class ActionUnassignedFragment extends InProgressFragment {
                     if (getChild.child("frequencyBase").getValue() != null) {
                         model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
                     }
-
                     if (getChild.child("frequencyValue").getValue() != null) {
                         model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
                     }
 
+                    if (model.getType() != null && model.getType() == 2) {
+                        System.out.println("model = " + model);
+                        getCustom(model, getChild, id);
+                    }
+
+                    //  if (model.getType() != null && model.getType() == 0) {
                     getCHS(model, actionIDs, id);
+                    // } else if (model.getType() != null && model.getType() == 1) {
+                    System.out.println("model = " + model);
                     getMandated(model, actionIDs, id);
-                    getCustom(model, getChild, id);
+
                 }
-            } else {
+            }else {
                 getCHSForNewUser(id);
                 getMandatedForNewUser(id);
             }
@@ -131,11 +140,12 @@ public class ActionUnassignedFragment extends InProgressFragment {
     }
 
     private void getCustom(DataModel model, DataSnapshot getChild, String id) {
-
+        System.out.println("getChild = " + getChild.getValue());
         if (model.getLevel() != null //MPA CUSTOM UNASSIGNED // NO USERS.
                 && model.getLevel() == Constants.MPA
                 && model.getAsignee() == null
                 && model.getTask() != null) {
+
 
             txtNoAction.setVisibility(View.GONE);
             mUnassignedAdapter.addItems(getChild.getKey(), new Action(
@@ -162,15 +172,20 @@ public class ActionUnassignedFragment extends InProgressFragment {
                     dbNetworkRef)
             );
         }
+        else {
+            mUnassignedAdapter.removeItem(getChild.getKey());
+        }
     }
 
     private void getCHS(DataModel model, String actionIDs, String id) {
+        System.out.println("model chs = " + model);
         dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot getChild : dataSnapshot.getChildren()) {
 
                     if (!actionIDs.equals(getChild.getKey())) {
+                        System.out.println("getChild.getKey() = " + getChild.getKey());
 
                         String CHSTaskName = (String) getChild.child("task").getValue();
                         Long CHSlevel = (Long) getChild.child("level").getValue();
@@ -201,6 +216,9 @@ public class ActionUnassignedFragment extends InProgressFragment {
                                     dbNetworkRef)
                             );
 
+                    }
+                    else {
+                        mUnassignedAdapter.removeItem(getChild.getKey());
                     }
                 }
             }
@@ -251,8 +269,12 @@ public class ActionUnassignedFragment extends InProgressFragment {
                             );
 
                         } catch (Exception exception) {
+                                mUnassignedAdapter.removeItem(getChild.getKey());
                             System.out.println("exception = " + exception);
                         }
+                    }
+                    else {
+                        mUnassignedAdapter.removeItem(getChild.getKey());
                     }
                 }
             }
@@ -303,9 +325,11 @@ public class ActionUnassignedFragment extends InProgressFragment {
                         );
 
                     } catch (Exception exception) {
+                        mUnassignedAdapter.removeItem(getChild.getKey());
                         System.out.println("exception = " + exception);
                     }
                 }
+
             }
 
             @Override
@@ -366,7 +390,7 @@ public class ActionUnassignedFragment extends InProgressFragment {
     }
 
     @Override
-    public void onActionItemSelected(int pos, String key) {
+    public void onActionItemSelected(int pos, String key, String userTypeID) {
         Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Currently under development!", Snackbar.LENGTH_LONG).show();
     }
 }

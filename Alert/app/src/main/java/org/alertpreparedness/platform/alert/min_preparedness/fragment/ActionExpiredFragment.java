@@ -114,21 +114,18 @@ public class ActionExpiredFragment extends InProgressFragment {
         dbActionBaseRef.addValueEventListener(this);
     }
 
-
     public ActionAdapter getmAdapter() {
         return new ActionAdapter(getContext(), dbActionBaseRef, this);
     }
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
+    public void process(DataSnapshot dataSnapshot) {
         ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
 
         for (String id : ids) {
-            System.out.println("id Expired= " + id);
             for (DataSnapshot getChild : dataSnapshot.child(id).getChildren()) {
                 String actionIDs = getChild.getKey();
-                System.out.println("getChild Expired= " + getChild);
                 DataModel model = getChild.getValue(DataModel.class);
 
                 if (getChild.child("frequencyBase").getValue() != null) {
@@ -138,19 +135,20 @@ public class ActionExpiredFragment extends InProgressFragment {
                     model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
                 }
 
-                if (model.getType() == 0) {
+                if (model.getType() != null && model.getType() == 0) {
                     getCHS(model, actionIDs, id);
-                } else if (model.getType() == 1) {
+                } else if (model.getType() != null && model.getType() == 1) {
                     getMandated(model, actionIDs, id);
-                } else {
-                    getCustom(model, getChild, id);
+                } else if (model.getType() != null && model.getType() == 2){
+                    System.out.println("model = " + model);
+                    getCustom(model, getChild, id, actionIDs);
                 }
-
             }
         }
+
     }
 
-    private void getCustom(DataModel model, DataSnapshot getChild, String id) {
+    private void getCustom(DataModel model, DataSnapshot getChild, String id, String actionIDs) {
 
         countryOffice.child(user.agencyAdminID).child(user.countryID).child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -195,10 +193,8 @@ public class ActionExpiredFragment extends InProgressFragment {
                     }
                 }
 
-                System.out.println("isInProgress = " + isInProgress);
-
                 if (!isInProgress) {
-                    System.out.println("model isInProgress= " + model);
+
                     addObjects(model.getTask(),
                             model.getDepartment(),
                             model.getCreatedAt(),
@@ -206,10 +202,14 @@ public class ActionExpiredFragment extends InProgressFragment {
                             model,
                             getChild,
                             id,
+                            actionIDs,
                             isCHS,
                             isCHSAssigned,
                             isMandated,
                             isMandatedAssigned);
+                }
+                else {
+                    mExpiredAdapter.removeItem(getChild.getKey());
                 }
 
             }
@@ -271,10 +271,14 @@ public class ActionExpiredFragment extends InProgressFragment {
                                             model,
                                             getChild,
                                             id,
+                                            actionIDs,
                                             isCHS,
                                             isCHSAssigned,
                                             isMandated,
                                             isMandatedAssigned);
+                                }
+                                else {
+                                    mExpiredAdapter.removeItem(getChild.getKey());
                                 }
 
                             }
@@ -321,10 +325,14 @@ public class ActionExpiredFragment extends InProgressFragment {
                                     model,
                                     getChild,
                                     id,
+                                    actionIDs,
                                     isCHS,
                                     isCHSAssigned,
                                     isMandated,
                                     isMandatedAssigned);
+                        }
+                        else {
+                            mExpiredAdapter.removeItem(getChild.getKey());
                         }
                     }
                 }
@@ -339,7 +347,7 @@ public class ActionExpiredFragment extends InProgressFragment {
     }
 
     private void addObjects(String name, String department, Long createdAt, Long level,
-                            DataModel model, DataSnapshot getChild, String id, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
+                            DataModel model, DataSnapshot getChild, String id, String actionIDs, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
 
         if (user.getUserID().equals(model.getAsignee()) //MPA CUSTOM assigned and EXPIRED for logged in user.
                 && model.getLevel() != null
@@ -360,7 +368,7 @@ public class ActionExpiredFragment extends InProgressFragment {
                 && model.getTask() != null)) {
 
             txtNoAction.setVisibility(View.GONE);
-
+            System.out.println("ID = "+id+" actionIDs = " + actionIDs);
             mExpiredAdapter.addItems(getChild.getKey(), new Action(
                     id,
                     name,
@@ -385,6 +393,9 @@ public class ActionExpiredFragment extends InProgressFragment {
                     dbNetworkRef)
             );
         }
+        else {
+            mExpiredAdapter.removeItem(getChild.getKey());
+        }
     }
 
     @Override
@@ -393,7 +404,7 @@ public class ActionExpiredFragment extends InProgressFragment {
     }
 
     @Override
-    public void onActionItemSelected(int pos, String key) {
+    public void onActionItemSelected(int pos, String key, String userTypeID) {
         SheetMenu.with(getContext()).setMenu(R.menu.menu_expired).setClick(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {

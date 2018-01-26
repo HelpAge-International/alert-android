@@ -34,7 +34,7 @@
         <activity
             android:name=".login.activity.LoginScreen"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan|adjustResize" />
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".dashboard.activity.HomeScreen"
             android:launchMode="singleTask"

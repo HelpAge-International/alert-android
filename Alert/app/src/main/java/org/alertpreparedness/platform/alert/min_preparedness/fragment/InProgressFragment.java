@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -149,39 +150,35 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     }
 
     @Override
-    public void onActionItemSelected(int pos, String key) {
-        SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress).setClick(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.complete_action:
-                        Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
-                        intent.putExtra("ACTION_KEY", key);
-                        startActivity(intent);
-                        break;
-                    case R.id.reassign_action:
-                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
-                        break;
-                    case R.id.action_notes:
-                        intent = new Intent(getActivity(), AddNotesActivity.class);
-                        intent.putExtra("ACTION_KEY", key);
-                        startActivity(intent);
-                        break;
-                    case R.id.attachments:
-                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
-                        break;
-                }
-                return false;
+    public void onActionItemSelected(int pos, String key, String userTypeID) {
+        SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress).setClick(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.complete_action:
+                    Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
+                    intent.putExtra("ACTION_KEY", key);
+                    intent.putExtra("USER_KEY", userTypeID);
+                    startActivity(intent);
+                    break;
+                case R.id.reassign_action:
+                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
+                    break;
+                case R.id.action_notes:
+                    intent = new Intent(getActivity(), AddNotesActivity.class);
+                    intent.putExtra("ACTION_KEY", key);
+                    startActivity(intent);
+                    break;
+                case R.id.attachments:
+                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
+                    break;
             }
+            return false;
         }).show();
     }
 
-
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
+    protected void process(DataSnapshot dataSnapshot) {
+        System.out.println("dataSnapshot = " + dataSnapshot);
         ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
-
+        System.out.println("user.getNetworkCountryID() = " + user.getNetworkCountryID());
         for (String id : ids) {
             System.out.println("iddddddddd = " + id);
             System.out.println("GET NETWORK ACTION " + dataSnapshot.child(id).getValue());
@@ -189,7 +186,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
             for (DataSnapshot getChild : dataSnapshot.child(id).getChildren()) {
 
                 String actionIDs = getChild.getKey();
-                
+
                 DataModel model = getChild.getValue(DataModel.class);
 
                 if (getChild.child("frequencyBase").getValue() != null) {
@@ -212,7 +209,6 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
     }
 
     private void getCustom(DataModel model, DataSnapshot getChild, String id) {
-
         countryOffice.child(user.agencyAdminID).child(user.countryID).child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
@@ -222,24 +218,17 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
 
                 if (value != null) {
                     if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_WEEK) {
-                        System.out.println("value 1 = " + value);
                         isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), value.intValue());
                     } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_WEEK) {
-                        System.out.println("value 2 = " + value);
                         isInProgress = DateHelper.isInProgressWeek(model.getUpdatedAt(), value.intValue());
                     } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_MONTH) {
-                        System.out.println("value 3 = " + value);
                         isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), value.intValue());
                     } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_MONTH) {
-                        System.out.println("value 4 = " + value);
                         isInProgress = DateHelper.isInProgressMonth(model.getUpdatedAt(), value.intValue());
                     } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_YEAR) {
-                        System.out.println("value 5 = " + value);
                         isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), value.intValue());
                     } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_YEAR) {
-                        System.out.println("value 6 = " + value);
                         isInProgress = DateHelper.isInProgressYear(model.getUpdatedAt(), value.intValue());
-                        System.out.println("isInProgress = " + isInProgress);
                     }
                 }
                 if (model.getFrequencyValue() != null && model.getFrequencyBase() != null) {
@@ -272,6 +261,8 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                             isCHSAssigned,
                             isMandated,
                             isMandatedAssigned);
+                } else {
+                    mAdapter.removeItem(dataSnapshot.getKey());
                 }
 
             }
@@ -297,7 +288,6 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                         isCHSAssigned = true;
 
                         countryOffice.child(user.agencyAdminID).child(user.countryID).child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @RequiresApi(api = Build.VERSION_CODES.N)
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 Long durationType = (Long) dataSnapshot.child("durationType").getValue();
@@ -349,6 +339,8 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                                             isCHSAssigned,
                                             isMandated,
                                             isMandatedAssigned);
+                                } else {
+                                    mAdapter.removeItem(dataSnapshot.getKey());
                                 }
 
                             }
@@ -396,6 +388,8 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                                     isCHSAssigned,
                                     isMandated,
                                     isMandatedAssigned);
+                        } else {
+                            mAdapter.removeItem(dataSnapshot.getKey());
                         }
                     }
                 }
@@ -435,7 +429,6 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                 && (model.getIsCompleteAt() == null && model.getIsComplete() == null || model.getIsCompleteAt() == null && !model.getIsComplete())
                 && name != null)) {
 
-            System.out.println("name = " + name);
             txtNoAction.setVisibility(View.GONE);
 
             mAdapter.addItems(getChild.getKey(), new Action(
@@ -464,10 +457,15 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
         }
     }
 
+
+    @Override
+    public void onDataChange(DataSnapshot dataSnapshot) {
+        process(dataSnapshot);
+    }
+
     @Override
     public void onCancelled(DatabaseError databaseError) {
 
     }
-
 
 }

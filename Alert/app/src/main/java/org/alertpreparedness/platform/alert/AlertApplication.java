@@ -46,7 +46,7 @@ import timber.log.Timber;
 @AcraMailSender(mailTo = "tj@rolleragency.co.uk")
 public class AlertApplication extends Application implements ValueEventListener {
 
-    public static final boolean IS_LIVE = false;
+    public static final boolean IS_LIVE = true;
     private User user;
 
 //    public static final String API_KEY = "";
@@ -58,7 +58,7 @@ public class AlertApplication extends Application implements ValueEventListener 
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.SAND;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING;
 
     @SuppressLint("StaticFieldLeak")
     private static Context sContext;

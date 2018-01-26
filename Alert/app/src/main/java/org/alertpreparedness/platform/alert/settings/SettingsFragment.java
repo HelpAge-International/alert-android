@@ -1,11 +1,14 @@
 package org.alertpreparedness.platform.alert.settings;
 
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
@@ -86,10 +89,20 @@ public class SettingsFragment extends Fragment implements ValueEventListener {
 
     @OnClick(R.id.btnLogout)
     void onLogoutClick(View v) {
-        PreferHelper.getInstance(getContext()).edit().remove(UserInfo.PREFS_USER).apply();
-        FirebaseAuth.getInstance().signOut();
-        startActivity(new Intent(getContext(), LoginScreen.class));
-        getActivity().finish();
+        AlertDialog.Builder builder;
+        builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Logout")
+                .setMessage("You will be unable to log back into the app unless you have internet connection. Are you sure you want to log out?")
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    PreferHelper.getInstance(getContext()).edit().remove(UserInfo.PREFS_USER).apply();
+                    FirebaseAuth.getInstance().signOut();
+                    startActivity(new Intent(getContext(), LoginScreen.class));
+                    getActivity().finish();                    })
+                .setNegativeButton(android.R.string.no, (dialog, which) -> {
+                    // do nothing
+                })
+                .show();
+
     }
 
     @OnClick(R.id.btnChangeEmail)

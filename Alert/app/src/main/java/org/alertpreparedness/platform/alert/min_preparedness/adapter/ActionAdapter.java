@@ -78,9 +78,11 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     public void removeItem(String key) {
         int index = keys.indexOf(key);
-        items.remove(keys.get(index));
-        keys.remove(index);
-        notifyItemRemoved(index);
+        if(index != -1) {
+            items.remove(keys.get(index));
+            keys.remove(index);
+            notifyItemRemoved(index);
+        }
     }
 
     @Override
@@ -98,7 +100,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
         holder.tvActionName.setText(action.getTaskName());
         holder.tvBudget.setText(getBudget(action.getBudget()));
         holder.tvDueDate.setText(getDate(action.getDueDate()));
-        holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position, keys.get(position)));
+        holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position, keys.get(position), action.getId()));
 
         if (action.getDueDate() == null) {
             holder.tvDueDate.setVisibility(View.GONE);
@@ -124,17 +126,21 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (departmentID != null) {
+                if (assignee!=null && departmentID != null && networkID == null) {
                     String department = (String) dataSnapshot.child("departments").child(departmentID).child("name").getValue();
                     setUser(holder, userRef, assignee, department);
-                } else if (networkID != null){
+                } else if (assignee!=null && networkID != null && networkID.equals(user.getNetworkID())){
                     System.out.println("networkID = " + networkID);
                     setNetworkUser(holder, userRef, networkRef, assignee, networkID, user);
-                } else if (id.equals(user.getLocalNetworkID())){
+                } else if (assignee!=null && id != null && id.equals(user.getLocalNetworkID())){
+                    setLocalNetworkUser(holder, userRef, networkRef, assignee, id, user);
+                } else if (assignee!=null && id != null && id.equals(user.getNetworkCountryID())){
+                    System.out.println("assignee in NetworkCountry= " + assignee);
                     setLocalNetworkUser(holder, userRef, networkRef, assignee, id, user);
                 }
                 else {
-                    setUser(holder, userRef, null, null);
+                    holder.tvUserName.setText("Unassigned");
+                   // setUser(holder, userRef, null, null);
                 }
             }
 
@@ -147,36 +153,37 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     }
 
     private void setLocalNetworkUser(ViewHolder holder, DatabaseReference userRef, DatabaseReference networkRef, String assignee, String id, User user) {
-        networkRef.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String name = (String) dataSnapshot.child("name").getValue();
-                System.out.println("name IN LOCAL = " + name);
-                userRef.child(assignee).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        String firstname = (String) dataSnapshot.child("firstName").getValue();
-                        String lastname = (String) dataSnapshot.child("lastName").getValue();
-                        String fullname = String.format("%s %s", firstname, lastname);
-                        holder.tvUserName.setText(fullname + ", " + name);
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+            networkRef.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String name = (String) dataSnapshot.child("name").getValue();
+                    System.out.println("name IN LOCAL = " + name);
+                    userRef.child(assignee).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            String firstname = (String) dataSnapshot.child("firstName").getValue();
+                            String lastname = (String) dataSnapshot.child("lastName").getValue();
+                            String fullname = String.format("%s %s", firstname, lastname);
+                            holder.tvUserName.setText(fullname + ", " + name);
+                        }
 
-                    }
-                });
-            }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+                }
 
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
     }
 
     private void setNetworkUser(ViewHolder holder, DatabaseReference userRef, DatabaseReference networkRef, String assignee, String networkID, User user) {
-        if (assignee != null && networkID != null) {
             //System.out.println("user.getLocalNetworkID() = " + user.getLocalNetworkID());
             networkRef.child(networkID).addListenerForSingleValueEvent(new ValueEventListener() {
 
@@ -205,13 +212,11 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
                 }
             });
-        }
 
     }
 
     private void setUser(ActionAdapter.ViewHolder holder, DatabaseReference userRef, String assignee, String department) {
         System.out.println("department = " + department);
-        if (assignee != null && department != null) {
             userRef.child(assignee).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -226,13 +231,12 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
                 }
             });
-        }
+//
 //        else {
 //            holder.tvUserName.setText("Unassigned");
 //        }
 
     }
-
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -294,7 +298,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-      //  changedListener.onItemChanged(dataSnapshot);
+
     }
 
     @Override
@@ -313,7 +317,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     }
 
     public interface ItemSelectedListener {
-        void onActionItemSelected(int pos, String key);
+        void onActionItemSelected(int pos, String key, String userTypeID);
     }
 
 

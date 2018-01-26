@@ -195,7 +195,6 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     }
 
     private void initViews() {
-        System.out.println("user = " + user);
         taskRef.addChildEventListener(taskListener);
         indicatorRef.addChildEventListener(indicatorListener);
         networkRef.addValueEventListener(networkListener);

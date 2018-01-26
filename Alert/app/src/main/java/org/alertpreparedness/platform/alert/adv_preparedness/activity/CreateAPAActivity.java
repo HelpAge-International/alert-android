@@ -12,7 +12,9 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import shortbread.Shortcut;
 
+@Shortcut(id = "createAPA", icon = R.drawable.fab_add, shortLabel = "Create APA")
 public class CreateAPAActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar)
