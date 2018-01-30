@@ -91,7 +91,7 @@ public class ActionUnassignedFragment extends InProgressFragment {
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionBaseRef.addValueEventListener(this);
+        dbActionBaseRef.addChildEventListener(this);
     }
 
     @Override
@@ -109,20 +109,20 @@ public class ActionUnassignedFragment extends InProgressFragment {
         System.out.println("user.getCountryID() = " + user.getCountryID());
         for (String id : ids) {
             if (dataSnapshot.getValue() != null && id != null) {
-                for (DataSnapshot getChild : dataSnapshot.child(id).getChildren()) {
-                    String actionIDs = getChild.getKey();
-                    DataModel model = getChild.getValue(DataModel.class);
+//                for (DataSnapshot getChild : dataSnapshot.child(id).getChildren()) {
+                    String actionIDs = dataSnapshot.getKey();
+                    DataModel model = dataSnapshot.getValue(DataModel.class);
 
-                    if (getChild.child("frequencyBase").getValue() != null) {
-                        model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
+                    if (dataSnapshot.child("frequencyBase").getValue() != null) {
+                        model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
                     }
-                    if (getChild.child("frequencyValue").getValue() != null) {
-                        model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
+                    if (dataSnapshot.child("frequencyValue").getValue() != null) {
+                        model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
                     }
 
                     if (model.getType() != null && model.getType() == 2) {
                         System.out.println("model = " + model);
-                        getCustom(model, getChild, id);
+                        getCustom(model, dataSnapshot, id);
                     }
 
                     //  if (model.getType() != null && model.getType() == 0) {
@@ -131,7 +131,7 @@ public class ActionUnassignedFragment extends InProgressFragment {
                     System.out.println("model = " + model);
                     getMandated(model, actionIDs, id);
 
-                }
+//                }
             }else {
                 getCHSForNewUser(id);
                 getMandatedForNewUser(id);

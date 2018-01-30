@@ -107,32 +107,35 @@ public class ActiveFragment extends Fragment implements ResponsePlansAdapter.Res
     public void onDataChange(DataSnapshot dataSnapshot) {
         for(DataSnapshot child : dataSnapshot.getChildren()) {
 
-            boolean isActive = (boolean)child.child("isActive").getValue();
+            if(child.child("isActive").exists()) {
 
-            if(isActive) {
-                int regionalApproval = getApprovalStatus(child.child("approval").child("regionDirector"));
-                int countryApproval = getApprovalStatus(child.child("approval").child("countryDirector"));
-                int globalApproval = getApprovalStatus(child.child("approval").child("globalDirector"));
+                boolean isActive = (boolean) child.child("isActive").getValue();
 
-                Long createdAt = (Long) child.child("timeCreated").getValue();
-                String hazardType = ExtensionHelperKt.getHazardTypes().get(Integer.valueOf((String) child.child("hazardScenario").getValue()));
-                String percentCompleted = String.valueOf(child.child("sectionsCompleted").getValue());
-                int status = Integer.valueOf(String.valueOf(child.child("status").getValue()));
-                String name = (String) child.child("name").getValue();
+                if (isActive) {
+                    int regionalApproval = getApprovalStatus(child.child("approval").child("regionDirector"));
+                    int countryApproval = getApprovalStatus(child.child("approval").child("countryDirector"));
+                    int globalApproval = getApprovalStatus(child.child("approval").child("globalDirector"));
 
-                System.out.println("child.getKey() = " + child.getKey());
-                System.out.println("user.countryID = " + user.countryID);
+                    Long createdAt = (Long) child.child("timeCreated").getValue();
+                    String hazardType = ExtensionHelperKt.getHazardTypes().get(Integer.valueOf((String) child.child("hazardScenario").getValue()));
+                    String percentCompleted = String.valueOf(child.child("sectionsCompleted").getValue());
+                    int status = Integer.valueOf(String.valueOf(child.child("status").getValue()));
+                    String name = (String) child.child("name").getValue();
 
-                mAdapter.addItem(child.getKey(), new ResponsePlanObj(
-                        hazardType,
-                        percentCompleted,
-                        name,
-                        status,
-                        new Date(createdAt),
-                        regionalApproval,
-                        countryApproval,
-                        globalApproval)
-                );
+                    System.out.println("child.getKey() = " + child.getKey());
+                    System.out.println("user.countryID = " + user.countryID);
+
+                    mAdapter.addItem(child.getKey(), new ResponsePlanObj(
+                            hazardType,
+                            percentCompleted,
+                            name,
+                            status,
+                            new Date(createdAt),
+                            regionalApproval,
+                            countryApproval,
+                            globalApproval)
+                    );
+                }
             }
         }
     }

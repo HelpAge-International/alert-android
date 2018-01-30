@@ -54,7 +54,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class InProgressFragment extends Fragment implements ActionAdapter.ItemSelectedListener, ValueEventListener {
+public class InProgressFragment extends Fragment implements ActionAdapter.ItemSelectedListener, ChildEventListener {
 
     private DataModel model;
 
@@ -137,7 +137,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionBaseRef.addValueEventListener(this);
+        dbActionBaseRef.addChildEventListener(this);
     }
 
     protected ActionAdapter getmAdapter() {
@@ -183,17 +183,17 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
             System.out.println("iddddddddd = " + id);
             System.out.println("GET NETWORK ACTION " + dataSnapshot.child(id).getValue());
 
-            for (DataSnapshot getChild : dataSnapshot.child(id).getChildren()) {
+//            for (DataSnapshot getChild : dataSnapshot.child(id).getChildren()) {
 
-                String actionIDs = getChild.getKey();
+                String actionIDs = dataSnapshot.getKey();
 
-                DataModel model = getChild.getValue(DataModel.class);
+                DataModel model = dataSnapshot.getValue(DataModel.class);
 
-                if (getChild.child("frequencyBase").getValue() != null) {
-                    model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
+                if (dataSnapshot.child("frequencyBase").getValue() != null) {
+                    model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
                 }
-                if (getChild.child("frequencyValue").getValue() != null) {
-                    model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
+                if (dataSnapshot.child("frequencyValue").getValue() != null) {
+                    model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
                 }
 
                 if (model.getType() != null && model.getType() == 0) {
@@ -202,9 +202,9 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                     getMandated(model, actionIDs, id);
                 } else if (model.getType() != null && model.getType() == 2){
                     System.out.println("model = " + model);
-                    getCustom(model, getChild, id);
+                    getCustom(model, dataSnapshot, id);
                 }
-            }
+//            }
         }
     }
 
@@ -459,8 +459,25 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
 
 
     @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
+    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
         process(dataSnapshot);
+
+    }
+
+    @Override
+    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+        process(dataSnapshot);
+
+    }
+
+    @Override
+    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+    }
+
+    @Override
+    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
     }
 
     @Override
