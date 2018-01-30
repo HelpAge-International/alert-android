@@ -23,6 +23,7 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -111,41 +112,19 @@ public class ActionExpiredFragment extends InProgressFragment {
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionBaseRef.addChildEventListener(this);
+//        dbActionBaseRef.addChildEventListener(this);
+        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
+
+        for (String id : ids) {
+            if(id != null) {
+                dbActionBaseRef.child(id).addChildEventListener(new ExpiredChildListener(id));
+            }
+
+        }
     }
 
     public ActionAdapter getmAdapter() {
         return new ActionAdapter(getContext(), dbActionBaseRef, this);
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void process(DataSnapshot dataSnapshot) {
-        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
-
-        for (String id : ids) {
-//            for (DataSnapshot getChild : dataSnapshot.child(id).getChildren()) {
-                String actionIDs = dataSnapshot.getKey();
-                DataModel model = dataSnapshot.getValue(DataModel.class);
-
-                if (dataSnapshot.child("frequencyBase").getValue() != null) {
-                    model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
-                }
-                if (dataSnapshot.child("frequencyValue").getValue() != null) {
-                    model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
-                }
-
-                if (model.getType() != null && model.getType() == 0) {
-                    getCHS(model, actionIDs, id);
-                } else if (model.getType() != null && model.getType() == 1) {
-                    getMandated(model, actionIDs, id);
-                } else if (model.getType() != null && model.getType() == 2){
-                    System.out.println("model = " + model);
-                    getCustom(model, dataSnapshot, id, actionIDs);
-                }
-//            }
-        }
-
     }
 
     private void getCustom(DataModel model, DataSnapshot getChild, String id, String actionIDs) {
@@ -398,10 +377,7 @@ public class ActionExpiredFragment extends InProgressFragment {
         }
     }
 
-    @Override
-    public void onCancelled(DatabaseError databaseError) {
 
-    }
 
     @Override
     public void onActionItemSelected(int pos, String key, String userTypeID) {
@@ -454,5 +430,61 @@ public class ActionExpiredFragment extends InProgressFragment {
             }
         }, year, month, day);
         pickerDialog.show();
+    }
+
+    private class ExpiredChildListener implements ChildEventListener {
+        private String id;
+
+        public ExpiredChildListener(String id) {
+            this.id = id;
+        }
+
+        @SuppressWarnings("ConstantConditions")
+        public void process(DataSnapshot dataSnapshot) {
+            System.out.println("processdataSnapshot = " + dataSnapshot);
+            String actionIDs = dataSnapshot.getKey();
+            DataModel model = dataSnapshot.getValue(DataModel.class);
+
+            if (dataSnapshot.child("frequencyBase").getValue() != null) {
+                model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
+            }
+            if (dataSnapshot.child("frequencyValue").getValue() != null) {
+                model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
+            }
+
+            if (model.getType() != null && model.getType() == 0) {
+                getCHS(model, actionIDs, id);
+            } else if (model.getType() != null && model.getType() == 1) {
+                getMandated(model, actionIDs, id);
+            } else if (model.getType() != null && model.getType() == 2){
+                System.out.println("model = " + model);
+                getCustom(model, dataSnapshot, id, actionIDs);
+            }
+        }
+
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            process(dataSnapshot);
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            process(dataSnapshot);
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
     }
 }

@@ -54,7 +54,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class InProgressFragment extends Fragment implements ActionAdapter.ItemSelectedListener, ChildEventListener {
+public class InProgressFragment extends Fragment implements ActionAdapter.ItemSelectedListener {
 
     private DataModel model;
 
@@ -137,7 +137,16 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionBaseRef.addChildEventListener(this);
+//        dbActionBaseRef.addChildEventListener(this);
+
+        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
+
+        for (String id : ids) {
+            if(id != null) {
+                dbActionBaseRef.child(id).addChildEventListener(new InProgressListener(id));
+            }
+
+        }
     }
 
     protected ActionAdapter getmAdapter() {
@@ -155,6 +164,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
             switch (menuItem.getItemId()) {
                 case R.id.complete_action:
                     Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
+                    System.out.println("onActionItemSelectedkey = " + key);
                     intent.putExtra("ACTION_KEY", key);
                     intent.putExtra("USER_KEY", userTypeID);
                     startActivity(intent);
@@ -173,39 +183,6 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
             }
             return false;
         }).show();
-    }
-
-    protected void process(DataSnapshot dataSnapshot) {
-        System.out.println("dataSnapshot = " + dataSnapshot);
-        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
-        System.out.println("user.getNetworkCountryID() = " + user.getNetworkCountryID());
-        for (String id : ids) {
-            System.out.println("iddddddddd = " + id);
-            System.out.println("GET NETWORK ACTION " + dataSnapshot.child(id).getValue());
-
-//            for (DataSnapshot getChild : dataSnapshot.child(id).getChildren()) {
-
-                String actionIDs = dataSnapshot.getKey();
-
-                DataModel model = dataSnapshot.getValue(DataModel.class);
-
-                if (dataSnapshot.child("frequencyBase").getValue() != null) {
-                    model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
-                }
-                if (dataSnapshot.child("frequencyValue").getValue() != null) {
-                    model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
-                }
-
-                if (model.getType() != null && model.getType() == 0) {
-                    getCHS(model, actionIDs, id);
-                } else if (model.getType() != null && model.getType() == 1) {
-                    getMandated(model, actionIDs, id);
-                } else if (model.getType() != null && model.getType() == 2){
-                    System.out.println("model = " + model);
-                    getCustom(model, dataSnapshot, id);
-                }
-//            }
-        }
     }
 
     private void getCustom(DataModel model, DataSnapshot getChild, String id) {
@@ -455,34 +432,66 @@ public class InProgressFragment extends Fragment implements ActionAdapter.ItemSe
                     dbNetworkRef.getRef())
             );
         }
+        else {
+            mAdapter.removeItem(getChild.getKey());
+        }
     }
 
+    private class InProgressListener implements ChildEventListener {
+        private String id;
 
-    @Override
-    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-        process(dataSnapshot);
+        public InProgressListener(String id) {
+            this.id = id;
+        }
 
+
+        protected void process(DataSnapshot dataSnapshot) {
+            String actionIDs = dataSnapshot.getKey();
+
+            DataModel model = dataSnapshot.getValue(DataModel.class);
+
+            if (dataSnapshot.child("frequencyBase").getValue() != null) {
+                model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
+            }
+            if (dataSnapshot.child("frequencyValue").getValue() != null) {
+                model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
+            }
+
+            if (model.getType() != null && model.getType() == 0) {
+                getCHS(model, actionIDs, id);
+            } else if (model.getType() != null && model.getType() == 1) {
+                getMandated(model, actionIDs, id);
+            } else if (model.getType() != null && model.getType() == 2){
+                System.out.println("model = " + model);
+                getCustom(model, dataSnapshot, id);
+            }
+        }
+
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            process(dataSnapshot);
+
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            process(dataSnapshot);
+
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
     }
-
-    @Override
-    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-        process(dataSnapshot);
-
-    }
-
-    @Override
-    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-    }
-
-    @Override
-    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-    }
-
-    @Override
-    public void onCancelled(DatabaseError databaseError) {
-
-    }
-
 }

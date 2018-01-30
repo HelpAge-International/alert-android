@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -89,41 +90,19 @@ public class ActionCompletedFragment extends InProgressFragment {
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionBaseRef.addChildEventListener(this);
+        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
+
+        for (String id : ids) {
+            if(id != null) {
+                dbActionBaseRef.child(id).addChildEventListener(new CompletedListener(id));
+            }
+
+        }
     }
 
     @Override
     protected ActionAdapter getmAdapter() {
         return new ActionAdapter(getContext(), dbActionBaseRef, this);
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void process(DataSnapshot dataSnapshot) {
-        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
-
-        for (String id : ids) {
-//            for (DataSnapshot getChild : dataSnapshot.child(id).getChildren()) {
-                String actionIDs = dataSnapshot.getKey();
-                DataModel model = dataSnapshot.getValue(DataModel.class);
-
-                if (dataSnapshot.child("frequencyBase").getValue() != null) {
-                    model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
-                }
-                if (dataSnapshot.child("frequencyValue").getValue() != null) {
-                    model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
-                }
-
-                if (model.getType() != null && model.getType() == 0) {
-                    getCHS(model, actionIDs, id);
-                } else if (model.getType() != null && model.getType() == 1) {
-                    getMandated(model, actionIDs, id);
-                } else if (model.getType() != null && model.getType() == 2){
-                    System.out.println("model = " + model);
-                    getCustom(model, dataSnapshot, id);
-                }
-//            }
-        }
     }
 
     private void getCustom(DataModel model, DataSnapshot getChild, String id) {
@@ -291,5 +270,62 @@ public class ActionCompletedFragment extends InProgressFragment {
     @Override
     public void onActionItemSelected(int pos, String key, String userTypeID) {
         Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Currently under development!", Snackbar.LENGTH_LONG).show();
+    }
+
+    private class CompletedListener implements ChildEventListener {
+        private String id;
+
+        public CompletedListener(String id) {
+            this.id = id;
+        }
+
+        @SuppressWarnings("ConstantConditions")
+        public void process(DataSnapshot dataSnapshot) {
+
+            String actionIDs = dataSnapshot.getKey();
+            DataModel model = dataSnapshot.getValue(DataModel.class);
+
+            if (dataSnapshot.child("frequencyBase").getValue() != null) {
+                model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
+            }
+            if (dataSnapshot.child("frequencyValue").getValue() != null) {
+                model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
+            }
+
+            if (model.getType() != null && model.getType() == 0) {
+                getCHS(model, actionIDs, id);
+            } else if (model.getType() != null && model.getType() == 1) {
+                getMandated(model, actionIDs, id);
+            } else if (model.getType() != null && model.getType() == 2){
+                System.out.println("model = " + model);
+                getCustom(model, dataSnapshot, id);
+            }
+
+        }
+
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            process(dataSnapshot);
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            process(dataSnapshot);
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
     }
 }

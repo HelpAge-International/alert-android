@@ -93,6 +93,7 @@ public class ActionUnassignedFragment extends InProgressFragment {
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
         ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
+
         for (String id : ids) {
             if(id != null) {
                 dbActionBaseRef.child(id).addChildEventListener(new UnassignedChildListener(id));
@@ -126,7 +127,6 @@ public class ActionUnassignedFragment extends InProgressFragment {
                 && model.getLevel() == Constants.MPA
                 && model.getAsignee() == null
                 && model.getTask() != null) {
-
 
             txtNoAction.setVisibility(View.GONE);
             mUnassignedAdapter.addItems(getChild.getKey(), new Action(
@@ -363,11 +363,6 @@ public class ActionUnassignedFragment extends InProgressFragment {
 
             }
         });
-    }
-
-    @Override
-    public void onCancelled(DatabaseError databaseError) {
-
     }
 
     @Override
