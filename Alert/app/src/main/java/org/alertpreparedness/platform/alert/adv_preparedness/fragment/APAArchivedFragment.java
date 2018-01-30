@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,6 +29,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ActionCHSRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
@@ -47,7 +49,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAArchivedFragment extends Fragment implements APActionAdapter.ItemSelectedListener, ValueEventListener {
+public class APAArchivedFragment extends Fragment implements APActionAdapter.ItemSelectedListener, ChildEventListener {
 
     public APAArchivedFragment() {
         // Required empty public constructor
@@ -90,6 +92,10 @@ public class APAArchivedFragment extends Fragment implements APActionAdapter.Ite
     DatabaseReference dbUserPublicRef;
 
     @Inject
+    @NetworkRef
+    DatabaseReference dbNetworkRef;
+
+    @Inject
     User user;
 
     private APActionAdapter mAPAdapter;
@@ -128,7 +134,7 @@ public class APAArchivedFragment extends Fragment implements APActionAdapter.Ite
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionRef.addValueEventListener(this);
+        dbActionRef.addChildEventListener(this);
     }
 
     protected APActionAdapter getAPAdapter() {
@@ -139,31 +145,6 @@ public class APAArchivedFragment extends Fragment implements APActionAdapter.Ite
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
-        for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-            String actionIDs = getChild.getKey();
-            System.out.println("getChild = " + getChild);
-            DataModel model = getChild.getValue(DataModel.class);
-
-            if (getChild.child("frequencyBase").getValue() != null) {
-                model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
-            }
-            if (getChild.child("frequencyValue").getValue() != null) {
-                model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
-            }
-
-            if (model.getType() == 0) {
-                getCHS(model, actionIDs);
-            } else if (model.getType() == 1) {
-                getMandated(model, actionIDs);
-            } else {
-                getCustom(model, getChild);
-            }
-        }
     }
 
     private void getCustom(DataModel model, DataSnapshot getChild) {
@@ -217,23 +198,28 @@ public class APAArchivedFragment extends Fragment implements APActionAdapter.Ite
                                 && model.getDueDate() != null) {
 
                             txtNoAction.setVisibility(View.GONE);
-//                            mAPAdapter.addItems(getChild.getKey(), new Action(
-//                                    CHSTaskName,
-//                                    model.getDepartment(),
-//                                    model.getAsignee(),
-//                                    model.getIsArchived(),
-//                                    model.getIsComplete(),
-//                                    CHSCreatedAt,
-//                                    model.getUpdatedAt(),
-//                                    model.getType(),
-//                                    model.getDueDate(),
-//                                    model.getBudget(),
-//                                    CHSlevel,
-//                                    model.getFrequencyBase(),
-//                                    freqValue,
-//                                    dbAgencyRef.getRef(),
-//                                    dbUserPublicRef.getRef())
-//                            );
+                            mAPAdapter.addItems(getChild.getKey(), new Action(
+                                    CHSTaskName,
+                                    CHSTaskName,
+                                    model.getDepartment(),
+                                    model.getAsignee(),
+                                    model.getCreatedByAgencyId(),
+                                    model.getCreatedByCountryId(),
+                                    model.getNetworkId(),
+                                    model.getIsArchived(),
+                                    model.getIsComplete(),
+                                    CHSCreatedAt,
+                                    model.getUpdatedAt(),
+                                    model.getType(),
+                                    model.getDueDate(),
+                                    model.getBudget(),
+                                    CHSlevel,
+                                    model.getFrequencyBase(),
+                                    freqValue,
+                                    user,
+                                    dbAgencyRef.getRef(),
+                                    dbUserPublicRef.getRef(),
+                                    dbNetworkRef));
                         }
                     }
                 }
@@ -304,6 +290,47 @@ public class APAArchivedFragment extends Fragment implements APActionAdapter.Ite
     @Override
     public void onActionItemSelected(int pos, String key) {
         Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Currently under development!", Snackbar.LENGTH_LONG).show();
+    }
+
+    private void process(DataSnapshot dataSnapshot) {
+        String actionIDs = dataSnapshot.getKey();
+        DataModel model = dataSnapshot.getValue(DataModel.class);
+
+        if (dataSnapshot.child("frequencyBase").getValue() != null) {
+            model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
+        }
+        if (dataSnapshot.child("frequencyValue").getValue() != null) {
+            model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
+        }
+
+        if (model.getType() == 0) {
+            getCHS(model, actionIDs);
+        } else if (model.getType() == 1) {
+            getMandated(model, actionIDs);
+        } else {
+            getCustom(model, dataSnapshot);
+        }
+
+    }
+
+    @Override
+    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+        process(dataSnapshot);
+    }
+
+    @Override
+    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+        process(dataSnapshot);
+    }
+
+    @Override
+    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+    }
+
+    @Override
+    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
     }
 
     @Override

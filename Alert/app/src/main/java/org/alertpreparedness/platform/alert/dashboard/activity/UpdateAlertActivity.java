@@ -265,10 +265,9 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
 
                    db.child("infoNotes").setValue(info);
                    db.child("estimatedPopulation").setValue(population);
-                   db.child("alertLevel").setValue(alertLevel).addOnCompleteListener(task -> {
-                       finishAffinity();
-                       startActivity(new Intent(UpdateAlertActivity.this, HomeScreen.class));
-                   });
+                   db.child("alertLevel").setValue(alertLevel);
+                   finishAffinity();
+                   startActivity(new Intent(UpdateAlertActivity.this, HomeScreen.class));
                   if (dataSnapshot.child("otherName").exists()) {
                         //TODO Fix other alert update
                   }

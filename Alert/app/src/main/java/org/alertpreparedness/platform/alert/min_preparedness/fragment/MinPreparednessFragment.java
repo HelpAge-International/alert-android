@@ -68,6 +68,7 @@ public class MinPreparednessFragment extends Fragment {
 
     private void initViews() {
         fabCreateAPA.setVisibility(View.GONE);
+        mPager.setOffscreenPageLimit(5);
         mPager.setAdapter(new MinPreparednessFragment.PagerAdapter(getFragmentManager()));
     }
 

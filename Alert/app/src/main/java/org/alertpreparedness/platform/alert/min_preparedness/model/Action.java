@@ -3,6 +3,7 @@ package org.alertpreparedness.platform.alert.min_preparedness.model;
 import android.net.Uri;
 
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
 
 import org.alertpreparedness.platform.alert.model.User;
 
@@ -21,6 +22,7 @@ public class Action {
     private String createdByAgencyId;
     private String createdByCountryId;
     private String networkId;
+    @Exclude
     private Integer frequencyValue;
     private Long frequencyBase;
     private Long actionType;
@@ -111,10 +113,12 @@ public class Action {
         isInProgress = inProgress;
     }
 
+    @Exclude
     public Integer getFrequencyValue() {
         return frequencyValue;
     }
 
+    @Exclude
     public void setFrequencyValue(Integer frequencyValue) {
         this.frequencyValue = frequencyValue;
     }

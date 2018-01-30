@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -48,7 +49,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APACompletedFragment extends Fragment implements APActionAdapter.ItemSelectedListener, ValueEventListener {
+public class APACompletedFragment extends Fragment implements APActionAdapter.ItemSelectedListener, ChildEventListener {
 
     public APACompletedFragment() {
         // Required empty public constructor
@@ -133,7 +134,7 @@ public class APACompletedFragment extends Fragment implements APActionAdapter.It
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionRef.addValueEventListener(this);
+        dbActionRef.addChildEventListener(this);
     }
 
     protected APActionAdapter getAPAdapter() {
@@ -145,24 +146,16 @@ public class APACompletedFragment extends Fragment implements APActionAdapter.It
         super.onViewCreated(view, savedInstanceState);
     }
 
-    @Override
-    public void onCancelled(DatabaseError databaseError) {
+    private void process(DataSnapshot dataSnapshot) {
+//        for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+            String actionIDs = dataSnapshot.getKey();
+            DataModel model = dataSnapshot.getValue(DataModel.class);
 
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
-        for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-            String actionIDs = getChild.getKey();
-            System.out.println("getChild = " + getChild);
-            DataModel model = getChild.getValue(DataModel.class);
-
-            if (getChild.child("frequencyBase").getValue() != null) {
-                model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
+            if (dataSnapshot.child("frequencyBase").getValue() != null) {
+                model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
             }
-            if (getChild.child("frequencyValue").getValue() != null) {
-                model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
+            if (dataSnapshot.child("frequencyValue").getValue() != null) {
+                model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
             }
 
             if (model.getType() == 0) {
@@ -170,9 +163,34 @@ public class APACompletedFragment extends Fragment implements APActionAdapter.It
             } else if (model.getType() == 1) {
                 getMandated(model, actionIDs);
             } else {
-                getCustom(model, getChild);
+                getCustom(model, dataSnapshot);
             }
-        }
+//        }
+    }
+
+    @Override
+    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+        process(dataSnapshot);
+    }
+
+    @Override
+    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+        process(dataSnapshot);
+    }
+
+    @Override
+    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+    }
+
+    @Override
+    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+    }
+
+    @Override
+    public void onCancelled(DatabaseError databaseError) {
+
     }
 
     private void getCustom(DataModel model, DataSnapshot getChild) {

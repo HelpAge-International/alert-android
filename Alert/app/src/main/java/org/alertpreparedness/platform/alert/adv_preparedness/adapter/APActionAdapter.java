@@ -229,7 +229,12 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//        System.out.println("apaactiondataSnapshot = " + dataSnapshot.getRef());
         Action action = dataSnapshot.getValue(Action.class);
+        assert action != null;
+        if(dataSnapshot.child("frequencyValue").exists()) {
+            action.setFrequencyValue(Integer.valueOf(dataSnapshot.child("frequencyValue").getValue().toString()));
+        }
         if (keys.indexOf(dataSnapshot.getKey()) == -1) {
             if (action.getComplete() != null && action.getComplete() && action.getDueDate() != null) {
                 keys.add(dataSnapshot.getKey());
@@ -245,6 +250,8 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
         Action action = dataSnapshot.getValue(Action.class);
+        assert action != null;
+        action.setFrequencyValue(Integer.valueOf(dataSnapshot.child("frequencyValue").getValue().toString()));
         if (keys.indexOf(dataSnapshot.getKey()) == -1) {
             if (action.getComplete() != null && action.getComplete() && action.getDueDate() != null) {
                 keys.add(dataSnapshot.getKey());

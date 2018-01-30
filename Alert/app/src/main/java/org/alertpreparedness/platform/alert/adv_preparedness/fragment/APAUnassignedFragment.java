@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,11 +31,13 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ActionCHSRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
+import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
 import javax.inject.Inject;
@@ -47,7 +50,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAUnassignedFragment extends Fragment implements APActionAdapter.ItemSelectedListener, ValueEventListener, UsersListDialogFragment.ItemSelectedListener {
+public class APAUnassignedFragment extends Fragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener, ChildEventListener {
 
     public APAUnassignedFragment() {
         // Required empty public constructor
@@ -56,6 +59,9 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
     @Nullable
     @BindView(R.id.rvAdvAction)
     RecyclerView mAdvActionRV;
+
+    @Inject
+    User user;
 
     @Nullable
     @BindView(R.id.imgStatus)
@@ -88,6 +94,10 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
     @Inject
     @UserPublicRef
     DatabaseReference dbUserPublicRef;
+
+    @Inject
+    @NetworkRef
+    DatabaseReference dbNetworkRef;
 
     private APActionAdapter mAPAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
@@ -123,7 +133,21 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionRef.addValueEventListener(this);
+        dbActionRef.addChildEventListener(this);
+        dbActionRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getValue() == null) {
+                    getCHSForNewUser();
+                    getMandatedForNewUser();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     protected APActionAdapter getAPAdapter() {
@@ -154,35 +178,6 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
         }).show();
     }
 
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
-        if (dataSnapshot.getValue() != null) {
-            for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                String actionIDs = getChild.getKey();
-                DataModel model = getChild.getValue(DataModel.class);
-
-                if (getChild.child("frequencyBase").getValue() != null) {
-                    model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
-                }
-                if (getChild.child("frequencyValue").getValue() != null) {
-                    model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
-                }
-
-                //if (model.getType() == 0) {
-                getCHS(model, actionIDs);
-                //  } else if (model.getType() == 1) {
-                getMandated(model, actionIDs);
-                //  } else {
-                getCustom(model, getChild);
-                // }
-            }
-        } else {
-            getCHSForNewUser();
-            getMandatedForNewUser();
-        }
-    }
-
     private void getCustom(DataModel model, DataSnapshot getChild) {
 
         if (model.getLevel() != null //MPA CUSTOM UNASSIGNED // NO USERS.
@@ -191,23 +186,29 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
                 && model.getTask() != null) {
 
             txtNoAction.setVisibility(View.GONE);
-//            mAPAdapter.addItems(getChild.getKey(), new Action(
-//                    model.getTask(),
-//                    model.getDepartment(),
-//                    model.getAsignee(),
-//                    model.getIsArchived(),
-//                    model.getIsComplete(),
-//                    model.getCreatedAt(),
-//                    model.getUpdatedAt(),
-//                    model.getType(),
-//                    model.getDueDate(),
-//                    model.getBudget(),
-//                    model.getLevel(),
-//                    model.getFrequencyBase(),
-//                    freqValue,
-//                    dbAgencyRef.getRef(),
-//                    dbUserPublicRef.getRef())
-//            );
+            mAPAdapter.addItems(getChild.getKey(), new Action(
+                    model.getId(),
+                    model.getTask(),
+                    model.getDepartment(),
+                    model.getAsignee(),
+                    model.getCreatedByAgencyId(),
+                    model.getCreatedByCountryId(),
+                    model.getNetworkId(),
+                    model.getIsArchived(),
+                    model.getIsComplete(),
+                    model.getCreatedAt(),
+                    model.getUpdatedAt(),
+                    model.getType(),
+                    model.getDueDate(),
+                    model.getBudget(),
+                    model.getLevel(),
+                    model.getFrequencyBase(),
+                    freqValue,
+                    user,
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef(),
+                    dbNetworkRef.getRef())
+            );
         }
     }
 
@@ -223,24 +224,30 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
                         Long CHSlevel = (Long) getChild.child("level").getValue();
                         Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
 
-                            txtNoAction.setVisibility(View.GONE);
-//                            mAPAdapter.addItems(getChild.getKey(), new Action(
-//                                    CHSTaskName,
-//                                    null,
-//                                    null,
-//                                    null,
-//                                    null,
-//                                    CHSCreatedAt,
-//                                    null,
-//                                    (long) 0, //CHS always 0
-//                                    null,
-//                                    null,
-//                                    CHSlevel,
-//                                    null,
-//                                    null,
-//                                    dbAgencyRef.getRef(),
-//                                    dbUserPublicRef.getRef())
-//                            );
+                        txtNoAction.setVisibility(View.GONE);
+                        mAPAdapter.addItems(getChild.getKey(), new Action(
+                                model.getId(),
+                                CHSTaskName,
+                                model.getDepartment(),
+                                model.getAsignee(),
+                                model.getCreatedByAgencyId(),
+                                model.getCreatedByCountryId(),
+                                model.getNetworkId(),
+                                model.getIsArchived(),
+                                model.getIsComplete(),
+                                CHSCreatedAt,
+                                model.getUpdatedAt(),
+                                model.getType(),
+                                model.getDueDate(),
+                                model.getBudget(),
+                                CHSlevel,
+                                model.getFrequencyBase(),
+                                freqValue,
+                                user,
+                                dbAgencyRef.getRef(),
+                                dbUserPublicRef.getRef(),
+                                dbNetworkRef.getRef())
+                        );
 
                     }
                 }
@@ -267,23 +274,30 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
                             Long manLevel = (Long) getChild.child("level").getValue();
 
                             txtNoAction.setVisibility(View.GONE);
-//                            mAPAdapter.addItems(getChild.getKey(), new Action(
-//                                    taskNameMandated,
-//                                    departmentMandated,
-//                                    null,
-//                                    null,
-//                                    null,
-//                                    manCreatedAt,
-//                                    null,
-//                                    (long) 1, //Mandated always 1
-//                                    null,
-//                                    null,
-//                                    manLevel,
-//                                    null,
-//                                    null,
-//                                    dbAgencyRef.getRef(),
-//                                    dbUserPublicRef.getRef())
-//                            );
+                            mAPAdapter.addItems(getChild.getKey(), new Action(
+                                    taskNameMandated,
+                                    departmentMandated,
+                                    model.getDepartment(),
+                                    model.getAsignee(),
+                                    model.getCreatedByAgencyId(),
+                                    model.getCreatedByCountryId(),
+                                    model.getNetworkId(),
+                                    model.getIsArchived(),
+                                    model.getIsComplete(),
+                                    manCreatedAt,
+                                    model.getUpdatedAt(),
+                                    model.getType(),
+                                    model.getDueDate(),
+                                    model.getBudget(),
+                                    manLevel,
+                                    model.getFrequencyBase(),
+                                    freqValue,
+                                    user,
+                                    dbAgencyRef.getRef(),
+                                    dbUserPublicRef.getRef(),
+                                    dbNetworkRef.getRef())
+                            );
+
 
                         } catch (Exception exception) {
                             System.out.println("exception = " + exception);
@@ -313,23 +327,29 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
                         Long manLevel = (Long) getChild.child("level").getValue();
 
                         txtNoAction.setVisibility(View.GONE);
-//                        mAPAdapter.addItems(getChild.getKey(), new Action(
-//                                taskNameMandated,
-//                                departmentMandated,
-//                                null,
-//                                null,
-//                                null,
-//                                manCreatedAt,
-//                                null,
-//                                (long) 1, //Mandated always 1
-//                                null,
-//                                null,
-//                                manLevel,
-//                                null,
-//                                null,
-//                                dbAgencyRef.getRef(),
-//                                dbUserPublicRef.getRef())
-//                        );
+                        mAPAdapter.addItems(getChild.getKey(), new Action(
+                                taskNameMandated,
+                                departmentMandated,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                manCreatedAt,
+                                null,
+                                null,
+                                null,
+                                null,
+                                manLevel,
+                                null,
+                                freqValue,
+                                user,
+                                dbAgencyRef.getRef(),
+                                dbUserPublicRef.getRef(),
+                                dbNetworkRef.getRef())
+                        );
 
                     } catch (Exception exception) {
                         System.out.println("exception = " + exception);
@@ -373,6 +393,29 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
 //                            dbAgencyRef.getRef(),
 //                            dbUserPublicRef.getRef())
 //                    );
+                    mAPAdapter.addItems(getChild.getKey(), new Action(
+                            CHSTaskName,
+                            CHSTaskName,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            CHSlevel,
+                            null,
+                            null,
+                            null,
+                            null,
+                            CHSCreatedAt,
+                            null,
+                            freqValue,
+                            user,
+                            dbAgencyRef.getRef(),
+                            dbUserPublicRef.getRef(),
+                            dbNetworkRef.getRef())
+                    );
                 }
             }
 
@@ -384,8 +427,48 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
     }
 
     @Override
+    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+        process(dataSnapshot);
+    }
+
+    @Override
+    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+        process(dataSnapshot);
+    }
+
+    @Override
+    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+    }
+
+    @Override
+    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+    }
+
+    @Override
     public void onCancelled(DatabaseError databaseError) {
 
+    }
+
+    private void process(DataSnapshot dataSnapshot) {
+        String actionIDs = dataSnapshot.getKey();
+        DataModel model = dataSnapshot.getValue(DataModel.class);
+
+        if (dataSnapshot.child("frequencyBase").getValue() != null) {
+            model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
+        }
+        if (dataSnapshot.child("frequencyValue").getValue() != null) {
+            model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
+        }
+
+        //if (model.getType() == 0) {
+        getCHS(model, actionIDs);
+        //  } else if (model.getType() == 1) {
+        getMandated(model, actionIDs);
+        //  } else {
+        getCustom(model, dataSnapshot);
+        // }
     }
 
     @Override

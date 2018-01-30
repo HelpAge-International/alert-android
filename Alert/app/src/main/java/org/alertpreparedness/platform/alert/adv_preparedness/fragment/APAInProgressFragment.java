@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -51,7 +52,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 05/01/2018.
  */
 
-public class APAInProgressFragment extends Fragment implements APActionAdapter.ItemSelectedListener, ValueEventListener {
+public class APAInProgressFragment extends Fragment implements APActionAdapter.ItemSelectedListener, ChildEventListener {
 
     public APAInProgressFragment() {
         // Required empty public constructor
@@ -124,7 +125,7 @@ public class APAInProgressFragment extends Fragment implements APActionAdapter.I
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionRef.addValueEventListener(this);
+        dbActionRef.addChildEventListener(this);
     }
 
     protected APActionAdapter getAPAdapter() {
@@ -162,33 +163,6 @@ public class APAInProgressFragment extends Fragment implements APActionAdapter.I
                 return false;
             }
         }).show();
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
-        for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-            String actionIDs = getChild.getKey();
-
-            DataModel model = getChild.getValue(DataModel.class);
-
-            if (getChild.child("frequencyBase").getValue() != null) {
-                model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
-            }
-            if (getChild.child("frequencyValue").getValue() != null) {
-                model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
-            }
-
-            if (model.getType() == 0) {
-                getCHS(model, actionIDs);
-            } else if (model.getType() == 1) {
-                getMandated(model, actionIDs);
-            } else {
-                System.out.println("model = " + model);
-                getCustom(model, getChild);
-            }
-
-        }
     }
 
     private void getCustom(DataModel model, DataSnapshot getChild) {
@@ -430,9 +404,49 @@ public class APAInProgressFragment extends Fragment implements APActionAdapter.I
 
 
     @Override
+    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+        process(dataSnapshot);
+    }
+
+    @Override
+    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+        process(dataSnapshot);
+    }
+
+    @Override
+    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+    }
+
+    @Override
+    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+    }
+
+    @Override
     public void onCancelled(DatabaseError databaseError) {
 
     }
 
+    private void process(DataSnapshot dataSnapshot) {
+        String actionIDs = dataSnapshot.getKey();
 
+        DataModel model = dataSnapshot.getValue(DataModel.class);
+
+        if (dataSnapshot.child("frequencyBase").getValue() != null) {
+            model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
+        }
+        if (dataSnapshot.child("frequencyValue").getValue() != null) {
+            model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
+        }
+
+        if (model.getType() == 0) {
+            getCHS(model, actionIDs);
+        } else if (model.getType() == 1) {
+            getMandated(model, actionIDs);
+        } else {
+            System.out.println("model = " + model);
+            getCustom(model, dataSnapshot);
+        }
+    }
 }

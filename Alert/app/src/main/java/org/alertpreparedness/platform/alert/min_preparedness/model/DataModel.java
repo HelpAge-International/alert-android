@@ -34,6 +34,7 @@ public class DataModel {
     private Uri path;
     public DatabaseReference db;
     public DatabaseReference userRef;
+    private String id;
 
     @Override
     public String toString() {
@@ -249,4 +250,11 @@ public class DataModel {
     }
 
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
 }

@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -91,52 +92,32 @@ public class ActionUnassignedFragment extends InProgressFragment {
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionBaseRef.addChildEventListener(this);
+        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
+        for (String id : ids) {
+            if(id != null) {
+                dbActionBaseRef.child(id).addChildEventListener(new UnassignedChildListener(id));
+                dbActionBaseRef.child(id).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.getValue() == null) {
+                            getCHSForNewUser(id);
+                            getMandatedForNewUser(id);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+        }
     }
 
     @Override
     protected ActionAdapter getmAdapter() {
         return new ActionAdapter(getContext(), dbActionBaseRef, this);
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void process(DataSnapshot dataSnapshot) {
-        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
-        System.out.println("user.getNetworkCountryID() = " + user.getNetworkCountryID());
-        System.out.println("user.getLocalNetworkID() = " + user.getLocalNetworkID());
-        System.out.println("user.getNetworkID() = " + user.getNetworkID());
-        System.out.println("user.getCountryID() = " + user.getCountryID());
-        for (String id : ids) {
-            if (dataSnapshot.getValue() != null && id != null) {
-//                for (DataSnapshot getChild : dataSnapshot.child(id).getChildren()) {
-                    String actionIDs = dataSnapshot.getKey();
-                    DataModel model = dataSnapshot.getValue(DataModel.class);
-
-                    if (dataSnapshot.child("frequencyBase").getValue() != null) {
-                        model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
-                    }
-                    if (dataSnapshot.child("frequencyValue").getValue() != null) {
-                        model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
-                    }
-
-                    if (model.getType() != null && model.getType() == 2) {
-                        System.out.println("model = " + model);
-                        getCustom(model, dataSnapshot, id);
-                    }
-
-                    //  if (model.getType() != null && model.getType() == 0) {
-                    getCHS(model, actionIDs, id);
-                    // } else if (model.getType() != null && model.getType() == 1) {
-                    System.out.println("model = " + model);
-                    getMandated(model, actionIDs, id);
-
-//                }
-            }else {
-                getCHSForNewUser(id);
-                getMandatedForNewUser(id);
-            }
-        }
     }
 
     private void getCustom(DataModel model, DataSnapshot getChild, String id) {
@@ -392,5 +373,70 @@ public class ActionUnassignedFragment extends InProgressFragment {
     @Override
     public void onActionItemSelected(int pos, String key, String userTypeID) {
         Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Currently under development!", Snackbar.LENGTH_LONG).show();
+    }
+
+    private class UnassignedChildListener implements ChildEventListener {
+
+        private String id;
+
+        public UnassignedChildListener(String id) {
+
+            this.id = id;
+        }
+
+        @SuppressWarnings("ConstantConditions")
+        public void process(DataSnapshot dataSnapshot) {
+            if (dataSnapshot.getValue() != null) {
+//                for (DataSnapshot getChild : dataSnapshot.child(id).getChildren()) {
+                String actionIDs = dataSnapshot.getKey();
+                DataModel model = dataSnapshot.getValue(DataModel.class);
+
+                if (dataSnapshot.child("frequencyBase").getValue() != null) {
+                    model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
+                }
+                if (dataSnapshot.child("frequencyValue").getValue() != null) {
+                    model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
+                }
+
+                if (model.getType() != null && model.getType() == 2) {
+                    System.out.println("model = " + model);
+                    getCustom(model, dataSnapshot, id);
+                }
+
+                //  if (model.getType() != null && model.getType() == 0) {
+                getCHS(model, actionIDs, id);
+                // } else if (model.getType() != null && model.getType() == 1) {
+                System.out.println("model = " + model);
+                getMandated(model, actionIDs, id);
+
+//                }
+            }
+
+        }
+
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            process(dataSnapshot);
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            process(dataSnapshot);
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
     }
 }

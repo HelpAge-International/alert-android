@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.service.autofill.Dataset;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
@@ -20,6 +21,7 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,6 +35,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseCountryOfficeRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
@@ -58,7 +61,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAExpiredFragment extends Fragment implements APActionAdapter.ItemSelectedListener, ValueEventListener {
+public class APAExpiredFragment extends Fragment implements APActionAdapter.ItemSelectedListener, ChildEventListener {
 
     public APAExpiredFragment() {
         // Required empty public constructor
@@ -95,6 +98,10 @@ public class APAExpiredFragment extends Fragment implements APActionAdapter.Item
     @Inject
     @ActionMandatedRef
     DatabaseReference dbMandatedRef;
+
+    @Inject
+    @NetworkRef
+    DatabaseReference dbNetworkRef;
 
     @Inject
     @UserPublicRef
@@ -144,7 +151,7 @@ public class APAExpiredFragment extends Fragment implements APActionAdapter.Item
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionRef.addValueEventListener(this);
+        dbActionRef.addChildEventListener(this);
     }
 
     protected APActionAdapter getAPAdapter() {
@@ -208,35 +215,6 @@ public class APAExpiredFragment extends Fragment implements APActionAdapter.Item
             }
         }, year, month, day);
         pickerDialog.show();
-    }
-
-
-
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void onDataChange(DataSnapshot dataSnapshot) {
-        for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-            String actionIDs = getChild.getKey();
-
-            DataModel model = getChild.getValue(DataModel.class);
-
-            if (getChild.child("frequencyBase").getValue() != null) {
-                model.setFrequencyBase(getChild.child("frequencyBase").getValue().toString());
-            }
-            if (getChild.child("frequencyValue").getValue() != null) {
-                model.setFrequencyValue(getChild.child("frequencyValue").getValue().toString());
-            }
-
-            if (model.getType() == 0) {
-                getCHS(model, actionIDs);
-            } else if (model.getType() == 1) {
-                getMandated(model, actionIDs);
-            } else {
-                System.out.println("model = " + model);
-                getCustom(model, getChild);
-            }
-
-        }
     }
 
     private void getCustom(DataModel model, DataSnapshot getChild) {
@@ -446,30 +424,79 @@ public class APAExpiredFragment extends Fragment implements APActionAdapter.Item
                 && model.getTask() != null)) {
 
             txtNoAction.setVisibility(View.GONE);
-
-//            mAPAdapter.addItems(getChild.getKey(), new Action(
-//                    name,
-//                    model.getDepartment(),
-//                    model.getAsignee(),
-//                    model.getIsArchived(),
-//                    model.getIsComplete(),
-//                    createdAt,
-//                    model.getUpdatedAt(),
-//                    model.getType(),
-//                    model.getDueDate(),
-//                    model.getBudget(),
-//                    level,
-//                    model.getFrequencyBase(),
-//                    freqValue,
-//                    dbAgencyRef.getRef(),
-//                    dbUserPublicRef.getRef())
-//            );
+            mAPAdapter.addItems(getChild.getKey(), new Action(
+                    model.getId(),
+                    name,
+                    model.getDepartment(),
+                    model.getAsignee(),
+                    model.getCreatedByAgencyId(),
+                    model.getCreatedByCountryId(),
+                    model.getNetworkId(),
+                    model.getIsArchived(),
+                    model.getIsComplete(),
+                    createdAt,
+                    model.getUpdatedAt(),
+                    model.getType(),
+                    model.getDueDate(),
+                    model.getBudget(),
+                    level,
+                    model.getFrequencyBase(),
+                    freqValue,
+                    user,
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef(),
+                    dbNetworkRef.getRef())
+            );
         }
+
+    }
+
+    @Override
+    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+        process(dataSnapshot);
+    }
+
+    @Override
+    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+        process(dataSnapshot);
+    }
+
+    @Override
+    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+    }
+
+    @Override
+    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
     }
 
     @Override
     public void onCancelled(DatabaseError databaseError) {
 
+    }
+
+    private void process(DataSnapshot dataSnapshot) {
+        String actionIDs = dataSnapshot.getKey();
+
+        DataModel model = dataSnapshot.getValue(DataModel.class);
+        model.setId(actionIDs);
+
+        if (dataSnapshot.child("frequencyBase").getValue() != null) {
+            model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
+        }
+        if (dataSnapshot.child("frequencyValue").getValue() != null) {
+            model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
+        }
+
+        if (model.getType() == 0) {
+            getCHS(model, actionIDs);
+        } else if (model.getType() == 1) {
+            getMandated(model, actionIDs);
+        } else {
+            System.out.println("model = " + model);
+            getCustom(model, dataSnapshot);
+        }
     }
 
 
