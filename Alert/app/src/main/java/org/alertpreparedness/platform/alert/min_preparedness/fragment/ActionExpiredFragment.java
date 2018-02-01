@@ -39,6 +39,7 @@ import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -60,8 +61,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionExpiredFragment extends InProgressFragment {
-
+public class ActionExpiredFragment extends BaseExpiredFragment {
 
     @Nullable
     @BindView(R.id.rvMinAction)
@@ -75,15 +75,11 @@ public class ActionExpiredFragment extends InProgressFragment {
     @BindView(R.id.imgStatus)
     ImageView imgExpired;
 
+    @Nullable
+    @BindView(R.id.tvNoAction)
+    TextView txtNoAction;
+
     protected ActionAdapter mExpiredAdapter;
-    private Boolean isCHS = false;
-    private Boolean isCHSAssigned = false;
-    private Boolean isMandated = false;
-    private Boolean isMandatedAssigned = false;
-    private Boolean isInProgress = false;
-    private int freqBase = 0;
-    private int freqValue = 0;
-    private String ids[] = {};
 
     @Nullable
     @Override
@@ -105,7 +101,7 @@ public class ActionExpiredFragment extends InProgressFragment {
         tvActionExpired.setText("Expired");
         tvActionExpired.setTextColor(getResources().getColor(R.color.alertRed));
 
-        mExpiredAdapter = getmAdapter();
+        mExpiredAdapter = new ActionAdapter(getContext(), dbActionBaseRef, this);
         mActionRV.setAdapter(mExpiredAdapter);
 
         mActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -123,286 +119,42 @@ public class ActionExpiredFragment extends InProgressFragment {
         }
     }
 
-    public ActionAdapter getmAdapter() {
-        return new ActionAdapter(getContext(), dbActionBaseRef, this);
+    @Override
+    protected int getType() {
+        return Constants.MPA;
     }
 
-    private void getCustom(DataModel model, DataSnapshot getChild, String id, String actionIDs) {
-
-        countryOffice.child(user.agencyAdminID).child(user.countryID).child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ValueEventListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Long durationType = (Long) dataSnapshot.child("durationType").getValue();
-                Long value = (Long) dataSnapshot.child("value").getValue();
-                System.out.println("model Custom Action = " + model);
-
-                if (value != null) {
-                    if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_WEEK) {
-                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), value.intValue());
-                    } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_WEEK) {
-                        isInProgress = DateHelper.isInProgressWeek(model.getUpdatedAt(), value.intValue());
-                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_MONTH) {
-                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), value.intValue());
-                    } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_MONTH) {
-                        isInProgress = DateHelper.isInProgressMonth(model.getUpdatedAt(), value.intValue());
-                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_YEAR) {
-                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), value.intValue());
-                    } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_YEAR) {
-                        isInProgress = DateHelper.isInProgressYear(model.getUpdatedAt(), value.intValue());
-                    }
-                }
-
-                if (model.getFrequencyValue() != null && model.getFrequencyBase() != null) {
-                    freqValue = model.getFrequencyValue().intValue();
-                    freqBase = model.getFrequencyBase().intValue();
-
-                    if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_WEEK) {
-                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), freqValue);
-                    } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_WEEK) {
-                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), freqValue);
-                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_MONTH) {
-                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), freqValue);
-                    } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_MONTH) {
-                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), freqValue);
-                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && freqBase == Constants.DUE_YEAR) {
-                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), freqValue);
-                    } else if (model.getUpdatedAt() != null && freqBase == Constants.DUE_YEAR) {
-                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), freqValue);
-                    }
-                }
-
-                if (!isInProgress) {
-
-                    addObjects(model.getTask(),
-                            model.getDepartment(),
-                            model.getCreatedAt(),
-                            model.getLevel(),
-                            model,
-                            getChild,
-                            id,
-                            actionIDs,
-                            isCHS,
-                            isCHSAssigned,
-                            isMandated,
-                            isMandatedAssigned);
-                }
-                else {
-                    mExpiredAdapter.removeItem(getChild.getKey());
-                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+    @Override
+    protected PreparednessAdapter getAdapter() {
+        return mExpiredAdapter;
     }
-
-    private void getCHS(DataModel model, String actionIDs, String id) {
-        dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    if (actionIDs.contains(getChild.getKey())) {
-                        String CHSTaskName = (String) getChild.child("task").getValue();
-                        Long CHSlevel = (Long) getChild.child("level").getValue();
-                        Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
-                        isCHS = true;
-                        isCHSAssigned = true;
-
-                        countryOffice.child(user.agencyAdminID).child(user.countryID).child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @RequiresApi(api = Build.VERSION_CODES.N)
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                Long durationType = (Long) dataSnapshot.child("durationType").getValue();
-                                Long value = (Long) dataSnapshot.child("value").getValue();
-
-                                if (value != null) {
-                                    if (model.getCreatedAt() != null && durationType != null && durationType == Constants.DUE_WEEK) {
-                                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), value.intValue());
-                                    } else if (model.getCreatedAt() != null && durationType != null && durationType == Constants.DUE_MONTH) {
-                                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), value.intValue());
-                                    } else if (model.getCreatedAt() != null && durationType != null && durationType == Constants.DUE_YEAR) {
-                                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), value.intValue());
-                                    }
-                                }
-
-                                if (model.getFrequencyValue() != null && model.getFrequencyBase() != null) {
-                                    freqValue = model.getFrequencyValue().intValue();
-                                    freqBase = model.getFrequencyBase().intValue();
-
-                                    if (model.getCreatedAt() != null && freqBase == Constants.DUE_WEEK) {
-                                        isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), freqValue);
-                                    } else if (model.getCreatedAt() != null && freqBase == Constants.DUE_MONTH) {
-                                        isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), freqValue);
-                                    } else if (model.getCreatedAt() != null && freqBase == Constants.DUE_YEAR) {
-                                        isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), freqValue);
-                                    }
-                                }
-
-                                if (!isInProgress) {
-                                    addObjects(CHSTaskName,
-                                            model.getDepartment(),
-                                            CHSCreatedAt,
-                                            CHSlevel,
-                                            model,
-                                            getChild,
-                                            id,
-                                            actionIDs,
-                                            isCHS,
-                                            isCHSAssigned,
-                                            isMandated,
-                                            isMandatedAssigned);
-                                }
-                                else {
-                                    mExpiredAdapter.removeItem(getChild.getKey());
-                                }
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
-                }
-            }
-
-
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void getMandated(DataModel model, String actionIDs, String id) {
-        dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    if (actionIDs.contains(getChild.getKey())) {
-                        String taskNameMandated = (String) getChild.child("task").getValue();
-                        String departmentMandated = (String) getChild.child("department").getValue();
-                        Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
-                        Long manLevel = (Long) getChild.child("level").getValue();
-
-                        isMandated = true;
-                        isMandatedAssigned = true;
-                        isCHS = false;
-                        isCHSAssigned = false;
-
-                        if (!isInProgress) {
-                            addObjects(taskNameMandated,
-                                    departmentMandated,
-                                    manCreatedAt,
-                                    manLevel,
-                                    model,
-                                    getChild,
-                                    id,
-                                    actionIDs,
-                                    isCHS,
-                                    isCHSAssigned,
-                                    isMandated,
-                                    isMandatedAssigned);
-                        }
-                        else {
-                            mExpiredAdapter.removeItem(getChild.getKey());
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-    }
-
-    private void addObjects(String name, String department, Long createdAt, Long level,
-                            DataModel model, DataSnapshot getChild, String id, String actionIDs, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
-
-        if (user.getUserID().equals(model.getAsignee()) //MPA CUSTOM assigned and EXPIRED for logged in user.
-                && model.getLevel() != null
-                && model.getLevel() == Constants.MPA
-                && model.getDueDate() != null
-                && model.getTask() != null
-                || (user.getUserID().equals(model.getAsignee()) //MPA CHS assigned and EXPIRED for logged in user.
-                && isCHSAssigned && isCHS
-                && model.getLevel() != null
-                && model.getLevel() == Constants.MPA
-                && model.getDueDate() != null
-                && model.getTask() != null)
-                || (user.getUserID().equals(model.getAsignee()) //MPA Mandated assigned and EXPIRED for logged in user.
-                && isMandatedAssigned && isMandated
-                && model.getLevel() != null
-                && model.getLevel() == Constants.MPA
-                && model.getDueDate() != null
-                && model.getTask() != null)) {
-
-            txtNoAction.setVisibility(View.GONE);
-            System.out.println("ID = "+id+" actionIDs = " + actionIDs);
-            mExpiredAdapter.addItems(getChild.getKey(), new Action(
-                    id,
-                    name,
-                    department,
-                    model.getAsignee(),
-                    model.getCreatedByAgencyId(),
-                    model.getCreatedByCountryId(),
-                    model.getNetworkId(),
-                    model.getIsArchived(),
-                    model.getIsComplete(),
-                    createdAt,
-                    model.getUpdatedAt(),
-                    model.getType(),
-                    model.getDueDate(),
-                    model.getBudget(),
-                    level,
-                    model.getFrequencyBase(),
-                    freqValue,
-                    user,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef(),
-                    dbNetworkRef)
-            );
-        }
-        else {
-            mExpiredAdapter.removeItem(getChild.getKey());
-        }
-    }
-
-
 
     @Override
     public void onActionItemSelected(int pos, String key, String userTypeID) {
-        SheetMenu.with(getContext()).setMenu(R.menu.menu_expired).setClick(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.update_date:
-                        showDatePicker(key);
-                        break;
-                    case R.id.reassign_action:
-                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
-                        break;
-                    case R.id.action_notes:
-                        Intent intent = new Intent(getActivity(), AddNotesActivity.class);
-                        intent.putExtra("ACTION_KEY", key);
-                        startActivity(intent);
-                        break;
-                    case R.id.attachments:
-                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
-                        break;
-                }
-                return false;
+        SheetMenu.with(getContext()).setMenu(R.menu.menu_expired).setClick(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.update_date:
+                    showDatePicker(key);
+                    break;
+                case R.id.reassign_action:
+                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
+                    break;
+                case R.id.action_notes:
+                    Intent intent = new Intent(getActivity(), AddNotesActivity.class);
+                    intent.putExtra("ACTION_KEY", key);
+                    startActivity(intent);
+                    break;
+                case R.id.attachments:
+                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
+                    break;
             }
+            return false;
         }).show();
+    }
+
+    @Override
+    protected TextView getNoActionView() {
+        return txtNoAction;
     }
 
     private void showDatePicker(String key) {
@@ -430,61 +182,5 @@ public class ActionExpiredFragment extends InProgressFragment {
             }
         }, year, month, day);
         pickerDialog.show();
-    }
-
-    private class ExpiredChildListener implements ChildEventListener {
-        private String id;
-
-        public ExpiredChildListener(String id) {
-            this.id = id;
-        }
-
-        @SuppressWarnings("ConstantConditions")
-        public void process(DataSnapshot dataSnapshot) {
-            System.out.println("processdataSnapshot = " + dataSnapshot);
-            String actionIDs = dataSnapshot.getKey();
-            DataModel model = dataSnapshot.getValue(DataModel.class);
-
-            if (dataSnapshot.child("frequencyBase").getValue() != null) {
-                model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
-            }
-            if (dataSnapshot.child("frequencyValue").getValue() != null) {
-                model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
-            }
-
-            if (model.getType() != null && model.getType() == 0) {
-                getCHS(model, actionIDs, id);
-            } else if (model.getType() != null && model.getType() == 1) {
-                getMandated(model, actionIDs, id);
-            } else if (model.getType() != null && model.getType() == 2){
-                System.out.println("model = " + model);
-                getCustom(model, dataSnapshot, id, actionIDs);
-            }
-        }
-
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            process(dataSnapshot);
-        }
-
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            process(dataSnapshot);
-        }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-        }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
     }
 }

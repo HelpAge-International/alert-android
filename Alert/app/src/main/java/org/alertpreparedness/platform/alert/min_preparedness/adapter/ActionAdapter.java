@@ -36,7 +36,7 @@ import butterknife.ButterKnife;
  * Created by faizmohideen on 20/12/2017.
  */
 
-public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder> implements ChildEventListener {
+public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder> implements ChildEventListener, PreparednessAdapter {
 
     private final ArrayList<String> keys;
     private Context context;

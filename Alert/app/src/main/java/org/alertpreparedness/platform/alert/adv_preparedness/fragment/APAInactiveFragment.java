@@ -32,6 +32,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
@@ -99,6 +100,10 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
 
     @Inject
     User user;
+
+    @Inject
+    @NetworkRef
+    DatabaseReference dbNetworkRef;
 
     private APActionAdapter mAPAdapter;
     private Boolean isCHS = false;
@@ -330,24 +335,29 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
                 && alertLevel == Constants.TRIGGER_RED)) {
 
             txtNoAction.setVisibility(View.GONE);
-
-//            mAPAdapter.addItems(getChild.getKey(), new Action(
-//                    name,
-//                    model.getDepartment(),
-//                    model.getAsignee(),
-//                    model.getIsArchived(),
-//                    model.getIsComplete(),
-//                    createdAt,
-//                    model.getUpdatedAt(),
-//                    model.getType(),
-//                    model.getDueDate(),
-//                    model.getBudget(),
-//                    level,
-//                    model.getFrequencyBase(),
-//                    freqValue,
-//                    dbAgencyRef.getRef(),
-//                    dbUserPublicRef.getRef())
-//            );
+            mAPAdapter.addItems(getChild.getKey(), new Action(
+                    model.getId(),
+                    model.getTask(),
+                    model.getDepartment(),
+                    model.getAsignee(),
+                    model.getCreatedByAgencyId(),
+                    model.getCreatedByCountryId(),
+                    model.getNetworkId(),
+                    model.getIsArchived(),
+                    model.getIsComplete(),
+                    createdAt,
+                    model.getUpdatedAt(),
+                    model.getType(),
+                    model.getDueDate(),
+                    model.getBudget(),
+                    level,
+                    model.getFrequencyBase(),
+                    freqValue,
+                    user,
+                    dbAgencyRef.getRef(),
+                    dbUserPublicRef.getRef(),
+                    dbNetworkRef.getRef())
+            );
         }
     }
 

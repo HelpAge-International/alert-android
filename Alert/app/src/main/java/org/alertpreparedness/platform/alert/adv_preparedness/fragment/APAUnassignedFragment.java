@@ -35,6 +35,8 @@ import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
+import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseUnassignedFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.model.User;
@@ -50,54 +52,24 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAUnassignedFragment extends Fragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener, ChildEventListener {
+public class APAUnassignedFragment extends BaseUnassignedFragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener {
 
     public APAUnassignedFragment() {
         // Required empty public constructor
     }
 
-    @Nullable
     @BindView(R.id.rvAdvAction)
     RecyclerView mAdvActionRV;
 
-    @Inject
-    User user;
-
-    @Nullable
     @BindView(R.id.imgStatus)
     ImageView imgActionUnassigned;
 
-    @Nullable
     @BindView(R.id.tvStatus)
     TextView tvActionUnassigned;
 
-    @Nullable
     @BindView(R.id.tvAPANoAction)
     TextView txtNoAction;
 
-    @Inject
-    @ActionRef
-    DatabaseReference dbActionRef;
-
-    @Inject
-    @AgencyRef
-    DatabaseReference dbAgencyRef;
-
-    @Inject
-    @ActionCHSRef
-    DatabaseReference dbCHSRef;
-
-    @Inject
-    @ActionMandatedRef
-    DatabaseReference dbMandatedRef;
-
-    @Inject
-    @UserPublicRef
-    DatabaseReference dbUserPublicRef;
-
-    @Inject
-    @NetworkRef
-    DatabaseReference dbNetworkRef;
 
     private APActionAdapter mAPAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
@@ -125,7 +97,7 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
         assert tvActionUnassigned != null;
         tvActionUnassigned.setText("Unassigned");
         tvActionUnassigned.setTextColor(getResources().getColor(R.color.alertRed));
-        mAPAdapter = getAPAdapter();
+        mAPAdapter = new APActionAdapter(getContext(), dbActionRef, this);
         assert mAdvActionRV != null;
         mAdvActionRV.setAdapter(mAPAdapter);
 
@@ -133,25 +105,28 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionRef.addChildEventListener(this);
-        dbActionRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getValue() == null) {
-                    getCHSForNewUser();
-                    getMandatedForNewUser();
-                }
+        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
+
+        for (String id : ids) {
+            if(id != null) {
+                dbActionBaseRef.child(id).addChildEventListener(new UnassignedChildListener(id));
+                dbActionBaseRef.child(id).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.getValue() == null) {
+                            getCHSForNewUser(id);
+                            getMandatedForNewUser(id);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
             }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    protected APActionAdapter getAPAdapter() {
-        return new APActionAdapter(getContext(), dbActionRef, this);
+        }
     }
 
     @Override
@@ -178,299 +153,6 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
         }).show();
     }
 
-    private void getCustom(DataModel model, DataSnapshot getChild) {
-
-        if (model.getLevel() != null //MPA CUSTOM UNASSIGNED // NO USERS.
-                && model.getLevel() == Constants.MPA
-                && model.getAsignee() == null
-                && model.getTask() != null) {
-
-            txtNoAction.setVisibility(View.GONE);
-            mAPAdapter.addItems(getChild.getKey(), new Action(
-                    model.getId(),
-                    model.getTask(),
-                    model.getDepartment(),
-                    model.getAsignee(),
-                    model.getCreatedByAgencyId(),
-                    model.getCreatedByCountryId(),
-                    model.getNetworkId(),
-                    model.getIsArchived(),
-                    model.getIsComplete(),
-                    model.getCreatedAt(),
-                    model.getUpdatedAt(),
-                    model.getType(),
-                    model.getDueDate(),
-                    model.getBudget(),
-                    model.getLevel(),
-                    model.getFrequencyBase(),
-                    freqValue,
-                    user,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef(),
-                    dbNetworkRef.getRef())
-            );
-        }
-    }
-
-    private void getCHS(DataModel model, String actionIDs) {
-        dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-
-                    if (!actionIDs.equals(getChild.getKey())) {
-
-                        String CHSTaskName = (String) getChild.child("task").getValue();
-                        Long CHSlevel = (Long) getChild.child("level").getValue();
-                        Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
-
-                        txtNoAction.setVisibility(View.GONE);
-                        mAPAdapter.addItems(getChild.getKey(), new Action(
-                                model.getId(),
-                                CHSTaskName,
-                                model.getDepartment(),
-                                model.getAsignee(),
-                                model.getCreatedByAgencyId(),
-                                model.getCreatedByCountryId(),
-                                model.getNetworkId(),
-                                model.getIsArchived(),
-                                model.getIsComplete(),
-                                CHSCreatedAt,
-                                model.getUpdatedAt(),
-                                model.getType(),
-                                model.getDueDate(),
-                                model.getBudget(),
-                                CHSlevel,
-                                model.getFrequencyBase(),
-                                freqValue,
-                                user,
-                                dbAgencyRef.getRef(),
-                                dbUserPublicRef.getRef(),
-                                dbNetworkRef.getRef())
-                        );
-
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void getMandated(DataModel model, String actionIDs) {
-        dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    if (!actionIDs.contains(getChild.getKey())) {
-
-                        try {
-                            String taskNameMandated = (String) getChild.child("task").getValue();
-                            String departmentMandated = (String) getChild.child("department").getValue();
-                            Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
-                            Long manLevel = (Long) getChild.child("level").getValue();
-
-                            txtNoAction.setVisibility(View.GONE);
-                            mAPAdapter.addItems(getChild.getKey(), new Action(
-                                    taskNameMandated,
-                                    departmentMandated,
-                                    model.getDepartment(),
-                                    model.getAsignee(),
-                                    model.getCreatedByAgencyId(),
-                                    model.getCreatedByCountryId(),
-                                    model.getNetworkId(),
-                                    model.getIsArchived(),
-                                    model.getIsComplete(),
-                                    manCreatedAt,
-                                    model.getUpdatedAt(),
-                                    model.getType(),
-                                    model.getDueDate(),
-                                    model.getBudget(),
-                                    manLevel,
-                                    model.getFrequencyBase(),
-                                    freqValue,
-                                    user,
-                                    dbAgencyRef.getRef(),
-                                    dbUserPublicRef.getRef(),
-                                    dbNetworkRef.getRef())
-                            );
-
-
-                        } catch (Exception exception) {
-                            System.out.println("exception = " + exception);
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-    }
-
-    private void getMandatedForNewUser() {
-        dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-
-                    try {
-                        String taskNameMandated = (String) getChild.child("task").getValue();
-                        String departmentMandated = (String) getChild.child("department").getValue();
-                        Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
-                        Long manLevel = (Long) getChild.child("level").getValue();
-
-                        txtNoAction.setVisibility(View.GONE);
-                        mAPAdapter.addItems(getChild.getKey(), new Action(
-                                taskNameMandated,
-                                departmentMandated,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                manCreatedAt,
-                                null,
-                                null,
-                                null,
-                                null,
-                                manLevel,
-                                null,
-                                freqValue,
-                                user,
-                                dbAgencyRef.getRef(),
-                                dbUserPublicRef.getRef(),
-                                dbNetworkRef.getRef())
-                        );
-
-                    } catch (Exception exception) {
-                        System.out.println("exception = " + exception);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-    }
-
-    private void getCHSForNewUser() {
-        dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-
-                    String CHSTaskName = (String) getChild.child("task").getValue();
-                    Long CHSlevel = (Long) getChild.child("level").getValue();
-                    Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
-
-                    txtNoAction.setVisibility(View.GONE);
-//                    mAPAdapter.addItems(getChild.getKey(), new Action(
-//                            CHSTaskName,
-//                            null,
-//                            null,
-//                            null,
-//                            null,
-//                            CHSCreatedAt,
-//                            null,
-//                            (long) 0, //CHS always 0
-//                            null,
-//                            null,
-//                            CHSlevel,
-//                            null,
-//                            null,
-//                            dbAgencyRef.getRef(),
-//                            dbUserPublicRef.getRef())
-//                    );
-                    mAPAdapter.addItems(getChild.getKey(), new Action(
-                            CHSTaskName,
-                            CHSTaskName,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            CHSlevel,
-                            null,
-                            null,
-                            null,
-                            null,
-                            CHSCreatedAt,
-                            null,
-                            freqValue,
-                            user,
-                            dbAgencyRef.getRef(),
-                            dbUserPublicRef.getRef(),
-                            dbNetworkRef.getRef())
-                    );
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    @Override
-    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-        process(dataSnapshot);
-    }
-
-    @Override
-    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-        process(dataSnapshot);
-    }
-
-    @Override
-    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-    }
-
-    @Override
-    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-    }
-
-    @Override
-    public void onCancelled(DatabaseError databaseError) {
-
-    }
-
-    private void process(DataSnapshot dataSnapshot) {
-        String actionIDs = dataSnapshot.getKey();
-        DataModel model = dataSnapshot.getValue(DataModel.class);
-
-        if (dataSnapshot.child("frequencyBase").getValue() != null) {
-            model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
-        }
-        if (dataSnapshot.child("frequencyValue").getValue() != null) {
-            model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
-        }
-
-        //if (model.getType() == 0) {
-        getCHS(model, actionIDs);
-        //  } else if (model.getType() == 1) {
-        getMandated(model, actionIDs);
-        //  } else {
-        getCustom(model, dataSnapshot);
-        // }
-    }
-
     @Override
     public void onItemSelected(UserModel userModel) {
         long millis = System.currentTimeMillis();
@@ -480,4 +162,18 @@ public class APAUnassignedFragment extends Fragment implements APActionAdapter.I
         mAPAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    protected int getType() {
+        return Constants.APA;
+    }
+
+    @Override
+    protected PreparednessAdapter getAdapter() {
+        return mAPAdapter;
+    }
+
+    @Override
+    protected TextView getNoActionView() {
+        return txtNoAction;
+    }
 }

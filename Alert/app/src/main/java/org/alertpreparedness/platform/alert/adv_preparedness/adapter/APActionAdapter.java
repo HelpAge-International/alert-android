@@ -24,6 +24,7 @@ import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
@@ -42,7 +43,7 @@ import butterknife.ButterKnife;
  * Created by faizmohideen on 05/01/2018.
  */
 
-public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHolder> implements ChildEventListener {
+public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHolder> implements ChildEventListener, PreparednessAdapter {
 
     private final ArrayList<String> keys;
     private Context context;
@@ -104,9 +105,11 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
     public void removeItem(String key) {
         int index = keys.indexOf(key);
-        items.remove(keys.get(index));
-        keys.remove(index);
-        notifyItemRemoved(index);
+        if(index != -1) {
+            items.remove(keys.get(index));
+            keys.remove(index);
+            notifyItemRemoved(index);
+        }
     }
 
     @Override

@@ -25,6 +25,10 @@ import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteAc
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.fragment.ActionArchivedFragment;
+import org.alertpreparedness.platform.alert.min_preparedness.fragment.ActionCompletedFragment;
+import org.alertpreparedness.platform.alert.min_preparedness.fragment.ActionExpiredFragment;
+import org.alertpreparedness.platform.alert.min_preparedness.fragment.ActionUnassignedFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.InProgressFragment;
 import org.alertpreparedness.platform.alert.mycountry.MyCountryFragment;
 import org.alertpreparedness.platform.alert.mycountry.ProgramResultsActivity;
@@ -84,4 +88,8 @@ public interface ApplicationComponent {
     void inject(UsersListDialogFragment fragment);
     void inject(SplashActivity splashActivity);
     void inject(CreateAPAActivity activity);
+    void inject(ActionArchivedFragment actionArchivedFragment);
+    void inject(ActionCompletedFragment actionCompletedFragment);
+    void inject(ActionExpiredFragment actionExpiredFragment);
+    void inject(ActionUnassignedFragment actionUnassignedFragment);
 }

@@ -26,6 +26,7 @@ import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -37,29 +38,22 @@ import butterknife.ButterKnife;
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionCompletedFragment extends InProgressFragment {
+public class ActionCompletedFragment extends BaseCompletedFragment {
 
-    @Nullable
     @BindView(R.id.rvMinAction)
     RecyclerView mActionRV;
 
-    @Nullable
     @BindView(R.id.tvStatus)
     TextView tvActionCompleted;
 
-    @Nullable
     @BindView(R.id.imgStatus)
     ImageView imgCompleted;
 
+    @BindView(R.id.tvNoAction)
+    TextView txtNoAction;
+
+
     private ActionAdapter mAdapter;
-    private Boolean isCHS = false;
-    private Boolean isCHSAssigned = false;
-    private Boolean isMandated = false;
-    private Boolean isMandatedAssigned = false;
-    private Boolean isInProgress = false;
-    private int freqBase = 0;
-    private int freqValue = 0;
-    private String ids[] = {};
 
     @Nullable
     @Override
@@ -82,7 +76,7 @@ public class ActionCompletedFragment extends InProgressFragment {
         tvActionCompleted.setText("Completed");
         tvActionCompleted.setTextColor(getResources().getColor(R.color.alertGreen));
 
-        mAdapter = getmAdapter();
+        mAdapter = new ActionAdapter(getContext(), dbActionBaseRef, this);
         assert mActionRV != null;
         mActionRV.setAdapter(mAdapter);
 
@@ -93,7 +87,7 @@ public class ActionCompletedFragment extends InProgressFragment {
         ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
 
         for (String id : ids) {
-            if(id != null) {
+            if (id != null) {
                 dbActionBaseRef.child(id).addChildEventListener(new CompletedListener(id));
             }
 
@@ -101,170 +95,13 @@ public class ActionCompletedFragment extends InProgressFragment {
     }
 
     @Override
-    protected ActionAdapter getmAdapter() {
-        return new ActionAdapter(getContext(), dbActionBaseRef, this);
+    protected int getType() {
+        return Constants.MPA;
     }
 
-    private void getCustom(DataModel model, DataSnapshot getChild, String id) {
-        System.out.println("model = " + model);
-        if (user.getUserID().equals(model.getAsignee()) //MPA CUSTOM assigned and COMPLETED for logged in user.
-                && model.getLevel() != null
-                && model.getLevel() == Constants.MPA
-                && model.getIsCompleteAt() != null
-                && model.getIsComplete() != null
-                && model.getIsComplete()) {
-
-            txtNoAction.setVisibility(View.GONE);
-            mAdapter.addItems(getChild.getKey(), new Action(
-                    id,
-                    model.getTask(),
-                    model.getDepartment(),
-                    model.getAsignee(),
-                    model.getCreatedByAgencyId(),
-                    model.getCreatedByCountryId(),
-                    model.getNetworkId(),
-                    model.getIsArchived(),
-                    model.getIsComplete(),
-                    model.getCreatedAt(),
-                    model.getUpdatedAt(),
-                    model.getType(),
-                    model.getDueDate(),
-                    model.getBudget(),
-                    model.getLevel(),
-                    model.getFrequencyBase(),
-                    freqValue,
-                    user,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef(),
-                    dbNetworkRef)
-            );
-        }
-        else {
-            mAdapter.removeItem(getChild.getKey());
-        }
-    }
-
-    private void getCHS(DataModel model, String actionIDs, String id) {
-        dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    if (actionIDs.contains(getChild.getKey())) {
-                        String CHSTaskName = (String) getChild.child("task").getValue();
-                        Long CHSlevel = (Long) getChild.child("level").getValue();
-                        Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
-                        isCHS = true;
-                        isCHSAssigned = true;
-
-                        if (isCHSAssigned && isCHS  //MPA CHS assigned and COMPLETED for logged in user.
-                                && user.getUserID().equals(model.getAsignee())
-                                && model.getLevel() != null
-                                && model.getLevel() == Constants.MPA
-                                && model.getIsCompleteAt() != null
-                                && model.getIsComplete() != null
-                                && model.getIsComplete()) {
-
-                            txtNoAction.setVisibility(View.GONE);
-                            mAdapter.addItems(getChild.getKey(), new Action(
-                                    id,
-                                    CHSTaskName,
-                                    model.getDepartment(),
-                                    model.getAsignee(),
-                                    model.getCreatedByAgencyId(),
-                                    model.getCreatedByCountryId(),
-                                    model.getNetworkId(),
-                                    model.getIsArchived(),
-                                    model.getIsComplete(),
-                                    CHSCreatedAt,
-                                    model.getUpdatedAt(),
-                                    model.getType(),
-                                    model.getDueDate(),
-                                    model.getBudget(),
-                                    CHSlevel,
-                                    model.getFrequencyBase(),
-                                    freqValue,
-                                    user,
-                                    dbAgencyRef.getRef(),
-                                    dbUserPublicRef.getRef(),
-                                    dbNetworkRef)
-                            );
-                        }
-                        else {
-                            mAdapter.removeItem(getChild.getKey());
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void getMandated(DataModel model, String actionIDs, String id) {
-        dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    if (actionIDs.contains(getChild.getKey())) {
-                        String taskNameMandated = (String) getChild.child("task").getValue();
-                        //String departmentMandated = (String) getChild.child("department").getValue(); //Department is also found under "action"
-                        Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
-                        Long manLevel = (Long) getChild.child("level").getValue();
-
-                        isMandated = true;
-                        isMandatedAssigned = true;
-                        isCHS = false;
-                        isCHSAssigned = false;
-
-                        if (isMandatedAssigned && isMandated  //MPA CHS assigned and COMPLETED for logged in user.
-                                && user.getUserID().equals(model.getAsignee())
-                                && model.getLevel() != null
-                                && model.getLevel() == Constants.MPA
-                                && model.getIsCompleteAt() != null
-                                && model.getIsComplete() != null
-                                && model.getIsComplete()) {
-
-                            txtNoAction.setVisibility(View.GONE);
-                            mAdapter.addItems(getChild.getKey(), new Action(
-                                    id,
-                                    taskNameMandated,
-                                    model.getDepartment(),
-                                    model.getAsignee(),
-                                    model.getCreatedByAgencyId(),
-                                    model.getCreatedByCountryId(),
-                                    model.getNetworkId(),
-                                    model.getIsArchived(),
-                                    model.getIsComplete(),
-                                    manCreatedAt,
-                                    model.getUpdatedAt(),
-                                    model.getType(),
-                                    model.getDueDate(),
-                                    model.getBudget(),
-                                    manLevel,
-                                    model.getFrequencyBase(),
-                                    freqValue,
-                                    user,
-                                    dbAgencyRef.getRef(),
-                                    dbUserPublicRef.getRef(),
-                                    dbNetworkRef)
-                            );
-                        }
-                        else {
-                            mAdapter.removeItem(getChild.getKey());
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
+    @Override
+    protected PreparednessAdapter getAdapter() {
+        return mAdapter;
     }
 
     @Override
@@ -272,60 +109,8 @@ public class ActionCompletedFragment extends InProgressFragment {
         Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Currently under development!", Snackbar.LENGTH_LONG).show();
     }
 
-    private class CompletedListener implements ChildEventListener {
-        private String id;
-
-        public CompletedListener(String id) {
-            this.id = id;
-        }
-
-        @SuppressWarnings("ConstantConditions")
-        public void process(DataSnapshot dataSnapshot) {
-
-            String actionIDs = dataSnapshot.getKey();
-            DataModel model = dataSnapshot.getValue(DataModel.class);
-
-            if (dataSnapshot.child("frequencyBase").getValue() != null) {
-                model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
-            }
-            if (dataSnapshot.child("frequencyValue").getValue() != null) {
-                model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
-            }
-
-            if (model.getType() != null && model.getType() == 0) {
-                getCHS(model, actionIDs, id);
-            } else if (model.getType() != null && model.getType() == 1) {
-                getMandated(model, actionIDs, id);
-            } else if (model.getType() != null && model.getType() == 2){
-                System.out.println("model = " + model);
-                getCustom(model, dataSnapshot, id);
-            }
-
-        }
-
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            process(dataSnapshot);
-        }
-
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            process(dataSnapshot);
-        }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-        }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
+    @Override
+    protected TextView getNoActionView() {
+        return txtNoAction;
     }
 }

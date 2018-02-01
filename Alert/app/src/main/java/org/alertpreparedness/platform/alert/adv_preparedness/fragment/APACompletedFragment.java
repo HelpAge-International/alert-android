@@ -30,10 +30,13 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseCountryOfficeRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseCompletedFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.model.User;
@@ -49,7 +52,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APACompletedFragment extends Fragment implements APActionAdapter.ItemSelectedListener, ChildEventListener {
+public class APACompletedFragment extends BaseCompletedFragment implements APActionAdapter.ItemSelectedListener {
 
     public APACompletedFragment() {
         // Required empty public constructor
@@ -71,41 +74,7 @@ public class APACompletedFragment extends Fragment implements APActionAdapter.It
     @BindView(R.id.tvAPANoAction)
     TextView txtNoAction;
 
-    @Inject
-    @ActionRef
-    DatabaseReference dbActionRef;
-
-    @Inject
-    @AgencyRef
-    DatabaseReference dbAgencyRef;
-
-    @Inject
-    @ActionCHSRef
-    DatabaseReference dbCHSRef;
-
-    @Inject
-    @ActionMandatedRef
-    DatabaseReference dbMandatedRef;
-
-    @Inject
-    @UserPublicRef
-    DatabaseReference dbUserPublicRef;
-
-    @Inject
-    @BaseCountryOfficeRef
-    DatabaseReference countryOffice;
-
-    @Inject
-    User user;
-
     private APActionAdapter mAPAdapter;
-    private Boolean isCHS = false;
-    private Boolean isCHSAssigned = false;
-    private Boolean isMandated = false;
-    private Boolean isMandatedAssigned = false;
-    private Boolean isInProgress = false;
-    private int freqBase = 0;
-    private int freqValue = 0;
 
     @Nullable
     @Override
@@ -126,7 +95,7 @@ public class APACompletedFragment extends Fragment implements APActionAdapter.It
         assert tvActionCompleted != null;
         tvActionCompleted.setText("Completed");
         tvActionCompleted.setTextColor(getResources().getColor(R.color.alertGreen));
-        mAPAdapter = getAPAdapter();
+        mAPAdapter = new APActionAdapter(getContext(), dbActionRef, this);
         assert mAdvActionRV != null;
         mAdvActionRV.setAdapter(mAPAdapter);
 
@@ -134,198 +103,19 @@ public class APACompletedFragment extends Fragment implements APActionAdapter.It
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionRef.addChildEventListener(this);
-    }
+        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
 
-    protected APActionAdapter getAPAdapter() {
-        return new APActionAdapter(getContext(), dbActionRef, this);
+        for (String id : ids) {
+            if (id != null) {
+                dbActionBaseRef.child(id).addChildEventListener(new CompletedListener(id));
+            }
+
+        }
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-    }
-
-    private void process(DataSnapshot dataSnapshot) {
-//        for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-            String actionIDs = dataSnapshot.getKey();
-            DataModel model = dataSnapshot.getValue(DataModel.class);
-
-            if (dataSnapshot.child("frequencyBase").getValue() != null) {
-                model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
-            }
-            if (dataSnapshot.child("frequencyValue").getValue() != null) {
-                model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
-            }
-
-            if (model.getType() == 0) {
-                getCHS(model, actionIDs);
-            } else if (model.getType() == 1) {
-                getMandated(model, actionIDs);
-            } else {
-                getCustom(model, dataSnapshot);
-            }
-//        }
-    }
-
-    @Override
-    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-        process(dataSnapshot);
-    }
-
-    @Override
-    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-        process(dataSnapshot);
-    }
-
-    @Override
-    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-    }
-
-    @Override
-    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-    }
-
-    @Override
-    public void onCancelled(DatabaseError databaseError) {
-
-    }
-
-    private void getCustom(DataModel model, DataSnapshot getChild) {
-        System.out.println("model = " + model);
-        if (user.getUserID().equals(model.getAsignee()) //APA CUSTOM assigned and COMPLETED for logged in user.
-                && model.getLevel() != null
-                && model.getLevel() == Constants.APA
-                && model.getIsCompleteAt() != null
-                && model.getIsComplete() != null
-                && model.getIsComplete()) {
-
-            txtNoAction.setVisibility(View.GONE);
-//            mAPAdapter.addItems(getChild.getKey(), new Action(
-//                    model.getTask(),
-//                    model.getDepartment(),
-//                    model.getAsignee(),
-//                    model.getIsArchived(),
-//                    model.getIsComplete(),
-//                    model.getCreatedAt(),
-//                    model.getUpdatedAt(),
-//                    model.getType(),
-//                    model.getDueDate(),
-//                    model.getBudget(),
-//                    model.getLevel(),
-//                    model.getFrequencyBase(),
-//                    freqValue,
-//                    dbAgencyRef.getRef(),
-//                    dbUserPublicRef.getRef())
-//            );
-        }
-    }
-
-    private void getCHS(DataModel model, String actionIDs) {
-        dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    if (actionIDs.contains(getChild.getKey())) {
-                        String CHSTaskName = (String) getChild.child("task").getValue();
-                        Long CHSlevel = (Long) getChild.child("level").getValue();
-                        Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
-                        isCHS = true;
-                        isCHSAssigned = true;
-
-                        if (isCHSAssigned && isCHS  //APA CHS assigned and COMPLETED for logged in user.
-                                && user.getUserID().equals(model.getAsignee())
-                                && model.getLevel() != null
-                                && model.getLevel() == Constants.APA
-                                && model.getIsCompleteAt() != null
-                                && model.getIsComplete() != null
-                                && model.getIsComplete()) {
-
-                            txtNoAction.setVisibility(View.GONE);
-//                            mAPAdapter.addItems(getChild.getKey(), new Action(
-//                                    CHSTaskName,
-//                                    model.getDepartment(),
-//                                    model.getAsignee(),
-//                                    model.getIsArchived(),
-//                                    model.getIsComplete(),
-//                                    CHSCreatedAt,
-//                                    model.getUpdatedAt(),
-//                                    model.getType(),
-//                                    model.getDueDate(),
-//                                    model.getBudget(),
-//                                    CHSlevel,
-//                                    model.getFrequencyBase(),
-//                                    freqValue,
-//                                    dbAgencyRef.getRef(),
-//                                    dbUserPublicRef.getRef())
-//                            );
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void getMandated(DataModel model, String actionIDs) {
-        dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    if (actionIDs.contains(getChild.getKey())) {
-                        String taskNameMandated = (String) getChild.child("task").getValue();
-                        //String departmentMandated = (String) getChild.child("department").getValue(); //Department is also found under "action"
-                        Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
-                        Long manLevel = (Long) getChild.child("level").getValue();
-
-                        isMandated = true;
-                        isMandatedAssigned = true;
-                        isCHS = false;
-                        isCHSAssigned = false;
-
-                        if (isMandatedAssigned && isMandated  //APA CHS assigned and COMPLETED for logged in user.
-                                && user.getUserID().equals(model.getAsignee())
-                                && model.getLevel() != null
-                                && model.getLevel() == Constants.APA
-                                && model.getIsCompleteAt() != null
-                                && model.getIsComplete() != null
-                                && model.getIsComplete()) {
-
-                            txtNoAction.setVisibility(View.GONE);
-//                            mAPAdapter.addItems(getChild.getKey(), new Action(
-//                                    taskNameMandated,
-//                                    model.getDepartment(),
-//                                    model.getAsignee(),
-//                                    model.getIsArchived(),
-//                                    model.getIsComplete(),
-//                                    manCreatedAt,
-//                                    model.getUpdatedAt(),
-//                                    model.getType(),
-//                                    model.getDueDate(),
-//                                    model.getBudget(),
-//                                    manLevel,
-//                                    model.getFrequencyBase(),
-//                                    freqValue,
-//                                    dbAgencyRef.getRef(),
-//                                    dbUserPublicRef.getRef())
-//                            );
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
     }
 
     @Override
@@ -334,5 +124,19 @@ public class APACompletedFragment extends Fragment implements APActionAdapter.It
     }
 
 
+    @Override
+    protected int getType() {
+        return Constants.APA;
+    }
+
+    @Override
+    protected PreparednessAdapter getAdapter() {
+        return mAPAdapter;
+    }
+
+    @Override
+    protected TextView getNoActionView() {
+        return txtNoAction;
+    }
 }
 
