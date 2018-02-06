@@ -80,8 +80,6 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
 
         setSupportActionBar(mToolbar);
 
-        System.out.println("alertRef.getKey() = " + alertRef.getKey());
-
         assert getSupportActionBar() != null;
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -256,8 +254,7 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
     }
 
     @Override
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
 
         // save RecyclerView state
@@ -267,8 +264,7 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
 
         // restore RecyclerView state

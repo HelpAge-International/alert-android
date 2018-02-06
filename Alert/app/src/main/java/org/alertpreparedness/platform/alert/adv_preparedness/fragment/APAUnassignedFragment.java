@@ -125,7 +125,6 @@ public class APAUnassignedFragment extends BaseUnassignedFragment implements APA
                     }
                 });
             }
-
         }
     }
 
