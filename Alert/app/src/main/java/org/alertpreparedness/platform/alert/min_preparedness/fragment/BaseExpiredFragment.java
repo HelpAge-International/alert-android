@@ -218,7 +218,7 @@ public abstract class BaseExpiredFragment extends BaseInProgressFragment {
 
     }
 
-    private void addObjects(String name, String department, Long createdAt, Long level,
+    protected void addObjects(String name, String department, Long createdAt, Long level,
                             DataModel model, DataSnapshot getChild, String id, String actionIDs, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
 
         if (user.getUserID().equals(model.getAsignee()) //MPA CUSTOM assigned and EXPIRED for logged in user.

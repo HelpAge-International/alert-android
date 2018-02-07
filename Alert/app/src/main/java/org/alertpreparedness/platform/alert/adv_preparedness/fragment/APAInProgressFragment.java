@@ -248,14 +248,13 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
         }
     }
 
+    @Override
     protected void addObjects(String name, Long createdAt, Long level,
                               DataModel model, DataSnapshot getChild, String id, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
         if (user.getUserID().equals(model.getAsignee()) //MPA Custom assigned and in-progress for logged in user.
                 && model.getAsignee() != null
                 && level != null
                 && level == getType()
-                && model.getAssignHazard() != null
-                && alertHazardTypes.indexOf(model.getAssignHazard().get(0)) == -1
                 && model.getDueDate() != null
                 && (model.getIsCompleteAt() == null && model.getIsComplete() == null || model.getIsCompleteAt() == null && !model.getIsComplete()) // isComplete can be set to false :D, and when it's false, isCreatedAt will disappear.
                 && name != null
@@ -276,31 +275,38 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
                 && (model.getIsCompleteAt() == null && model.getIsComplete() == null || model.getIsCompleteAt() == null && !model.getIsComplete())
                 && name != null)) {
 
-            getNoActionView().setVisibility(View.GONE);
+                if(model.getAssignHazard() != null
+                    && alertHazardTypes.indexOf(model.getAssignHazard().get(0)) != -1) {
 
-            getAdapter().addItems(getChild.getKey(), new Action(
-                    id,
-                    name,
-                    model.getDepartment(),
-                    model.getAsignee(),
-                    model.getCreatedByAgencyId(),
-                    model.getCreatedByCountryId(),
-                    model.getNetworkId(),
-                    model.getIsArchived(),
-                    model.getIsComplete(),
-                    createdAt,
-                    model.getUpdatedAt(),
-                    model.getType(),
-                    model.getDueDate(),
-                    model.getBudget(),
-                    level,
-                    model.getFrequencyBase(),
-                    freqValue,
-                    user,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef(),
-                    dbNetworkRef.getRef())
-            );
+                    getNoActionView().setVisibility(View.GONE);
+
+                    getAdapter().addItems(getChild.getKey(), new Action(
+                            id,
+                            name,
+                            model.getDepartment(),
+                            model.getAsignee(),
+                            model.getCreatedByAgencyId(),
+                            model.getCreatedByCountryId(),
+                            model.getNetworkId(),
+                            model.getIsArchived(),
+                            model.getIsComplete(),
+                            createdAt,
+                            model.getUpdatedAt(),
+                            model.getType(),
+                            model.getDueDate(),
+                            model.getBudget(),
+                            level,
+                            model.getFrequencyBase(),
+                            freqValue,
+                            user,
+                            dbAgencyRef.getRef(),
+                            dbUserPublicRef.getRef(),
+                            dbNetworkRef.getRef())
+                    );
+                }
+                else {
+                    getAdapter().removeItem(getChild.getKey());
+                }
         }
         else {
             getAdapter().removeItem(getChild.getKey());

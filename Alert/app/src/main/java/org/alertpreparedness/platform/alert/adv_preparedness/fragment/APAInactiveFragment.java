@@ -353,8 +353,6 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
 
 
         if (model.getLevel() != null
-                && model.getAssignHazard() != null
-                && alertHazardTypes.indexOf(model.getAssignHazard().get(0)) == -1
                 && model.getLevel() == Constants.APA
                 || (isCHS && isCHSAssigned //APA CHS inactive for logged in user.
                 && user.getUserID().equals(model.getAsignee())
@@ -365,30 +363,39 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
                 && model.getLevel() != null
                 && model.getLevel() == Constants.APA)) {
 
-            txtNoAction.setVisibility(View.GONE);
-            mAPAdapter.addItems(getChild.getKey(), new Action(
-                    model.getId(),
-                    model.getTask(),
-                    model.getDepartment(),
-                    model.getAsignee(),
-                    model.getCreatedByAgencyId(),
-                    model.getCreatedByCountryId(),
-                    model.getNetworkId(),
-                    model.getIsArchived(),
-                    model.getIsComplete(),
-                    createdAt,
-                    model.getUpdatedAt(),
-                    model.getType(),
-                    model.getDueDate(),
-                    model.getBudget(),
-                    level,
-                    model.getFrequencyBase(),
-                    freqValue,
-                    user,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef(),
-                    dbNetworkRef.getRef())
-            );
+            if(model.getAssignHazard() != null
+                    && alertHazardTypes.indexOf(model.getAssignHazard().get(0)) == -1) {
+                txtNoAction.setVisibility(View.GONE);
+                mAPAdapter.addItems(getChild.getKey(), new Action(
+                        model.getId(),
+                        model.getTask(),
+                        model.getDepartment(),
+                        model.getAsignee(),
+                        model.getCreatedByAgencyId(),
+                        model.getCreatedByCountryId(),
+                        model.getNetworkId(),
+                        model.getIsArchived(),
+                        model.getIsComplete(),
+                        createdAt,
+                        model.getUpdatedAt(),
+                        model.getType(),
+                        model.getDueDate(),
+                        model.getBudget(),
+                        level,
+                        model.getFrequencyBase(),
+                        freqValue,
+                        user,
+                        dbAgencyRef.getRef(),
+                        dbUserPublicRef.getRef(),
+                        dbNetworkRef.getRef())
+                );
+            }
+            else {
+                mAPAdapter.removeItem(getChild.getKey());
+            }
+        }
+        else {
+            mAPAdapter.removeItem(getChild.getKey());
         }
     }
 
