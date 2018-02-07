@@ -315,7 +315,7 @@ public abstract class BaseInProgressFragment extends Fragment implements ActionA
 
     protected abstract TextView getNoActionView();
 
-    private void addObjects(String name, Long createdAt, Long level,
+    protected void addObjects(String name, Long createdAt, Long level,
                             DataModel model, DataSnapshot getChild, String id, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
         System.out.println("model.getTask() = " + model.getTask());
         if (user.getUserID().equals(model.getAsignee()) //MPA Custom assigned and in-progress for logged in user.

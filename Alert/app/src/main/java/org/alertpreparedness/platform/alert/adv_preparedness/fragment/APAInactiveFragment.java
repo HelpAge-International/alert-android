@@ -33,6 +33,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
@@ -44,6 +45,7 @@ import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
+import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseInProgressFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.model.User;
@@ -63,7 +65,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAInactiveFragment extends Fragment implements APActionAdapter.ItemSelectedListener, ChildEventListener {
+public class APAInactiveFragment extends Fragment implements APActionAdapter.ItemSelectedListener {
 
     private ArrayList<Integer> alertHazardTypes = new ArrayList<>();
 
@@ -133,6 +135,10 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
     @Inject
     @AlertRef
     DatabaseReference alertRef;
+
+    @Inject
+    @BaseActionRef
+    public DatabaseReference dbActionBaseRef;
 
     private APActionAdapter mAPAdapter;
     private Boolean isCHS = false;
@@ -386,29 +392,39 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
         }
     }
 
-    @Override
-    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-        process(dataSnapshot);
-    }
+    private class InactiveAPAListener implements ChildEventListener {
 
-    @Override
-    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-        process(dataSnapshot);
-    }
+        private String id;
 
-    @Override
-    public void onChildRemoved(DataSnapshot dataSnapshot) {
+        public InactiveAPAListener(String id) {
 
-    }
+            this.id = id;
+        }
 
-    @Override
-    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            process(dataSnapshot);
+        }
 
-    }
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            process(dataSnapshot);
+        }
 
-    @Override
-    public void onCancelled(DatabaseError databaseError) {
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
 
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
     }
 
     private void process(DataSnapshot dataSnapshot) {
@@ -475,8 +491,6 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
 
     private class AlertListener implements ValueEventListener{
 
-
-
         private void proccess(DataSnapshot dataSnapshot) {
             AlertModel model = dataSnapshot.getValue(AlertModel.class);
 
@@ -499,7 +513,14 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
                 dbActionRef.removeEventListener(this);
             }
             catch (Exception e) {}
-            dbActionRef.addChildEventListener(APAInactiveFragment.this);
+            String[] ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
+
+            for (String id : ids) {
+                if(id != null) {
+                    dbActionBaseRef.child(id).addChildEventListener(new InactiveAPAListener(id));
+                }
+
+            }
         }
 
         @Override
