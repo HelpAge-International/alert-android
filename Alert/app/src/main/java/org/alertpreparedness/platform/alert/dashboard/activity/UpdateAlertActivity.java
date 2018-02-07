@@ -12,6 +12,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.firebase.AffectedAreaModel;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
@@ -45,6 +46,9 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
 
     @Inject @AlertRef
     DatabaseReference alertRef;
+
+    @Inject @BaseAlertRef
+    DatabaseReference baseAlertRef;
 
     @Inject
     User user;
@@ -238,7 +242,7 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
 
     private void update(int alertLevel, String reason, long population, List<AffectedAreaModel> areas, String info) {
 
-        DatabaseReference db = alertRef.child(alert.getKey());
+        DatabaseReference db = baseAlertRef.child(alert.getParentKey()).child(alert.getKey());
 
 
            db.addListenerForSingleValueEvent(new ValueEventListener() {
