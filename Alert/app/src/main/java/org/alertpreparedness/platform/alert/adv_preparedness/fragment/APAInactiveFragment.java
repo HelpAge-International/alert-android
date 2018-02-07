@@ -22,6 +22,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
@@ -32,8 +33,14 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
+import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
+import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
+import org.alertpreparedness.platform.alert.firebase.AlertModel;
+import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
@@ -41,6 +48,10 @@ import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 
@@ -53,6 +64,8 @@ import ru.whalemare.sheetmenu.SheetMenu;
  */
 
 public class APAInactiveFragment extends Fragment implements APActionAdapter.ItemSelectedListener, ChildEventListener {
+
+    private ArrayList<Integer> alertHazardTypes = new ArrayList<>();
 
     public APAInactiveFragment() {
         // Required empty public constructor
@@ -99,11 +112,27 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
     DatabaseReference dbUserPublicRef;
 
     @Inject
+    @BaseAlertRef
+    DatabaseReference baseAlertRef;
+
+    @Inject
     User user;
 
     @Inject
     @NetworkRef
     DatabaseReference dbNetworkRef;
+
+    @Inject
+    @NetworkRef
+    DatabaseReference networkRef;
+
+    @Inject
+    @AgencyRef
+    DatabaseReference agencyRef;
+
+    @Inject
+    @AlertRef
+    DatabaseReference alertRef;
 
     private APActionAdapter mAPAdapter;
     private Boolean isCHS = false;
@@ -113,6 +142,9 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
     private Boolean isInProgress = false;
     private int freqBase = 0;
     private int freqValue = 0;
+    private AgencyListener agencyListener = new AgencyListener();
+    private AlertListener alertListener = new AlertListener();
+    private NetworkListener networkListener = new NetworkListener();
 
 
     @Nullable
@@ -142,7 +174,8 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        dbActionRef.addChildEventListener(this);
+        networkRef.addValueEventListener(networkListener);
+
     }
 
     protected APActionAdapter getAPAdapter() {
@@ -157,28 +190,25 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
 
     @Override
     public void onActionItemSelected(int pos, String key) {
-        SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress).setClick(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.complete_action:
-                        Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
-                        startActivity(intent);
-                        break;
-                    case R.id.reassign_action:
-                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
-                        break;
-                    case R.id.action_notes:
-                        intent = new Intent(getActivity(), AddNotesActivity.class);
-                        intent.putExtra("ACTION_KEY", key);
-                        startActivity(intent);
-                        break;
-                    case R.id.attachments:
-                        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
-                        break;
-                }
-                return false;
+        SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress).setClick(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.complete_action:
+                    Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
+                    startActivity(intent);
+                    break;
+                case R.id.reassign_action:
+                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
+                    break;
+                case R.id.action_notes:
+                    intent = new Intent(getActivity(), AddNotesActivity.class);
+                    intent.putExtra("ACTION_KEY", key);
+                    startActivity(intent);
+                    break;
+                case R.id.attachments:
+                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
+                    break;
             }
+            return false;
         }).show();
     }
 
@@ -188,18 +218,18 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Long alertLevel = (Long) dataSnapshot.child("alertLevel").getValue();
 
-                if (isInProgress) {
-                    addObjects(model.getTask(),
-                            model.getCreatedAt(),
-                            model.getLevel(),
-                            model,
-                            alertLevel,
-                            getChild,
-                            isCHS,
-                            isCHSAssigned,
-                            isMandated,
-                            isMandatedAssigned);
-                }
+//                if (isInProgress) {
+                addObjects(model.getTask(),
+                        model.getCreatedAt(),
+                        model.getLevel(),
+                        model,
+                        alertLevel,
+                        getChild,
+                        isCHS,
+                        isCHSAssigned,
+                        isMandated,
+                        isMandatedAssigned);
+//                }
 
             }
 
@@ -227,19 +257,19 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 Long alertLevel = (Long) dataSnapshot.child("alertLevel").getValue();
 
-                                if (isInProgress) {
-                                    addObjects(CHSTaskName,
-                                            CHSCreatedAt,
-                                            CHSlevel,
-                                            model,
-                                            alertLevel,
-                                            getChild,
-                                            isCHS,
-                                            isCHSAssigned,
-                                            isMandated,
-                                            isMandatedAssigned);
+//                                if (isInProgress) {
+                                addObjects(CHSTaskName,
+                                        CHSCreatedAt,
+                                        CHSlevel,
+                                        model,
+                                        alertLevel,
+                                        getChild,
+                                        isCHS,
+                                        isCHSAssigned,
+                                        isMandated,
+                                        isMandatedAssigned);
 
-                                }
+//                                }
 
                             }
 
@@ -267,7 +297,6 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
                 for (DataSnapshot getChild : dataSnapshot.getChildren()) {
                     if (actionIDs.contains(getChild.getKey())) {
                         String taskNameMandated = (String) getChild.child("task").getValue();
-                        //String departmentMandated = (String) getChild.child("department").getValue();
                         Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
                         Long manLevel = (Long) getChild.child("level").getValue();
 
@@ -281,19 +310,19 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 Long alertLevel = (Long) dataSnapshot.child("alertLevel").getValue();
 
-                                if (isInProgress) {
-                                    addObjects(taskNameMandated,
-                                            manCreatedAt,
-                                            manLevel,
-                                            model,
-                                            alertLevel,
-                                            getChild,
-                                            isCHS,
-                                            isCHSAssigned,
-                                            isMandated,
-                                            isMandatedAssigned);
+//                                if (isInProgress) {
+                                addObjects(taskNameMandated,
+                                        manCreatedAt,
+                                        manLevel,
+                                        model,
+                                        alertLevel,
+                                        getChild,
+                                        isCHS,
+                                        isCHSAssigned,
+                                        isMandated,
+                                        isMandatedAssigned);
 
-                                }
+//                                }
 
                             }
 
@@ -315,24 +344,20 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
 
     private void addObjects(String name, Long createdAt, Long level,
                             DataModel model, Long alertLevel, DataSnapshot getChild, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
-        System.out.println("model.getTask() = " + model.getTask());
-        if (user.getUserID().equals(model.getAsignee()) //APA Custom inactive for logged in user.
-                && model.getLevel() != null
-                && alertLevel != null
+
+
+        if (model.getLevel() != null
+                && model.getAssignHazard() != null
+                && alertHazardTypes.indexOf(model.getAssignHazard().get(0)) == -1
                 && model.getLevel() == Constants.APA
-                && alertLevel == Constants.TRIGGER_RED
                 || (isCHS && isCHSAssigned //APA CHS inactive for logged in user.
                 && user.getUserID().equals(model.getAsignee())
                 && model.getLevel() != null
-                && alertLevel != null
-                && model.getLevel() == Constants.APA
-                && alertLevel == Constants.TRIGGER_RED)
+                && model.getLevel() == Constants.APA)
                 || (isMandated && isMandatedAssigned //APA Mandated inactive for logged in user.
                 && user.getUserID().equals(model.getAsignee())
                 && model.getLevel() != null
-                && alertLevel != null
-                && model.getLevel() == Constants.APA
-                && alertLevel == Constants.TRIGGER_RED)) {
+                && model.getLevel() == Constants.APA)) {
 
             txtNoAction.setVisibility(View.GONE);
             mAPAdapter.addItems(getChild.getKey(), new Action(
@@ -388,7 +413,6 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
 
     private void process(DataSnapshot dataSnapshot) {
         String actionIDs = dataSnapshot.getKey();
-
         DataModel model = dataSnapshot.getValue(DataModel.class);
 
         if (dataSnapshot.child("frequencyBase").getValue() != null) {
@@ -407,6 +431,85 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
             getCustom(model, dataSnapshot);
         }
 
+    }
+
+    private class NetworkListener implements ValueEventListener {
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            onNetworkRetrieved(dataSnapshot);
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    }
+
+    private void onNetworkRetrieved(DataSnapshot snapshot) {
+        agencyRef.addListenerForSingleValueEvent(agencyListener);
+        alertRef.addValueEventListener(alertListener);
+    }
+
+    private class AgencyListener implements ValueEventListener {
+        @SuppressWarnings("unchecked")
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            HashMap<String, Boolean> networks = (HashMap<String, Boolean>) dataSnapshot.child("networks").getValue();
+
+            if (networks != null) {
+                for (String id : networks.keySet()) {
+                    System.out.println("networkidid = " + id);
+                    DatabaseReference ref = baseAlertRef.child(id);
+
+                    ref.addValueEventListener(alertListener);
+                }
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    }
+
+    private class AlertListener implements ValueEventListener{
+
+
+
+        private void proccess(DataSnapshot dataSnapshot) {
+            AlertModel model = dataSnapshot.getValue(AlertModel.class);
+
+            assert model != null;
+            model.setKey(dataSnapshot.getKey());
+            model.setParentKey(dataSnapshot.getRef().getParent().getKey());
+
+            if (model.getAlertLevel() == Constants.TRIGGER_RED && model.getHazardScenario() != null) {
+                update(model);
+            }
+
+        }
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            for(DataSnapshot child : dataSnapshot.getChildren()) {
+                proccess(child);
+            }
+            try {
+                dbActionRef.removeEventListener(this);
+            }
+            catch (Exception e) {}
+            dbActionRef.addChildEventListener(APAInactiveFragment.this);
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    }
+
+    private void update(AlertModel model) {
+        alertHazardTypes.add(model.getHazardScenario());
     }
 }
 

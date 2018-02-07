@@ -10,7 +10,7 @@ public class APAAction {
 
     private ArrayList<Integer> assignHazard;
 
-    private String assignee;
+    private String asignee;
 
     private Integer budget;
 
@@ -22,6 +22,14 @@ public class APAAction {
 
     private Long createdAt;
 
+    private Long updatedAt;
+
+    private int type;
+
+    private int level;
+
+    private Long dueDate;
+
     public APAAction() {}
 
     public ArrayList<Integer> getAssignHazard() {
@@ -32,12 +40,12 @@ public class APAAction {
         this.assignHazard = assignHazard;
     }
 
-    public String getAssignee() {
-        return assignee;
+    public String getAsignee() {
+        return asignee;
     }
 
-    public void setAssignee(String assignee) {
-        this.assignee = assignee;
+    public void setAsignee(String asignee) {
+        this.asignee = asignee;
     }
 
     public Integer getBudget() {
@@ -78,5 +86,38 @@ public class APAAction {
 
     public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
+        this.updatedAt = createdAt;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Long updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Long getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(Long dueDate) {
+        this.dueDate = dueDate;
     }
 }

@@ -23,6 +23,7 @@ import org.alertpreparedness.platform.alert.dashboard.adapter.AlertFieldsAdapter
 import org.alertpreparedness.platform.alert.dashboard.model.AlertFieldModel;
 import org.alertpreparedness.platform.alert.firebase.AffectedAreaModel;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
+import org.alertpreparedness.platform.alert.firebase.ApprovalModel;
 import org.alertpreparedness.platform.alert.helper.AlertLevelDialog;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
@@ -30,6 +31,7 @@ import org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActiv
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.inject.Inject;
 
@@ -149,6 +151,18 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
                 user.getUserID(),
                 mCurrentAffectedAreas
         );
+
+        ApprovalModel approval = new ApprovalModel();
+        approval.setCountryDirector(new HashMap<String, Integer>() {{
+            if (isRedAlert) {
+                put(user.getCountryID(), 1);
+            }
+            else {
+                put(user.getCountryID(), 2);
+            }
+        }});
+
+        m.setApproval(approval);
         if(isRedAlert) {
             m.setReasonForRedAlert(mFieldsAdapter.getRedAlertReason());
         }

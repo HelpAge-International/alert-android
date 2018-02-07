@@ -199,4 +199,5 @@
     <string name="txt_create_apa">Create APA</string>
     <string name="title_choose_file">Choose a file</string>
     <string name="internal_storage">Internal storage</string>
+    <string name="edit_apa">Edit APA</string>
 </resources>

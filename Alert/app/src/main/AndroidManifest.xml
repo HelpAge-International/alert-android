@@ -119,6 +119,9 @@
         <activity
             android:name=".adv_preparedness.activity.CreateAPAActivity"
             android:label="@string/txt_create_apa" />
+        <activity
+            android:name=".adv_preparedness.activity.EditAPAActivity"
+            android:label="@string/edit_apa" />
     </application>
 
 </manifest>

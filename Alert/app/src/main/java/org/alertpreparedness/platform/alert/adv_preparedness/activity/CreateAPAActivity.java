@@ -23,7 +23,6 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
-import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity;
 import org.alertpreparedness.platform.alert.dashboard.activity.HazardSelectionActivity;
 import org.alertpreparedness.platform.alert.firebase.APAAction;
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.AssignToDialogFragment;
@@ -32,12 +31,13 @@ import org.alertpreparedness.platform.alert.risk_monitoring.dialog.DepartmentDia
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.DepartmentListener;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelUserPublic;
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.AddIndicatorViewModel;
+import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 import org.jetbrains.annotations.Nullable;
+import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
 import javax.inject.Inject;
 
@@ -82,18 +82,18 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
     @CountryOfficeRef
     DatabaseReference countryRef;
 
-    private int mSelectedAssignPosition = 0;
-    private int mDepartmentPosition = 0;
-    private boolean needsDocument;
-    private AddIndicatorViewModel mViewModel;
-    private ArrayList<ModelUserPublic> mStaff;
-    private AssignToDialogFragment mDialogAssign = new AssignToDialogFragment();
-    private DepartmentDialogFragment mDepartmentFragment = new DepartmentDialogFragment();
-    private String assignee;
+    protected int mSelectedAssignPosition = 0;
+    protected int mDepartmentPosition = 0;
+    protected boolean needsDocument;
+    protected AddIndicatorViewModel mViewModel;
+    protected ArrayList<ModelUserPublic> mStaff;
+    protected AssignToDialogFragment mDialogAssign = new AssignToDialogFragment();
+    protected DepartmentDialogFragment mDepartmentFragment = new DepartmentDialogFragment();
+    protected String assignee;
     public static final int HAZARD_RESULT = 9003;
-    private int mCurrentHazardType;
-    private ArrayList<DepartmentModel> departments = new ArrayList<>();
-    private String selectedDepartment;
+    protected int mCurrentHazardType;
+    protected ArrayList<DepartmentModel> departments = new ArrayList<>();
+    protected String selectedDepartment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,7 +128,7 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
         }
     }
 
-    private void initData() {
+    protected void initData() {
         countryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -178,7 +178,7 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
 
     }
 
-    private void initViews() {
+    protected void initViews() {
         mDialogAssign.setOnAssignToListener(this);
         mDepartmentFragment.setOnAssignToListener(this);
         needsDocumentView.setOnCheckedChangeListener(this);
@@ -242,7 +242,7 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
         return true;
     }
 
-    private void save() {
+    protected void save() {
         if(budget.getText().length() == 0) {
             SnackbarHelper.show(this, "Please enter a budget");
             return;
@@ -269,7 +269,8 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
         }
 
         APAAction apaAction = new APAAction();
-        apaAction.setAssignee(assignee);
+        apaAction.setAsignee(assignee);
+        apaAction.setDueDate(new DateTime().plusWeeks(1).getMillis());
         apaAction.setTask(task.getText().toString());
         apaAction.setBudget(Integer.valueOf(budget.getText().toString()));
         apaAction.setAssignHazard(new ArrayList<Integer>() {{
@@ -278,7 +279,8 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
         apaAction.setCreatedAt(new Date().getTime());
         apaAction.setRequireDoc(needsDocument);
         apaAction.setDepartment(selectedDepartment);
-
+        apaAction.setLevel(Constants.APA);
+        apaAction.setType(Constants.CUSTOM);
         DatabaseReference ref = actionRef.push();
         ref.setValue(apaAction);
         finish();

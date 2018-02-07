@@ -279,7 +279,6 @@ public abstract class BaseExpiredFragment extends BaseInProgressFragment {
 
         @SuppressWarnings("ConstantConditions")
         public void process(DataSnapshot dataSnapshot) {
-            System.out.println("processdataSnapshot = " + dataSnapshot);
             String actionIDs = dataSnapshot.getKey();
             DataModel model = dataSnapshot.getValue(DataModel.class);
 

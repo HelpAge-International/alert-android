@@ -5,6 +5,10 @@ import android.net.Uri;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 
+import org.alertpreparedness.platform.alert.firebase.APAAction;
+
+import java.util.ArrayList;
+
 /**
  * Created by faizmohideen on 17/01/2018.
  */
@@ -32,6 +36,7 @@ public class DataModel {
     private Long createdAt;
     private Long updatedAt;
     private Uri path;
+    private ArrayList<Integer> assignHazard;
     public DatabaseReference db;
     public DatabaseReference userRef;
     private String id;
@@ -256,5 +261,13 @@ public class DataModel {
 
     public String getId() {
         return id;
+    }
+
+    public ArrayList<Integer> getAssignHazard() {
+        return assignHazard;
+    }
+
+    public void setAssignHazard(ArrayList<Integer> assignHazard) {
+        this.assignHazard = assignHazard;
     }
 }

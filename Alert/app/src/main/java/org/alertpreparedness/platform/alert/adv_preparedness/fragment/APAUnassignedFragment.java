@@ -24,6 +24,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
@@ -136,13 +137,18 @@ public class APAUnassignedFragment extends BaseUnassignedFragment implements APA
     @Override
     public void onActionItemSelected(int pos, String key) {
         this.actionID = key;
+        System.out.println("pos = [" + pos + "], key = [" + key + "]");
         SheetMenu.with(getContext()).setMenu(R.menu.menu_unassigned_apa).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.assign_action:
                     dialog.show(getActivity().getFragmentManager(), "users_list");
                     break;
                 case R.id.edit_action:
-                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "EDIT ACTION", Snackbar.LENGTH_LONG).show();
+                    Intent i = new Intent(getContext(), EditAPAActivity.class);
+                    i.putExtra(EditAPAActivity.APA_ID, key);
+                    System.out.println("key = " + key);
+                    startActivity(i);
+//                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "EDIT ACTION", Snackbar.LENGTH_LONG).show();
                     break;
             }
             return false;
