@@ -60,13 +60,9 @@ public class AlertApplication extends Application implements ValueEventListener 
 
     public static final APP_STATUS CURRENT_STATUS = APP_STATUS.SAND;
 
-    @SuppressLint("StaticFieldLeak")
-    private static Context sContext;
-
     @Override
     public void onCreate() {
         super.onCreate();
-        sContext = getApplicationContext();
         FirebaseApp.initializeApp(this);
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 //        FirebaseAuth.getInstance().signOut();
@@ -117,13 +113,6 @@ public class AlertApplication extends Application implements ValueEventListener 
 
         DependencyInjector.initialize(this);
 
-    }
-
-    public static Context getContext() {
-        if (sContext == null) {
-            throw new IllegalArgumentException("Context is null!!");
-        }
-        return sContext;
     }
 
     public void startPermissionListeners(@PermissionRef DatabaseReference permissionsRef, User user) {

@@ -100,7 +100,7 @@ class LogViewHolder(itemView: View, private val logs: List<ModelLog>, private va
                     else -> {
                         Timber.d("delete")
                         context.alert("Deleting this entry will remove it from this indicator log, this action cannot be undone. Are you sure you want to continue?", "Delete entry") {
-                            yesButton { logs[adapterPosition].id?.let { RiskMonitoringService.deleteLog(indicatorId, it) } }
+                            yesButton { logs[adapterPosition].id?.let { RiskMonitoringService(context).deleteLog(indicatorId, it) } }
                             noButton {}
                         }.show()
                     }

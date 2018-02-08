@@ -95,10 +95,10 @@ class AddIndicatorViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
 
     private fun getCountryJson() {
         mDisposables.add(
-                RiskMonitoringService.readJsonFile()
+                RiskMonitoringService(getApplication()).readJsonFile()
                         .flatMap { fileText ->
                             val jsonObject = JSONObject(fileText)
-                            return@flatMap RiskMonitoringService.mapJasonToCountryData(jsonObject, Gson())
+                            return@flatMap RiskMonitoringService(getApplication()).mapJasonToCountryData(jsonObject, Gson())
                         }
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -110,7 +110,7 @@ class AddIndicatorViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
     }
 
     private fun getHazards(countryId: String) {
-        mDisposables.add(RiskMonitoringService.getHazards(countryId)
+        mDisposables.add(RiskMonitoringService(getApplication()).getHazards(countryId)
                 .map { it.filter { it.isActive } }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -153,7 +153,7 @@ class AddIndicatorViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
     }
 
     private fun getHazardOtherName(hazard: ModelHazard) {
-        mDisposables.add(RiskMonitoringService.getHazardOtherName(hazard)
+        mDisposables.add(RiskMonitoringService(getApplication()).getHazardOtherName(hazard)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ pair ->
@@ -162,7 +162,7 @@ class AddIndicatorViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
         )
     }
 
-    fun addIndicator(indicator: ModelIndicator, countryContext: Boolean) = RiskMonitoringService.addIndicatorToHazard(indicator, countryContext)
+    fun addIndicator(indicator: ModelIndicator, countryContext: Boolean) = RiskMonitoringService(getApplication()).addIndicatorToHazard(indicator, countryContext)
 
     override fun onCleared() {
         super.onCleared()

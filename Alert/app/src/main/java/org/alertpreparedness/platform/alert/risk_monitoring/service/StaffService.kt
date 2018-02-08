@@ -37,10 +37,10 @@ class StaffService(private val context: Context) {
         println("userDetail = ${userDetail}")
 
         return RxFirebaseDatabase.observeValueEvent(userDetail, { snap ->
-            val toJson = RiskMonitoringService.gson.toJson(snap.value)
+            val toJson = RiskMonitoringService(context).gson.toJson(snap.value)
             val reader = JsonReader(StringReader(toJson.trim()))
             reader.isLenient = true
-            val fromJson = RiskMonitoringService.gson.fromJson<ModelUserPublic>(reader, ModelUserPublic::class.java)
+            val fromJson = RiskMonitoringService(context).gson.fromJson<ModelUserPublic>(reader, ModelUserPublic::class.java)
             println("fromJson = ${fromJson}")
             return@observeValueEvent fromJson
         })

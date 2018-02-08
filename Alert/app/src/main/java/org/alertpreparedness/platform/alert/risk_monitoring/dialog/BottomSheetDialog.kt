@@ -95,11 +95,6 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
         logBadge.bindTarget(flIndicatorLog).badgeGravity = Gravity.END or Gravity.TOP
         logBadge.setBadgeTextSize(7.toFloat(), true)
 
-//        val attBadge = QBadgeView(activity)
-//        attBadge.bindTarget(flIndicatorAttach).badgeGravity = Gravity.END or Gravity.TOP
-//        attBadge.badgeNumber = 1
-//        attBadge.setBadgeTextSize(7.toFloat(), true)
-
         mViewModel.getLiveIndicatorLogs(mIndicatorId).observe(this, Observer { logs ->
             logBadge.badgeNumber = logs?.size ?: 0
         })

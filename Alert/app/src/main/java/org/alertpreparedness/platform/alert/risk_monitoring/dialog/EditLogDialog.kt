@@ -40,7 +40,7 @@ class EditLogDialog : DialogFragment() {
                 .setPositiveButton(getString(R.string.save), { _, _ ->
                     if (indicatorId.isNotEmpty() && logId.isNotEmpty() && content.isNotEmpty()) {
                         Timber.d("start updating log content*****************")
-                        RiskMonitoringService.updateLogContent(indicatorId, logId, view.etEditLog.text.toString())
+                        RiskMonitoringService(activity).updateLogContent(indicatorId, logId, view.etEditLog.text.toString())
                     }
                 })
                 .create()

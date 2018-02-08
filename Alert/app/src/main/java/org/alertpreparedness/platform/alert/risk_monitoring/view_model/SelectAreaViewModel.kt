@@ -51,12 +51,12 @@ class SelectAreaViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
     fun getCountryJsonData() {
         try {
             mDisposables.add(
-                    RiskMonitoringService.readJsonFile()
+                    RiskMonitoringService(getApplication()).readJsonFile()
                             .map { fileText ->
                                 return@map JSONObject(fileText)
                             }
                             .flatMap { jsonObject: JSONObject ->
-                                RiskMonitoringService.mapJasonToCountryData(jsonObject, Gson())
+                                RiskMonitoringService(getApplication()).mapJasonToCountryData(jsonObject, Gson())
                             }
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())

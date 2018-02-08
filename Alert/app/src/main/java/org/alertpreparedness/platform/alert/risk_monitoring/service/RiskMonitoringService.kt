@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.risk_monitoring.service
 
+import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import durdinapps.rxfirebase2.RxFirebaseDatabase
@@ -20,14 +21,14 @@ import java.io.StringReader
  * Created by Fei on 11/11/2017.
  */
 
-object RiskMonitoringService {
+class RiskMonitoringService(private val context : Context) {
 
     public val gson: Gson = Gson()
-    private val mAppStatus = PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS)
+    private val mAppStatus = PreferHelper.getString(context, Constants.APP_STATUS)
 
     fun readJsonFile(): Observable<String> {
         return Observable.create { subscriber ->
-            val fileText: String = AlertApplication.getContext().assets.open("country_levels_values.json").bufferedReader().use {
+            val fileText: String = context.assets.open("country_levels_values.json").bufferedReader().use {
                 it.readText()
             }
             subscriber.onNext(fileText)
@@ -100,7 +101,7 @@ object RiskMonitoringService {
     }
 
     fun addIndicatorToHazard(indicator: ModelIndicator, countryContext: Boolean) {
-        val indicatorRef = FirebaseHelper.getIndicatorsRef(mAppStatus, if (countryContext) PreferHelper.getString(AlertApplication.getContext(), Constants.COUNTRY_ID) else indicator.hazardScenario.id)
+        val indicatorRef = FirebaseHelper.getIndicatorsRef(mAppStatus, if (countryContext) PreferHelper.getString(context, Constants.COUNTRY_ID) else indicator.hazardScenario.id)
         val key = indicatorRef.push().key
         if (countryContext) {
             indicatorRef.child(key).setValue(indicator).continueWith {
@@ -116,7 +117,7 @@ object RiskMonitoringService {
     }
 
     fun getIndicatorsForAssignee(hazardId: String, network: ModelNetwork?): Flowable<List<ModelIndicator>> {
-        val indicatorRef = FirebaseHelper.getIndicatorsRef(mAppStatus, hazardId).orderByChild("assignee").equalTo(PreferHelper.getString(AlertApplication.getContext(), Constants.UID))
+        val indicatorRef = FirebaseHelper.getIndicatorsRef(mAppStatus, hazardId).orderByChild("assignee").equalTo(PreferHelper.getString(context, Constants.UID))
         return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
             snap.children.map {
                 val toJson = gson.toJson(it.value)
