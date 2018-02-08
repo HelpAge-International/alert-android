@@ -27,7 +27,7 @@ import timber.log.Timber
  */
 class IndicatorLogRVAdapter(private val logs: List<ModelLog>, private val context: Context, private val indicatorId: String, private val fm: FragmentManager) : RecyclerView.Adapter<LogViewHolder>() {
 
-    private val mUid = PreferHelper.getString(AlertApplication.getContext(), Constants.UID)
+    private val mUid = PreferHelper.getString(context, Constants.UID)
 
     override fun getItemCount(): Int {
         return logs.size
@@ -59,7 +59,7 @@ class IndicatorLogRVAdapter(private val logs: List<ModelLog>, private val contex
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): LogViewHolder {
-        val view = View.inflate(AlertApplication.getContext(), R.layout.item_view_indicator_log, null)
+        val view = View.inflate(context, R.layout.item_view_indicator_log, null)
         return LogViewHolder(view, logs, context, indicatorId, fm)
     }
 

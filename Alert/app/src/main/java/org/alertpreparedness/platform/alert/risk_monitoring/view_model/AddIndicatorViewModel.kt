@@ -1,5 +1,7 @@
 package org.alertpreparedness.platform.alert.risk_monitoring.view_model
 
+import android.app.Application
+import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.location.Geocoder
@@ -28,11 +30,13 @@ import java.util.*
 /**
  * Created by fei on 16/11/2017.
  */
-class AddIndicatorViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
+class AddIndicatorViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
+
+    constructor(application: Application) : super(application)
 
     private val mDisposables: CompositeDisposable = CompositeDisposable()
-    private val agencyId = PreferHelper.getString(AlertApplication.getContext(), Constants.AGENCY_ID)
-    private val countryId = PreferHelper.getString(AlertApplication.getContext(), Constants.COUNTRY_ID)
+    private val agencyId = PreferHelper.getString(getApplication(), Constants.AGENCY_ID)
+    private val countryId = PreferHelper.getString(getApplication(), Constants.COUNTRY_ID)
     private val mHazards: MutableLiveData<List<ModelHazard>> = MutableLiveData()
     private val mStaff: MutableLiveData<List<ModelUserPublic>> = MutableLiveData()
     private val mOtherNamesLive: MutableLiveData<Pair<String, String>> = MutableLiveData()
@@ -70,7 +74,7 @@ class AddIndicatorViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
     }
 
     private fun getAddressByLocation(location: Location) {
-        val geoCoder = Geocoder(AlertApplication.getContext(), Locale.getDefault())
+        val geoCoder = Geocoder(getApplication(), Locale.getDefault())
         mDisposables.add(geoCoder.getFromLocation(location.latitude, location.longitude, 1)
                 .toObservable()
                 .subscribeOn(Schedulers.io())
@@ -84,7 +88,7 @@ class AddIndicatorViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                         mAddressLive.value = addresses.getAddressLine(0)
                     }
                 }, { error ->
-                    Toasty.error(AlertApplication.getContext(), error.message.toString()).show()
+                    Toasty.error(getApplication(), error.message.toString()).show()
                     mAddressLive.value = ""
                 }))
     }
@@ -120,7 +124,7 @@ class AddIndicatorViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
         println("getStaff")
         val users = mutableListOf<ModelUserPublic>()
 
-        StaffService.getCountryAdmin().doOnSubscribe { }
+        StaffService(getApplication()).getCountryAdmin().doOnSubscribe { }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ user ->
@@ -128,13 +132,13 @@ class AddIndicatorViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                     users.add(user)
                     mStaff.value = users
 
-                    mDisposables.add(StaffService.getCountryStaff(countryId)
+                    mDisposables.add(StaffService(getApplication()).getCountryStaff(countryId)
 //                .doOnSubscribe { users.clear() }
                             .flatMap({ ids ->
                                 return@flatMap Flowable.fromIterable(ids)
                             })
                             .flatMap({ id ->
-                                return@flatMap StaffService.getUserDetail(id)
+                                return@flatMap StaffService(getApplication()).getUserDetail(id)
                             })
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())

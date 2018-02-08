@@ -41,7 +41,7 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
     private lateinit var llInformationSource: LinearLayout
     private lateinit var mViewModel: ActiveRiskViewModel
     private lateinit var mIndicatorModel: ModelIndicator
-    private val mCountryId = PreferHelper.getString(AlertApplication.getContext(), Constants.COUNTRY_ID)
+    private lateinit var  mCountryId : String
     private var mHazardId = ""
     private var mIndicatorId = ""
     private var mNetworkId:String? = null
@@ -62,6 +62,7 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun initData() {
+        mCountryId = PreferHelper.getString(context, Constants.COUNTRY_ID)
         Timber.d("country id: %s", mCountryId)
         if (arguments.containsKey(ActiveRiskFragment.HAZARD_ID)) {
             mHazardId = arguments.get(ActiveRiskFragment.HAZARD_ID) as String
@@ -122,24 +123,24 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
         view.llUpdateIndicator.setOnClickListener {
             Timber.d("update clicked")
             dismiss()
-            Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).subscribe({
-                UpdateIndicatorActivity.startActivity(AlertApplication.getContext(), mHazardId, mIndicatorId)
-            })
+//            Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).subscribe({
+                UpdateIndicatorActivity.startActivity(activity, mHazardId, mIndicatorId)
+//            })
         }
 
         view.llIndicatorLog.setOnClickListener {
             Timber.d("start log activity with id: %s", mIndicatorId)
             dismiss()
-            Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).subscribe({
-                IndicatorLogActivity.startActivity(AlertApplication.getContext(), mIndicatorId, mIndicatorModel.triggerSelected)
-            })
+//            Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).subscribe({
+                IndicatorLogActivity.startActivity(activity, mIndicatorId, mIndicatorModel.triggerSelected)
+//            })
         }
 
         view.llEditIndicator.setOnClickListener {
             dismiss()
-            Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).subscribe({
-                AddIndicatorActivity.startActivityWithValues(AlertApplication.getContext(), mHazardId, mIndicatorId, mNetworkId, mNetworkCountryId)
-            })
+//            Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).subscribe({
+                AddIndicatorActivity.startActivityWithValues(activity, mHazardId, mIndicatorId, mNetworkId, mNetworkCountryId)
+//            })
         }
     }
 

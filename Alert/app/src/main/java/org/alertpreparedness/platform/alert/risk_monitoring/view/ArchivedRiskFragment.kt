@@ -45,7 +45,7 @@ class ArchivedRiskFragment : Fragment(), OnIndicatorSelectedListener {
         // Inflate the layout for this fragment
         val view = inflater?.inflate(R.layout.fragment_archived_risk, container, false)
         val rvRiskArchived: RecyclerView? = view?.find(R.id.rvRiskArchived)
-        rvRiskArchived?.layoutManager = LinearLayoutManager(AlertApplication.getContext())
+        rvRiskArchived?.layoutManager = LinearLayoutManager(activity)
         val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
         rvRiskArchived?.addItemDecoration(decoration)
         mViewModel.getLiveGroups(false).observe(this, Observer<MutableList<ExpandableGroup<ModelIndicator>>> {
@@ -53,7 +53,7 @@ class ArchivedRiskFragment : Fragment(), OnIndicatorSelectedListener {
             if (size > 0) {
                 pbLoadingArchived?.hide()
             }
-            rvRiskArchived?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, mCountryLocation, this, mapOf())
+            rvRiskArchived?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, mCountryLocation, this, mapOf(), context)
         })
         return view
     }

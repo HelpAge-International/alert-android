@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.risk_monitoring.adapter
 
+import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
@@ -17,12 +18,12 @@ import timber.log.Timber
 /**
  * Created by fei on 09/11/2017.
  */
-class AreaRVAdapter(private val areas: MutableList<ModelIndicatorLocation>, private val countryDataList:List<CountryJsonData>) : RecyclerView.Adapter<AreaViewHolder>() {
+class AreaRVAdapter(private val areas: MutableList<ModelIndicatorLocation>, private val countryDataList:List<CountryJsonData>, private val context : Context) : RecyclerView.Adapter<AreaViewHolder>() {
 
     private var listener: OnAreaDeleteListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): AreaViewHolder =
-            AreaViewHolder(View.inflate(AlertApplication.getContext(), R.layout.area_item_view, null), listener)
+            AreaViewHolder(View.inflate(context, R.layout.area_item_view, null), listener)
 
     override fun onBindViewHolder(holder: AreaViewHolder?, position: Int) {
         with(areas[position]) {

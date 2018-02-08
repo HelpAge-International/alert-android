@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.risk_monitoring.service
 
+import android.content.Context
 import com.google.firebase.database.DataSnapshot
 import durdinapps.rxfirebase2.RxFirebaseDatabase
 import io.reactivex.Flowable
@@ -13,9 +14,9 @@ import org.json.JSONObject
 /**
  * Created by fei on 15/11/2017.
  */
-object NetworkService {
+class NetworkService(context : Context) {
 
-    private val mAppStatus = PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS)!!
+    private val mAppStatus = PreferHelper.getString(context, Constants.APP_STATUS)!!
 
     fun mapNetworksForCountry(agencyId: String, countryId: String) : Flowable<MutableMap<String, String>> {
         val networkMapRef = FirebaseHelper.getNetworkMapRef(mAppStatus, agencyId, countryId)

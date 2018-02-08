@@ -43,7 +43,6 @@ import javax.inject.Inject;
 public class DataHandler {
     private List<Integer> alerts = new ArrayList<Integer>();
     private DBListener dbListener = new DBListener();
-    private String mAppStatus = PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS);
     private Calendar date = Calendar.getInstance();
     private String dateFormat = "dd/MM/yyyy";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());

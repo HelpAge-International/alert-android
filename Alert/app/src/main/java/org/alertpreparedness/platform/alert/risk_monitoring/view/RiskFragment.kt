@@ -42,7 +42,7 @@ class RiskFragment : Fragment() {
         tlRisk.addTab(tlRisk.newTab())
         tlRisk.setupWithViewPager(vpRisk)
 
-        val pagerAdapter = RiskPagerAdapter(activity.supportFragmentManager, tlRisk.tabCount)
+        val pagerAdapter = RiskPagerAdapter(activity.supportFragmentManager, tlRisk.tabCount, activity)
         vpRisk.adapter = pagerAdapter
     }
 

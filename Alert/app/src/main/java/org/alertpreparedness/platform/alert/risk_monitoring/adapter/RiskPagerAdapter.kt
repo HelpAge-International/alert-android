@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.risk_monitoring.adapter
 
+import android.content.Context
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
@@ -11,7 +12,7 @@ import org.alertpreparedness.platform.alert.risk_monitoring.view.ArchivedRiskFra
 /**
  * Created by fei on 07/11/2017.
  */
-class RiskPagerAdapter(fm: FragmentManager, tabs: Int) : FragmentStatePagerAdapter(fm) {
+class RiskPagerAdapter(fm: FragmentManager, tabs: Int, private val context : Context) : FragmentStatePagerAdapter(fm) {
     private var totalTabs = tabs
 
     override fun getItem(position: Int): Fragment {
@@ -30,10 +31,10 @@ class RiskPagerAdapter(fm: FragmentManager, tabs: Int) : FragmentStatePagerAdapt
     override fun getPageTitle(position: Int): CharSequence {
         return when (position) {
             0 -> {
-                AlertApplication.getContext().getString(R.string.active)
+                context.getString(R.string.active)
             }
             else -> {
-                AlertApplication.getContext().getString(R.string.archived)
+                context.getString(R.string.archived)
             }
         }
     }

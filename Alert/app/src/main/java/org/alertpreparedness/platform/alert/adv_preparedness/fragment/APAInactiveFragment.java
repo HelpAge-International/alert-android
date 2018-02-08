@@ -169,7 +169,6 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
         mAPAdapter = getAPAdapter();
         assert mAdvActionRV != null;
         mAdvActionRV.setAdapter(mAPAdapter);
-
         mAdvActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));

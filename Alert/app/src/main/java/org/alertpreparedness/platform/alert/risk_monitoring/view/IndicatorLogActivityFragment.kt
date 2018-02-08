@@ -73,7 +73,7 @@ class IndicatorLogActivityFragment : Fragment() {
                 val model = ModelLog(null, PreferHelper.getString(activity, Constants.UID), view.etIndicatorLog.text.toString(), DateTime().millis, mTriggerSelection)
                 mViewmodel.addLogToIndicator(model, mIndicatorId as String)
             }
-            AppUtils.hideSoftKeyboard(AlertApplication.getContext(), view.etIndicatorLog)
+            AppUtils.hideSoftKeyboard(context, view.etIndicatorLog)
             view.etIndicatorLog.text.clear()
         }
     }

@@ -156,7 +156,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
             countryList?.let {
                 mCountryJsonList = countryList
                 if (countryList.size == 248) {
-                    mAreaAdapter = AreaRVAdapter(mAreas, countryList)
+                    mAreaAdapter = AreaRVAdapter(mAreas, countryList, this)
                     rvLocationSubNational.adapter = mAreaAdapter
                     mAreaAdapter.setOnAreaDeleteListener(this)
                     if (pbAddIndicator.isShown) {
@@ -176,13 +176,13 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
 
         rvSources.hasFixedSize()
         rvSources.layoutManager = LinearLayoutManager(this)
-        mSourceAdapter = SourceRVAdapter(mSources)
+        mSourceAdapter = SourceRVAdapter(mSources, this)
         rvSources.adapter = mSourceAdapter
         mSourceAdapter.setOnSourceDeleteListener(this)
 
         rvLocationSubNational.hasFixedSize()
         rvLocationSubNational.layoutManager = LinearLayoutManager(this)
-        mAreaAdapter = AreaRVAdapter(mAreas, mCountryJsonList)
+        mAreaAdapter = AreaRVAdapter(mAreas, mCountryJsonList, this)
         rvLocationSubNational.adapter = mAreaAdapter
         mAreaAdapter.setOnAreaDeleteListener(this)
 
@@ -309,7 +309,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
 
     private fun initListeners() {
         tvSelectHazard.setOnClickListener {
-            AppUtils.hideSoftKeyboard(AlertApplication.getContext(), tvSelectHazard)
+            AppUtils.hideSoftKeyboard(this, tvSelectHazard)
             Timber.d("show popup menu")
             mPopupMenu.show()
         }
@@ -376,7 +376,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         })
 
         tvGreenFrequency.setOnClickListener {
-            AppUtils.hideSoftKeyboard(AlertApplication.getContext(), tvGreenFrequency)
+            AppUtils.hideSoftKeyboard(this, tvGreenFrequency)
             mPopupMenuFrequencyGreen.show()
         }
 
@@ -386,7 +386,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         }
 
         tvAmberFrequency.setOnClickListener {
-            AppUtils.hideSoftKeyboard(AlertApplication.getContext(), tvAmberFrequency)
+            AppUtils.hideSoftKeyboard(this, tvAmberFrequency)
             mPopupMenuFrequencyAmber.show()
         }
 
@@ -396,7 +396,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         }
 
         tvRedFrequency.setOnClickListener {
-            AppUtils.hideSoftKeyboard(AlertApplication.getContext(), tvRedFrequency)
+            AppUtils.hideSoftKeyboard(this, tvRedFrequency)
             mPopupMenuFrequencyRed.show()
         }
 
@@ -653,7 +653,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
                         EDIT_NO_HAZARD_CHANGE -> {
                             Timber.d("EDIT_NO_HAZARD_CHANGE")
 //                            mRiskViewModel.updateIndicatorModel(mHazardId as String, mIndicatorId as String, mIndicatorModel.copy(id = null))
-                            val indicatorRef = FirebaseHelper.getIndicatorRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), mHazardId, mIndicatorId)
+                            val indicatorRef = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this, Constants.APP_STATUS), mHazardId, mIndicatorId)
                             when (mIsCountryContext) {
                                 true -> {
                                     val context = ModelHazardCountryContext()
@@ -707,7 +707,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
                             Timber.d("check this, %s", mIndicatorModel.hazardScenario)
                             when (mIsCountryContext) {
                                 true -> {
-                                    val indicatorRef = FirebaseHelper.getIndicatorRef(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), PreferHelper.getString(this, Constants.COUNTRY_ID), mIndicatorId)
+                                    val indicatorRef = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this, Constants.APP_STATUS), PreferHelper.getString(this, Constants.COUNTRY_ID), mIndicatorId)
                                     updateAndClearOldForContextNetwork(indicatorRef, mIndicatorModel)
                                 }
                                 else -> {

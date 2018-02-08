@@ -1,5 +1,7 @@
 package org.alertpreparedness.platform.alert.risk_monitoring.view_model
 
+import android.app.Application
+import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -20,14 +22,16 @@ import timber.log.Timber
 /**
  * Created by fei on 22/11/2017.
  */
-class SelectAreaViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
+class SelectAreaViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
 
     private val mDisposables = CompositeDisposable()
     private val mSelectedCountryLive: MutableLiveData<ModelCountry> = MutableLiveData()
     private val mCountryJsonDataLive: MutableLiveData<List<CountryJsonData>> = MutableLiveData()
     private val mCountryDataList: ArrayList<CountryJsonData> = arrayListOf()
-    private val mCountryId = PreferHelper.getString(AlertApplication.getContext(), Constants.COUNTRY_ID)
-    private val mAgencyId = PreferHelper.getString(AlertApplication.getContext(), Constants.AGENCY_ID)
+    private val mCountryId = PreferHelper.getString(getApplication(), Constants.COUNTRY_ID)
+    private val mAgencyId = PreferHelper.getString(getApplication(), Constants.AGENCY_ID)
+
+    constructor(application: Application) : super(application)
 
     init {
         FirebaseAuth.getInstance().addAuthStateListener(this)
@@ -69,7 +73,7 @@ class SelectAreaViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
     }
 
     private fun getSelectedCountry() {
-        mDisposables.add(CountryService.getCountryModel(mAgencyId, mCountryId)
+        mDisposables.add(CountryService(getApplication()).getCountryModel(mAgencyId, mCountryId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ country: ModelCountry ->

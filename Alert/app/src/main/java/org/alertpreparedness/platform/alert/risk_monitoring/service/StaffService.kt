@@ -1,6 +1,8 @@
 package org.alertpreparedness.platform.alert.risk_monitoring.service
 
+import android.content.Context
 import com.google.gson.Gson
+import com.google.gson.JsonDeserializationContext
 import com.google.gson.stream.JsonReader
 import durdinapps.rxfirebase2.RxFirebaseDatabase
 import io.reactivex.Flowable
@@ -17,12 +19,12 @@ import java.io.StringReader
 /**
  * Created by fei on 16/11/2017.
  */
-object StaffService {
+class StaffService(private val context: Context) {
 
     val gson = Gson()
 
     fun getCountryStaff(countryId: String): Flowable<List<String>> {
-        val staffCountry = FirebaseHelper.getStaffForCountry(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), countryId)
+        val staffCountry = FirebaseHelper.getStaffForCountry(PreferHelper.getString(context, Constants.APP_STATUS), countryId)
         return RxFirebaseDatabase.observeValueEvent(staffCountry)
                 .map { snap ->
                     snap.children.map { it.key }
@@ -30,7 +32,7 @@ object StaffService {
     }
 
     fun getCountryAdmin(): Flowable<ModelUserPublic> {
-        val userDetail = FirebaseHelper.getUserDetail(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), PreferHelper.getString(AlertApplication.getContext(), Constants.COUNTRY_ID))
+        val userDetail = FirebaseHelper.getUserDetail(PreferHelper.getString(context, Constants.APP_STATUS), PreferHelper.getString(context, Constants.COUNTRY_ID))
         println("userDetail = ${userDetail.ref}")
         println("userDetail = ${userDetail}")
 
@@ -46,7 +48,7 @@ object StaffService {
     }
 
     fun getUserDetail(userId: String): Flowable<ModelUserPublic> {
-        val userDetail = FirebaseHelper.getUserDetail(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), userId)
+        val userDetail = FirebaseHelper.getUserDetail(PreferHelper.getString(context, Constants.APP_STATUS), userId)
         return RxFirebaseDatabase.observeValueEvent(userDetail, ModelUserPublic::class.java)
                 .map({ model: ModelUserPublic ->
                     println("model = ${model}")
@@ -56,7 +58,7 @@ object StaffService {
     }
 
     fun getCountryAdminDetail(userId: String): Flowable<ModelUserPublic> {
-        val userDetail = FirebaseHelper.getUserDetail(PreferHelper.getString(AlertApplication.getContext(), Constants.APP_STATUS), userId)
+        val userDetail = FirebaseHelper.getUserDetail(PreferHelper.getString(context, Constants.APP_STATUS), userId)
         return RxFirebaseDatabase.observeValueEvent(userDetail, ModelUserPublic::class.java)
                 .map({ model: ModelUserPublic ->
                     model.id = userId

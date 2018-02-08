@@ -57,7 +57,7 @@ class ActiveRiskFragment : Fragment(), OnIndicatorSelectedListener {
             })
             // Inflate the layout for this fragment
 
-            rvRiskActive?.layoutManager = LinearLayoutManager(AlertApplication.getContext())
+            rvRiskActive?.layoutManager = LinearLayoutManager(context)
             val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
             rvRiskActive?.addItemDecoration(decoration)
             mViewModel.getLiveGroups(true).observe(this, Observer<MutableList<ExpandableGroup<ModelIndicator>>> {
@@ -65,7 +65,7 @@ class ActiveRiskFragment : Fragment(), OnIndicatorSelectedListener {
                 if (size > 0) {
                     pbLoading?.hide()
                 }
-                rvRiskActive?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, mCountryLocation, this, mNetworkCountryMap)
+                rvRiskActive?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, mCountryLocation, this, mNetworkCountryMap, context)
             })
         })
 

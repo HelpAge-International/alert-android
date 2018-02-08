@@ -1,5 +1,7 @@
 package org.alertpreparedness.platform.alert.risk_monitoring.view_model
 
+import android.app.Application
+import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
@@ -24,7 +26,9 @@ import timber.log.Timber
 /**
  * Created by fei on 14/11/2017.
  */
-class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
+class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
+
+    constructor(application: Application) : super(application)
 
     private val mDisposables: CompositeDisposable = CompositeDisposable()
     private var mIndicatorMap = mutableMapOf<String, List<ModelIndicator>>()
@@ -41,8 +45,8 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
     private val mNetworkMapLive: MutableLiveData<Map<String, String>> = MutableLiveData()
     private val mOtherHazardNameLive:MutableLiveData<String> = MutableLiveData()
 
-    private val mAgencyId = PreferHelper.getString(AlertApplication.getContext(), Constants.AGENCY_ID)
-    private val mCountryId = PreferHelper.getString(AlertApplication.getContext(), Constants.COUNTRY_ID)
+    private val mAgencyId = PreferHelper.getString(getApplication(), Constants.AGENCY_ID)
+    private val mCountryId = PreferHelper.getString(getApplication(), Constants.COUNTRY_ID)
 
 
     init {
@@ -55,7 +59,7 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
     }
 
     fun getLiveCountryModel(): MutableLiveData<ModelCountry> {
-        mDisposables.add(CountryService.getCountryModel(mAgencyId, mCountryId)
+        mDisposables.add(CountryService(getApplication()).getCountryModel(mAgencyId, mCountryId)
                 .subscribe({ country ->
                     mCountryModelLive.value = country
                 }, { error ->
@@ -94,7 +98,7 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
 
                             logs.forEach { model ->
                                 mDisposables.add(
-                                        StaffService.getUserDetail(model.addedBy)
+                                        StaffService(getApplication()).getUserDetail(model.addedBy)
                                                 .subscribe({ user ->
                                                     model.addedByName = String.format("%s %s", user.firstName, user.lastName)
                                                     mLogsLive.value = logs
@@ -139,7 +143,7 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
 
     fun getLiveNetworkMap(): MutableLiveData<Map<String, String>> {
         mDisposables.add(
-                NetworkService.mapNetworksForCountry(mAgencyId, mCountryId)
+                NetworkService(getApplication()).mapNetworksForCountry(mAgencyId, mCountryId)
                         .subscribe({ map ->
                             mNetworkMapLive.value = map
                         }, { error ->
@@ -263,7 +267,7 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
         mDisposables.add(disposableHazard)
 
         //network hazard and indicators
-        val disposableNetwork = NetworkService.mapNetworksForCountry(mAgencyId, mCountryId)
+        val disposableNetwork = NetworkService(getApplication()).mapNetworksForCountry(mAgencyId, mCountryId)
                 .subscribe({ networkMap ->
                     networkMap.forEach { (networkId, networkCountryId) ->
 
@@ -277,7 +281,7 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                                 })
                         )
 
-                        mDisposables.add(NetworkService.getNetworkDetail(networkId)
+                        mDisposables.add(NetworkService(getApplication()).getNetworkDetail(networkId)
                                 .subscribe({ network ->
 
                                     mDisposables.add(RiskMonitoringService.getHazards(networkCountryId)
@@ -379,7 +383,7 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
 
         //local network hazard and indicators
         mDisposables.add(
-                NetworkService.listLocalNetworksForCountry(mAgencyId, mCountryId)
+                NetworkService(getApplication()).listLocalNetworksForCountry(mAgencyId, mCountryId)
                         .subscribe({ localNetworkList ->
                             Timber.d("local networks: %s", localNetworkList.size)
                             localNetworkList.forEach { localNetworkId ->
@@ -397,7 +401,7 @@ class ActiveRiskViewModel : ViewModel(), FirebaseAuth.AuthStateListener {
                                         })
                                 )
 
-                                mDisposables.add(NetworkService.getNetworkDetail(localNetworkId)
+                                mDisposables.add(NetworkService(getApplication()).getNetworkDetail(localNetworkId)
                                         .subscribe({ network ->
                                             Timber.d(network.toString())
 

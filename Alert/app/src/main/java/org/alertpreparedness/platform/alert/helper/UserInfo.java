@@ -29,7 +29,6 @@ import org.alertpreparedness.platform.alert.interfaces.AuthCallback;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.realm.UserRealm;
-import org.alertpreparedness.platform.alert.risk_monitoring.service.NetworkService;
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.SelectAreaViewModel;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.DBListener;
@@ -121,14 +120,14 @@ public class UserInfo implements ValueEventListener {
 
         if(userNode.child("agencyAdmin").hasChildren()) {
             agencyAdmin = userNode.child("agencyAdmin").getChildren().iterator().next().getKey();
-            PreferHelper.putString(AlertApplication.getContext(), Constants.AGENCY_ID, agencyAdmin);
-            String agencyIDTemp = PreferHelper.getString(AlertApplication.getContext(), Constants.AGENCY_ID);
+            PreferHelper.putString(context, Constants.AGENCY_ID, agencyAdmin);
+            String agencyIDTemp = PreferHelper.getString(context, Constants.AGENCY_ID);
             System.out.println("agencyIDTemp = " + agencyIDTemp);
         }
 
         if(userNode.child("systemAdmin").hasChildren()) {
             systemAdmin = userNode.child("systemAdmin").getChildren().iterator().next().getKey();
-            PreferHelper.putString(AlertApplication.getContext(), Constants.SYSTEM_ID, systemAdmin);
+            PreferHelper.putString(context, Constants.SYSTEM_ID, systemAdmin);
         }
 
         System.out.println("userNode.getRef() = " + userNode.getRef());
@@ -136,11 +135,11 @@ public class UserInfo implements ValueEventListener {
 
         String countryId = userNode.child("countryId").getValue(String.class);
 
-        PreferHelper.putInt(AlertApplication.getContext(), Constants.USER_TYPE, userType);
+        PreferHelper.putInt(context, Constants.USER_TYPE, userType);
 
         UserRealm user = new UserRealm(userId, agencyAdmin, systemAdmin, countryId, null, null, null, userType, nodeName.equals("countryDirector"));
 
-        //PreferHelper.putString(AlertApplication.getContext(), Constants.COUNTRY_ID, user.getCountryId());
+        //PreferHelper.putString(context, Constants.COUNTRY_ID, user.getCountryId());
 
        // userObj = user.toUser();
         //countryOffice.child(user.getAgencyAdmin()).child(user.getCountryId()).addValueEventListener(this);
@@ -159,23 +158,23 @@ public class UserInfo implements ValueEventListener {
 
                 if(dataSnapshot.child("localNetworks").hasChildren()) {
                     localNetworkID = dataSnapshot.child("localNetworks").getChildren().iterator().next().getKey();
-                    PreferHelper.putString(AlertApplication.getContext(), Constants.LOCAL_NETWORK_ID, localNetworkID);
+                    PreferHelper.putString(context, Constants.LOCAL_NETWORK_ID, localNetworkID);
                     System.out.println("localNetworkID NN= " + localNetworkID);
                 }
 
                 if(dataSnapshot.child("networks").hasChildren()) {
                     networkID = dataSnapshot.child("networks").getChildren().iterator().next().getKey();
-                    PreferHelper.putString(AlertApplication.getContext(), Constants.NETWORK_ID, networkID);
+                    PreferHelper.putString(context, Constants.NETWORK_ID, networkID);
                     System.out.println("NetworkID NN= " + networkID);
 
                     networkCountryID = (String) dataSnapshot.child("networks").child(networkID).child("networkCountryId").getValue();
-                    PreferHelper.putString(AlertApplication.getContext(), Constants.NETWORK_COUNTRY_ID, networkCountryID);
+                    PreferHelper.putString(context, Constants.NETWORK_COUNTRY_ID, networkCountryID);
                     System.out.println("NetworkCountryID NN= " + networkCountryID);
                 }
 
                 UserRealm user = new UserRealm(userId, agencyAdmin, systemAdmin, countryId, localNetworkID, networkID, networkCountryID, userType, nodeName.equals("countryDirector"));
 
-                PreferHelper.putString(AlertApplication.getContext(), Constants.COUNTRY_ID, user.getCountryId());
+                PreferHelper.putString(context, Constants.COUNTRY_ID, user.getCountryId());
 
                 userObj = user.toUser();
             }

@@ -1,6 +1,8 @@
 package org.alertpreparedness.platform.alert.risk_monitoring.adapter
 
+import android.content.Context
 import android.support.v7.widget.RecyclerView
+import android.view.ContextMenu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -15,7 +17,7 @@ import timber.log.Timber
 /**
  * Created by fei on 09/11/2017.
  */
-class SourceRVAdapter(private val sources: MutableList<ModelSource>) : RecyclerView.Adapter<SourceViewHolder>() {
+class SourceRVAdapter(private val sources: MutableList<ModelSource>, private val context : Context) : RecyclerView.Adapter<SourceViewHolder>() {
 
     private var listener: OnSourceDeleteListener? = null
 
@@ -28,7 +30,7 @@ class SourceRVAdapter(private val sources: MutableList<ModelSource>) : RecyclerV
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): SourceViewHolder {
-        return SourceViewHolder(View.inflate(AlertApplication.getContext(), R.layout.source_item_view, null), listener)
+        return SourceViewHolder(View.inflate(context, R.layout.source_item_view, null), listener)
     }
 
     fun setOnSourceDeleteListener(sourceDeleteListener: OnSourceDeleteListener) {

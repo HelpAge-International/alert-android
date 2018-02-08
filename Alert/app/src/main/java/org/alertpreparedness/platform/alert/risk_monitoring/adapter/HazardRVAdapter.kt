@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.risk_monitoring.adapter
 
+import android.content.Context
 import android.os.Build
 import android.view.View
 import android.view.ViewGroup
@@ -54,7 +55,7 @@ class HazardViewHolder(itemView: View, location:Int) : GroupViewHolder(itemView)
 
 }
 
-class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener, networkCountryMap:Map<String,String>?) : ChildViewHolder(itemView) {
+class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener, networkCountryMap:Map<String,String>?, private val context: Context) : ChildViewHolder(itemView) {
 
     private val indicatorTitle: TextView = itemView.findViewById(R.id.tvIndicatorName)
     private val indicatorGeo: TextView = itemView.find(R.id.tvIndicatorGeo)
@@ -87,36 +88,36 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener,
         when (indicator.triggerSelected) {
             Constants.TRIGGER_GREEN -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_green, AlertApplication.getContext().theme)
+                    indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_green, context.theme)
                 }
                 else {
-                    indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_green)
+                    indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_green)
                 }
                 indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_GREEN]
-                indicatorNextUpdate.textColor = AlertApplication.getContext().resources.getColor(R.color.alertGreen)
-                indicatorDue.textColor = AlertApplication.getContext().resources.getColor(R.color.alertGreen)
+                indicatorNextUpdate.textColor = context.resources.getColor(R.color.alertGreen)
+                indicatorDue.textColor = context.resources.getColor(R.color.alertGreen)
             }
             Constants.TRIGGER_AMBER -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_amber, AlertApplication.getContext().theme)
+                    indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_amber, context.theme)
                 }
                 else {
-                    indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_amber)
+                    indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_amber)
                 }
                 indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_AMBER]
-                indicatorNextUpdate.textColor = AlertApplication.getContext().resources.getColor(R.color.alertAmber)
-                indicatorDue.textColor = AlertApplication.getContext().resources.getColor(R.color.alertAmber)
+                indicatorNextUpdate.textColor = context.resources.getColor(R.color.alertAmber)
+                indicatorDue.textColor = context.resources.getColor(R.color.alertAmber)
             }
             else -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_red, AlertApplication.getContext().theme)
+                    indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_red, context.theme)
                 }
                 else {
-                    indicatorLevel.background = AlertApplication.getContext().resources.getDrawable(R.drawable.indicator_red)
+                    indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_red)
                 }
                 indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_RED]
-                indicatorNextUpdate.textColor = AlertApplication.getContext().resources.getColor(R.color.alertRed)
-                indicatorDue.textColor = AlertApplication.getContext().resources.getColor(R.color.alertRed)
+                indicatorNextUpdate.textColor = context.resources.getColor(R.color.alertRed)
+                indicatorDue.textColor = context.resources.getColor(R.color.alertRed)
             }
         }
         indicatorLevel.setOnClickListener {
@@ -128,15 +129,15 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener,
     }
 }
 
-class HazardAdapter(groups: List<ExpandableGroup<ModelIndicator>>, countryLocation:Int, listener:OnIndicatorSelectedListener, networkCountryMap:Map<String,String>?) : ExpandableRecyclerViewAdapter<HazardViewHolder, IndicatorViewHolder>(groups) {
+class HazardAdapter(groups: List<ExpandableGroup<ModelIndicator>>, countryLocation:Int, listener:OnIndicatorSelectedListener, networkCountryMap:Map<String,String>?, private val context : Context) : ExpandableRecyclerViewAdapter<HazardViewHolder, IndicatorViewHolder>(groups) {
 
     private val mListener = listener
     private val mLocation = countryLocation
     private val mMap = networkCountryMap
 
     override fun onCreateChildViewHolder(parent: ViewGroup?, viewType: Int): IndicatorViewHolder {
-        val view = View.inflate(AlertApplication.getContext(), R.layout.risk_indicator_item_view, null)
-        return IndicatorViewHolder(view, mListener, mMap)
+        val view = View.inflate(context, R.layout.risk_indicator_item_view, null)
+        return IndicatorViewHolder(view, mListener, mMap, context)
     }
 
     override fun onBindGroupViewHolder(holder: HazardViewHolder?, flatPosition: Int, group: ExpandableGroup<*>?) {
@@ -151,7 +152,7 @@ class HazardAdapter(groups: List<ExpandableGroup<ModelIndicator>>, countryLocati
     }
 
     override fun onCreateGroupViewHolder(parent: ViewGroup?, viewType: Int): HazardViewHolder {
-        val view = View.inflate(AlertApplication.getContext(), R.layout.risk_hazard_item_view, null)
+        val view = View.inflate(context, R.layout.risk_hazard_item_view, null)
         return HazardViewHolder(view, mLocation)
     }
 

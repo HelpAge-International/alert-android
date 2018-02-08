@@ -109,7 +109,6 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
         mAPAdapter = new APActionAdapter(getContext(), dbActionRef, this);
         assert mAdvActionRV != null;
         mAdvActionRV.setAdapter(mAPAdapter);
-
         mAdvActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
