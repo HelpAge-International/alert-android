@@ -20,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import org.alertpreparedness.platform.alert.min_preparedness.fragment.InProgressFragment;
 import org.alertpreparedness.platform.alert.model.User;
 
 import java.util.regex.Matcher;

@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -117,6 +118,9 @@ public class ActionExpiredFragment extends BaseExpiredFragment {
             }
 
         }
+
+        handleMinFab();
+
     }
 
     @Override
@@ -127,6 +131,11 @@ public class ActionExpiredFragment extends BaseExpiredFragment {
     @Override
     protected PreparednessAdapter getAdapter() {
         return mExpiredAdapter;
+    }
+
+    @Override
+    protected RecyclerView getListView() {
+        return mActionRV;
     }
 
     @Override

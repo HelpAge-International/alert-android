@@ -114,6 +114,7 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
         networkRef.addValueEventListener(networkListener);
+        handleAdvFab();
     }
 
     @Override
@@ -311,5 +312,10 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
 
     private void update(AlertModel model) {
         alertHazardTypes.add(model.getHazardScenario());
+    }
+
+    @Override
+    protected RecyclerView getListView() {
+        return mAdvActionRV;
     }
 }

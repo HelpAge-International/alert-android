@@ -127,6 +127,7 @@ public class APAUnassignedFragment extends BaseUnassignedFragment implements APA
                 });
             }
         }
+        handleAdvFab();
     }
 
     @Override
@@ -177,5 +178,10 @@ public class APAUnassignedFragment extends BaseUnassignedFragment implements APA
     @Override
     protected TextView getNoActionView() {
         return txtNoAction;
+    }
+
+    @Override
+    protected RecyclerView getListView() {
+        return mAdvActionRV;
     }
 }

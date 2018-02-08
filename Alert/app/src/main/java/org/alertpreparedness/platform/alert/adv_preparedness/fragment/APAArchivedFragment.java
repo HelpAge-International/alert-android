@@ -116,11 +116,17 @@ public class APAArchivedFragment extends BaseArchivedFragment implements APActio
             }
 
         }
+        handleAdvFab();
     }
 
     @Override
     public PreparednessAdapter getAdapter() {
         return mAPAdapter;
+    }
+
+    @Override
+    protected RecyclerView getListView() {
+        return mAdvActionRV;
     }
 
     @Override

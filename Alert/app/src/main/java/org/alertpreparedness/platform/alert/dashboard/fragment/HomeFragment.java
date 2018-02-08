@@ -53,6 +53,7 @@ import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.realm.SettingsRealm;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -137,7 +138,6 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     @Inject
     @BaseIndicatorRef
     DatabaseReference baseIndicatorRef;
-
 
     @Inject
     @BaseActionRef

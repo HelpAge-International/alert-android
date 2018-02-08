@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -92,7 +93,11 @@ public class ActionCompletedFragment extends BaseCompletedFragment {
             }
 
         }
+
+        handleMinFab();
     }
+
+
 
     @Override
     protected int getType() {
@@ -102,6 +107,11 @@ public class ActionCompletedFragment extends BaseCompletedFragment {
     @Override
     protected PreparednessAdapter getAdapter() {
         return mAdapter;
+    }
+
+    @Override
+    protected RecyclerView getListView() {
+        return mActionRV;
     }
 
     @Override

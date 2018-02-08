@@ -111,6 +111,7 @@ public class APACompletedFragment extends BaseCompletedFragment implements APAct
             }
 
         }
+        handleAdvFab();
     }
 
     @Override
@@ -137,6 +138,11 @@ public class APACompletedFragment extends BaseCompletedFragment implements APAct
     @Override
     protected TextView getNoActionView() {
         return txtNoAction;
+    }
+
+    @Override
+    protected RecyclerView getListView() {
+        return mAdvActionRV;
     }
 }
 

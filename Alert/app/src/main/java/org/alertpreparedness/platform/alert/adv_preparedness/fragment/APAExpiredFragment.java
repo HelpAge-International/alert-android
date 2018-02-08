@@ -142,6 +142,7 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
         networkRef.addValueEventListener(networkListener);
+        handleAdvFab();
     }
 
     protected APActionAdapter getAPAdapter() {
@@ -366,6 +367,11 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
 
     private void update(AlertModel model) {
         alertHazardTypes.add(model.getHazardScenario());
+    }
+
+    @Override
+    protected RecyclerView getListView() {
+        return mAdvActionRV;
     }
 }
 

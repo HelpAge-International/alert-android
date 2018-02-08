@@ -31,7 +31,7 @@ public class AdvPreparednessFragment extends Fragment implements View.OnClickLis
     ViewPager mPager;
 
     @BindView(R.id.fabAddAPA)
-    android.support.design.widget.FloatingActionButton fabCreateAPA;
+    public android.support.design.widget.FloatingActionButton fabCreateAPA;
 
     @Nullable
     @Override

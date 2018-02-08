@@ -3,6 +3,7 @@ package org.alertpreparedness.platform.alert.adv_preparedness.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -174,6 +175,39 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
         networkRef.addValueEventListener(networkListener);
+        AdvPreparednessFragment xFragment = null;
+        for(Fragment fragment : getFragmentManager().getFragments()){
+            if(fragment instanceof AdvPreparednessFragment){
+                xFragment = (AdvPreparednessFragment) fragment;
+                break;
+            }
+        }
+        if(xFragment != null) {
+            FloatingActionButton fab = xFragment.fabCreateAPA;
+            fab.show();
+
+            mAdvActionRV.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    if (dy > 0 && fab.isShown()) {
+                        fab.hide();
+                    }
+//                    else if (!fab.isShown() && dy <= 0) {
+//                        fab.show();
+//                    }
+                    System.out.println("dy = " + dy);
+
+                }
+
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        fab.show();
+                    }
+                    super.onScrollStateChanged(recyclerView, newState);
+                }
+            });
+        }
 
     }
 
@@ -489,7 +523,7 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
         }
     }
 
-    private class AlertListener implements ValueEventListener{
+    private class AlertListener implements ValueEventListener {
 
         private void process(DataSnapshot dataSnapshot) {
 
@@ -525,7 +559,6 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
                 if(id != null) {
                     dbActionBaseRef.child(id).addChildEventListener(new InactiveAPAListener(id));
                 }
-
             }
         }
 
@@ -538,6 +571,7 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
     private void update(AlertModel model) {
         alertHazardTypes.add(model.getHazardScenario());
     }
+
 }
 
 
