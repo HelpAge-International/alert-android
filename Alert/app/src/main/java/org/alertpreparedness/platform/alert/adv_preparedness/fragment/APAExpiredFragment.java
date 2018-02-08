@@ -2,19 +2,14 @@ package org.alertpreparedness.platform.alert.adv_preparedness.fragment;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.service.autofill.Dataset;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
@@ -25,6 +20,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
@@ -35,13 +33,13 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseExpiredFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
+import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -261,8 +259,14 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
 
     private class AlertListener implements ValueEventListener{
 
-        private void proccess(DataSnapshot dataSnapshot) {
-            AlertModel model = dataSnapshot.getValue(AlertModel.class);
+        private void process(DataSnapshot dataSnapshot) {
+
+            final GsonBuilder gsonBuilder = new GsonBuilder();
+            final Gson gson = gsonBuilder.create();
+
+            JsonReader reader = new JsonReader(new StringReader(gson.toJson(dataSnapshot.getValue()).trim()));
+            reader.setLenient(true);
+            AlertModel model = gson.fromJson(reader, AlertModel.class);
 
             assert model != null;
             model.setKey(dataSnapshot.getKey());
@@ -277,7 +281,7 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             for(DataSnapshot child : dataSnapshot.getChildren()) {
-                proccess(child);
+                process(child);
             }
             try {
                 dbActionRef.removeEventListener(this);

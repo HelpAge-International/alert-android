@@ -18,13 +18,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
@@ -51,11 +53,9 @@ import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 import org.alertpreparedness.platform.alert.model.User;
-import org.w3c.dom.Text;
 
-import java.util.ArrayList;
+import java.io.StringReader;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -281,6 +281,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     }
 
     private void updateTitle() {
+
         boolean redPresent = false;
         boolean amberPresent = false;
         boolean noAlerts = false;
@@ -409,8 +410,14 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
             this.isNetworkAlert = isNetworkAlert;
         }
 
-        private void proccess(DataSnapshot dataSnapshot, String s) {
-            AlertModel model = dataSnapshot.getValue(AlertModel.class);
+        private void process(DataSnapshot dataSnapshot, String s) {
+
+            final GsonBuilder gsonBuilder = new GsonBuilder();
+            final Gson gson = gsonBuilder.create();
+
+            JsonReader reader = new JsonReader(new StringReader(gson.toJson(dataSnapshot.getValue()).trim()));
+            reader.setLenient(true);
+            AlertModel model = gson.fromJson(reader, AlertModel.class);
 
             assert model != null;
             model.setKey(dataSnapshot.getKey());
@@ -433,12 +440,12 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            proccess(dataSnapshot, s);
+            process(dataSnapshot, s);
         }
 
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            proccess(dataSnapshot, s);
+            process(dataSnapshot, s);
         }
 
         @Override
