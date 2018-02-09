@@ -1,9 +1,9 @@
 package org.alertpreparedness.platform.alert.min_preparedness.fragment;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,8 +21,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.adv_preparedness.fragment.UsersListDialogFragment;
+import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -43,7 +46,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionUnassignedFragment extends BaseUnassignedFragment {
+public class ActionUnassignedFragment extends BaseUnassignedFragment implements UsersListDialogFragment.ItemSelectedListener {
 
     @BindView(R.id.rvMinAction)
     RecyclerView mActionRV;
@@ -62,6 +65,9 @@ public class ActionUnassignedFragment extends BaseUnassignedFragment {
     TextView txtNoAction;
 
     private ActionAdapter mUnassignedAdapter;
+    private UsersListDialogFragment dialog = new UsersListDialogFragment();
+
+    private String actionID;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -71,6 +77,8 @@ public class ActionUnassignedFragment extends BaseUnassignedFragment {
         DependencyInjector.applicationComponent().inject(this);
 
         initViews();
+
+        dialog.setListener(this);
 
         return v;
     }
@@ -133,26 +141,30 @@ public class ActionUnassignedFragment extends BaseUnassignedFragment {
 
     @Override
     public void onActionItemSelected(int pos, String key, String userTypeID) {
+        this.actionID = key;
+
         SheetMenu.with(getContext()).setMenu(R.menu.menu_unassigned).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.update_date:
                     showDatePicker(key);
+
                     break;
                 case R.id.assign_action:
-                    assignAction();
+                    dialog.show(getActivity().getFragmentManager(), "users_list");
+
                     break;
                 case R.id.action_notes:
+                    Intent intent = new Intent(getActivity(), AddNotesActivity.class);
+                    intent.putExtra("ACTION_KEY", key);
+                    startActivity(intent);
+
                     break;
                 case R.id.attachments:
+
                     break;
             }
+            return false;
         }).show();
-
-        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Currently under development!", Snackbar.LENGTH_LONG).show();
-    }
-
-    private void assignAction() {
-        
     }
 
     private void showDatePicker(String key) {
@@ -186,4 +198,15 @@ public class ActionUnassignedFragment extends BaseUnassignedFragment {
     protected TextView getNoActionView() {
         return txtNoAction;
     }
+
+    //region UsersListDialogFragment.ItemSelectedListener
+    @Override
+    public void onItemSelected(UserModel model) {
+        long millis = System.currentTimeMillis();
+        dbActionRef.child(actionID).child("asignee").setValue(model.getUserID());
+        dbActionRef.child(actionID).child("updatedAt").setValue(millis);
+        mUnassignedAdapter.removeItem(actionID);
+        mUnassignedAdapter.notifyDataSetChanged();
+    }
+    //endregion
 }
