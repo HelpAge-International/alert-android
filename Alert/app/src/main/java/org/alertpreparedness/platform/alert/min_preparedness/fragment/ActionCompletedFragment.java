@@ -1,11 +1,8 @@
 package org.alertpreparedness.platform.alert.min_preparedness.fragment;
 
-import android.app.Fragment;
-import android.os.Build;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -17,29 +14,24 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
-
-import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.adv_preparedness.fragment.UsersListDialogFragment;
+import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
-import org.alertpreparedness.platform.alert.helper.DateHelper;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
-import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionCompletedFragment extends BaseCompletedFragment {
+public class ActionCompletedFragment extends BaseCompletedFragment implements UsersListDialogFragment.ItemSelectedListener {
 
     @BindView(R.id.rvMinAction)
     RecyclerView mActionRV;
@@ -56,6 +48,9 @@ public class ActionCompletedFragment extends BaseCompletedFragment {
 
     private ActionAdapter mAdapter;
 
+    private UsersListDialogFragment dialog = new UsersListDialogFragment();
+    private String actionID;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -65,6 +60,8 @@ public class ActionCompletedFragment extends BaseCompletedFragment {
         DependencyInjector.applicationComponent().inject(this);
 
         initViews();
+
+        dialog.setListener(this);
 
         return v;
     }
@@ -116,11 +113,38 @@ public class ActionCompletedFragment extends BaseCompletedFragment {
 
     @Override
     public void onActionItemSelected(int pos, String key, String userTypeID) {
-        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Currently under development!", Snackbar.LENGTH_LONG).show();
+        this.actionID = key;
+        SheetMenu.with(getContext()).setMenu(R.menu.menu_completed).setClick(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.reassign_action:
+                    dialog.show(getActivity().getFragmentManager(), "users_list");
+                    break;
+                case R.id.action_notes:
+                    Intent intent = new Intent(getActivity(), AddNotesActivity.class);
+                    intent.putExtra("ACTION_KEY", key);
+                    startActivity(intent);
+                    break;
+                case R.id.attachments:
+                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
+                    break;
+            }
+            return false;
+        }).show();
     }
 
     @Override
     protected TextView getNoActionView() {
         return txtNoAction;
     }
+
+    //region UsersListDialogFragment.ItemSelectedListener
+    @Override
+    public void onItemSelected(UserModel model) {
+        long millis = System.currentTimeMillis();
+        dbActionRef.child(actionID).child("asignee").setValue(model.getUserID());
+        dbActionRef.child(actionID).child("updatedAt").setValue(millis);
+        mAdapter.removeItem(actionID);
+        mAdapter.notifyDataSetChanged();
+    }
+    //endregion
 }
