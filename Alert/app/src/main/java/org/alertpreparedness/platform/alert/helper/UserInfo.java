@@ -15,6 +15,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 
 import org.alertpreparedness.platform.alert.AlertApplication;
@@ -25,6 +27,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseCountryOfficeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.interfaces.AuthCallback;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.model.User;
@@ -68,6 +71,10 @@ public class UserInfo implements ValueEventListener {
     DatabaseReference countryOffice;
 
     @Inject
+    @UserPublicRef
+    DatabaseReference userPublic;
+
+    @Inject
     Context context;
 
     private UserAuthenticationListener listener = new UserAuthenticationListener();
@@ -84,9 +91,17 @@ public class UserInfo implements ValueEventListener {
         this.userId = userId;
         this.authCallback = authCallback;
 
+        registerNotificationId(FirebaseInstanceId.getInstance().getToken());
+
         for (String nodeName : users) {
             db = database.child(nodeName);
             db.addListenerForSingleValueEvent(listener);
+        }
+    }
+
+    public void registerNotificationId(String deviceNotificationId) {
+        if(deviceNotificationId != null) {
+            userPublic.child(userId).child("deviceNotificationId").setValue(deviceNotificationId);
         }
     }
 

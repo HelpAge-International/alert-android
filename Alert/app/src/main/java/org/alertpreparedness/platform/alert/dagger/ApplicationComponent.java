@@ -32,6 +32,13 @@ import org.alertpreparedness.platform.alert.min_preparedness.fragment.ActionUnas
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.InProgressFragment;
 import org.alertpreparedness.platform.alert.mycountry.MyCountryFragment;
 import org.alertpreparedness.platform.alert.mycountry.ProgramResultsActivity;
+import org.alertpreparedness.platform.alert.notifications.ActionFetcher;
+import org.alertpreparedness.platform.alert.notifications.ActionNotificationService;
+import org.alertpreparedness.platform.alert.notifications.ActionUpdateNotificationHandler;
+import org.alertpreparedness.platform.alert.notifications.IndicatorFetcher;
+import org.alertpreparedness.platform.alert.notifications.IndicatorNotificationService;
+import org.alertpreparedness.platform.alert.notifications.IndicatorUpdateNotificationHandler;
+import org.alertpreparedness.platform.alert.offline.OfflineSyncHandler;
 import org.alertpreparedness.platform.alert.responseplan.ActiveFragment;
 import org.alertpreparedness.platform.alert.responseplan.ArchivedFragment;
 import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity;
@@ -88,6 +95,13 @@ public interface ApplicationComponent {
     void inject(UsersListDialogFragment fragment);
     void inject(SplashActivity splashActivity);
     void inject(CreateAPAActivity activity);
+    void inject(OfflineSyncHandler offlineSyncHandler);
+    void inject(IndicatorUpdateNotificationHandler indicatorUpdateNotificationHandler);
+    void inject(IndicatorFetcher indicatorFetcher);
+    void inject(IndicatorNotificationService indicatorNotificationService);
+    void inject(ActionFetcher actionFetcher);
+    void inject(ActionNotificationService actionNotificationService);
+    void inject(ActionUpdateNotificationHandler actionUpdateNotificationHandler);
     void inject(ActionArchivedFragment actionArchivedFragment);
     void inject(ActionCompletedFragment actionCompletedFragment);
     void inject(ActionExpiredFragment actionExpiredFragment);

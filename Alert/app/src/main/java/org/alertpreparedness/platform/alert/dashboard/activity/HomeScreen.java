@@ -5,12 +5,22 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import org.alertpreparedness.platform.alert.MainDrawer;
+import org.alertpreparedness.platform.alert.adv_preparedness.fragment.AdvPreparednessFragment;
 import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
+import org.alertpreparedness.platform.alert.min_preparedness.fragment.MinPreparednessFragment;
+import org.alertpreparedness.platform.alert.risk_monitoring.view.RiskFragment;
 
 
 public class HomeScreen extends MainDrawer {
 
     private static final int STORAGE_RC = 0x0013;
+
+    public static final int SCREEN_HOME = 0;
+    public static final int SCREEN_INDICATOR = 1;
+    public static final int SCREEN_APA = 2;
+    public static final int SCREEN_MPA = 3;
+
+    public static final String START_SCREEN = "START_SCREEN";
 
     @Override
     protected void onStart() {
@@ -20,8 +30,24 @@ public class HomeScreen extends MainDrawer {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        int startScreen = getIntent().getIntExtra(START_SCREEN, SCREEN_HOME);
 
-        setFragment(new HomeFragment());
+        switch (startScreen){
+            case SCREEN_INDICATOR:
+                setFragment(new RiskFragment());
+                break;
+            case SCREEN_APA:
+                setFragment(new AdvPreparednessFragment());
+                break;
+            case SCREEN_MPA:
+                setFragment(new MinPreparednessFragment());
+                break;
+            case SCREEN_HOME:
+            default:
+                setFragment(new HomeFragment());
+
+
+        }
     }
 
 

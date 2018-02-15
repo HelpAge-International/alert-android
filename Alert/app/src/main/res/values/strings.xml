@@ -199,5 +199,29 @@
     <string name="txt_create_apa">Create APA</string>
     <string name="title_choose_file">Choose a file</string>
     <string name="internal_storage">Internal storage</string>
+
+
+
+    <!--Notifications-->
+    <string name="notification_indicator_7_days_title">An Indicator requires updating this week</string>
+    <string name="notification_indicator_7_days_content">The following indicator: %1$s needs to be updated this week</string>
+    <string name="notification_indicator_1_day_title">An Indicator requires updating today</string>
+    <string name="notification_indicator_1_day_content">The following indicator: %1$s needs to be updated today</string>
+    <string name="notification_indicator_passed_title">An Indicator\'s next update date has passed!</string>
+    <string name="notification_indicator_passed_content">The following indicator: %1$s\'s next update date has passed, it needs updating</string>
+
+    <string name="notification_mpa_7_days_title">A minimum preparedness action is due this week</string>
+    <string name="notification_mpa_7_days_content">The following minimum preparedness action: %1$s needs to be completed this week</string>
+    <string name="notification_mpa_1_day_title">A minimum preparedness action is due today</string>
+    <string name="notification_mpa_1_day_content">The following minimum preparedness action: %1$s needs to be completed today</string>
+    <string name="notification_mpa_passed_title">A minimum preparedness action\'s due date has passed!</string>
+    <string name="notification_mpa_passed_content">The following minimum preparedness action:%1$s\'s due date has passed, it needs completing</string>
+
+    <string name="notification_apa_7_days_title">A advanced preparedness action is due this week</string>
+    <string name="notification_apa_7_days_content">The following advanced preparedness action: %1$s needs to be completed this week</string>
+    <string name="notification_apa_1_day_title">A advanced preparedness action is due today</string>
+    <string name="notification_apa_1_day_content">The following advanced preparedness action: %1$s needs to be completed today</string>
+    <string name="notification_apa_passed_title">A advanced preparedness action\'s due date has passed!</string>
+    <string name="notification_apa_passed_content">The following advanced preparedness action:%1$s\'s due date has passed, it needs completing</string>
     <string name="edit_apa">Edit APA</string>
 </resources>

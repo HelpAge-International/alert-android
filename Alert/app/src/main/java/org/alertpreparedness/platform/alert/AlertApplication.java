@@ -6,6 +6,13 @@ import android.app.Application;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
+import com.firebase.jobdispatcher.Constraint;
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
+import com.firebase.jobdispatcher.Job;
+import com.firebase.jobdispatcher.JobTrigger;
+import com.firebase.jobdispatcher.Lifetime;
+import com.firebase.jobdispatcher.Trigger;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -26,13 +33,20 @@ import org.acra.data.StringFormat;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseUserRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.PermissionRef;
+import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.notifications.ActionUpdateNotificationHandler;
+import org.alertpreparedness.platform.alert.notifications.IndicatorFetcher;
+import org.alertpreparedness.platform.alert.notifications.IndicatorUpdateNotificationHandler;
+import org.alertpreparedness.platform.alert.offline.OfflineSyncHandler;
+import org.alertpreparedness.platform.alert.offline.SyncJobService;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SettingsFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -72,7 +86,7 @@ public class AlertApplication extends Application implements ValueEventListener 
         // JODA
         JodaTimeAndroid.init(this);
 
-        ACRA.init(this);
+//        ACRA.init(this);
 
         if(!PreferHelper.getBoolean(this, Constants.HAS_RUN_BEFORE)) {
             System.out.println("PreferHelper.getString(this, Constants.HAS_RUN_BEFORE) = " + PreferHelper.getString(this, Constants.HAS_RUN_BEFORE));
@@ -112,6 +126,22 @@ public class AlertApplication extends Application implements ValueEventListener 
         }
 
         DependencyInjector.initialize(this);
+
+        FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(this));
+        Job myJob = dispatcher.newJobBuilder()
+                .setService(SyncJobService.class) // the JobService that will be called
+                .setTag("sync")        // uniquely identifies the job
+                .setRecurring(true)
+                .setConstraints(Constraint.ON_ANY_NETWORK)
+                .setReplaceCurrent(true)
+                .setLifetime(Lifetime.FOREVER)
+                .setTrigger(Trigger.executionWindow((int) TimeUnit.MINUTES.toSeconds(60), (int) TimeUnit.MINUTES.toSeconds(90)))
+                .build();
+
+        dispatcher.schedule(myJob);
+        new IndicatorUpdateNotificationHandler(this).scheduleAllNotifications();
+        new ActionUpdateNotificationHandler(this).scheduleAllNotifications();
+
 
     }
 

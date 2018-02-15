@@ -15,6 +15,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseCountryOfficeRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseHazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseUserRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
@@ -84,6 +85,12 @@ public class FirebaseModule {
     @HazardRef
     public DatabaseReference provideHazardRef(@BaseDatabaseRef DatabaseReference db, User user) {
         return db.child("hazard").child(user.countryID);
+    }
+
+    @Provides
+    @BaseHazardRef
+    public DatabaseReference provideBaseHazardRef(@BaseDatabaseRef DatabaseReference db) {
+        return db.child("hazard");
     }
 
     @Provides

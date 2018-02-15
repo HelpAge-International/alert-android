@@ -46,5 +46,9 @@
         <item name="android:background">@color/colorAccent</item> //background
     </style>
 
+    <style name="SplashTheme" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/splash</item>
+    </style>
+
 </resources>
 
