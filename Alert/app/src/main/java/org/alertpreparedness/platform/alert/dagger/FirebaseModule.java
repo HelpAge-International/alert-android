@@ -11,6 +11,8 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyBaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionCHSRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
@@ -23,6 +25,8 @@ import org.alertpreparedness.platform.alert.dagger.annotation.DocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardOtherRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.LocalNetworkRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NetworkCountryRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.PermissionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ProgrammeRef;
@@ -112,6 +116,18 @@ public class FirebaseModule {
     }
 
     @Provides
+    @BaseActionMandatedRef
+    public DatabaseReference provideBaseActionMandatedRef(@BaseDatabaseRef DatabaseReference db) {
+        return db.child("actionMandated");
+    }
+
+    @Provides
+    @BaseActionCHSRef
+    public DatabaseReference provideBaseActionCHSRef(@BaseDatabaseRef DatabaseReference db) {
+        return db.child("actionCHS");
+    }
+
+    @Provides
     @UserRef
     public DatabaseReference provideUserRef(@BaseDatabaseRef DatabaseReference db, @UserId String userId) {
         return db.child("userPublic").child(userId);
@@ -135,6 +151,17 @@ public class FirebaseModule {
         return db.child("countryOffice").child(user.agencyAdminID).child(user.countryID);
     }
 
+    @Provides
+    @LocalNetworkRef
+    public DatabaseReference providesLocalNetworkRef(@BaseDatabaseRef DatabaseReference db, User user) {
+        return db.child("network").child(user.getLocalNetworkID());
+    }
+
+    @Provides
+    @NetworkCountryRef
+    public DatabaseReference providesNetworkCountryRef(@BaseDatabaseRef DatabaseReference db, User user) {
+        return db.child("networkCountry").child(user.getNetworkID()).child(user.getNetworkCountryID());
+    }
 
     @Provides
     @UserPublicRef

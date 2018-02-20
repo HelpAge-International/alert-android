@@ -54,6 +54,7 @@ import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListene
 import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.realm.SettingsRealm;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -411,13 +412,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         }
 
         private void process(DataSnapshot dataSnapshot, String s) {
-
-            final GsonBuilder gsonBuilder = new GsonBuilder();
-            final Gson gson = gsonBuilder.create();
-
-            JsonReader reader = new JsonReader(new StringReader(gson.toJson(dataSnapshot.getValue()).trim()));
-            reader.setLenient(true);
-            AlertModel model = gson.fromJson(reader, AlertModel.class);
+            AlertModel model = AppUtils.getValueFromDataSnapshot(dataSnapshot, AlertModel.class);
 
             assert model != null;
             model.setKey(dataSnapshot.getKey());
@@ -434,7 +429,6 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                 if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
                     updateNetworkAlert(model.getKey(), model);
                 }
-
             }
         }
 
@@ -468,7 +462,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
         protected void process(DataSnapshot dataSnapshot, String s) {
             if (dataSnapshot.getRef().getParent().getParent().getKey().equals("action")) {
-                ActionModel model = dataSnapshot.getValue(ActionModel.class);
+                ActionModel model = AppUtils.getValueFromDataSnapshot(dataSnapshot, ActionModel.class);
 
                 assert model != null;
                 boolean shouldAdd = model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null;
@@ -503,7 +497,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
         private void chsProcess(DataSnapshot dataSnapshot, String s) {
             if (dataSnapshot.getRef().getParent().getParent().getKey().equals("action")) {
-                ActionModel model = dataSnapshot.getValue(ActionModel.class);
+                ActionModel model = AppUtils.getValueFromDataSnapshot(dataSnapshot, ActionModel.class);
                 String actionIDs = dataSnapshot.getKey();
 
                 if (model.getType() == 0) {
@@ -601,7 +595,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         @Override
         protected void process(DataSnapshot dataSnapshot, String s) {
             if (dataSnapshot.getRef().getParent().getParent().getKey().equals("action")) {
-                ActionModel model = dataSnapshot.getValue(ActionModel.class);
+                ActionModel model = AppUtils.getValueFromDataSnapshot(dataSnapshot, ActionModel.class);
 
                 assert model != null;
                 boolean shouldAdd = model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null;

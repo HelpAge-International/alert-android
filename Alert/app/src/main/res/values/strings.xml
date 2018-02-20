@@ -212,6 +212,8 @@
 
     <string name="notification_mpa_7_days_title">A minimum preparedness action is due this week</string>
     <string name="notification_mpa_7_days_content">The following minimum preparedness action: %1$s needs to be completed this week</string>
+    <string name="notification_mpa_expired_title">A minimum preparedness action has expired</string>
+    <string name="notification_mpa_expired_content">The following minimum preparedness action: %1$s has expired</string>
     <string name="notification_mpa_1_day_title">A minimum preparedness action is due today</string>
     <string name="notification_mpa_1_day_content">The following minimum preparedness action: %1$s needs to be completed today</string>
     <string name="notification_mpa_passed_title">A minimum preparedness action\'s due date has passed!</string>
@@ -219,9 +221,13 @@
 
     <string name="notification_apa_7_days_title">A advanced preparedness action is due this week</string>
     <string name="notification_apa_7_days_content">The following advanced preparedness action: %1$s needs to be completed this week</string>
+    <string name="notification_apa_expired_title">A advanced preparedness action has expired</string>
+    <string name="notification_apa_expired_content">The following advanced preparedness action: %1$s has expired</string>
     <string name="notification_apa_1_day_title">A advanced preparedness action is due today</string>
     <string name="notification_apa_1_day_content">The following advanced preparedness action: %1$s needs to be completed today</string>
     <string name="notification_apa_passed_title">A advanced preparedness action\'s due date has passed!</string>
     <string name="notification_apa_passed_content">The following advanced preparedness action:%1$s\'s due date has passed, it needs completing</string>
     <string name="edit_apa">Edit APA</string>
+    <string name="email_not_associated_with_account">The email address you entered is not associated with an ALERT account. Please try again.</string>
+    <string name="password_incorrect">The password you entered is incorrect, please check and try again.</string>
 </resources>

@@ -16,13 +16,19 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
 
+import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.InProgressFragment;
 import org.alertpreparedness.platform.alert.model.User;
 
+import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -130,4 +136,12 @@ public class AppUtils {
         return FirebaseStorage.getInstance().getReferenceFromUrl("gs://alert-190fa.appspot.com");
     }
 
+    public static <T> T getValueFromDataSnapshot(DataSnapshot dataSnapshot, Class<T> clazz) {
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.create();
+
+        JsonReader reader = new JsonReader(new StringReader(gson.toJson(dataSnapshot.getValue()).trim()));
+        reader.setLenient(true);
+        return gson.fromJson(reader, clazz);
+    }
 }

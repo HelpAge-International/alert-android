@@ -37,6 +37,11 @@ public class SplashActivity extends BaseActivity {
     public static final int NOTIFICATION_ALERT = 0;
     public static final int NOTIFICATION_INDICATOR_ASSIGNED = 1;
     public static final int NOTIFICATION_INDICATOR_RESCHEDULE = 2;
+    public static final int NOTIFICATION_ACTION_ASSIGNED = 3;
+    public static final int NOTIFICATION_ACTION_RESCHEDULE = 4;
+    public static final int NOTIFICATION_ACTION_COUNTRY_RESCHEDULE = 5;
+    public static final int NOTIFICATION_ACTION_LOCAL_NETWORK_RESCHEDULE = 6;
+    public static final int NOTIFICATION_ACTION_NETWORK_COUNTRY_RESCHEDULE = 7;
 
     public static final String NOTIFICATION_FIELD_TYPE = "type";
 
@@ -68,6 +73,15 @@ public class SplashActivity extends BaseActivity {
 //                    String indicatorId = getIntent().getExtras().getString("indicatorId");
                     Intent intent = new Intent(this, HomeScreen.class);
                     intent.putExtra(HomeScreen.START_SCREEN, HomeScreen.SCREEN_INDICATOR);
+                    startActivity(intent);
+                    finish();
+                }
+                else if(notificationType == NOTIFICATION_ACTION_ASSIGNED)
+                {
+                    Intent intent = new Intent(this, HomeScreen.class);
+                    int actionType = Integer.parseInt(getIntent().getExtras().getString("actionType"));
+
+                    intent.putExtra(HomeScreen.START_SCREEN, actionType == 1 ? HomeScreen.SCREEN_MPA : HomeScreen.SCREEN_APA);
                     startActivity(intent);
                     finish();
                 }

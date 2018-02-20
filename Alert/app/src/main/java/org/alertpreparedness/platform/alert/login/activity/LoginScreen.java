@@ -144,11 +144,11 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
         progressDialog.dismiss();
         if(e instanceof FirebaseAuthInvalidUserException) { //no user found
-            SnackbarHelper.show(this, "The email address you entered is not associated with an ALERT account. Please try again.");
+            SnackbarHelper.show(this, getString(R.string.email_not_associated_with_account));
         }
         else if(e instanceof FirebaseAuthInvalidCredentialsException) {//incorrect password
 
-            SnackbarHelper.show(this, "The password you entered is incorrect, please check and try again.");
+            SnackbarHelper.show(this, getString(R.string.password_incorrect));
         }
         else if (e instanceof FirebaseAuthException) {
             String error = ((FirebaseAuthException) e).getErrorCode();
@@ -161,14 +161,16 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     //login successful
     @Override
     public void onComplete(@NonNull Task<AuthResult> task) {
+        progressDialog.dismiss();
         if (task.isSuccessful()) {
+            System.out.println("firebaseAuth.getCurrentUser() = " + firebaseAuth.getCurrentUser());
             if (firebaseAuth.getCurrentUser()!=null) {
                 PreferHelper.putString(this, Constants.UID, firebaseAuth.getCurrentUser().getUid());
                 userInfo.authUser(this, PreferHelper.getString(this, Constants.UID));
             }
         }
         else {
-            SnackbarHelper.show(this, "The email address you entered is not associated with an ALERT account. Please try again.");
+            SnackbarHelper.show(this, getString(R.string.email_not_associated_with_account));
         }
     }
 

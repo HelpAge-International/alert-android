@@ -34,6 +34,7 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseUserRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.PermissionRef;
 import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
+import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.notifications.ActionUpdateNotificationHandler;
 import org.alertpreparedness.platform.alert.notifications.IndicatorFetcher;
@@ -60,7 +61,7 @@ import timber.log.Timber;
 @AcraMailSender(mailTo = "tj@rolleragency.co.uk")
 public class AlertApplication extends Application implements ValueEventListener {
 
-    public static final boolean IS_LIVE = true;
+    public static final boolean IS_LIVE = false;
     private User user;
 
 //    public static final String API_KEY = "";
@@ -85,6 +86,8 @@ public class AlertApplication extends Application implements ValueEventListener 
         Realm.init(this);
         // JODA
         JodaTimeAndroid.init(this);
+
+        boolean loggedIn = FirebaseAuth.getInstance().getCurrentUser() != null && new UserInfo().getUser() != null && !PreferHelper.getString(this, Constants.UID).equals("");
 
 //        ACRA.init(this);
 
@@ -127,20 +130,25 @@ public class AlertApplication extends Application implements ValueEventListener 
 
         DependencyInjector.initialize(this);
 
-        FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(this));
-        Job myJob = dispatcher.newJobBuilder()
-                .setService(SyncJobService.class) // the JobService that will be called
-                .setTag("sync")        // uniquely identifies the job
-                .setRecurring(true)
-                .setConstraints(Constraint.ON_ANY_NETWORK)
-                .setReplaceCurrent(true)
-                .setLifetime(Lifetime.FOREVER)
-                .setTrigger(Trigger.executionWindow((int) TimeUnit.MINUTES.toSeconds(60), (int) TimeUnit.MINUTES.toSeconds(90)))
-                .build();
+        if(loggedIn) {
+            FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(this));
+            Job myJob = dispatcher.newJobBuilder()
+                    .setService(SyncJobService.class) // the JobService that will be called
+                    .setTag("sync")        // uniquely identifies the job
+                    .setRecurring(true)
+                    .setConstraints(Constraint.ON_ANY_NETWORK)
+                    .setReplaceCurrent(true)
+                    .setLifetime(Lifetime.FOREVER)
+                    .setTrigger(Trigger.executionWindow((int) TimeUnit.MINUTES.toSeconds(60), (int) TimeUnit.MINUTES.toSeconds(90)))
+                    .build();
 
-        dispatcher.schedule(myJob);
-        new IndicatorUpdateNotificationHandler(this).scheduleAllNotifications();
-        new ActionUpdateNotificationHandler(this).scheduleAllNotifications();
+            dispatcher.schedule(myJob);
+            new IndicatorUpdateNotificationHandler(this).scheduleAllNotifications();
+            new ActionUpdateNotificationHandler(this).scheduleAllNotifications();
+        }
+        else{
+            //TODO: CANCEL ALL NOTIFICATIONS?
+        }
 
 
     }
