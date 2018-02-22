@@ -112,6 +112,7 @@ public class AlertFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void rescheduleActionNotifications() {
+        System.out.println("");
         new ActionUpdateNotificationHandler(this).scheduleAllNotifications();
     }
 }

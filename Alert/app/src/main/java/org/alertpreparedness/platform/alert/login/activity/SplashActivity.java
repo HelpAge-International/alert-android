@@ -56,7 +56,6 @@ public class SplashActivity extends BaseActivity {
         System.out.println("new UserInfo().getUser() = " + new UserInfo().getUser());
         System.out.println("PreferHelper.getString(this, Constants.UID) = " + PreferHelper.getString(this, Constants.UID));
 
-
         if (FirebaseAuth.getInstance().getCurrentUser() != null && new UserInfo().getUser() != null && !PreferHelper.getString(this, Constants.UID).equals("")) {
             DependencyInjector.applicationComponent().inject(this);
             if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("type")) {

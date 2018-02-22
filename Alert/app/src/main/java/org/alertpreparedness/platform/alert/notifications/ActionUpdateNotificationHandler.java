@@ -126,6 +126,7 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
                     break;
                 case COUNTRY:
                     clockSetting = actionFetcherResult.getCountryClockSettings();
+                    Timber.d("ClockSetting: " + clockSetting.getValue() + " - " + clockSetting.getDurationType());
                     break;
             }
             scheduleNotification(context, model.getAction(), model.getGroupId(), model.getActionId(), clockSetting);
@@ -146,9 +147,11 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
 
         if(dbRef != null){
             dbRef = dbRef.child("clockSettings").child("preparedness");
-            dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            DatabaseReference finalDbRef = dbRef;
+            dbRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
+                    finalDbRef.removeEventListener(this);
                     scheduleNotification(context, actionModel, groupId, actionId, dataSnapshot.getValue(ClockSetting.class));
                 }
 
@@ -235,6 +238,8 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
             }
         }
         if(((actionModel.getFrequencyBase() != null && actionModel.getFrequencyValue() != null) || clockSettings != null) && actionModel.getCreatedAt() != null){
+            Timber.d("TimeStamp: " + actionModel.getDueDate());
+
             Date startDate;
 
             if(actionModel.getIsCompleteAt() != null){
@@ -250,12 +255,14 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
             int frequencyBase;
             int frequencyValue;
             if(actionModel.getFrequencyBase() != null && actionModel.getFrequencyValue() != null) {
+                Timber.d(actionModel.getUpdatedAt() + "A: " + actionModel.getFrequencyBase() + " - " + actionModel.getFrequencyValue());
                 frequencyBase = actionModel.getFrequencyBase();
                 frequencyValue = actionModel.getFrequencyValue();
             }
             else{
                 frequencyBase = clockSettings.getDurationType();
                 frequencyValue = clockSettings.getValue();
+                Timber.d(actionModel.getUpdatedAt() + "B: " + frequencyBase + " - " + frequencyValue);
             }
 
             Calendar expirationCalendar = Calendar.getInstance();
@@ -278,7 +285,9 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
             bundle.putString(BUNDLE_ACTION_ID, actionId);
             bundle.putInt(BUNDLE_NOTIFICATION_TYPE, NOTIFICATION_TYPE_EXPIRED);
 
+            //TODO expiration wrong
             int timeFromNow = (int) ((expirationDate.getTime() - System.currentTimeMillis())/1000);
+            Timber.d(actionModel.getUpdatedAt() + "C: " + timeFromNow);
             if(timeFromNow > 0) {
                 dispatcher.schedule(
                         dispatcher
@@ -291,7 +300,7 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
                                 .setService(ActionNotificationService.class)
                                 .build()
                 );
-                Timber.d("Scheduling Expiration" + actionId + " - " + expirationDate + " - " + timeFromNow);
+                Timber.d("Scheduling Expiration" + actionId + " - " + actionModel.getUpdatedAt() + " - " + expirationDate + " - " + timeFromNow);
             }
         }
     }
