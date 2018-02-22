@@ -21,6 +21,7 @@ import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseNoteRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
@@ -37,6 +38,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapter.ItemSelectedListener, ValueEventListener, View.OnClickListener {
+
+    public static final String ACTION_ID = "ACTION_KEY";
+    public static final String PARENT_ACTION_ID = "PARENT_ACTION_ID";
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -55,7 +59,7 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
     DatabaseReference dbActionRef;
 
     @Inject
-    @NoteRef
+    @BaseNoteRef
     DatabaseReference dbNoteRef;
 
     @Inject
@@ -67,6 +71,8 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
     DatabaseReference dbUserRef;
 
     AddNotesAdapter addNotesAdapter;
+    private String actionKey;
+    private String actionParentKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,37 +89,29 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        actionKey = getIntent().getStringExtra(ACTION_ID);
+        actionParentKey = getIntent().getStringExtra(PARENT_ACTION_ID);
+
         initData();
     }
 
     private void initData() {
-        dbActionRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    getData(getChild.getKey());
-                    initView(getChild.getKey());
-                }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("databaseError = " + databaseError);
-            }
-        });
+        getData();
+        initView();
+
     }
 
-    private void getData(String key) {
-        System.out.println("key = " + key);
-        dbNoteRef.child(key).addValueEventListener(this);
+    private void getData() {
+        dbNoteRef.child(actionParentKey).child(actionKey).addValueEventListener(this);
     }
 
-    protected AddNotesAdapter getmAdapter(String key) {
-        return new AddNotesAdapter(getApplicationContext(), dbNoteRef.child(key), this);
+    protected AddNotesAdapter getmAdapter() {
+        return new AddNotesAdapter(getApplicationContext(), dbNoteRef.child(actionParentKey).child(actionKey), this);
     }
 
-    private void initView(String key) {
-        addNotesAdapter = getmAdapter(key);
+    private void initView() {
+        addNotesAdapter = getmAdapter();
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
@@ -162,14 +160,12 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
     public void saveNote(String texts) {
 
         if(!TextUtils.isEmpty(texts)) {
-            Intent intent = getIntent();
-            String key = intent.getStringExtra("ACTION_KEY");
-            String id = dbNoteRef.child(key).push().getKey();
+            String id = dbNoteRef.child(actionParentKey).child(actionKey).push().getKey();
             String userID = PreferHelper.getString(getApplicationContext(), Constants.AGENCY_ID);
             Long millis = System.currentTimeMillis();
 
             Notes notes = new Notes(texts, millis, userID);
-            dbNoteRef.child(key).child(id).setValue(notes);
+            dbNoteRef.child(actionParentKey).child(actionKey).child(id).setValue(notes);
 
         }else {
             SnackbarHelper.show(this, getString(R.string.txt_note_not_empty));

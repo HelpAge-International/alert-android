@@ -78,8 +78,6 @@ public class InProgressFragment extends BaseInProgressFragment implements Action
 //        FragmentManager.BackStackEntry backEntry = getFragmentManager().getBackStackEntryAt(0);
 //        System.out.println("backEntry = " + backEntry);
 //
-
-        handleMinFab();
     }
 
 

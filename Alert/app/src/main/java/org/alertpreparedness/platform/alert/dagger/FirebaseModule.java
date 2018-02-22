@@ -17,8 +17,10 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseCountryOfficeRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseDocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseHazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseNoteRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseUserRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.DocumentRef;
@@ -197,6 +199,12 @@ public class FirebaseModule {
     }
 
     @Provides
+    @BaseNoteRef
+    public DatabaseReference provideBaseNoteRef(@BaseDatabaseRef DatabaseReference db) {
+        return db.child("note");
+    }
+
+    @Provides
     @Singleton
     @ActionCHSRef
     public DatabaseReference provideCHSRef(@BaseDatabaseRef DatabaseReference db, User user) {
@@ -254,6 +262,12 @@ public class FirebaseModule {
     @DocumentRef
     public DatabaseReference provideDocRef(@BaseDatabaseRef DatabaseReference db, User user) {
         return db.child("document").child(user.countryID);
+    }
+
+    @Provides
+    @BaseDocumentRef
+    public DatabaseReference provideBaseDocRef(@BaseDatabaseRef DatabaseReference db) {
+        return db.child("document");
     }
 
 //    @Provides

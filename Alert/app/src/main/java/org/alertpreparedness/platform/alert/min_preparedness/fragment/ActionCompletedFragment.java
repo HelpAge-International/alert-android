@@ -19,6 +19,7 @@ import org.alertpreparedness.platform.alert.adv_preparedness.fragment.UsersListD
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -91,7 +92,6 @@ public class ActionCompletedFragment extends BaseCompletedFragment implements Us
 
         }
 
-        handleMinFab();
     }
 
 
@@ -121,11 +121,15 @@ public class ActionCompletedFragment extends BaseCompletedFragment implements Us
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
-                    intent.putExtra("ACTION_KEY", key);
+                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent.putExtra(AddNotesActivity.ACTION_ID, key);
                     startActivity(intent);
                     break;
                 case R.id.attachments:
-                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
+                    Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
+                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
+                    startActivity(intent2);
                     break;
             }
             return false;

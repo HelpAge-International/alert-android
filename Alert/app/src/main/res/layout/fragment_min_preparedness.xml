@@ -11,15 +11,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fabAddAPA"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_margin="@dimen/space_16"
-        app:backgroundTint="@color/btnColor"
-        app:srcCompat="@drawable/fab_add"
-        android:layout_alignParentEnd="true" />
+    <!--<android.support.design.widget.FloatingActionButton-->
+        <!--android:id="@+id/fabAddAPA"-->
+        <!--android:layout_width="56dp"-->
+        <!--android:layout_height="56dp"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_margin="@dimen/space_16"-->
+        <!--app:backgroundTint="@color/btnColor"-->
+        <!--app:srcCompat="@drawable/fab_add"-->
+        <!--android:layout_alignParentEnd="true" />-->
 
 </RelativeLayout>

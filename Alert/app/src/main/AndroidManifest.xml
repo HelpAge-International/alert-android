@@ -157,6 +157,8 @@
         <activity
             android:name=".adv_preparedness.activity.EditAPAActivity"
             android:label="@string/edit_apa" />
+        <activity android:name=".min_preparedness.activity.ViewAttachmentsActivity"
+            android:label="@string/attachments"/>
     </application>
 
 </manifest>

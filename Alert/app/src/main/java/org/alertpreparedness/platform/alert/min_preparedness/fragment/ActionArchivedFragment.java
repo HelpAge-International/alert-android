@@ -90,7 +90,6 @@ public class ActionArchivedFragment extends BaseArchivedFragment {
             }
         }
 
-        handleMinFab();
     }
 
     @Override

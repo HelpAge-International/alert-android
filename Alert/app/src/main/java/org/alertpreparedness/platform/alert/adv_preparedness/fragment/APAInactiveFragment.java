@@ -464,20 +464,25 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
         String actionIDs = dataSnapshot.getKey();
         DataModel model = dataSnapshot.getValue(DataModel.class);
 
-        if (dataSnapshot.child("frequencyBase").getValue() != null) {
-            model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
-        }
-        if (dataSnapshot.child("frequencyValue").getValue() != null) {
-            model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
-        }
+        if(model != null) {
 
-        if (model.getType() == 0) {
-            getCHS(model, actionIDs);
-        } else if (model.getType() == 1) {
-            getMandated(model, actionIDs);
-        } else {
-            System.out.println("model = " + model);
-            getCustom(model, dataSnapshot);
+            if (dataSnapshot.child("frequencyBase").getValue() != null) {
+                model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
+            }
+            if (dataSnapshot.child("frequencyValue").getValue() != null) {
+                model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
+            }
+
+            if (model.getType() != null && model.getType() == 0) {
+                getCHS(model, actionIDs);
+            }
+            else if (model.getType() != null && model.getType() == 1) {
+                getMandated(model, actionIDs);
+            }
+            else {
+                System.out.println("model = " + model);
+                getCustom(model, dataSnapshot);
+            }
         }
 
     }

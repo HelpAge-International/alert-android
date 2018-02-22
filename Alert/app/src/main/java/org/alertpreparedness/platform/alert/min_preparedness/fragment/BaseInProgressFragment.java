@@ -30,6 +30,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
@@ -96,42 +97,6 @@ public abstract class BaseInProgressFragment extends Fragment implements ActionA
     protected abstract PreparednessAdapter getAdapter();
     protected abstract RecyclerView getListView();
 
-    public void handleMinFab() {
-        MinPreparednessFragment xFragment = null;
-        for(Fragment fragment : getFragmentManager().getFragments()){
-            if(fragment instanceof MinPreparednessFragment){
-                xFragment = (MinPreparednessFragment) fragment;
-                break;
-            }
-        }
-        if(xFragment != null) {
-            FloatingActionButton fab = xFragment.fabCreateAPA;
-            fab.show();
-
-            getListView().addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    if (dy > 0 && fab.isShown()) {
-                        fab.hide();
-                    }
-//                    else if (!fab.isShown() && dy <= 0) {
-//                        fab.show();
-//                    }
-                    System.out.println("dy = " + dy);
-
-                }
-
-                @Override
-                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        fab.show();
-                    }
-                    super.onScrollStateChanged(recyclerView, newState);
-                }
-            });
-        }
-    }
-
     public void handleAdvFab() {
         AdvPreparednessFragment xFragment = null;
         for(Fragment fragment : getFragmentManager().getFragments()){
@@ -184,12 +149,16 @@ public abstract class BaseInProgressFragment extends Fragment implements ActionA
                     Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
                     break;
                 case R.id.action_notes:
-                    intent = new Intent(getActivity(), AddNotesActivity.class);
-                    intent.putExtra("ACTION_KEY", key);
-                    startActivity(intent);
+                    Intent intent3 = new Intent(getActivity(), AddNotesActivity.class);
+                    intent3.putExtra(AddNotesActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent3.putExtra(AddNotesActivity.ACTION_ID, key);
+                    startActivity(intent3);
                     break;
                 case R.id.attachments:
-                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
+                    Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
+                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
+                    startActivity(intent2);
                     break;
             }
             return false;

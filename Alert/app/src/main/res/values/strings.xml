@@ -68,7 +68,6 @@
     <string name="edit">Edit</string>
     <string name="information_source">Information Source</string>
     <string name="indicator_log">Indicator Log</string>
-    <string name="attachments">Attachments</string>
     <string name="text_create_alert">Create alert</string>
     <string name="email_address">Email Address</string>
     <string name="password">Password</string>
@@ -230,4 +229,7 @@
     <string name="edit_apa">Edit APA</string>
     <string name="email_not_associated_with_account">The email address you entered is not associated with an ALERT account. Please try again.</string>
     <string name="password_incorrect">The password you entered is incorrect, please check and try again.</string>
+    <string name="attachments">Attachments</string>
+    <string name="download">Download</string>
+    <string name="online_error">You need to be online to perform this action</string>
 </resources>

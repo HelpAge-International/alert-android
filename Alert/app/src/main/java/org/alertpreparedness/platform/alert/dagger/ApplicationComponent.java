@@ -24,6 +24,8 @@ import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesAc
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.ActionArchivedFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.ActionCompletedFragment;
@@ -106,4 +108,7 @@ public interface ApplicationComponent {
     void inject(ActionCompletedFragment actionCompletedFragment);
     void inject(ActionExpiredFragment actionExpiredFragment);
     void inject(ActionUnassignedFragment actionUnassignedFragment);
+    void inject(ViewAttachmentsActivity viewAttachmentsActivity);
+
+    void inject(ViewAttachmentAdapter viewAttachmentAdapter);
 }

@@ -48,9 +48,6 @@ public class MinPreparednessFragment extends Fragment {
     @BindView(R.id.action_pager)
     ViewPager mPager;
 
-    @BindView(R.id.fabAddAPA)
-    android.support.design.widget.FloatingActionButton fabCreateAPA;
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -67,7 +64,7 @@ public class MinPreparednessFragment extends Fragment {
     }
 
     private void initViews() {
-        fabCreateAPA.setVisibility(View.GONE);
+//        fabCreateAPA.setVisibility(View.GONE);
         mPager.setOffscreenPageLimit(5);
         mPager.setAdapter(new MinPreparednessFragment.PagerAdapter(getFragmentManager()));
     }

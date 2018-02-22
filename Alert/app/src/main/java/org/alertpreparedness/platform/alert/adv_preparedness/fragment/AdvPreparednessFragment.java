@@ -36,7 +36,7 @@ public class AdvPreparednessFragment extends Fragment implements View.OnClickLis
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_min_preparedness, container, false);
+        View v = inflater.inflate(R.layout.fragment_adv_preparedness, container, false);
 
         ButterKnife.bind(this, v);
 
@@ -51,6 +51,7 @@ public class AdvPreparednessFragment extends Fragment implements View.OnClickLis
     private void initViews() {
         fabCreateAPA.setOnClickListener(this);
         mPager.setAdapter(new AdvPreparednessFragment.PagerAdapter(getFragmentManager()));
+        mPager.setOffscreenPageLimit(6);
     }
 
     @Override

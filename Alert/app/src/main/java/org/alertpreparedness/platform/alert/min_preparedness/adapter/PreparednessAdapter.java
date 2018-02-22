@@ -9,4 +9,5 @@ import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 public interface PreparednessAdapter {
     public void addItems(String key, Action action);
     public void removeItem(String key);
+    Action getItem(int pos);
 }

@@ -14,7 +14,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.InProgressFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.interfaces.OnItemsChangedListener;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
@@ -51,6 +53,14 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     @AgencyRef
     DatabaseReference dbAgencyRef;
 
+    @Inject
+    User user;
+
+    @Inject
+    @CountryOfficeRef
+    DatabaseReference countryOfficeRef;
+
+
     public void addItems(String key, Action action) {
         if (keys.indexOf(key) == -1) {
             keys.add(key);
@@ -70,6 +80,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
         this.listener = listener;
         this.keys = new ArrayList<>(items.keySet());
         this.dbRef.addChildEventListener(this);
+        DependencyInjector.applicationComponent().inject(this);
     }
 
     public Action getItem(int index) {
@@ -122,12 +133,18 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     private void getDepartment(DatabaseReference db, DatabaseReference userRef, DatabaseReference networkRef, User user, String id, String departmentID, String networkID, String assignee, ActionAdapter.ViewHolder holder) {
 
+        System.out.println("getdepartmentdb = " + db);
+
         db.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (assignee!=null && departmentID != null && networkID == null) {
                     String department = (String) dataSnapshot.child("departments").child(departmentID).child("name").getValue();
+                    System.out.println("department = " + department);
+                    if(department == null) {
+                        getCountryDepartment(holder, userRef, assignee, departmentID);
+                    }
                     setUser(holder, userRef, assignee, department);
                 } else if (assignee!=null && networkID != null && networkID.equals(user.getNetworkID())){
                     System.out.println("networkID = " + networkID);
@@ -150,6 +167,24 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
             }
         });
 
+    }
+
+    private void getCountryDepartment(ActionAdapter.ViewHolder holder, DatabaseReference userRef, String assignee, String departmentID) {
+        countryOfficeRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String department = (String) dataSnapshot.child("departments").child(departmentID).child("name").getValue();
+                System.out.println("department2 = " + department);
+
+                setUser(holder, userRef, assignee, department);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void setLocalNetworkUser(ViewHolder holder, DatabaseReference userRef, DatabaseReference networkRef, String assignee, String id, User user) {
@@ -184,7 +219,6 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     }
 
     private void setNetworkUser(ViewHolder holder, DatabaseReference userRef, DatabaseReference networkRef, String assignee, String networkID, User user) {
-            //System.out.println("user.getLocalNetworkID() = " + user.getLocalNetworkID());
             networkRef.child(networkID).addListenerForSingleValueEvent(new ValueEventListener() {
 
                 @Override

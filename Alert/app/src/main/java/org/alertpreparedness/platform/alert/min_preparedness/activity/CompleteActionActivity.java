@@ -418,6 +418,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
             return;
         }
         saveData(notes);
+        finish();
     }
 
     @Override
