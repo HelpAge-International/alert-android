@@ -46,6 +46,7 @@ import javax.inject.Inject;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.realm.Realm;
+import timber.log.Timber;
 
 /**
  * Created by faizmohideen on 08/11/2017.
@@ -100,6 +101,7 @@ public class UserInfo implements ValueEventListener {
     }
 
     public void registerNotificationId(String deviceNotificationId) {
+        Timber.d("DEVICE NOTIFICAITON ID: " + deviceNotificationId);
         if(deviceNotificationId != null) {
             userPublic.child(userId).child("deviceNotificationId").setValue(deviceNotificationId);
         }

@@ -35,6 +35,7 @@ import org.alertpreparedness.platform.alert.mycountry.ProgramResultsActivity;
 import org.alertpreparedness.platform.alert.notifications.ActionFetcher;
 import org.alertpreparedness.platform.alert.notifications.ActionNotificationService;
 import org.alertpreparedness.platform.alert.notifications.ActionUpdateNotificationHandler;
+import org.alertpreparedness.platform.alert.notifications.AlertFirebaseInstanceIDService;
 import org.alertpreparedness.platform.alert.notifications.IndicatorFetcher;
 import org.alertpreparedness.platform.alert.notifications.IndicatorNotificationService;
 import org.alertpreparedness.platform.alert.notifications.IndicatorUpdateNotificationHandler;
@@ -49,6 +50,7 @@ import org.alertpreparedness.platform.alert.responseplan.ResponsePlanFragment;
 import org.alertpreparedness.platform.alert.settings.ChangeEmailActivity;
 import org.alertpreparedness.platform.alert.settings.ChangePasswordActivity;
 import org.alertpreparedness.platform.alert.settings.SettingsFragment;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import javax.inject.Singleton;
 
@@ -106,4 +108,7 @@ public interface ApplicationComponent {
     void inject(ActionCompletedFragment actionCompletedFragment);
     void inject(ActionExpiredFragment actionExpiredFragment);
     void inject(ActionUnassignedFragment actionUnassignedFragment);
+    void inject(AlertFirebaseInstanceIDService alertFirebaseInstanceIDService);
+
+    void inject(NetworkFetcher networkFetcher);
 }

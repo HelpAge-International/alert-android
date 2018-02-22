@@ -189,7 +189,6 @@ public class ActionNotificationService extends JobService {
                             NotificationManager.IMPORTANCE_DEFAULT);
                     notificationManager.createNotificationChannel(channel);
                 }
-                Timber.d("Sending Notification for:" + groupId + " - " + actionId);
                 notificationManager.notify(actionId, new Random().nextInt(), mBuilder.build());
             }
         }

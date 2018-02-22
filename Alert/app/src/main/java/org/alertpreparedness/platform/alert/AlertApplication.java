@@ -73,7 +73,7 @@ public class AlertApplication extends Application implements ValueEventListener 
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.SAND;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING;
 
     @Override
     public void onCreate() {
@@ -87,7 +87,7 @@ public class AlertApplication extends Application implements ValueEventListener 
         // JODA
         JodaTimeAndroid.init(this);
 
-        boolean loggedIn = FirebaseAuth.getInstance().getCurrentUser() != null && new UserInfo().getUser() != null && !PreferHelper.getString(this, Constants.UID).equals("");
+        boolean loggedIn = FirebaseAuth.getInstance().getCurrentUser() != null;
 
 //        ACRA.init(this);
 
@@ -149,8 +149,6 @@ public class AlertApplication extends Application implements ValueEventListener 
         else{
             //TODO: CANCEL ALL NOTIFICATIONS?
         }
-
-
     }
 
     public void startPermissionListeners(@PermissionRef DatabaseReference permissionsRef, User user) {

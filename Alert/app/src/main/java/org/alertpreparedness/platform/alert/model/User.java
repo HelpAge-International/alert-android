@@ -130,6 +130,7 @@ public class User implements Serializable {
         return hazardID;
     }
 
+    @Deprecated
     public String getNetworkCountryID() {
         return networkCountryID;
     }
@@ -162,6 +163,7 @@ public class User implements Serializable {
         return countryListId;
     }
 
+    @Deprecated
     public String getLocalNetworkID() {
         return localNetworkID;
     }
@@ -170,6 +172,7 @@ public class User implements Serializable {
         this.localNetworkID = localNetworkID;
     }
 
+    @Deprecated
     public String getNetworkID() {
         return networkID;
     }
