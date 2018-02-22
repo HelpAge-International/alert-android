@@ -18,7 +18,7 @@ public class NetworkFetcher implements ValueEventListener {
 
     @Inject
     @CountryOfficeRef
-    private DatabaseReference countryOfficeRef;
+    DatabaseReference countryOfficeRef;
 
     private NetworkFetcherListener networkFetcherListener;
 
@@ -33,6 +33,7 @@ public class NetworkFetcher implements ValueEventListener {
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
+        System.out.println("NetworkFetcherdataSnapshot = " + dataSnapshot.getRef());
         //noinspection unchecked
         HashMap<String, Boolean> localNetworks = dataSnapshot.child("localNetworks").exists() ? (HashMap<String, Boolean>) dataSnapshot.child("localNetworks").getValue() : new HashMap<>();
 
@@ -61,6 +62,16 @@ public class NetworkFetcher implements ValueEventListener {
     public class NetworkFetcherResult{
         private List<String> localNetworks;
         private List<String> globalNetworks;
+
+        @Override
+        public String toString() {
+            return "NetworkFetcherResult{" +
+                    "localNetworks=" + localNetworks +
+                    ", globalNetworks=" + globalNetworks +
+                    ", networksCountries=" + networksCountries +
+                    '}';
+        }
+
         private List<String> networksCountries;
 
         public NetworkFetcherResult(List<String> localNetworks, List<String> globalNetworks, List<String> networksCountries) {
