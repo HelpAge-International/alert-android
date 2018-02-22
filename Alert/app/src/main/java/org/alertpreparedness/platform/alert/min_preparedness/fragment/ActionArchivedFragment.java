@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.alert.min_preparedness.fragment;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -23,6 +24,9 @@ import com.google.firebase.database.ValueEventListener;
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
@@ -31,12 +35,13 @@ import org.alertpreparedness.platform.alert.utils.Constants;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionArchivedFragment extends BaseArchivedFragment {
+public class ActionArchivedFragment extends BaseArchivedFragment implements ActionAdapter.ItemSelectedListener {
 
     @BindView(R.id.rvMinAction)
     RecyclerView mActionRV;
@@ -70,7 +75,7 @@ public class ActionArchivedFragment extends BaseArchivedFragment {
         assert imgArchived != null;
         imgArchived.setImageResource(R.drawable.ic_close_round_gray);
         assert tvActionArchived != null;
-        tvActionArchived.setText("Archived");
+        tvActionArchived.setText(R.string.archived);
         tvActionArchived.setTextColor(getResources().getColor(R.color.alertGray));
 
         mAdapter = new ActionAdapter(getContext(), dbActionRef, this);
@@ -94,7 +99,27 @@ public class ActionArchivedFragment extends BaseArchivedFragment {
 
     @Override
     public void onActionItemSelected(int pos, String key, String userTypeID) {
-        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Currently under development!", Snackbar.LENGTH_LONG).show();
+        SheetMenu.with(getContext()).setMenu(R.menu.menu_archived).setClick(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.reactive_action:
+                    //TODO
+                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reactivate Clicked", Snackbar.LENGTH_LONG).show();
+                    break;
+                case R.id.action_notes:
+                    Intent intent2 = new Intent(getActivity(), AddNotesActivity.class);
+                    intent2.putExtra(AddNotesActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent2.putExtra(AddNotesActivity.ACTION_ID, key);
+                    startActivity(intent2);
+                    break;
+                case R.id.attachments:
+                    Intent intent3 = new Intent(getActivity(), ViewAttachmentsActivity.class);
+                    intent3.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent3.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
+                    startActivity(intent3);
+                    break;
+            }
+            return false;
+        }).show();
     }
 
     @Override

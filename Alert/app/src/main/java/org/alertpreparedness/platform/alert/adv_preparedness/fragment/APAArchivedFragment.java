@@ -34,6 +34,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.ActionExpiredFragment;
@@ -98,7 +99,7 @@ public class APAArchivedFragment extends BaseArchivedFragment implements APActio
         assert imgActionArchived != null;
         imgActionArchived.setImageResource(R.drawable.ic_close_round_gray);
         assert tvActionArchived != null;
-        tvActionArchived.setText("Archived");
+        tvActionArchived.setText(R.string.archived);
         tvActionArchived.setTextColor(getResources().getColor(R.color.alertGray));
         mAPAdapter = new APActionAdapter(getContext(), dbActionRef, this);
         assert mAdvActionRV != null;
@@ -141,7 +142,27 @@ public class APAArchivedFragment extends BaseArchivedFragment implements APActio
 
     @Override
     public void onActionItemSelected(int pos, String key) {
-        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Currently under development!", Snackbar.LENGTH_LONG).show();
+        SheetMenu.with(getContext()).setMenu(R.menu.menu_archived).setClick(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.reactive_action:
+                    //TODO
+                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reactivate Clicked", Snackbar.LENGTH_LONG).show();
+                    break;
+                case R.id.action_notes:
+                    Intent intent2 = new Intent(getActivity(), AddNotesActivity.class);
+                    intent2.putExtra(AddNotesActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent2.putExtra(AddNotesActivity.ACTION_ID, key);
+                    startActivity(intent2);
+                    break;
+                case R.id.attachments:
+                    Intent intent3 = new Intent(getActivity(), ViewAttachmentsActivity.class);
+                    intent3.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent3.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
+                    startActivity(intent3);
+                    break;
+            }
+            return false;
+        }).show();
     }
 }
 

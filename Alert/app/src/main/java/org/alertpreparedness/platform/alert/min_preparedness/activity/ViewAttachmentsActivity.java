@@ -92,7 +92,7 @@ public class ViewAttachmentsActivity extends AppCompatActivity implements ViewAt
 
         actionKey = getIntent().getStringExtra(ACTION_ID);
         actionParentKey = getIntent().getStringExtra(PARENT_ACTION_ID);
-        dbActionBaseRef.child(actionParentKey).child(actionKey).child("documents").addValueEventListener(new FetchDocumentKeys());
+        dbActionBaseRef.child(actionParentKey).child(actionKey).child("documents").addChildEventListener(new FetchDocumentKeys());
 
     }
 
@@ -110,12 +110,15 @@ public class ViewAttachmentsActivity extends AppCompatActivity implements ViewAt
 
     @Override
     public void onAttachmentSelected(DocumentModel document) {
-        if(user.getUserID() == document.getUploadedBy()) {
+        System.out.println("document.getUploadedBy() = " + document.getUploadedBy());
+        System.out.println("user.getUserID() = " + user.getUserID());
+        if(user.getUserID().equals(document.getUploadedBy())) {
             SheetMenu.with(this).setMenu(R.menu.menu_attachment).setClick(menuItem -> {
                 if (AppUtils.isDeviceOnline(this)) {
                     switch (menuItem.getItemId()) {
                         case R.id.delete:
                             dbActionBaseRef.child(actionParentKey).child(actionKey).child("documents").child(document.getKey()).removeValue();
+                            dbDocRef.child(actionParentKey).child(document.getKey()).removeValue();
                             break;
                         case R.id.download:
                             new DownloadFileFromURL(this, document.getFileName()).execute(document.getFilePath());
@@ -143,12 +146,26 @@ public class ViewAttachmentsActivity extends AppCompatActivity implements ViewAt
         }
     }
 
-    private class FetchDocumentKeys implements ValueEventListener {
+    private class FetchDocumentKeys implements ChildEventListener {
+
         @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            for (DataSnapshot document : dataSnapshot.getChildren()) {
-                dbDocRef.child(actionParentKey).child(document.getKey()).addValueEventListener(new FetchDocumentListener());
-            }
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            dbDocRef.child(actionParentKey).child(dataSnapshot.getKey()).addValueEventListener(new FetchDocumentListener());
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            dbDocRef.child(actionParentKey).child(dataSnapshot.getKey()).addValueEventListener(new FetchDocumentListener());
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+            adapter.removeItem(dataSnapshot.getKey());
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
         }
 
         @Override
@@ -161,10 +178,12 @@ public class ViewAttachmentsActivity extends AppCompatActivity implements ViewAt
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             DocumentModel model = dataSnapshot.getValue(DocumentModel.class);
-            assert model != null;
-            model.setKey(dataSnapshot.getKey());
-            model.setRef(dataSnapshot.getRef());
-            adapter.addItem(model);
+
+            if(model != null) {
+                model.setKey(dataSnapshot.getKey());
+                model.setRef(dataSnapshot.getRef());
+                adapter.addItem(model);
+            }
         }
 
         @Override

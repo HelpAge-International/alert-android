@@ -17,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.adv_preparedness.fragment.UsersListDialogFragment;
+import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
@@ -38,7 +40,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionExpiredFragment extends BaseExpiredFragment {
+public class ActionExpiredFragment extends BaseExpiredFragment implements UsersListDialogFragment.ItemSelectedListener, ActionAdapter.ItemSelectedListener {
 
     @Nullable
     @BindView(R.id.rvMinAction)
@@ -57,6 +59,8 @@ public class ActionExpiredFragment extends BaseExpiredFragment {
     TextView txtNoAction;
 
     protected ActionAdapter mExpiredAdapter;
+    private String actionID;
+    private UsersListDialogFragment dialog = new UsersListDialogFragment();
 
     @Nullable
     @Override
@@ -67,6 +71,8 @@ public class ActionExpiredFragment extends BaseExpiredFragment {
         DependencyInjector.applicationComponent().inject(this);
 
         initViews();
+
+        dialog.setListener(this);
 
         return v;
     }
@@ -92,7 +98,6 @@ public class ActionExpiredFragment extends BaseExpiredFragment {
             if(id != null) {
                 dbActionBaseRef.child(id).addChildEventListener(new ExpiredChildListener(id));
             }
-
         }
 
     }
@@ -114,13 +119,14 @@ public class ActionExpiredFragment extends BaseExpiredFragment {
 
     @Override
     public void onActionItemSelected(int pos, String key, String userTypeID) {
+        this.actionID = key;
         SheetMenu.with(getContext()).setMenu(R.menu.menu_expired).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.update_date:
                     showDatePicker(key);
                     break;
                 case R.id.reassign_action:
-                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
+                    dialog.show(getActivity().getFragmentManager(), "users_list");
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
@@ -138,6 +144,16 @@ public class ActionExpiredFragment extends BaseExpiredFragment {
             return false;
         }).show();
     }
+
+    //region UsersListDialogFragment.ItemSelectedListener
+    @Override
+    public void onItemSelected(UserModel model) {
+        long millis = System.currentTimeMillis();
+        dbActionRef.child(actionID).child("asignee").setValue(model.getUserID());
+        dbActionRef.child(actionID).child("updatedAt").setValue(millis);
+        ((ActionAdapter)getAdapter()).notifyDataSetChanged();
+    }
+    //endregion
 
     @Override
     protected TextView getNoActionView() {

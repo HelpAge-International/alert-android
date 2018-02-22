@@ -36,6 +36,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseUnassignedFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
@@ -138,7 +139,6 @@ public class APAUnassignedFragment extends BaseUnassignedFragment implements APA
     @Override
     public void onActionItemSelected(int pos, String key) {
         this.actionID = key;
-        System.out.println("pos = [" + pos + "], key = [" + key + "]");
         SheetMenu.with(getContext()).setMenu(R.menu.menu_unassigned_apa).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.assign_action:
@@ -147,9 +147,7 @@ public class APAUnassignedFragment extends BaseUnassignedFragment implements APA
                 case R.id.edit_action:
                     Intent i = new Intent(getContext(), EditAPAActivity.class);
                     i.putExtra(EditAPAActivity.APA_ID, key);
-                    System.out.println("key = " + key);
                     startActivity(i);
-//                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "EDIT ACTION", Snackbar.LENGTH_LONG).show();
                     break;
             }
             return false;

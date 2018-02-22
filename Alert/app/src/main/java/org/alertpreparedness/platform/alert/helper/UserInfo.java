@@ -164,6 +164,7 @@ public class UserInfo implements ValueEventListener {
     }
 
     private void getNetworkIDs(UserRealm user, String agencyAdmin, String systemAdmin, String countryId, int userType, String nodeName) {
+        System.out.println("countryOffice.chi= " + countryOffice.child(user.getAgencyAdmin()).child(user.getCountryId()).getRef());
         countryOffice.child(user.getAgencyAdmin()).child(user.getCountryId()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

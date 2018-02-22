@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
+import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionCHSRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionMandatedRef;
@@ -34,6 +36,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseCompletedFragment;
@@ -52,7 +55,9 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APACompletedFragment extends BaseCompletedFragment implements APActionAdapter.ItemSelectedListener {
+public class APACompletedFragment extends BaseCompletedFragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener {
+
+    private String actionID;
 
     public APACompletedFragment() {
         // Required empty public constructor
@@ -75,6 +80,7 @@ public class APACompletedFragment extends BaseCompletedFragment implements APAct
     TextView txtNoAction;
 
     private APActionAdapter mAPAdapter;
+    private UsersListDialogFragment dialog = new UsersListDialogFragment();
 
     @Nullable
     @Override
@@ -85,6 +91,7 @@ public class APACompletedFragment extends BaseCompletedFragment implements APAct
         DependencyInjector.applicationComponent().inject(this);
 
         initViews();
+        dialog.setListener(this);
 
         return v;
     }
@@ -121,8 +128,27 @@ public class APACompletedFragment extends BaseCompletedFragment implements APAct
 
     @Override
     public void onActionItemSelected(int pos, String key) {
-        Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Currently under development!", Snackbar.LENGTH_LONG).show();
-    }
+        this.actionID = key;
+        SheetMenu.with(getContext()).setMenu(R.menu.menu_completed).setClick(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.reassign_action:
+                    dialog.show(getActivity().getFragmentManager(), "users_list");
+                    break;
+                case R.id.action_notes:
+                    Intent intent = new Intent(getActivity(), AddNotesActivity.class);
+                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent.putExtra(AddNotesActivity.ACTION_ID, key);
+                    startActivity(intent);
+                    break;
+                case R.id.attachments:
+                    Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
+                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
+                    startActivity(intent2);
+                    break;
+            }
+            return false;
+        }).show();    }
 
 
     @Override
@@ -144,5 +170,16 @@ public class APACompletedFragment extends BaseCompletedFragment implements APAct
     protected RecyclerView getListView() {
         return mAdvActionRV;
     }
+
+    //region UsersListDialogFragment.ItemSelectedListener
+    @Override
+    public void onItemSelected(UserModel model) {
+        long millis = System.currentTimeMillis();
+        dbActionRef.child(actionID).child("asignee").setValue(model.getUserID());
+        dbActionRef.child(actionID).child("updatedAt").setValue(millis);
+        getAdapter().removeItem(actionID);
+        ((APActionAdapter)getAdapter()).notifyDataSetChanged();
+    }
+    //endregion
 }
 

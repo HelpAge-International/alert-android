@@ -229,6 +229,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         ViewCompat.setNestedScrollingEnabled(alertRecyclerView, false);
         ViewCompat.setNestedScrollingEnabled(myTaskRecyclerView, false);
         scroller.setOnScrollChangeListener(this);
+        System.out.println("user = " + user);
     }
 
     @Override

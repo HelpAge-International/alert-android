@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -23,6 +24,7 @@ import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.UserListAdapter;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.StaffRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 
 import java.util.ArrayList;
@@ -45,13 +47,17 @@ public class UsersListDialogFragment extends DialogFragment implements UserListA
     private ArrayList<UserModel> userList;
     private int mPosition = 0;
 
-    @Nullable
     @BindView(R.id.rvUsersList)
     RecyclerView mList;
 
     @Inject
     @UserPublicRef
     DatabaseReference dbUserPublicRef;
+
+    @Inject
+    @StaffRef
+    DatabaseReference staffRef;
+
     private ItemSelectedListener listener;
     private UserModel mUser;
 
@@ -68,7 +74,7 @@ public class UsersListDialogFragment extends DialogFragment implements UserListA
         mList.setAdapter(mAdapter);
         mList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        dbUserPublicRef.addValueEventListener(this);
+        staffRef.addValueEventListener(this);
 
         builder.setView(v)
                 .setPositiveButton(R.string.save, (dialog, id) -> {
@@ -88,12 +94,8 @@ public class UsersListDialogFragment extends DialogFragment implements UserListA
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-            String firstname = (String) dataSnapshot.child(getChild.getKey()).child("firstName").getValue();
-            String lastname = (String) dataSnapshot.child(getChild.getKey()).child("lastName").getValue();
-            String fullname = String.format("%s %s", firstname, lastname);
-
-            mAdapter.addUsers(getChild.getKey(), new UserModel(getChild.getKey(), fullname));
+        for (DataSnapshot child : dataSnapshot.getChildren()) {
+            dbUserPublicRef.child(child.getKey()).addValueEventListener(new UserListener());
         }
     }
 
@@ -111,6 +113,22 @@ public class UsersListDialogFragment extends DialogFragment implements UserListA
         this.listener = listener;
     }
 
+    class UserListener implements ValueEventListener {
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            String firstname = (String) dataSnapshot.child("firstName").getValue();
+            String lastname = (String) dataSnapshot.child("lastName").getValue();
+            String fullname = String.format("%s %s", firstname, lastname);
+
+            mAdapter.addUsers(dataSnapshot.getKey(), new UserModel(dataSnapshot.getKey(), fullname));
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    }
 
     public interface ItemSelectedListener {
         void onItemSelected(UserModel model);
