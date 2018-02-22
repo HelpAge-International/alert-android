@@ -23,6 +23,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseDocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseStorageRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.DocumentRef;
 import org.alertpreparedness.platform.alert.firebase.DocumentModel;
+import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.DownloadFileFromURL;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
@@ -61,6 +62,9 @@ public class ViewAttachmentsActivity extends AppCompatActivity implements ViewAt
     @Inject
     @BaseActionRef
     DatabaseReference dbActionBaseRef;
+
+    @Inject
+    User user;
 
     private String actionKey;
     private String actionParentKey;
@@ -106,22 +110,37 @@ public class ViewAttachmentsActivity extends AppCompatActivity implements ViewAt
 
     @Override
     public void onAttachmentSelected(DocumentModel document) {
-        SheetMenu.with(this).setMenu(R.menu.menu_attachment).setClick(menuItem -> {
-            if(AppUtils.isDeviceOnline(this)) {
-                switch (menuItem.getItemId()) {
-                    case R.id.delete:
-
-                        break;
-                    case R.id.download:
-                        new DownloadFileFromURL(this, document.getFileName()).execute(document.getFilePath());
-                        break;
+        if(user.getUserID() == document.getUploadedBy()) {
+            SheetMenu.with(this).setMenu(R.menu.menu_attachment).setClick(menuItem -> {
+                if (AppUtils.isDeviceOnline(this)) {
+                    switch (menuItem.getItemId()) {
+                        case R.id.delete:
+                            dbActionBaseRef.child(actionParentKey).child(actionKey).child("documents").child(document.getKey()).removeValue();
+                            break;
+                        case R.id.download:
+                            new DownloadFileFromURL(this, document.getFileName()).execute(document.getFilePath());
+                            break;
+                    }
+                } else {
+                    SnackbarHelper.show(this, getString(R.string.online_error));
                 }
-            }
-            else {
-                SnackbarHelper.show(this, getString(R.string.online_error));
-            }
-            return false;
-        }).show();
+                return false;
+            }).show();
+        }
+        else {
+            SheetMenu.with(this).setMenu(R.menu.menu_attachment_read_only).setClick(menuItem -> {
+                if (AppUtils.isDeviceOnline(this)) {
+                    switch (menuItem.getItemId()) {
+                        case R.id.download:
+                            new DownloadFileFromURL(this, document.getFileName()).execute(document.getFilePath());
+                            break;
+                    }
+                } else {
+                    SnackbarHelper.show(this, getString(R.string.online_error));
+                }
+                return false;
+            }).show();
+        }
     }
 
     private class FetchDocumentKeys implements ValueEventListener {
