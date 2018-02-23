@@ -8,12 +8,11 @@ import com.google.firebase.database.ValueEventListener;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.LocalNetworkRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.NetworkCountryRef;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.ClockSetting;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 import org.alertpreparedness.platform.alert.utils.SynchronizedCounter;
 
 import java.util.ArrayList;
@@ -38,13 +37,6 @@ public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterLis
     @CountryOfficeRef
     public DatabaseReference countryOfficeRef;
 
-    @Inject
-    @LocalNetworkRef
-    public DatabaseReference localNetworkRef;
-
-    @Inject
-    @NetworkCountryRef
-    public DatabaseReference networkCountryRef;
 
     private boolean failed = false;
 
@@ -70,9 +62,8 @@ public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterLis
         actionFetcherResult = new ActionFetcherResult();
 
         actionCounter = new SynchronizedCounter(
-                    (country ? 2 : 0) +
-                        (networkCountry ? 2 : 0) +
-                        (localNetwork ? 2 : 0)
+                (country ? 2 : 0) + ((networkCountry || localNetwork) ? 1 : 0)
+
         );
         actionCounter.addListener(this);
 
@@ -81,15 +72,24 @@ public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterLis
             countryOfficeRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(countryOfficeRef, ActionType.COUNTRY, actionFetcherResult, actionCounter));
         }
 
-        if(networkCountry) {
-            baseActionRef.child(user.getNetworkCountryID()).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ActionListener(baseActionRef, ActionType.NETWORK_COUNTRY, user.getNetworkCountryID(), actionFetcherResult, actionCounter));
-            networkCountryRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(networkCountryRef, ActionType.NETWORK_COUNTRY, actionFetcherResult, actionCounter));
-        }
+        new NetworkFetcher(networkFetcherResult -> {
+            if(networkCountry) {
+                actionCounter.increment(networkFetcherResult.getNetworksCountries().size() + 1);
+                for(String networkCountryId : networkFetcherResult.getNetworksCountries()) {
+                    baseActionRef.child(networkCountryId).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ActionListener(baseActionRef, ActionType.NETWORK_COUNTRY, networkCountryId, actionFetcherResult, actionCounter));
+                }
+            }
 
-        if(localNetwork) {
-            baseActionRef.child(user.getLocalNetworkID()).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ActionListener(baseActionRef, ActionType.LOCAL_NETWORK, user.getLocalNetworkID(), actionFetcherResult, actionCounter));
-            localNetworkRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(localNetworkRef, ActionType.LOCAL_NETWORK, actionFetcherResult, actionCounter));
-        }
+            if(localNetwork) {
+                actionCounter.increment(networkFetcherResult.getLocalNetworks().size() + 1);
+                for(String localNetworkId : networkFetcherResult.getLocalNetworks()) {
+                    baseActionRef.child(localNetworkId).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ActionListener(baseActionRef, ActionType.LOCAL_NETWORK, localNetworkId, actionFetcherResult, actionCounter));
+                }
+            }
+
+            actionCounter.decrement();
+        }).fetch();
+
     }
 
     @Override

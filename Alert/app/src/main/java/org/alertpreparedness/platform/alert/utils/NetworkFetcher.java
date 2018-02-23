@@ -18,7 +18,7 @@ public class NetworkFetcher implements ValueEventListener {
 
     @Inject
     @CountryOfficeRef
-    private DatabaseReference countryOfficeRef;
+    public DatabaseReference countryOfficeRef;
 
     private NetworkFetcherListener networkFetcherListener;
 

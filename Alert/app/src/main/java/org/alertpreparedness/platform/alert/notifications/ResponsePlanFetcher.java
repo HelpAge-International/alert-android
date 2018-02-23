@@ -6,13 +6,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
-import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.LocalNetworkRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.NetworkCountryRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
-import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.ClockSetting;
+import org.alertpreparedness.platform.alert.firebase.ResponsePlanModel;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.SynchronizedCounter;
@@ -39,13 +36,6 @@ public class ResponsePlanFetcher implements SynchronizedCounter.SynchronizedCoun
     @CountryOfficeRef
     public DatabaseReference countryOfficeRef;
 
-    @Inject
-    @LocalNetworkRef
-    public DatabaseReference localNetworkRef;
-
-    @Inject
-    @NetworkCountryRef
-    public DatabaseReference networkCountryRef;
     private boolean failed = false;
 
     private ResponsePlanFetcherResult responsePlanFetcherResult = new ResponsePlanFetcherResult();
@@ -62,34 +52,14 @@ public class ResponsePlanFetcher implements SynchronizedCounter.SynchronizedCoun
         DependencyInjector.applicationComponent().inject(this);
     }
 
-    public void fetchAll(){
-        fetch(true, true, true);
-    }
+    public void fetch(){
+        responsePlanFetcherResult = new ResponsePlanFetcher.ResponsePlanFetcherResult();
 
-    public void fetch(boolean country, boolean networkCountry, boolean localNetwork){
-        responsePlanFetcherResult = new ResponsePlanFetcherResult();
-
-        responsePlanCounter = new SynchronizedCounter(
-                    (country ? 2 : 0) +
-                        (networkCountry ? 2 : 0) +
-                        (localNetwork ? 2 : 0)
-        );
+        responsePlanCounter = new SynchronizedCounter(2);
         responsePlanCounter.addListener(this);
 
-        if(country) {
-            baseResponsePlanRef.child(user.getCountryID()).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ResponsePlanListener(baseResponsePlanRef, ResponsePlanType.COUNTRY, user.getCountryID(), responsePlanFetcherResult, responsePlanCounter));
-            countryOfficeRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(countryOfficeRef, ResponsePlanType.COUNTRY, responsePlanFetcherResult, responsePlanCounter));
-        }
-
-        if(networkCountry) {
-            baseResponsePlanRef.child(user.getNetworkCountryID()).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ResponsePlanListener(baseResponsePlanRef, ResponsePlanType.NETWORK_COUNTRY, user.getNetworkCountryID(), responsePlanFetcherResult, responsePlanCounter));
-            networkCountryRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(networkCountryRef, ResponsePlanType.NETWORK_COUNTRY, responsePlanFetcherResult, responsePlanCounter));
-        }
-
-        if(localNetwork) {
-            baseResponsePlanRef.child(user.getLocalNetworkID()).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ResponsePlanListener(baseResponsePlanRef, ResponsePlanType.LOCAL_NETWORK, user.getLocalNetworkID(), responsePlanFetcherResult, responsePlanCounter));
-            localNetworkRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(localNetworkRef, ResponsePlanType.LOCAL_NETWORK, responsePlanFetcherResult, responsePlanCounter));
-        }
+        baseResponsePlanRef.child(user.getCountryID()).addValueEventListener(new ResponsePlanFetcher.ResponsePlanListener(baseResponsePlanRef, ResponsePlanFetcher.ResponsePlanType.COUNTRY, user.getCountryID(), responsePlanFetcherResult, responsePlanCounter));
+        countryOfficeRef.child("clockSettings").child("preparedness").addValueEventListener(new ResponsePlanFetcher.ClockSettingsListener(countryOfficeRef, ResponsePlanFetcher.ResponsePlanType.COUNTRY, responsePlanFetcherResult, responsePlanCounter));
     }
 
     @Override
@@ -154,8 +124,6 @@ public class ResponsePlanFetcher implements SynchronizedCounter.SynchronizedCoun
 
     public class ResponsePlanFetcherResult{
         private List<ResponsePlanFetcherModel> models = new ArrayList<>();
-        private ClockSetting networkCountryClockSettings;
-        private ClockSetting localNetworkClockSettings;
         private ClockSetting countryClockSettings;
 
         public List<ResponsePlanFetcherModel> getModels() {
@@ -164,22 +132,6 @@ public class ResponsePlanFetcher implements SynchronizedCounter.SynchronizedCoun
 
         public void setModels(List<ResponsePlanFetcherModel> models) {
             this.models = models;
-        }
-
-        public ClockSetting getNetworkCountryClockSettings() {
-            return networkCountryClockSettings;
-        }
-
-        public void setNetworkCountryClockSettings(ClockSetting networkCountryClockSettings) {
-            this.networkCountryClockSettings = networkCountryClockSettings;
-        }
-
-        public ClockSetting getLocalNetworkClockSettings() {
-            return localNetworkClockSettings;
-        }
-
-        public void setLocalNetworkClockSettings(ClockSetting localNetworkClockSettings) {
-            this.localNetworkClockSettings = localNetworkClockSettings;
         }
 
         public ClockSetting getCountryClockSettings() {
@@ -240,13 +192,6 @@ public class ResponsePlanFetcher implements SynchronizedCounter.SynchronizedCoun
             ClockSetting clockSetting = dataSnapshot.getValue(ClockSetting.class);
 
             switch (responsePlanType) {
-
-                case NETWORK_COUNTRY:
-                    responsePlanFetcherResult.setNetworkCountryClockSettings(clockSetting);
-                    break;
-                case LOCAL_NETWORK:
-                    responsePlanFetcherResult.setLocalNetworkClockSettings(clockSetting);
-                    break;
                 case COUNTRY:
                     responsePlanFetcherResult.setCountryClockSettings(clockSetting);
                     break;
