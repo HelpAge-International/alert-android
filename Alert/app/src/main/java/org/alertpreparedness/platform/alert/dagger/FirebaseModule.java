@@ -1,7 +1,6 @@
 package org.alertpreparedness.platform.alert.dagger;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 
 import com.google.firebase.database.DatabaseReference;
 
@@ -15,8 +14,8 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionCHSRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseCountryOfficeRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseHazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
@@ -30,11 +29,11 @@ import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.LocalNetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkCountryRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.PermissionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ProgrammeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
-import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.model.User;

@@ -80,7 +80,7 @@ public class IndicatorFetcher implements SynchronizedCounter.SynchronizedCounter
     private void fetchIndicators() {
         indicators = new ArrayList<>();
         indicatorCounter = new SynchronizedCounter(hazardIds.size());
-        indicatorCounter.addListener(this);
+        indicatorCounter.ad dListener(this);
 
         for (String hazardId : hazardIds) {
             baseIndicatorRef.child(hazardId).orderByChild("assignee").equalTo(user.getUserID()).addListenerForSingleValueEvent(new IndicatorListener(indicators, indicatorCounter, hazardId));
