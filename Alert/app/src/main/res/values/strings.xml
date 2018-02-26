@@ -232,4 +232,5 @@
     <string name="attachments">Attachments</string>
     <string name="download">Download</string>
     <string name="online_error">You need to be online to perform this action</string>
+    <string name="archived_title">Archived</string>
 </resources>

@@ -44,6 +44,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import javax.inject.Inject;
 
@@ -55,7 +56,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APACompletedFragment extends BaseCompletedFragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener {
+public class APACompletedFragment extends BaseCompletedFragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
 
     private String actionID;
 
@@ -110,14 +111,10 @@ public class APACompletedFragment extends BaseCompletedFragment implements APAct
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
+        new NetworkFetcher(this).fetch();
 
-        for (String id : ids) {
-            if (id != null) {
-                dbActionBaseRef.child(id).addChildEventListener(new CompletedListener(id));
-            }
+        dbActionBaseRef.child(user.countryID).addChildEventListener(new CompletedListener(user.countryID));
 
-        }
         handleAdvFab();
     }
 
@@ -181,5 +178,14 @@ public class APACompletedFragment extends BaseCompletedFragment implements APAct
         ((APActionAdapter)getAdapter()).notifyDataSetChanged();
     }
     //endregion
+
+    @Override
+    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
+        for (String id : networkFetcherResult.all()) {
+            if (id != null) {
+                dbActionBaseRef.child(id).addChildEventListener(new CompletedListener(id));
+            }
+        }
+    }
 }
 

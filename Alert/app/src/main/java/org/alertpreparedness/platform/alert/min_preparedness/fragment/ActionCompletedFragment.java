@@ -23,6 +23,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttach
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,7 +33,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionCompletedFragment extends BaseCompletedFragment implements UsersListDialogFragment.ItemSelectedListener, ActionAdapter.ItemSelectedListener {
+public class ActionCompletedFragment extends BaseCompletedFragment implements UsersListDialogFragment.ItemSelectedListener, ActionAdapter.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
 
     @BindView(R.id.rvMinAction)
     RecyclerView mActionRV;
@@ -83,14 +84,9 @@ public class ActionCompletedFragment extends BaseCompletedFragment implements Us
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
+        new NetworkFetcher(this).fetch();
 
-        for (String id : ids) {
-            if (id != null) {
-                dbActionBaseRef.child(id).addChildEventListener(new CompletedListener(id));
-            }
-
-        }
+        dbActionBaseRef.child(user.countryID).addChildEventListener(new CompletedListener(user.countryID));
 
     }
 
@@ -150,4 +146,13 @@ public class ActionCompletedFragment extends BaseCompletedFragment implements Us
         mAdapter.notifyDataSetChanged();
     }
     //endregion
+
+    @Override
+    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
+        for (String id : networkFetcherResult.all()) {
+            if (id != null) {
+                dbActionBaseRef.child(id).addChildEventListener(new CompletedListener(id));
+            }
+        }
+    }
 }

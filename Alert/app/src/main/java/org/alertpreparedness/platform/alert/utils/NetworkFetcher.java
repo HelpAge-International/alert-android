@@ -14,6 +14,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.realm.internal.Util;
+
 public class NetworkFetcher implements ValueEventListener {
 
     @Inject
@@ -78,6 +80,10 @@ public class NetworkFetcher implements ValueEventListener {
             this.localNetworks = localNetworks;
             this.globalNetworks = globalNetworks;
             this.networksCountries = networksCountries;
+        }
+
+        public  List<String> all() {
+            return AppUtils.smartCombine(AppUtils.smartCombine(localNetworks, globalNetworks), networksCountries);
         }
 
         public List<String> getLocalNetworks() {

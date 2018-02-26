@@ -25,6 +25,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttach
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,7 +41,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionExpiredFragment extends BaseExpiredFragment implements UsersListDialogFragment.ItemSelectedListener, ActionAdapter.ItemSelectedListener {
+public class ActionExpiredFragment extends BaseExpiredFragment implements UsersListDialogFragment.ItemSelectedListener, ActionAdapter.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
 
     @Nullable
     @BindView(R.id.rvMinAction)
@@ -91,14 +92,9 @@ public class ActionExpiredFragment extends BaseExpiredFragment implements UsersL
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-//        dbActionBaseRef.addChildEventListener(this);
-        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
+        new NetworkFetcher(this).fetch();
 
-        for (String id : ids) {
-            if(id != null) {
-                dbActionBaseRef.child(id).addChildEventListener(new ExpiredChildListener(id));
-            }
-        }
+        dbActionBaseRef.child(user.countryID).addChildEventListener(new ExpiredChildListener(user.countryID));
 
     }
 
@@ -185,5 +181,14 @@ public class ActionExpiredFragment extends BaseExpiredFragment implements UsersL
             }
         }, year, month, day);
         pickerDialog.show();
+    }
+
+    @Override
+    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
+        for (String id : networkFetcherResult.all()) {
+            if (id != null) {
+                dbActionBaseRef.child(id).addChildEventListener(new ExpiredChildListener(id));
+            }
+        }
     }
 }

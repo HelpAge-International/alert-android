@@ -24,6 +24,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttach
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,7 +33,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class InProgressFragment extends BaseInProgressFragment implements ActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener {
+public class InProgressFragment extends BaseInProgressFragment implements ActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
 
     private String actionID;
 
@@ -72,23 +73,10 @@ public class InProgressFragment extends BaseInProgressFragment implements Action
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-//        dbActionBaseRef.addChildEventListener(this);
+        new NetworkFetcher(this).fetch();
 
-        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
+        dbActionBaseRef.child(user.countryID).addChildEventListener(new InProgressListener(user.countryID));
 
-        for (String id : ids) {
-            if(id != null) {
-                dbActionBaseRef.child(id).addChildEventListener(new InProgressListener(id));
-            }
-
-        }
-
-//        String fragmentTag = getFragmentManager().getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1).getName();
-//        System.out.println("fragmentTag = " + getS().findFragmentByTag(fragmentTag));
-
-//        FragmentManager.BackStackEntry backEntry = getFragmentManager().getBackStackEntryAt(0);
-//        System.out.println("backEntry = " + backEntry);
-//
     }
 
 
@@ -153,4 +141,11 @@ public class InProgressFragment extends BaseInProgressFragment implements Action
         ((ActionAdapter)getAdapter()).notifyDataSetChanged();
     }
     //endregion
+
+    @Override
+    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
+        for (String id : networkFetcherResult.all()) {
+            dbActionBaseRef.child(id).addChildEventListener(new InProgressListener(id));
+        }
+    }
 }
