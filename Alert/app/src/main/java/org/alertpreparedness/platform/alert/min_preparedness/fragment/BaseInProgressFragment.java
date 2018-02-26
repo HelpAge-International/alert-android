@@ -331,7 +331,6 @@ public abstract class BaseInProgressFragment extends Fragment {
 
     protected void addObjects(String name, Long createdAt, Long level,
                             DataModel model, DataSnapshot getChild, String id, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
-        System.out.println("model.getTask() = " + model.getTask());
         if (user.getUserID().equals(model.getAsignee()) //MPA Custom assigned and in-progress for logged in user.
                 && model.getAsignee() != null
                 && level != null
@@ -396,6 +395,9 @@ public abstract class BaseInProgressFragment extends Fragment {
 
 
         protected void process(DataSnapshot dataSnapshot) {
+
+            System.out.println("InProgressListenerdataSnapshot = " + dataSnapshot);
+
             String actionIDs = dataSnapshot.getKey();
 
             DataModel model = dataSnapshot.getValue(DataModel.class);

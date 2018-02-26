@@ -254,17 +254,21 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
         Action action = dataSnapshot.getValue(Action.class);
         assert action != null;
-        action.setFrequencyValue(Integer.valueOf(dataSnapshot.child("frequencyValue").getValue().toString()));
+        if(dataSnapshot.child("frequencyValue").exists()) {
+            action.setFrequencyValue(Integer.valueOf(dataSnapshot.child("frequencyValue").getValue().toString()));
+        }
         if (keys.indexOf(dataSnapshot.getKey()) == -1) {
             if (action.getComplete() != null && action.getComplete() && action.getDueDate() != null) {
                 keys.add(dataSnapshot.getKey());
                 items.put(dataSnapshot.getKey(), action);
                 notifyItemInserted(keys.size() - 1);
             }
-        } else {
+        }
+        else {
             items.put(dataSnapshot.getKey(), action);
             notifyItemChanged(keys.indexOf(dataSnapshot.getKey()));
         }
+
     }
 
     @Override
