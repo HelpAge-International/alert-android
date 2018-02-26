@@ -46,7 +46,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by Tj on 01/02/2018.
  */
 
-public abstract class BaseInProgressFragment extends Fragment implements ActionAdapter.ItemSelectedListener {
+public abstract class BaseInProgressFragment extends Fragment {
 
     @Inject
     @ActionCHSRef
@@ -131,38 +131,6 @@ public abstract class BaseInProgressFragment extends Fragment implements ActionA
                 }
             });
         }
-    }
-
-
-    @Override
-    public void onActionItemSelected(int pos, String key, String userTypeID) {
-        SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress).setClick(menuItem -> {
-            switch (menuItem.getItemId()) {
-                case R.id.complete_action:
-                    Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
-                    System.out.println("onActionItemSelectedkey = " + key);
-                    intent.putExtra("ACTION_KEY", key);
-                    intent.putExtra("USER_KEY", userTypeID);
-                    startActivity(intent);
-                    break;
-                case R.id.reassign_action:
-                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
-                    break;
-                case R.id.action_notes:
-                    Intent intent3 = new Intent(getActivity(), AddNotesActivity.class);
-                    intent3.putExtra(AddNotesActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
-                    intent3.putExtra(AddNotesActivity.ACTION_ID, key);
-                    startActivity(intent3);
-                    break;
-                case R.id.attachments:
-                    Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
-                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
-                    intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
-                    startActivity(intent2);
-                    break;
-            }
-            return false;
-        }).show();
     }
 
     private void getMandated(DataModel model, String actionIDs, String id) {

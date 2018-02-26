@@ -27,6 +27,7 @@ import com.google.gson.stream.JsonReader;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
+import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionCHSRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionMandatedRef;
@@ -40,6 +41,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.model.User;
@@ -59,9 +61,10 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAInactiveFragment extends Fragment implements APActionAdapter.ItemSelectedListener {
+public class APAInactiveFragment extends Fragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener {
 
     private ArrayList<Integer> alertHazardTypes = new ArrayList<>();
+    private String actionID;
 
     public APAInactiveFragment() {
         // Required empty public constructor
@@ -145,6 +148,7 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
     private AgencyListener agencyListener = new AgencyListener();
     private AlertListener alertListener = new AlertListener();
     private NetworkListener networkListener = new NetworkListener();
+    private UsersListDialogFragment dialog = new UsersListDialogFragment();
 
 
     @Nullable
@@ -156,6 +160,8 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
         DependencyInjector.applicationComponent().inject(this);
 
         initViews();
+
+        dialog.setListener(this);
 
         return v;
     }
@@ -222,22 +228,24 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
 
     @Override
     public void onActionItemSelected(int pos, String key) {
-        SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress).setClick(menuItem -> {
+        actionID = key;
+        SheetMenu.with(getContext()).setMenu(R.menu.menu_archived).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
-                case R.id.complete_action:
-                    Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
-                    startActivity(intent);
-                    break;
-                case R.id.reassign_action:
-                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
+                case R.id.reactive_action:
+                    //TODO
+                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reactivate Clicked", Snackbar.LENGTH_LONG).show();
                     break;
                 case R.id.action_notes:
-                    intent = new Intent(getActivity(), AddNotesActivity.class);
-                    intent.putExtra("ACTION_KEY", key);
-                    startActivity(intent);
+                    Intent intent2 = new Intent(getActivity(), AddNotesActivity.class);
+                    intent2.putExtra(AddNotesActivity.PARENT_ACTION_ID, mAPAdapter.getItem(pos).getId());
+                    intent2.putExtra(AddNotesActivity.ACTION_ID, key);
+                    startActivity(intent2);
                     break;
                 case R.id.attachments:
-                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
+                    Intent intent3 = new Intent(getActivity(), ViewAttachmentsActivity.class);
+                    intent3.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, mAPAdapter.getItem(pos).getId());
+                    intent3.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
+                    startActivity(intent3);
                     break;
             }
             return false;
@@ -423,6 +431,13 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
         else {
             mAPAdapter.removeItem(getChild.getKey());
         }
+    }
+
+    @Override
+    public void onItemSelected(UserModel model) {
+        dbActionRef.child(actionID).child("asignee").setValue(model.getUserID());
+        dbActionRef.child(actionID).child("updatedAt").setValue(System.currentTimeMillis());
+        mAPAdapter.notifyDataSetChanged();
     }
 
     private class InactiveAPAListener implements ChildEventListener {

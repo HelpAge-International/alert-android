@@ -77,18 +77,18 @@ public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterLis
         actionCounter.addListener(this);
 
         if(country) {
-            baseActionRef.child(user.getCountryID()).orderByChild("asignee").equalTo(user.getUserID()).addListenerForSingleValueEvent(new ActionListener(ActionType.COUNTRY, user.getCountryID(), actionFetcherResult, actionCounter));
-            countryOfficeRef.child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ClockSettingsListener(ActionType.COUNTRY, actionFetcherResult, actionCounter));
+            baseActionRef.child(user.getCountryID()).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ActionListener(baseActionRef, ActionType.COUNTRY, user.getCountryID(), actionFetcherResult, actionCounter));
+            countryOfficeRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(countryOfficeRef, ActionType.COUNTRY, actionFetcherResult, actionCounter));
         }
 
         if(networkCountry) {
-            baseActionRef.child(user.getNetworkCountryID()).orderByChild("asignee").equalTo(user.getUserID()).addListenerForSingleValueEvent(new ActionListener(ActionType.NETWORK_COUNTRY, user.getNetworkCountryID(), actionFetcherResult, actionCounter));
-            networkCountryRef.child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ClockSettingsListener(ActionType.NETWORK_COUNTRY, actionFetcherResult, actionCounter));
+            baseActionRef.child(user.getNetworkCountryID()).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ActionListener(baseActionRef, ActionType.NETWORK_COUNTRY, user.getNetworkCountryID(), actionFetcherResult, actionCounter));
+            networkCountryRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(networkCountryRef, ActionType.NETWORK_COUNTRY, actionFetcherResult, actionCounter));
         }
 
         if(localNetwork) {
-            baseActionRef.child(user.getLocalNetworkID()).orderByChild("asignee").equalTo(user.getUserID()).addListenerForSingleValueEvent(new ActionListener(ActionType.LOCAL_NETWORK, user.getLocalNetworkID(), actionFetcherResult, actionCounter));
-            localNetworkRef.child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ClockSettingsListener(ActionType.LOCAL_NETWORK, actionFetcherResult, actionCounter));
+            baseActionRef.child(user.getLocalNetworkID()).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ActionListener(baseActionRef, ActionType.LOCAL_NETWORK, user.getLocalNetworkID(), actionFetcherResult, actionCounter));
+            localNetworkRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(localNetworkRef, ActionType.LOCAL_NETWORK, actionFetcherResult, actionCounter));
         }
     }
 
@@ -115,16 +115,19 @@ public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterLis
         private final ActionFetcherResult actionFetcherResult;
         private final SynchronizedCounter actionCounter;
         private final ActionType actionType;
+        private final DatabaseReference dbRef;
 
-        public ActionListener(ActionType actionType, String groupId, ActionFetcherResult actionFetcherResult, SynchronizedCounter actionCounter) {
+        public ActionListener(DatabaseReference dbRef, ActionType actionType, String groupId, ActionFetcherResult actionFetcherResult, SynchronizedCounter actionCounter) {
             this.groupId = groupId;
             this.actionType = actionType;
             this.actionFetcherResult = actionFetcherResult;
             this.actionCounter = actionCounter;
+            this.dbRef = dbRef;
         }
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            dbRef.removeEventListener(this);
             if(dataSnapshot != null){
                 for(DataSnapshot actionSnap : dataSnapshot.getChildren()){
                     Timber.d(dataSnapshot.toString());
@@ -222,15 +225,18 @@ public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterLis
         private final ActionType actionType;
         private final ActionFetcherResult actionFetcherResult;
         private final SynchronizedCounter actionCounter;
+        private final DatabaseReference dbRef;
 
-        public ClockSettingsListener(ActionType actionType, ActionFetcherResult actionFetcherResult, SynchronizedCounter actionCounter) {
+        public ClockSettingsListener(DatabaseReference dbRef, ActionType actionType, ActionFetcherResult actionFetcherResult, SynchronizedCounter actionCounter) {
             this.actionType = actionType;
             this.actionFetcherResult = actionFetcherResult;
             this.actionCounter = actionCounter;
+            this.dbRef = dbRef;
         }
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            dbRef.removeEventListener(this);
             ClockSetting clockSetting = dataSnapshot.getValue(ClockSetting.class);
 
             switch (actionType) {

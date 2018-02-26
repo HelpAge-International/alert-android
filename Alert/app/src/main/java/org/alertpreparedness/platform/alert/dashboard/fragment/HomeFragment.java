@@ -55,6 +55,7 @@ import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.realm.SettingsRealm;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -70,7 +71,7 @@ import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetai
  * Created by Tj on 13/12/2017.
  */
 
-public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItemClickedListener, FirebaseAuth.AuthStateListener, NestedScrollView.OnScrollChangeListener {
+public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItemClickedListener, FirebaseAuth.AuthStateListener, NestedScrollView.OnScrollChangeListener, NetworkFetcher.NetworkFetcherListener {
 
     @BindView(R.id.tasks_list_view)
     RecyclerView myTaskRecyclerView;
@@ -369,6 +370,28 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
     }
 
+    @Override
+    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
+        System.out.println("networkFetcherResult = " + networkFetcherResult);
+        if (networkFetcherResult != null) {
+            for (String id : networkFetcherResult.getNetworksCountries()) {
+               addListenerForNetworkData(id);
+            }
+            for (String id : networkFetcherResult.getGlobalNetworks()) {
+                addListenerForNetworkData(id);
+            }
+            for (String id : networkFetcherResult.getLocalNetworks()) {
+                addListenerForNetworkData(id);
+            }
+        }
+    }
+
+    private void addListenerForNetworkData(String id) {
+        baseAlertRef.child(id).addChildEventListener(networkAlertListener);
+        baseActionRef.child(id).addChildEventListener(networkTaskListener);
+        baseIndicatorRef.child(id).addChildEventListener(networkTaskListener);
+    }
+
     private class HazardListener implements ChildEventListener {
 
         private void process(DataSnapshot datasnapshot) {
@@ -422,7 +445,10 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                 if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
                     updateAlert(dataSnapshot.getKey(), model);
                 }
-            } else if (!model.hasNetworkApproval()) {
+            }
+            else {
+//            else if (!model.hasNetworkApproval()) {
+                System.out.println("AlertModelmodel = " + model);
 
                 model.setLeadAgencyId(networkLeadId);
                 model.setAgencyAdminId(agencyAdminId);
@@ -557,19 +583,10 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         @SuppressWarnings("unchecked")
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            HashMap<String, Boolean> networks = (HashMap<String, Boolean>) dataSnapshot.child("networks").getValue();
+//            HashMap<String, Boolean> networks = (HashMap<String, Boolean>) dataSnapshot.child("networks").getValue();
             agencyAdminId = dataSnapshot.child("adminId").getValue(String.class);
 
-            if (networks != null) {
-                for (String id : networks.keySet()) {
-                    System.out.println("networkidid = " + id);
-                    DatabaseReference ref = baseAlertRef.child(id);
-
-                    ref.addChildEventListener(networkAlertListener);
-                    baseActionRef.child(id).addChildEventListener(networkTaskListener);
-                    baseIndicatorRef.child(id).addChildEventListener(networkTaskListener);
-                }
-            }
+            new NetworkFetcher(HomeFragment.this).fetch();
         }
 
         @Override

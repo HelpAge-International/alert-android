@@ -19,6 +19,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseHazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseResponsePlansRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseNoteRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseUserRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
@@ -33,6 +34,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.PermissionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ProgrammeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.StaffRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
@@ -58,6 +60,12 @@ public class FirebaseModule {
     @ResponsePlansRef
     public DatabaseReference provideResponsePlansRef(@BaseDatabaseRef DatabaseReference db, User user) {
         return db.child("responsePlan").child(user.countryID);
+    }
+
+    @Provides
+    @BaseResponsePlansRef
+    public DatabaseReference provideBaseResponsePlansRef(@BaseDatabaseRef DatabaseReference db, User user) {
+        return db.child("responsePlan");
     }
 
     @Provides
@@ -190,6 +198,15 @@ public class FirebaseModule {
     public DatabaseReference provideBaseAgencykRef(@BaseDatabaseRef DatabaseReference db) {
         return db.child("agency");
     }
+
+
+    @Provides
+    @Singleton
+    @StaffRef
+    public DatabaseReference provideStaffRef(@BaseDatabaseRef DatabaseReference db, User user) {
+        return db.child("staff").child(user.countryID);
+    }
+
 
     @Provides
     @NoteRef

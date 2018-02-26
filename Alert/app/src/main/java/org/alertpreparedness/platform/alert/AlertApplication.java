@@ -130,8 +130,6 @@ public class AlertApplication extends Application implements ValueEventListener 
         else{
             //TODO: CANCEL ALL NOTIFICATIONS?
         }
-
-
     }
 
     public void startPermissionListeners(@PermissionRef DatabaseReference permissionsRef, User user) {

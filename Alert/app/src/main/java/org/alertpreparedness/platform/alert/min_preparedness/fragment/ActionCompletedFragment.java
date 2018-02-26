@@ -32,7 +32,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionCompletedFragment extends BaseCompletedFragment implements UsersListDialogFragment.ItemSelectedListener {
+public class ActionCompletedFragment extends BaseCompletedFragment implements UsersListDialogFragment.ItemSelectedListener, ActionAdapter.ItemSelectedListener {
 
     @BindView(R.id.rvMinAction)
     RecyclerView mActionRV;
@@ -147,7 +147,6 @@ public class ActionCompletedFragment extends BaseCompletedFragment implements Us
         long millis = System.currentTimeMillis();
         dbActionRef.child(actionID).child("asignee").setValue(model.getUserID());
         dbActionRef.child(actionID).child("updatedAt").setValue(millis);
-        mAdapter.removeItem(actionID);
         mAdapter.notifyDataSetChanged();
     }
     //endregion

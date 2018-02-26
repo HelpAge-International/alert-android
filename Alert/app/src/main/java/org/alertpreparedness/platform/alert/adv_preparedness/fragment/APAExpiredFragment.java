@@ -26,6 +26,7 @@ import com.google.gson.stream.JsonReader;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
+import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
@@ -33,6 +34,8 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
+import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseExpiredFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
@@ -58,7 +61,9 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAExpiredFragment extends BaseExpiredFragment implements APActionAdapter.ItemSelectedListener {
+public class APAExpiredFragment extends BaseExpiredFragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener {
+
+    private String actionID;
 
     public APAExpiredFragment() {
         // Required empty public constructor
@@ -113,6 +118,7 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
     private AlertListener alertListener = new AlertListener();
     private NetworkListener networkListener = new NetworkListener();
     private ArrayList<Integer> alertHazardTypes = new ArrayList<>();
+    private UsersListDialogFragment dialog = new UsersListDialogFragment();
 
     @Nullable
     @Override
@@ -123,6 +129,7 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
         DependencyInjector.applicationComponent().inject(this);
 
         initViews();
+        dialog.setListener(this);
 
         return v;
     }
@@ -157,21 +164,26 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
 
     @Override
     public void onActionItemSelected(int pos, String key) {
+        this.actionID = key;
         SheetMenu.with(getContext()).setMenu(R.menu.menu_expired).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.update_date:
                     showDatePicker(key);
                     break;
                 case R.id.reassign_action:
-                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reassigned Clicked", Snackbar.LENGTH_LONG).show();
+                    dialog.show(getActivity().getFragmentManager(), "users_list");
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
-                    intent.putExtra("ACTION_KEY", key);
+                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent.putExtra(AddNotesActivity.ACTION_ID, key);
                     startActivity(intent);
                     break;
                 case R.id.attachments:
-                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Attached Clicked", Snackbar.LENGTH_LONG).show();
+                    Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
+                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
+                    startActivity(intent2);
                     break;
             }
             return false;
@@ -219,6 +231,16 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
     protected TextView getNoActionView() {
         return txtNoAction;
     }
+
+    //region UsersListDialogFragment.ItemSelectedListener
+    @Override
+    public void onItemSelected(UserModel model) {
+        long millis = System.currentTimeMillis();
+        dbActionRef.child(actionID).child("asignee").setValue(model.getUserID());
+        dbActionRef.child(actionID).child("updatedAt").setValue(millis);
+        ((APActionAdapter)getAdapter()).notifyDataSetChanged();
+    }
+    //endregion
 
     private class NetworkListener implements ValueEventListener {
 

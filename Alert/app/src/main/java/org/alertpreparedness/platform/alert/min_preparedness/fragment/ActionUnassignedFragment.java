@@ -47,7 +47,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionUnassignedFragment extends BaseUnassignedFragment implements UsersListDialogFragment.ItemSelectedListener {
+public class ActionUnassignedFragment extends BaseUnassignedFragment implements UsersListDialogFragment.ItemSelectedListener, ActionAdapter.ItemSelectedListener {
 
     @BindView(R.id.rvMinAction)
     RecyclerView mActionRV;
@@ -146,11 +146,9 @@ public class ActionUnassignedFragment extends BaseUnassignedFragment implements 
             switch (menuItem.getItemId()) {
                 case R.id.update_date:
                     showDatePicker(key);
-
                     break;
                 case R.id.assign_action:
                     dialog.show(getActivity().getFragmentManager(), "users_list");
-
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
