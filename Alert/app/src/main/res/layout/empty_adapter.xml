@@ -39,7 +39,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="You have not tasks that needs completing this week"
+        android:text="You have not task that needs completing this week"
         android:textAlignment="center"
         android:textColor="@android:color/darker_gray"
         android:textSize="13sp"

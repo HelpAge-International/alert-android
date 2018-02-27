@@ -1,10 +1,5 @@
 package org.alertpreparedness.platform.alert.firebase;
 
-import com.google.firebase.auth.FirebaseAuth;
-
-import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
-import org.alertpreparedness.platform.alert.responseplan.ActiveFragment;
-
 /**
  * Created by Tj on 27/12/2017.
  */
@@ -31,7 +26,7 @@ public class ActionModel {
 
 //    if(isCompleteExist){
 //        boolean isComplete = (boolean) dataSnapshot.child("isComplete").getValue();
-//        Tasks tasks = new Tasks(isComplete);
+//        Task tasks = new Task(isComplete);
 //
 //    }
 //
@@ -39,7 +34,7 @@ public class ActionModel {
 //        if (dataSnapshot.hasChild("dueDate")) {
 //
 //            long dueDate = (long) dataSnapshot.child("dueDate").getValue();
-//            Tasks tasks = new Tasks(0, "action", task, dueDate);
+//            Task tasks = new Task(0, "action", task, dueDate);
 //            iHome.addTask(tasks);
 //        }
 //    }

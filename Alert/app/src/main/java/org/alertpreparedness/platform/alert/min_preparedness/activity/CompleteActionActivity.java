@@ -3,8 +3,6 @@ package org.alertpreparedness.platform.alert.min_preparedness.activity;
 import android.content.ActivityNotFoundException;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -12,36 +10,24 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 
 import org.alertpreparedness.platform.alert.R;
@@ -51,16 +37,8 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseStorageRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.DocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
-import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
-import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
-import org.alertpreparedness.platform.alert.dashboard.adapter.AlertFieldsAdapter;
-import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
-import org.alertpreparedness.platform.alert.min_preparedness.adapter.AttachmentAdapter;
-import org.alertpreparedness.platform.alert.min_preparedness.fragment.MinPreparednessFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.helper.FileUtils;
-import org.alertpreparedness.platform.alert.min_preparedness.helper.RealPathUtil;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.min_preparedness.model.FileInfo;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Notes;
 import org.alertpreparedness.platform.alert.model.User;
@@ -68,20 +46,16 @@ import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SimpleAdapter;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
-import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.whalemare.sheetmenu.SheetMenu;
-import timber.log.Timber;
 
 public class CompleteActionActivity extends AppCompatActivity implements SimpleAdapter.RemoveListener, View.OnClickListener {
 

@@ -4,15 +4,16 @@ package org.alertpreparedness.platform.alert.dashboard.model;
  * Created by faizmohideen on 13/11/2017.
  */
 
-public class Tasks {
+public class Task {
 
     private int alertLevel;
     private int actionType;
     private String taskType;
     private String taskName;
     public long dueDate;
+    private String hazardId;
 
-    public Tasks(boolean isCompleteTask) {
+    public Task(boolean isCompleteTask) {
         this.isCompleteTask = isCompleteTask;
     }
 
@@ -26,13 +27,13 @@ public class Tasks {
 
     private boolean isCompleteTask;
 
-    public Tasks(int alertLevel, String taskType, String taskName, long dueDate) {
+    public Task(int alertLevel, String taskType, String taskName, long dueDate) {
         this.alertLevel = alertLevel;
         this.taskType = taskType;
         this.taskName = taskName;
         this.dueDate = dueDate;
     }
-    public Tasks(int alertLevel, String taskType, String taskName, long dueDate, int actionType) {
+    public Task(int alertLevel, String taskType, String taskName, long dueDate, int actionType) {
         this.alertLevel = alertLevel;
         this.taskType = taskType;
         this.taskName = taskName;
@@ -80,4 +81,11 @@ public class Tasks {
         this.dueDate = dueDate;
     }
 
+    public String getHazardId() {
+        return hazardId;
+    }
+
+    public void setHazardId(String hazardId) {
+        this.hazardId = hazardId;
+    }
 }

@@ -100,7 +100,7 @@
 
             <TextView
                 android:id="@+id/networkTasks"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_horizontal_margin_half"
@@ -123,7 +123,7 @@
 
             <TextView
                 android:id="@+id/noNetworkTasks"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:background="@color/divider_color_lighter"
                 android:padding="@dimen/activity_vertical_margin"
                 android:textColor="@color/grey_title"

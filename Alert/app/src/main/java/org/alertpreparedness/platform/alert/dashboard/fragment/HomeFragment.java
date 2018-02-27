@@ -24,9 +24,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
@@ -45,20 +42,18 @@ import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
+import org.alertpreparedness.platform.alert.dashboard.model.Task;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
-import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.realm.SettingsRealm;
+import org.alertpreparedness.platform.alert.risk_monitoring.view.ActiveRiskFragment;
+import org.alertpreparedness.platform.alert.risk_monitoring.view.UpdateIndicatorActivity;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
-
-import java.io.StringReader;
-import java.util.HashMap;
 
 import javax.inject.Inject;
 
@@ -71,7 +66,7 @@ import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetai
  * Created by Tj on 13/12/2017.
  */
 
-public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItemClickedListener, FirebaseAuth.AuthStateListener, NestedScrollView.OnScrollChangeListener, NetworkFetcher.NetworkFetcherListener {
+public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItemClickedListener, FirebaseAuth.AuthStateListener, NestedScrollView.OnScrollChangeListener, NetworkFetcher.NetworkFetcherListener, TaskAdapter.TaskSelectListener {
 
     @BindView(R.id.tasks_list_view)
     RecyclerView myTaskRecyclerView;
@@ -175,7 +170,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     private HazardListener hazardListener = new HazardListener();
     private String agencyAdminId;
     private String networkLeadId;
-    private Tasks task;
+    private Task task;
     private TaskAdapter networkTaskAdapter;
 
     @Nullable
@@ -220,10 +215,10 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         networkTaskList.setLayoutManager(new LinearLayoutManager(getContext()));
         networkTaskList.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        taskAdapter = new TaskAdapter();
+        taskAdapter = new TaskAdapter(this);
         myTaskRecyclerView.setAdapter(taskAdapter);
 
-        networkTaskAdapter = new TaskAdapter();
+        networkTaskAdapter = new TaskAdapter(this);
         networkTaskList.setAdapter(networkTaskAdapter);
 
         scroller.setNestedScrollingEnabled(false);
@@ -239,14 +234,15 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     }
 
     @Override
-    public void addTask(String key, Tasks task) {
+    public void addTask(String key, Task task) {
         taskAdapter.add(key, task);
     }
 
-    private void addNetworkTask(String key, Tasks tasks) {
+    private void addNetworkTask(String key, Task task) {
         networkTaskList.setVisibility(View.VISIBLE);
         noNetworkTasks.setVisibility(View.GONE);
-        networkTaskAdapter.add(key, tasks);
+        networkTasksTitle.setVisibility(View.VISIBLE);
+        networkTaskAdapter.add(key, task);
     }
 
     @Override
@@ -392,11 +388,21 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         baseIndicatorRef.child(id).addChildEventListener(networkTaskListener);
     }
 
+    @Override
+    public void onTaskSelected(String id, Task task) {
+
+        Intent intent = new Intent(getActivity(), UpdateIndicatorActivity.class);
+        intent.putExtra("hazard_id", task.getHazardId());
+        intent.putExtra("indicator_id", id);
+
+        startActivity(intent);
+    }
+
     private class HazardListener implements ChildEventListener {
 
         private void process(DataSnapshot datasnapshot) {
-            baseActionRef.child(datasnapshot.getKey()).addChildEventListener(hazardTaskListener);
-            baseIndicatorRef.child(datasnapshot.getKey()).addChildEventListener(hazardTaskListener);
+            baseActionRef.child(datasnapshot.getKey()).addChildEventListener(hazardListener);
+            baseIndicatorRef.child(datasnapshot.getKey()).addChildEventListener(new TaskListener(datasnapshot.getKey()));
         }
 
         @Override
@@ -486,6 +492,14 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
     private class TaskListener implements ChildEventListener {
 
+        private String hazardId;
+
+        public TaskListener() {}
+
+        public TaskListener(String hazardId) {
+            this.hazardId = hazardId;
+        }
+
         protected void process(DataSnapshot dataSnapshot, String s) {
             if (dataSnapshot.getRef().getParent().getParent().getKey().equals("action")) {
                 ActionModel model = AppUtils.getValueFromDataSnapshot(dataSnapshot, ActionModel.class);
@@ -495,7 +509,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
                 if (shouldAdd) {
                     if (DateHelper.isDueInWeek(model.getDueDate()) || DateHelper.itWasDue(model.getDueDate())) {
-                        addTask(dataSnapshot.getKey(), new Tasks(0, "action", model.getTask(), model.getDueDate()));
+                        addTask(dataSnapshot.getKey(), new Task(0, "action", model.getTask(), model.getDueDate()));
                     }
                     else {
                         taskAdapter.tryRemove(dataSnapshot.getKey());
@@ -507,12 +521,14 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                 IndicatorModel model = dataSnapshot.getValue(IndicatorModel.class);
 
                 assert model != null;
+
                 boolean shouldAdd = model.getAssignee() != null && model.getAssignee().equals(user.getUserID()) && model.getDueDate() != null;
                 System.out.println("shouldAdd = " + shouldAdd);
                 if (model.getAssignee() != null && model.getAssignee().equals(user.getUserID()) && model.getDueDate() != null) {
-                    Tasks tasks = new Tasks(model.getTriggerSelected().intValue(), "indicator", model.getName(), model.getDueDate());
-                    if (DateHelper.isDueInWeek(tasks.dueDate) || DateHelper.itWasDue(tasks.dueDate)) {
-                        addTask(dataSnapshot.getKey(), tasks);
+                    Task task = new Task(model.getTriggerSelected().intValue(), "indicator", model.getName(), model.getDueDate());
+                    task.setHazardId(hazardId);
+                    if (DateHelper.isDueInWeek(task.dueDate) || DateHelper.itWasDue(task.dueDate)) {
+                        addTask(dataSnapshot.getKey(), task);
                     }
                     else {
                         taskAdapter.tryRemove(dataSnapshot.getKey());
@@ -534,10 +550,10 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                             for (DataSnapshot getChild : dataSnapshot.getChildren()) {
 
                                 if (actionIDs.contains(getChild.getKey())) {
-                                    // Tasks task;
+                                    // Task task;
                                     String taskNameCHS = (String) getChild.child("task").getValue();
                                     System.out.println("taskNameCHS = " + taskNameCHS);
-                                    addTask(dataSnapshot.getKey(), new Tasks(0, "action", taskNameCHS, model.getDueDate(), model.getType()));
+                                    addTask(dataSnapshot.getKey(), new Task(0, "action", taskNameCHS, model.getDueDate(), model.getType()));
                                 }
                             }
                         }
@@ -618,7 +634,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                 boolean shouldAdd = model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null;
                 if (shouldAdd) {
                     if (DateHelper.isDueInWeek(model.getDueDate()) || DateHelper.itWasDue(model.getDueDate())) {
-                        addNetworkTask(dataSnapshot.getKey(), new Tasks(0, "action", model.getTask(), model.getDueDate()));
+                        addNetworkTask(dataSnapshot.getKey(), new Task(0, "action", model.getTask(), model.getDueDate()));
                     }
                     else {
                         networkTaskAdapter.tryRemove(dataSnapshot.getKey());
@@ -631,9 +647,9 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                 assert model != null;
                 boolean shouldAdd = model.getAssignee() != null && model.getAssignee().equals(user.getUserID()) && model.getDueDate() != null;
                 if (shouldAdd) {
-                    Tasks tasks = new Tasks(model.getTriggerSelected().intValue(), "indicator", model.getName(), model.getDueDate());
-                    if (DateHelper.isDueInWeek(tasks.dueDate) || DateHelper.itWasDue(tasks.dueDate)) {
-                        addNetworkTask(dataSnapshot.getKey(), tasks);
+                    Task task = new Task(model.getTriggerSelected().intValue(), "indicator", model.getName(), model.getDueDate());
+                    if (DateHelper.isDueInWeek(task.dueDate) || DateHelper.itWasDue(task.dueDate)) {
+                        addNetworkTask(dataSnapshot.getKey(), task);
                     }
                     else {
                         networkTaskAdapter.tryRemove(dataSnapshot.getKey());
