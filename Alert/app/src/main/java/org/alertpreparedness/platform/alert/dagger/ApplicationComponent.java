@@ -42,12 +42,13 @@ import org.alertpreparedness.platform.alert.notifications.IndicatorFetcher;
 import org.alertpreparedness.platform.alert.notifications.IndicatorNotificationService;
 import org.alertpreparedness.platform.alert.notifications.IndicatorUpdateNotificationHandler;
 import org.alertpreparedness.platform.alert.notifications.ResponsePlanFetcher;
+import org.alertpreparedness.platform.alert.notifications.ResponsePlanNotificationService;
+import org.alertpreparedness.platform.alert.notifications.ResponsePlanUpdateNotificationHandler;
 import org.alertpreparedness.platform.alert.offline.OfflineSyncHandler;
 import org.alertpreparedness.platform.alert.responseplan.ActiveFragment;
 import org.alertpreparedness.platform.alert.responseplan.ArchivedFragment;
 import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity;
 import org.alertpreparedness.platform.alert.dashboard.activity.UpdateAlertActivity;
-import org.alertpreparedness.platform.alert.helper.DataHandler;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.MinPreparednessFragment;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlanFragment;
 import org.alertpreparedness.platform.alert.settings.ChangeEmailActivity;
@@ -112,11 +113,10 @@ public interface ApplicationComponent {
     void inject(ActionExpiredFragment actionExpiredFragment);
     void inject(ActionUnassignedFragment actionUnassignedFragment);
     void inject(ViewAttachmentsActivity viewAttachmentsActivity);
-
     void inject(ViewAttachmentAdapter viewAttachmentAdapter);
     void inject(AlertFirebaseInstanceIDService alertFirebaseInstanceIDService);
-
     void inject(NetworkFetcher networkFetcher);
-
     void inject(ResponsePlanFetcher responsePlanFetcher);
+    void inject(ResponsePlanNotificationService responsePlanNotificationService);
+    void inject(ResponsePlanUpdateNotificationHandler responsePlanUpdateNotificationHandler);
 }

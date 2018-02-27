@@ -35,7 +35,6 @@ public class NetworkFetcher implements ValueEventListener {
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        System.out.println("NetworkFetcherdataSnapshot = " + dataSnapshot.getRef());
         //noinspection unchecked
         HashMap<String, Boolean> localNetworks = dataSnapshot.child("localNetworks").exists() ? (HashMap<String, Boolean>) dataSnapshot.child("localNetworks").getValue() : new HashMap<>();
 

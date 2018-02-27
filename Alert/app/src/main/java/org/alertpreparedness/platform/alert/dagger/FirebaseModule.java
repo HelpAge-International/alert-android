@@ -1,7 +1,6 @@
 package org.alertpreparedness.platform.alert.dagger;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 
 import com.google.firebase.database.DatabaseReference;
 
@@ -20,6 +19,8 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseCountryOfficeR
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseHazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseNetworkCountryRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseNetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseResponsePlansRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseNoteRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseUserRef;
@@ -28,8 +29,6 @@ import org.alertpreparedness.platform.alert.dagger.annotation.DocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardOtherRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.LocalNetworkRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.NetworkCountryRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.PermissionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ProgrammeRef;
@@ -162,15 +161,15 @@ public class FirebaseModule {
     }
 
     @Provides
-    @LocalNetworkRef
-    public DatabaseReference providesLocalNetworkRef(@BaseDatabaseRef DatabaseReference db, User user) {
-        return db.child("network").child(user.getLocalNetworkID());
+    @BaseNetworkRef
+    public DatabaseReference providesLocalNetworkRef(@BaseDatabaseRef DatabaseReference db) {
+        return db.child("network");
     }
 
     @Provides
-    @NetworkCountryRef
-    public DatabaseReference providesNetworkCountryRef(@BaseDatabaseRef DatabaseReference db, User user) {
-        return db.child("networkCountry").child(user.getNetworkID()).child(user.getNetworkCountryID());
+    @BaseNetworkCountryRef
+    public DatabaseReference providesNetworkCountryRef(@BaseDatabaseRef DatabaseReference db) {
+        return db.child("networkCountry");
     }
 
     @Provides

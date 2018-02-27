@@ -141,7 +141,7 @@ public class AppUtils {
 
     public static <T> T getValueFromDataSnapshot(DataSnapshot dataSnapshot, Class<T> clazz) {
         final GsonBuilder gsonBuilder = new GsonBuilder();
-        final Gson gson = gsonBuilder.create();
+        final Gson gson = gsonBuilder.setExclusionStrategies(new SnapshotExclusionStrat()).create();
 
         JsonReader reader = new JsonReader(new StringReader(gson.toJson(dataSnapshot.getValue()).trim()));
         reader.setLenient(true);

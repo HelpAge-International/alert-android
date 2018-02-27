@@ -57,6 +57,7 @@ public class PreferHelper {
 
     public static final String SCHEDULED_INDICATOR_NOTIFICATIONS_KEY = "SCHEDULED_INDICATOR_NOTIFICATIONS_KEY";
     public static final String SCHEDULED_ACTION_NOTIFICATIONS_KEY = "SCHEDULED_ACTION_NOTIFICATIONS_KEY";
+    public static final String SCHEDULED_RESPONSE_PLAN_NOTIFICATIONS_KEY = "SCHEDULED_RESPONSE_PLAN_NOTIFICATIONS_KEY";
 
     public static List<String> getScheduledIndicatorNotifications(Context context) {
         return getListOfString(context, SCHEDULED_INDICATOR_NOTIFICATIONS_KEY);
@@ -87,6 +88,21 @@ public class PreferHelper {
 
     public static void removeFromScheduledActionNotifications(Context context, String id) {
         removeFromListOfStrings(context, SCHEDULED_ACTION_NOTIFICATIONS_KEY, id);
+    }
+    public static List<String> getScheduledResponsePlanNotifications(Context context) {
+        return getListOfString(context, SCHEDULED_RESPONSE_PLAN_NOTIFICATIONS_KEY);
+    }
+
+    public static void setScheduledResponsePlanNotifications(Context context, List<String> ids) {
+        setListOfString(context, SCHEDULED_RESPONSE_PLAN_NOTIFICATIONS_KEY, ids);
+    }
+
+    public static void addToScheduledResponsePlanNotifications(Context context, String id) {
+        addToListOfStrings(context, SCHEDULED_RESPONSE_PLAN_NOTIFICATIONS_KEY, id);
+    }
+
+    public static void removeFromScheduledResponsePlanNotifications(Context context, String id) {
+        removeFromListOfStrings(context, SCHEDULED_RESPONSE_PLAN_NOTIFICATIONS_KEY, id);
     }
 
     public static void addToListOfStrings(Context context, String key, String value){

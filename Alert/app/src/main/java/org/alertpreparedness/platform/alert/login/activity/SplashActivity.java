@@ -42,6 +42,8 @@ public class SplashActivity extends BaseActivity {
     public static final int NOTIFICATION_ACTION_COUNTRY_RESCHEDULE = 5;
     public static final int NOTIFICATION_ACTION_LOCAL_NETWORK_RESCHEDULE = 6;
     public static final int NOTIFICATION_ACTION_NETWORK_COUNTRY_RESCHEDULE = 7;
+    public static final int NOTIFICATION_RESPONSE_PLAN_RESCHEDULE = 8;
+    public static final int NOTIFICATION_RESPONSE_PLAN_COUNTRY_RESCHEDULE = 9;
 
     public static final String NOTIFICATION_FIELD_TYPE = "type";
 
@@ -52,9 +54,6 @@ public class SplashActivity extends BaseActivity {
         // This method will be executed once the timer is over
         // Start your app main activity
         AppUtils.getDatabase();
-        System.out.println("FirebaseAuth.getInstance().getCurrentUser() = " + FirebaseAuth.getInstance().getCurrentUser());
-        System.out.println("new UserInfo().getUser() = " + new UserInfo().getUser());
-        System.out.println("PreferHelper.getString(this, Constants.UID) = " + PreferHelper.getString(this, Constants.UID));
 
         if (FirebaseAuth.getInstance().getCurrentUser() != null && new UserInfo().getUser() != null && !PreferHelper.getString(this, Constants.UID).equals("")) {
             DependencyInjector.applicationComponent().inject(this);
@@ -93,12 +92,12 @@ public class SplashActivity extends BaseActivity {
                 startActivity(new Intent(this, HomeScreen.class));
                 finish();
             }
+            OfflineSyncHandler.getInstance().sync();
         } else {
             startActivity(new Intent(this, LoginScreen.class));
             finish();
         }
 
-        OfflineSyncHandler.getInstance().sync();
 
         Timber.d("Token: " + FirebaseInstanceId.getInstance().getToken());
     }

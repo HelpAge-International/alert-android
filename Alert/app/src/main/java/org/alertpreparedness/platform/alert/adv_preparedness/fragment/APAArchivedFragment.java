@@ -141,10 +141,10 @@ public class APAArchivedFragment extends BaseArchivedFragment implements APActio
     public void onActionItemSelected(int pos, String key) {
         SheetMenu.with(getContext()).setMenu(R.menu.menu_archived).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
-                case R.id.reactive_action:
-                    //TODO
-                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reactivate Clicked", Snackbar.LENGTH_LONG).show();
-                    break;
+//                case R.id.reactive_action:
+//                    //TODO
+//                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reactivate Clicked", Snackbar.LENGTH_LONG).show();
+//                    break;
                 case R.id.action_notes:
                     Intent intent2 = new Intent(getActivity(), AddNotesActivity.class);
                     intent2.putExtra(AddNotesActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
