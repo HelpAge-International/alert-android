@@ -8,6 +8,9 @@ import org.alertpreparedness.platform.alert.utils.Constants
  * Created by fei on 14/11/2017.
  */
 
+val HAZARD_EMPTY = 1
+val HAZARD_NOT_EMPTY = 0
+
 fun getLevel1Values(countryId: Int, mCountryDataList : ArrayList<CountryJsonData>) : List<String>? {
     val selectedCountry = mCountryDataList.first { countryJsonData -> countryJsonData.countryId == countryId }
     return selectedCountry.levelOneValues?.map { it.value }

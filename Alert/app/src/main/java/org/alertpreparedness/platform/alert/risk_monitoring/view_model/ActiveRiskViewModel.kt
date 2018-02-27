@@ -10,6 +10,7 @@ import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import org.alertpreparedness.platform.alert.AlertApplication
+import org.alertpreparedness.platform.alert.HAZARD_EMPTY
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelCountry
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelHazard
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
@@ -204,6 +205,8 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
         //normal country hazard and indicators
         val disposableHazard = RiskMonitoringService(getApplication()).getHazards(mCountryId)
                 .subscribe({ hazards: List<ModelHazard>? ->
+                    Timber.d("***********************")
+                    Timber.d(hazards.toString())
                     hazards?.forEach {
                         if (it.id != null) {
                             if (it.id != mCountryId) {
@@ -218,15 +221,18 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
                                         mHazardNameMap.put(it.id!!, Constants.HAZARD_SCENARIO_NAME[it.hazardScenario])
                                     }
                                 }
-                                println("it.id = ${it.id}")
                                 val disposableIndicator = RiskMonitoringService(getApplication()).getIndicators(it.id!!)
                                         .subscribe({ indicators ->
+//                                            println("indicatorsit.id = ${it.id}")
+//                                            println("indicators = ${indicators}")
                                             mIndicatorMap.put(it.id!!, indicators)
+                                            println("mIndicatorMap = ${mIndicatorMap}")
                                             val group = ExpandableGroup(mHazardNameMap[it.id!!], indicators)
                                             val groupIndex = getGroupIndex(group.title, mGroups)
                                             if (groupIndex != -1) {
                                                 val existItems = mGroups[groupIndex].items
                                                 var totalItems = existItems
+                                                println("totalItems = ${totalItems}")
                                                 if (it.isActive == isActive) {
 
                                                     indicators.forEach { i ->
@@ -251,6 +257,16 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
                                             } else {
                                                 if (it.isActive == isActive && group.items.isNotEmpty()) {
                                                     mGroups.add(group)
+                                                }
+                                                else if(group.items.isEmpty()) {
+                                                    val v = ModelIndicator(modelType = HAZARD_EMPTY)
+                                                    v.modelType = HAZARD_EMPTY
+                                                    group.items.add(v)
+                                                    mGroups.add(group)
+
+                                                    println("group.items = ${group.items.size}")
+                                                    println("group.items[0].modelType = ${group.items[0].modelType}")
+
                                                 }
                                             }
                                             mLiveData.value = mGroups
