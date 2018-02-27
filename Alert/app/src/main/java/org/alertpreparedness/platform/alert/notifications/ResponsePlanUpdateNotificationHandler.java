@@ -14,6 +14,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.DocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
 import org.alertpreparedness.platform.alert.firebase.ResponsePlanModel;
 import org.alertpreparedness.platform.alert.firebase.ClockSetting;
@@ -98,37 +99,24 @@ public class ResponsePlanUpdateNotificationHandler implements ResponsePlanFetche
         }
         Timber.d("Scheduled Notifications: " + responsePlanFetcherResult.getModels().size());
     }
+
+    //TODO
     public void scheduleNotification(Context context, ResponsePlanModel responsePlanModel, String groupId, String responsePlanId) {
-//        DatabaseReference dbRef = null;
-//        if(responsePlanId.equals(user.getNetworkCountryID())){
-//            dbRef = networkCountryRef;
-//        }
-//        else if(responsePlanId.equals(user.getLocalNetworkID())){
-//            dbRef = localNetworkRef;
-//        }
-//        else if(responsePlanId.equals(user.getCountryID())){
-//            dbRef = countryOfficeRef;
-//        }
-//
-//        if(dbRef != null){
-//            dbRef = dbRef.child("clockSettings").child("preparedness");
-//            DatabaseReference finalDbRef = dbRef;
-//            dbRef.addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    finalDbRef.removeEventListener(this);
-//                    scheduleNotification(context, responsePlanModel, groupId, responsePlanId, dataSnapshot.getValue(ClockSetting.class));
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//                    Timber.e("Failed to fetch clock settings");
-//                }
-//            });
-//        }
-//        else {
-//            scheduleNotification(context, responsePlanModel, groupId, responsePlanId, null);
-//        }
+        if(groupId.equals(user.getCountryID())){
+            DatabaseReference dbRef = countryOfficeRef.child("clockSettings").child("responsePlans");
+            dbRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    dbRef.removeEventListener(this);
+                    scheduleNotification(context, responsePlanModel, groupId, responsePlanId, dataSnapshot.getValue(ClockSetting.class));
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Timber.e("Failed to fetch clock settings");
+                }
+            });
+        }
     }
     public void scheduleNotification(Context context, ResponsePlanModel responsePlanModel, String groupId, String responsePlanId, ClockSetting clockSettings) {
         FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(context));

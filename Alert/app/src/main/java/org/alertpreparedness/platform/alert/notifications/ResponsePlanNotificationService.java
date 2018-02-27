@@ -73,40 +73,41 @@ public class ResponsePlanNotificationService extends JobService {
         return false;
     }
 
-    private void showNotificaiton(ResponsePlanModel responsePlanModel, String groupId, String actionId) {
-//        if (responsePlanModel != null) {
-//            String title = getString();
-//            String content;
+    //TODO:
+    private void showNotificaiton(ResponsePlanModel responsePlanModel, String groupId, String responsePlanId) {
+        if (responsePlanModel != null) {
+            String title = getString(R.string.notification_response_plan_exipred_title);
+            String content = getString(R.string.notification_response_plan_exipred_content, responsePlanModel.getName());
+
+            Intent intent = new Intent(getApplicationContext(), HomeScreen.class);
+            intent.putExtra("group_id", groupId);
+            intent.putExtra("respone_plan_id", responsePlanId);
+//            intent.putExtra(HomeScreen.START_SCREEN, responsePlanModel.getType() == 1 ? HomeScreen.SCREEN_MPA : HomeScreen.SCREEN_APA);
 //
-//            Intent intent = new Intent(getApplicationContext(), HomeScreen.class);
-////            intent.putExtra("group_id", groupId);
-////            intent.putExtra("respone_plan_id", actionId);
-////            intent.putExtra(HomeScreen.START_SCREEN, responsePlanModel.getType() == 1 ? HomeScreen.SCREEN_MPA : HomeScreen.SCREEN_APA);
-////
-////            Timber.d("StartScreen Plan: " + (responsePlanModel.getType() == 1 ? HomeScreen.SCREEN_MPA : HomeScreen.SCREEN_APA));
-//
-//            PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//            NotificationCompat.Builder mBuilder =
-//                    new NotificationCompat.Builder(getApplicationContext(), "alert")
-//                            .setContentTitle(title)
-//                            .setContentText(content)
-//                            .setSmallIcon(R.drawable.alert_logo)
-//                            .setPriority(NotificationCompat.PRIORITY_HIGH)
-//                            .setContentIntent(pendingIntent)
-//                            .setAutoCancel(true);
-//
-//            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//            if (notificationManager != null) {
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                    NotificationChannel channel = new NotificationChannel("alert",
-//                            "Default Alert Notification Channel",
-//                            NotificationManager.IMPORTANCE_DEFAULT);
-//                    notificationManager.createNotificationChannel(channel);
-//                }
-//                notificationManager.notify(actionId, new Random().nextInt(), mBuilder.build());
-//            }
-//        }
+//            Timber.d("StartScreen Plan: " + (responsePlanModel.getType() == 1 ? HomeScreen.SCREEN_MPA : HomeScreen.SCREEN_APA));
+
+            PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(getApplicationContext(), "alert")
+                            .setContentTitle(title)
+                            .setContentText(content)
+                            .setSmallIcon(R.drawable.alert_logo)
+                            .setPriority(NotificationCompat.PRIORITY_HIGH)
+                            .setContentIntent(pendingIntent)
+                            .setAutoCancel(true);
+
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    NotificationChannel channel = new NotificationChannel("alert",
+                            "Default Alert Notification Channel",
+                            NotificationManager.IMPORTANCE_DEFAULT);
+                    notificationManager.createNotificationChannel(channel);
+                }
+                notificationManager.notify(responsePlanId, new Random().nextInt(), mBuilder.build());
+            }
+        }
     }
 
     @Override

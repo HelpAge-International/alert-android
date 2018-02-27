@@ -59,7 +59,7 @@ public class ResponsePlanFetcher implements SynchronizedCounter.SynchronizedCoun
         responsePlanCounter.addListener(this);
 
         baseResponsePlanRef.child(user.getCountryID()).addValueEventListener(new ResponsePlanFetcher.ResponsePlanListener(baseResponsePlanRef, ResponsePlanFetcher.ResponsePlanType.COUNTRY, user.getCountryID(), responsePlanFetcherResult, responsePlanCounter));
-        countryOfficeRef.child("clockSettings").child("preparedness").addValueEventListener(new ResponsePlanFetcher.ClockSettingsListener(countryOfficeRef, ResponsePlanFetcher.ResponsePlanType.COUNTRY, responsePlanFetcherResult, responsePlanCounter));
+        countryOfficeRef.child("clockSettings").child("responsePlans").addValueEventListener(new ResponsePlanFetcher.ClockSettingsListener(countryOfficeRef, ResponsePlanFetcher.ResponsePlanType.COUNTRY, responsePlanFetcherResult, responsePlanCounter));
     }
 
     @Override
@@ -96,7 +96,8 @@ public class ResponsePlanFetcher implements SynchronizedCounter.SynchronizedCoun
         }
 
         @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
+        public void onDataChange(DataSnapshot dataSnapshot)
+        {
             dbRef.removeEventListener(this);
             if(dataSnapshot != null){
                 for(DataSnapshot responsePlanSnap : dataSnapshot.getChildren()){

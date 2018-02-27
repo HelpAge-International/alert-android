@@ -39,6 +39,7 @@ import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.notifications.ActionUpdateNotificationHandler;
 import org.alertpreparedness.platform.alert.notifications.IndicatorFetcher;
 import org.alertpreparedness.platform.alert.notifications.IndicatorUpdateNotificationHandler;
+import org.alertpreparedness.platform.alert.notifications.ResponsePlanUpdateNotificationHandler;
 import org.alertpreparedness.platform.alert.offline.OfflineSyncHandler;
 import org.alertpreparedness.platform.alert.offline.SyncJobService;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -73,13 +74,16 @@ public class AlertApplication extends Application implements ValueEventListener 
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.SAND;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        DependencyInjector.initialize(this);
+
         FirebaseApp.initializeApp(this);
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
 //        FirebaseAuth.getInstance().signOut();
         Shortbread.create(this);
 
@@ -88,6 +92,8 @@ public class AlertApplication extends Application implements ValueEventListener 
         JodaTimeAndroid.init(this);
 
         boolean loggedIn = FirebaseAuth.getInstance().getCurrentUser() != null;
+
+        System.out.println("FirebaseAuth.getInstance().getCurrentUser() = " + FirebaseAuth.getInstance().getCurrentUser());
 
 //        ACRA.init(this);
 
@@ -128,7 +134,6 @@ public class AlertApplication extends Application implements ValueEventListener 
             PreferHelper.putString(getApplicationContext(), Constants.APP_STATUS, Constants.APP_STATUS_SAND);
         }
 
-        DependencyInjector.initialize(this);
 
         if(loggedIn) {
             FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(this));
@@ -145,6 +150,7 @@ public class AlertApplication extends Application implements ValueEventListener 
             dispatcher.schedule(myJob);
             new IndicatorUpdateNotificationHandler(this).scheduleAllNotifications();
             new ActionUpdateNotificationHandler(this).scheduleAllNotifications();
+            new ResponsePlanUpdateNotificationHandler(this).scheduleAllNotifications();
         }
         else{
             //TODO: CANCEL ALL NOTIFICATIONS?

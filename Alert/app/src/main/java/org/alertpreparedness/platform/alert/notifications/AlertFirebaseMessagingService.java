@@ -10,6 +10,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
+import org.alertpreparedness.platform.alert.firebase.ResponsePlanModel;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.login.activity.SplashActivity;
 import org.alertpreparedness.platform.alert.model.User;
@@ -45,6 +46,12 @@ public class AlertFirebaseMessagingService extends FirebaseMessagingService {
             }
             else if(type == SplashActivity.NOTIFICATION_ACTION_NETWORK_COUNTRY_RESCHEDULE){
                 rescheduleActionNotifications();
+            }
+            else if(type == SplashActivity.NOTIFICATION_RESPONSE_PLAN_RESCHEDULE) {
+                rescheduleResponsePlanNotification(remoteMessage.getData().get("groupId"), remoteMessage.getData().get("responsePlanId"));
+            }
+            else if(type == SplashActivity.NOTIFICATION_RESPONSE_PLAN_COUNTRY_RESCHEDULE){
+                rescheduleResponsePlanNotifications();
             }
         }
     }
@@ -111,8 +118,40 @@ public class AlertFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
+    public void rescheduleResponsePlanNotification(String groupId, String responsePlanId){
+        Timber.d("Rescheduling ResponsePlan Notification: " + groupId + " - " +  responsePlanId);
+
+        User user = new UserInfo().getUser();
+
+        DatabaseReference db = FirebaseDatabase.getInstance().getReference().child(PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS)).child("responsePlan").child(groupId).child(responsePlanId);
+
+        if(user != null){
+            db.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    ResponsePlanModel responsePlanModel = AppUtils.getValueFromDataSnapshot(dataSnapshot, ResponsePlanModel.class);
+                    if(responsePlanModel == null){
+                        ResponsePlanUpdateNotificationHandler.cancelNotification(getApplicationContext(), responsePlanId);
+                    }
+                    else{
+                        new ResponsePlanUpdateNotificationHandler(getApplicationContext()).scheduleNotification(getApplicationContext(), responsePlanModel, groupId, responsePlanId);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    ResponsePlanUpdateNotificationHandler.cancelNotification(getApplicationContext(), responsePlanId);
+                }
+            });
+        }
+    }
+
+
     private void rescheduleActionNotifications() {
-        System.out.println("");
         new ActionUpdateNotificationHandler(this).scheduleAllNotifications();
+    }
+
+    private void rescheduleResponsePlanNotifications() {
+        new ResponsePlanUpdateNotificationHandler(this).scheduleAllNotifications();
     }
 }

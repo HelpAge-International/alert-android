@@ -226,6 +226,8 @@
     <string name="notification_apa_1_day_content">The following advanced preparedness action: %1$s needs to be completed today</string>
     <string name="notification_apa_passed_title">A advanced preparedness action\'s due date has passed!</string>
     <string name="notification_apa_passed_content">The following advanced preparedness action:%1$s\'s due date has passed, it needs completing</string>
+    <string name="notification_response_plan_exipred_title">A response plan has expired</string>
+    <string name="notification_response_plan_exipred_content">The following response plan: %1$s has expired</string>
     <string name="edit_apa">Edit APA</string>
     <string name="email_not_associated_with_account">The email address you entered is not associated with an ALERT account. Please try again.</string>
     <string name="password_incorrect">The password you entered is incorrect, please check and try again.</string>

@@ -123,13 +123,13 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
             ClockSetting clockSetting = null;
             switch (model.getActionType()) {
                 case NETWORK_COUNTRY:
-                    clockSetting = actionFetcherResult.getNetworkCountryClockSettings();
+                    clockSetting = actionFetcherResult.getNetworkCountryClockSettings(model.getGroupId());
                     break;
                 case LOCAL_NETWORK:
-                    clockSetting = actionFetcherResult.getLocalNetworkClockSettings();
+                    clockSetting = actionFetcherResult.getLocalNetworkClockSettings(model.getGroupId());
                     break;
                 case COUNTRY:
-                    clockSetting = actionFetcherResult.getCountryClockSettings();
+                    clockSetting = actionFetcherResult.getCountryClockSettings(model.getGroupId());
                     Timber.d("ClockSetting: " + clockSetting.getValue() + " - " + clockSetting.getDurationType());
                     break;
             }
