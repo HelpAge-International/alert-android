@@ -87,7 +87,7 @@ public class InProgressFragment extends BaseInProgressFragment implements Action
             switch (menuItem.getItemId()) {
                 case R.id.complete_action:
                     Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
-                    System.out.println("onActionItemSelectedkey = " + key);
+                    intent.putExtra(CompleteActionActivity.REQUIRE_DOC, getAdapter().getItem(pos).getRequireDoc());
                     intent.putExtra("ACTION_KEY", key);
                     intent.putExtra("USER_KEY", userTypeID);
                     startActivity(intent);

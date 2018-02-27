@@ -3,7 +3,6 @@ package org.alertpreparedness.platform.alert.adv_preparedness.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,7 +32,6 @@ import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseInProgressFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
@@ -43,7 +41,6 @@ import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -138,6 +135,7 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
             switch (menuItem.getItemId()) {
                 case R.id.complete_action:
                     Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
+                    intent.putExtra(CompleteActionActivity.REQUIRE_DOC, getAdapter().getItem(pos).getRequireDoc());
                     startActivity(intent);
                     break;
                 case R.id.reassign_action:

@@ -35,6 +35,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseHazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
@@ -131,6 +132,9 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     @HazardRef
     DatabaseReference hazardRef;
 
+    @Inject
+    @BaseHazardRef
+    DatabaseReference baseHazardRef;
 
     @Inject
     @BaseIndicatorRef
@@ -193,7 +197,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
     private void initViews() {
         taskRef.addChildEventListener(taskListener);
-        indicatorRef.addChildEventListener(indicatorListener);
+        indicatorRef.addChildEventListener(new TaskListener(user.countryID));
         networkRef.addValueEventListener(networkListener);
         hazardRef.addChildEventListener(hazardListener);
         alertRecyclerView.setHasFixedSize(true);
@@ -349,21 +353,6 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         Rect rectf3 = new Rect();
         networkTitle.getGlobalVisibleRect(rectf3);
 
-        //TODO
-//        System.out.println("rectf3 = " + rectf3.bottom);
-//        System.out.println("rectf2 = " + rectf2.bottom);
-//        System.out.println("rectf3 = " + Math.abs(rectf3.bottom));
-//        System.out.println("scrollY = " + (scrollY - 60));
-//
-//        if (Math.abs(rectf3.bottom) >= scrollY - 60) {
-//            taskTypeTitle.setText(getString(R.string.network));
-//            ((MainDrawer) getActivity()).removeActionbarElevation();
-//        }
-//        else if (Math.abs(rectf.bottom) >= scrollY - 60) {
-//            taskTypeTitle.setText(getString(R.string.country));
-//            ((MainDrawer) getActivity()).removeActionbarElevation();
-//        }
-
     }
 
     @Override
@@ -385,7 +374,8 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     private void addListenerForNetworkData(String id) {
         baseAlertRef.child(id).addChildEventListener(networkAlertListener);
         baseActionRef.child(id).addChildEventListener(networkTaskListener);
-        baseIndicatorRef.child(id).addChildEventListener(networkTaskListener);
+        baseIndicatorRef.child(id).addChildEventListener(new TaskListener(id));
+        baseHazardRef.child(id).addChildEventListener(hazardListener);
     }
 
     @Override

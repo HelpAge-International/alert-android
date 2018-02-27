@@ -236,4 +236,6 @@
     <string name="online_error">You need to be online to perform this action</string>
     <string name="archived_title">Archived</string>
     <string name="no_indicators">There are no indicators associated with this hazard</string>
+    <string name="add_attachment_not_required">+ Add attachments</string>
+    <string name="attachment_required_error">An attachment is required to complete this action</string>
 </resources>

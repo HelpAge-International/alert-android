@@ -31,6 +31,7 @@ public class Action {
     private Long level;
     private Long createdAt;
     private Long updatedAt;
+    private boolean requireDoc;
 
     @Exclude
     private Uri path;
@@ -264,5 +265,13 @@ public class Action {
                 ", userRef=" + userRef +
                 ", networkRef=" + networkRef +
                 '}';
+    }
+
+    public boolean getRequireDoc() {
+        return requireDoc;
+    }
+
+    public void setRequireDoc(boolean requireDoc) {
+        this.requireDoc = requireDoc;
     }
 }
