@@ -29,6 +29,9 @@ import org.alertpreparedness.platform.alert.min_preparedness.fragment.InProgress
 import org.alertpreparedness.platform.alert.model.User;
 
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -138,10 +141,15 @@ public class AppUtils {
 
     public static <T> T getValueFromDataSnapshot(DataSnapshot dataSnapshot, Class<T> clazz) {
         final GsonBuilder gsonBuilder = new GsonBuilder();
-        final Gson gson = gsonBuilder.create();
+        final Gson gson = gsonBuilder.setExclusionStrategies(new SnapshotExclusionStrat()).create();
 
         JsonReader reader = new JsonReader(new StringReader(gson.toJson(dataSnapshot.getValue()).trim()));
         reader.setLenient(true);
         return gson.fromJson(reader, clazz);
+    }
+
+    public static List<String> smartCombine(List<String> first, List<String> second) {
+        first.addAll(second);
+        return new ArrayList<>(new HashSet<>(first));
     }
 }

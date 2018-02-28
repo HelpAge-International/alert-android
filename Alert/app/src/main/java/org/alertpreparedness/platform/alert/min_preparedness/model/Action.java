@@ -31,10 +31,21 @@ public class Action {
     private Long level;
     private Long createdAt;
     private Long updatedAt;
+    private boolean requireDoc;
+
+    @Exclude
     private Uri path;
+
+    @Exclude
     public User user;
+
+    @Exclude
     public DatabaseReference db;
+
+    @Exclude
     public DatabaseReference userRef;
+
+    @Exclude
     public DatabaseReference networkRef;
 
     public Action() {
@@ -227,21 +238,6 @@ public class Action {
         this.path = path;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public DatabaseReference getNetworkRef() {
-        return networkRef;
-    }
-
-    public void setNetworkRef(DatabaseReference networkRef) {
-        this.networkRef = networkRef;
-    }
 
     @Override
     public String toString() {
@@ -269,5 +265,13 @@ public class Action {
                 ", userRef=" + userRef +
                 ", networkRef=" + networkRef +
                 '}';
+    }
+
+    public boolean getRequireDoc() {
+        return requireDoc;
+    }
+
+    public void setRequireDoc(boolean requireDoc) {
+        this.requireDoc = requireDoc;
     }
 }

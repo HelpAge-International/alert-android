@@ -65,6 +65,7 @@ class ActiveRiskFragment : Fragment(), OnIndicatorSelectedListener {
                 if (size > 0) {
                     pbLoading?.hide()
                 }
+
                 rvRiskActive?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, mCountryLocation, this, mNetworkCountryMap, context)
             })
         })

@@ -50,9 +50,9 @@ class ArchivedRiskFragment : Fragment(), OnIndicatorSelectedListener {
         rvRiskArchived?.addItemDecoration(decoration)
         mViewModel.getLiveGroups(false).observe(this, Observer<MutableList<ExpandableGroup<ModelIndicator>>> {
             val size = it?.size ?: 0
-            if (size > 0) {
+//            if (size > 0) {
                 pbLoadingArchived?.hide()
-            }
+//            }
             rvRiskArchived?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, mCountryLocation, this, mapOf(), context)
         })
         return view

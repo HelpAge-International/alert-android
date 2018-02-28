@@ -188,7 +188,7 @@
     <string name="txt_assign_action">Assign action</string>
     <string name="txt_edit_action">Edit action</string>
     <string name="navbar_subtitle">%s for %s, %s</string>
-    <string name="no_network_tasks">You don\'t have any network tasks</string>
+    <string name="no_network_tasks">You don\'t have any network task</string>
     <string name="txt_needs_done">What needs to be done?</string>
     <string name="txt_hazard_association">Hazard Association</string>
     <string name="txt_department">Department</string>
@@ -226,10 +226,16 @@
     <string name="notification_apa_1_day_content">The following advanced preparedness action: %1$s needs to be completed today</string>
     <string name="notification_apa_passed_title">A advanced preparedness action\'s due date has passed!</string>
     <string name="notification_apa_passed_content">The following advanced preparedness action:%1$s\'s due date has passed, it needs completing</string>
+    <string name="notification_response_plan_exipred_title">A response plan has expired</string>
+    <string name="notification_response_plan_exipred_content">The following response plan: %1$s has expired</string>
     <string name="edit_apa">Edit APA</string>
     <string name="email_not_associated_with_account">The email address you entered is not associated with an ALERT account. Please try again.</string>
     <string name="password_incorrect">The password you entered is incorrect, please check and try again.</string>
     <string name="attachments">Attachments</string>
     <string name="download">Download</string>
     <string name="online_error">You need to be online to perform this action</string>
+    <string name="archived_title">Archived</string>
+    <string name="no_indicators">There are no indicators associated with this hazard</string>
+    <string name="add_attachment_not_required">+ Add attachments</string>
+    <string name="attachment_required_error">An attachment is required to complete this action</string>
 </resources>

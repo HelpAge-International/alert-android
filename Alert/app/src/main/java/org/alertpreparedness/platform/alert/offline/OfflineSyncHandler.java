@@ -158,7 +158,7 @@ public class OfflineSyncHandler {
 
         });
     }
-    
+
     private void fetchIndicatorLogs() {
         fetchNetworks(networkIds -> {
             for (String networkId : networkIds) {

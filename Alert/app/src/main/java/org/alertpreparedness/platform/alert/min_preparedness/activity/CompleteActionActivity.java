@@ -3,8 +3,6 @@ package org.alertpreparedness.platform.alert.min_preparedness.activity;
 import android.content.ActivityNotFoundException;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -12,36 +10,24 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 
 import org.alertpreparedness.platform.alert.R;
@@ -51,16 +37,8 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseStorageRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.DocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
-import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
-import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
-import org.alertpreparedness.platform.alert.dashboard.adapter.AlertFieldsAdapter;
-import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
-import org.alertpreparedness.platform.alert.min_preparedness.adapter.AttachmentAdapter;
-import org.alertpreparedness.platform.alert.min_preparedness.fragment.MinPreparednessFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.helper.FileUtils;
-import org.alertpreparedness.platform.alert.min_preparedness.helper.RealPathUtil;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.min_preparedness.model.FileInfo;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Notes;
 import org.alertpreparedness.platform.alert.model.User;
@@ -68,23 +46,20 @@ import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SimpleAdapter;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
-import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.whalemare.sheetmenu.SheetMenu;
-import timber.log.Timber;
 
 public class CompleteActionActivity extends AppCompatActivity implements SimpleAdapter.RemoveListener, View.OnClickListener {
 
+    public static final String REQUIRE_DOC = "require_doc";
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
@@ -131,6 +106,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     private StorageReference riversRef;
 
     SimpleAdapter simpleAdapter;
+    private boolean needsDoc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,6 +126,8 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
 
         addAttachments.setOnClickListener(this);
 
+        needsDoc = getIntent().getBooleanExtra(REQUIRE_DOC, true);
+
         initView();
 
     }
@@ -161,6 +139,9 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setAdapter(simpleAdapter);
+        if(!needsDoc) {
+            addAttachments.setText(R.string.add_attachment_not_required);
+        }
     }
 
     @Override
@@ -190,24 +171,21 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     }
 
     public void bottomSheet() {
-        SheetMenu.with(this).setTitle("Add attachment").setMenu(R.menu.menu_add_attachment).setClick(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.take_photo:
-                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        startActivityForResult(intent, 0);
-                        break;
-                    case R.id.take_video:
-                        intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-                        startActivityForResult(intent, VIDEO_REQUEST_CODE);
-                        break;
-                    case R.id.select_file:
-                        showFileChooser();
-                        break;
-                }
-                return false;
+        SheetMenu.with(this).setTitle("Add attachment").setMenu(R.menu.menu_add_attachment).setClick(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.take_photo:
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(intent, 0);
+                    break;
+                case R.id.take_video:
+                    intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                    startActivityForResult(intent, VIDEO_REQUEST_CODE);
+                    break;
+                case R.id.select_file:
+                    showFileChooser();
+                    break;
             }
+            return false;
         }).show();
     }
 
@@ -295,10 +273,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
         Intent intent = getIntent();
         String key = intent.getStringExtra("ACTION_KEY");
         String userTypeID = intent.getStringExtra("USER_KEY");
-        System.out.println("userTypeID = " + userTypeID);
         saveNote(texts, key, userTypeID);
-        System.out.println("imgList.size() = " + imgList.size());
-        System.out.println("imgList = " + imgList);
 
         for (int i = 0; i < imgList.size(); i++) {
 
@@ -323,8 +298,6 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
             System.out.println("ref = " + ref);
 
 
-            System.out.println("riversRef = " + riversRef);
-            System.out.println("saveimgList = " + imgList);
             riversRef.putFile(Uri.parse("file://" + pathList.get(i)))
                     .addOnSuccessListener(taskSnapshot -> {
 
@@ -362,13 +335,16 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
             if(userTypeID.equals(user.getCountryID())) {
                 dbActionRef.child(key).child("isComplete").setValue(true);
                 dbActionRef.child(key).child("isCompleteAt").setValue(millis);
-            }else if (userTypeID.equals(user.getNetworkID())) {
+            }
+            else if (userTypeID.equals(user.getNetworkID())) {
                 dbActionBaseRef.child(user.getNetworkID()).child(key).child("isComplete").setValue(true);
                 dbActionBaseRef.child(user.getNetworkID()).child(key).child("isCompleteAt").setValue(millis);
-            }else if (userTypeID.equals(user.getNetworkCountryID())){
+            }
+            else if (userTypeID.equals(user.getNetworkCountryID())){
                 dbActionBaseRef.child(user.getNetworkCountryID()).child(key).child("isComplete").setValue(true);
                 dbActionBaseRef.child(user.getNetworkCountryID()).child(key).child("isCompleteAt").setValue(millis);
-            }else if (userTypeID.equals(user.getLocalNetworkID())){
+            }
+            else if (userTypeID.equals(user.getLocalNetworkID())){
                 dbActionBaseRef.child(user.getLocalNetworkID()).child(key).child("isComplete").setValue(true);
                 dbActionBaseRef.child(user.getLocalNetworkID()).child(key).child("isCompleteAt").setValue(millis);
             }
@@ -415,6 +391,10 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
 
         if (TextUtils.isEmpty(notes)) {
             SnackbarHelper.show(this, getString(R.string.txt_err_complete_action_note));
+            return;
+        }
+        if(needsDoc && pathList.size() == 0) {
+            SnackbarHelper.show(this, getString(R.string.attachment_required_error));
             return;
         }
         saveData(notes);

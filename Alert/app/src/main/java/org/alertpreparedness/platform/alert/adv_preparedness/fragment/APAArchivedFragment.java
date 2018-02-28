@@ -43,6 +43,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import javax.inject.Inject;
 
@@ -54,7 +55,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAArchivedFragment extends BaseArchivedFragment implements APActionAdapter.ItemSelectedListener {
+public class APAArchivedFragment extends BaseArchivedFragment implements APActionAdapter.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
 
     public APAArchivedFragment() {
         // Required empty public constructor
@@ -99,7 +100,7 @@ public class APAArchivedFragment extends BaseArchivedFragment implements APActio
         assert imgActionArchived != null;
         imgActionArchived.setImageResource(R.drawable.ic_close_round_gray);
         assert tvActionArchived != null;
-        tvActionArchived.setText(R.string.archived);
+        tvActionArchived.setText(R.string.archived_title);
         tvActionArchived.setTextColor(getResources().getColor(R.color.alertGray));
         mAPAdapter = new APActionAdapter(getContext(), dbActionRef, this);
         assert mAdvActionRV != null;
@@ -109,14 +110,10 @@ public class APAArchivedFragment extends BaseArchivedFragment implements APActio
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
+        new NetworkFetcher(this).fetch();
 
-        for (String id : ids) {
-            if(id != null) {
-                dbActionBaseRef.child(id).addChildEventListener(new ArchivedChildListener(id));
-            }
+        dbActionBaseRef.child(user.countryID).addChildEventListener(new ArchivedChildListener(user.countryID));
 
-        }
         handleAdvFab();
     }
 
@@ -144,10 +141,10 @@ public class APAArchivedFragment extends BaseArchivedFragment implements APActio
     public void onActionItemSelected(int pos, String key) {
         SheetMenu.with(getContext()).setMenu(R.menu.menu_archived).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
-                case R.id.reactive_action:
-                    //TODO
-                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reactivate Clicked", Snackbar.LENGTH_LONG).show();
-                    break;
+//                case R.id.reactive_action:
+//                    //TODO
+//                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reactivate Clicked", Snackbar.LENGTH_LONG).show();
+//                    break;
                 case R.id.action_notes:
                     Intent intent2 = new Intent(getActivity(), AddNotesActivity.class);
                     intent2.putExtra(AddNotesActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
@@ -163,6 +160,15 @@ public class APAArchivedFragment extends BaseArchivedFragment implements APActio
             }
             return false;
         }).show();
+    }
+
+    @Override
+    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
+        for (String id : networkFetcherResult.all()) {
+            if(id != null) {
+                dbActionBaseRef.child(id).addChildEventListener(new ArchivedChildListener(id));
+            }
+        }
     }
 }
 

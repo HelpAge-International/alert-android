@@ -14,6 +14,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.realm.internal.Util;
+
 public class NetworkFetcher implements ValueEventListener {
 
     @Inject
@@ -33,7 +35,6 @@ public class NetworkFetcher implements ValueEventListener {
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        System.out.println("NetworkFetcherdataSnapshot = " + dataSnapshot.getRef());
         //noinspection unchecked
         HashMap<String, Boolean> localNetworks = dataSnapshot.child("localNetworks").exists() ? (HashMap<String, Boolean>) dataSnapshot.child("localNetworks").getValue() : new HashMap<>();
 
@@ -78,6 +79,10 @@ public class NetworkFetcher implements ValueEventListener {
             this.localNetworks = localNetworks;
             this.globalNetworks = globalNetworks;
             this.networksCountries = networksCountries;
+        }
+
+        public  List<String> all() {
+            return AppUtils.smartCombine(AppUtils.smartCombine(localNetworks, globalNetworks), networksCountries);
         }
 
         public List<String> getLocalNetworks() {

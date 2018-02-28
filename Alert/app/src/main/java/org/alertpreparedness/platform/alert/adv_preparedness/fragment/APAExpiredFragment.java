@@ -41,6 +41,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseExpire
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import java.io.StringReader;
 import java.text.ParseException;
@@ -49,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -61,9 +63,10 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAExpiredFragment extends BaseExpiredFragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener {
+public class APAExpiredFragment extends BaseExpiredFragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
 
     private String actionID;
+    private List<String> networkIds;
 
     public APAExpiredFragment() {
         // Required empty public constructor
@@ -114,9 +117,7 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
     private int freqBase = 0;
     private int freqValue = 0;
 
-    private AgencyListener agencyListener = new AgencyListener();
     private AlertListener alertListener = new AlertListener();
-    private NetworkListener networkListener = new NetworkListener();
     private ArrayList<Integer> alertHazardTypes = new ArrayList<>();
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
 
@@ -148,7 +149,8 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        networkRef.addValueEventListener(networkListener);
+        new NetworkFetcher(this).fetch();
+
         handleAdvFab();
     }
 
@@ -242,41 +244,12 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
     }
     //endregion
 
-    private class NetworkListener implements ValueEventListener {
-
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            onNetworkRetrieved(dataSnapshot);
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    }
-
-    private void onNetworkRetrieved(DataSnapshot snapshot) {
-        agencyRef.addListenerForSingleValueEvent(agencyListener);
+    @Override
+    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
+        this.networkIds = networkFetcherResult.all();
         alertRef.addValueEventListener(alertListener);
-    }
-
-    private class AgencyListener implements ValueEventListener {
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            HashMap<String, Boolean> networks = (HashMap<String, Boolean>) dataSnapshot.child("networks").getValue();
-
-            if (networks != null) {
-                for (String id : networks.keySet()) {
-                    DatabaseReference ref = baseAlertRef.child(id);
-                    ref.addValueEventListener(alertListener);
-                }
-            }
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
+        for (String id : networkFetcherResult.all()) {
+            baseAlertRef.child(id).addValueEventListener(alertListener);
         }
     }
 
@@ -310,14 +283,13 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
                 dbActionRef.removeEventListener(this);
             }
             catch (Exception e) {}
-            ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
 
-            for (String id : ids) {
+            for (String id : networkIds) {
                 if(id != null) {
                     dbActionBaseRef.child(id).addChildEventListener(new ExpiredChildListener(id));
                 }
-
             }
+            dbActionBaseRef.child(user.countryID).addChildEventListener(new ExpiredChildListener(user.countryID));
         }
 
         @Override

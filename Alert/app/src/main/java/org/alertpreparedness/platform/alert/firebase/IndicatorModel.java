@@ -10,6 +10,7 @@ public class IndicatorModel {
     private String name;
     private Long triggerSelected;
     private Long dueDate;
+    private String hazardId;
 
     public IndicatorModel() {
 
@@ -55,5 +56,13 @@ public class IndicatorModel {
 
     public void setDueDate(Long dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public void setHazardId(String hazardId) {
+        this.hazardId = hazardId;
+    }
+
+    public String getHazardId() {
+        return hazardId;
     }
 }

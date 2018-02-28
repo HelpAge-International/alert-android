@@ -17,6 +17,11 @@ public class SynchronizedCounter {
         notifyListeners();
     }
 
+    public synchronized void increment(int amount) {
+        c += amount;
+        notifyListeners();
+    }
+
     public synchronized void decrement() {
         c--;
         notifyListeners();

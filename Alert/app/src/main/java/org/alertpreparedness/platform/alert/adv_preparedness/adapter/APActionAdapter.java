@@ -21,11 +21,13 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertFieldsAdapter;
 import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
 import org.alertpreparedness.platform.alert.dashboard.model.Alert;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
 import java.text.SimpleDateFormat;
@@ -233,7 +235,9 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 //        System.out.println("apaactiondataSnapshot = " + dataSnapshot.getRef());
-        Action action = dataSnapshot.getValue(Action.class);
+        Action action = AppUtils.getValueFromDataSnapshot(dataSnapshot, Action.class);
+        System.out.println("ActiondataSnapshot = " + dataSnapshot.getRef());
+//        Action action = dataSnapshot.getValue(Action.class);
         assert action != null;
         if(dataSnapshot.child("frequencyValue").exists()) {
             action.setFrequencyValue(Integer.valueOf(dataSnapshot.child("frequencyValue").getValue().toString()));
@@ -254,17 +258,21 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
         Action action = dataSnapshot.getValue(Action.class);
         assert action != null;
-        action.setFrequencyValue(Integer.valueOf(dataSnapshot.child("frequencyValue").getValue().toString()));
+        if(dataSnapshot.child("frequencyValue").exists()) {
+            action.setFrequencyValue(Integer.valueOf(dataSnapshot.child("frequencyValue").getValue().toString()));
+        }
         if (keys.indexOf(dataSnapshot.getKey()) == -1) {
             if (action.getComplete() != null && action.getComplete() && action.getDueDate() != null) {
                 keys.add(dataSnapshot.getKey());
                 items.put(dataSnapshot.getKey(), action);
                 notifyItemInserted(keys.size() - 1);
             }
-        } else {
+        }
+        else {
             items.put(dataSnapshot.getKey(), action);
             notifyItemChanged(keys.indexOf(dataSnapshot.getKey()));
         }
+
     }
 
     @Override

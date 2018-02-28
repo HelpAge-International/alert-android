@@ -14,13 +14,15 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseNetworkCountryRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseNetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.LocalNetworkRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.NetworkCountryRef;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.ClockSetting;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.internal.Utils;
 import timber.log.Timber;
 
 public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetcherListener {
@@ -43,16 +46,17 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
     public DatabaseReference baseActionRef;
 
     @Inject
+    @BaseNetworkCountryRef
+    public DatabaseReference baseNetworkCountryRef;
+
+    @Inject
+    @BaseNetworkRef
+    public DatabaseReference baseNetworkRef;
+
+    @Inject
     @CountryOfficeRef
     public DatabaseReference countryOfficeRef;
 
-    @Inject
-    @LocalNetworkRef
-    public DatabaseReference localNetworkRef;
-
-    @Inject
-    @NetworkCountryRef
-    public DatabaseReference networkCountryRef;
 
     public static final String BUNDLE_ACTION_ID = "ActionId";
     public static final String BUNDLE_GROUP_ID = "GroupId";
@@ -119,13 +123,13 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
             ClockSetting clockSetting = null;
             switch (model.getActionType()) {
                 case NETWORK_COUNTRY:
-                    clockSetting = actionFetcherResult.getNetworkCountryClockSettings();
+                    clockSetting = actionFetcherResult.getNetworkCountryClockSettings(model.getGroupId());
                     break;
                 case LOCAL_NETWORK:
-                    clockSetting = actionFetcherResult.getLocalNetworkClockSettings();
+                    clockSetting = actionFetcherResult.getLocalNetworkClockSettings(model.getGroupId());
                     break;
                 case COUNTRY:
-                    clockSetting = actionFetcherResult.getCountryClockSettings();
+                    clockSetting = actionFetcherResult.getCountryClockSettings(model.getGroupId());
                     Timber.d("ClockSetting: " + clockSetting.getValue() + " - " + clockSetting.getDurationType());
                     break;
             }
@@ -134,36 +138,46 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
         Timber.d("Scheduled Notifications: " + actionFetcherResult.getModels().size());
     }
     public void scheduleNotification(Context context, ActionModel actionModel, String groupId, String actionId) {
-        DatabaseReference dbRef = null;
-        if(actionId.equals(user.getNetworkCountryID())){
-            dbRef = networkCountryRef;
-        }
-        else if(actionId.equals(user.getLocalNetworkID())){
-            dbRef = localNetworkRef;
-        }
-        else if(actionId.equals(user.getCountryID())){
-            dbRef = countryOfficeRef;
-        }
 
-        if(dbRef != null){
-            dbRef = dbRef.child("clockSettings").child("preparedness");
-            DatabaseReference finalDbRef = dbRef;
-            dbRef.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    finalDbRef.removeEventListener(this);
-                    scheduleNotification(context, actionModel, groupId, actionId, dataSnapshot.getValue(ClockSetting.class));
+        new NetworkFetcher(networkFetcherResult -> {
+            List<DatabaseReference> dbRefs = new ArrayList<>();
+            if(networkFetcherResult.getLocalNetworks().contains(groupId)){
+                dbRefs.add(baseNetworkRef.child(groupId));
+            }
+            else if(networkFetcherResult.getNetworksCountries().contains(groupId)){
+                for(String globalNetworkId : networkFetcherResult.getGlobalNetworks()){
+                    dbRefs.add(baseNetworkCountryRef.child(globalNetworkId).child(groupId));
                 }
+            }
+            else if(groupId.equals(user.getCountryID())){
+                dbRefs.add(countryOfficeRef);
+            }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Timber.e("Failed to fetch clock settings");
+            if(dbRefs.size() != 0){
+                for(final DatabaseReference dbRef : dbRefs) {
+
+                    dbRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.exists()) {
+                                dbRef.removeEventListener(this);
+                                ClockSetting clockSetting = AppUtils.getValueFromDataSnapshot(dataSnapshot.child("clockSettings").child("preparedness"), ClockSetting.class);
+                                scheduleNotification(context, actionModel, groupId, actionId, clockSetting);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Timber.e("Failed to fetch clock settings");
+                        }
+                    });
                 }
-            });
-        }
-        else {
-            scheduleNotification(context, actionModel, groupId, actionId, null);
-        }
+            }
+            else {
+                scheduleNotification(context, actionModel, groupId, actionId, null);
+            }
+
+        }).fetch();
     }
     public void scheduleNotification(Context context, ActionModel actionModel, String groupId, String actionId, ClockSetting clockSettings) {
         FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(context));

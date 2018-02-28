@@ -12,10 +12,7 @@ import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
 import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder
 import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder
 import de.hdodenhof.circleimageview.CircleImageView
-import org.alertpreparedness.platform.alert.AlertApplication
-import org.alertpreparedness.platform.alert.R
-import org.alertpreparedness.platform.alert.getCountryImage
-import org.alertpreparedness.platform.alert.getHazardImg
+import org.alertpreparedness.platform.alert.*
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.alert.utils.Constants
 import org.jetbrains.anko.find
@@ -66,65 +63,73 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener,
     private val indicatorNetworkId: TextView = itemView.find(R.id.tvIndicatorNetworkName)
     private val mListener = listener
     private val mNetworkMap = networkCountryMap
+    private val container: LinearLayout = itemView.find(R.id.container)
+    private val emptyMessage: TextView = itemView.find(R.id.empty_message)
+
 
     init {
         indicatorLayout.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
     fun onBind(indicator: ModelIndicator) {
-        indicatorTitle.text = indicator.name
-        if (indicator.geoLocation != -1) {
-            indicatorGeo.text = Constants.INDICATOR_GEO_LOCATION[indicator.geoLocation]
-        }
-        val dateTime = DateTime(indicator.dueDate)
-        indicatorDue.text = String.format("%s %s %s", dateTime.dayOfMonth().asText, dateTime.monthOfYear().asShortText, dateTime.year().asText)
-        if (indicator.networkName != null) {
-            indicatorNetworkId.text = indicator.networkName
-            indicatorNetworkId.visibility = View.VISIBLE
-        } else {
-            indicatorNetworkId.visibility = View.GONE
-        }
+        container.visibility = View.VISIBLE
+        emptyMessage.visibility = View.GONE
+        if (indicator.modelType == HAZARD_NOT_EMPTY) {
+            indicatorTitle.text = indicator.name
+            if (indicator.geoLocation != -1) {
+                indicatorGeo.text = Constants.INDICATOR_GEO_LOCATION[indicator.geoLocation]
+            }
+            val dateTime = DateTime(indicator.dueDate)
+            indicatorDue.text = String.format("%s %s %s", dateTime.dayOfMonth().asText, dateTime.monthOfYear().asShortText, dateTime.year().asText)
+            if (indicator.networkName != null) {
+                indicatorNetworkId.text = indicator.networkName
+                indicatorNetworkId.visibility = View.VISIBLE
+            } else {
+                indicatorNetworkId.visibility = View.GONE
+            }
 
-        when (indicator.triggerSelected) {
-            Constants.TRIGGER_GREEN -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_green, context.theme)
+            when (indicator.triggerSelected) {
+                Constants.TRIGGER_GREEN -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_green, context.theme)
+                    } else {
+                        indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_green)
+                    }
+                    indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_GREEN]
+                    indicatorNextUpdate.textColor = context.resources.getColor(R.color.alertGreen)
+                    indicatorDue.textColor = context.resources.getColor(R.color.alertGreen)
                 }
-                else {
-                    indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_green)
+                Constants.TRIGGER_AMBER -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_amber, context.theme)
+                    } else {
+                        indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_amber)
+                    }
+                    indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_AMBER]
+                    indicatorNextUpdate.textColor = context.resources.getColor(R.color.alertAmber)
+                    indicatorDue.textColor = context.resources.getColor(R.color.alertAmber)
                 }
-                indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_GREEN]
-                indicatorNextUpdate.textColor = context.resources.getColor(R.color.alertGreen)
-                indicatorDue.textColor = context.resources.getColor(R.color.alertGreen)
+                else -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_red, context.theme)
+                    } else {
+                        indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_red)
+                    }
+                    indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_RED]
+                    indicatorNextUpdate.textColor = context.resources.getColor(R.color.alertRed)
+                    indicatorDue.textColor = context.resources.getColor(R.color.alertRed)
+                }
             }
-            Constants.TRIGGER_AMBER -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_amber, context.theme)
-                }
-                else {
-                    indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_amber)
-                }
-                indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_AMBER]
-                indicatorNextUpdate.textColor = context.resources.getColor(R.color.alertAmber)
-                indicatorDue.textColor = context.resources.getColor(R.color.alertAmber)
-            }
-            else -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_red, context.theme)
-                }
-                else {
-                    indicatorLevel.background = context.resources.getDrawable(R.drawable.indicator_red)
-                }
-                indicatorLevel.text = Constants.TRIGGER_LEVEL[Constants.TRIGGER_RED]
-                indicatorNextUpdate.textColor = context.resources.getColor(R.color.alertRed)
-                indicatorDue.textColor = context.resources.getColor(R.color.alertRed)
+            indicatorLevel.setOnClickListener {
+                //            Timber.d("hazardId: %s, indicatorId: %s", indicator.hazardScenario.key?:"", indicator.id)
+                Timber.d("indicator model: %s", indicator)
+                //            Timber.d("map: %s", mNetworkMap.toString())
+                indicator.hazardScenario.key?.let { it1 -> indicator.id?.let { it2 -> mListener.selectedIndicator(if (it1 == "countryContext" && indicator.networkId != null && mNetworkMap != null) mNetworkMap[indicator.networkId]!! else it1, it2, if (indicator.networkId != null) indicator.networkId else null, if (indicator.networkId != null && mNetworkMap != null && mNetworkMap.containsKey(indicator.networkId)) mNetworkMap[indicator.networkId] else null) } }
             }
         }
-        indicatorLevel.setOnClickListener {
-//            Timber.d("hazardId: %s, indicatorId: %s", indicator.hazardScenario.key?:"", indicator.id)
-            Timber.d("indicator model: %s", indicator)
-//            Timber.d("map: %s", mNetworkMap.toString())
-            indicator.hazardScenario.key?.let { it1 -> indicator.id?.let { it2 -> mListener.selectedIndicator(if (it1 == "countryContext" && indicator.networkId != null && mNetworkMap != null) mNetworkMap[indicator.networkId]!! else it1, it2, if (indicator.networkId != null) indicator.networkId else null, if (indicator.networkId != null && mNetworkMap != null && mNetworkMap.containsKey(indicator.networkId)) mNetworkMap[indicator.networkId] else null) } }
+        else {
+            container.visibility = View.GONE
+            emptyMessage.visibility = View.VISIBLE
         }
     }
 }
@@ -147,8 +152,8 @@ class HazardAdapter(groups: List<ExpandableGroup<ModelIndicator>>, countryLocati
 
     override fun onBindChildViewHolder(holder: IndicatorViewHolder?, flatPosition: Int, group: ExpandableGroup<*>?, childIndex: Int) {
         val indicator: ModelIndicator = group?.items?.get(childIndex) as ModelIndicator
-//        println("holder = [${holder}], flatPosition = [${flatPosition}], group = [${group}], childIndex = [${childIndex}]")
-            holder?.onBind(indicator)
+
+        holder?.onBind(indicator)
     }
 
     override fun onCreateGroupViewHolder(parent: ViewGroup?, viewType: Int): HazardViewHolder {

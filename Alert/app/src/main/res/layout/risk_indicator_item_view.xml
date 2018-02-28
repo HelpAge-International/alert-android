@@ -7,85 +7,102 @@
               android:orientation="vertical"
               android:padding="10dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/tvIndicatorGeo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
-            android:textColor="@color/grey_title"
-            android:textSize="12sp"
-            tools:text="National indicator"/>
-
-        <TextView
-            android:id="@+id/tvIndicatorNetworkName"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
-            android:gravity="end"
-            android:textColor="@color/grey_title"
-            android:textSize="12sp"
-            android:visibility="gone"
-            tools:text="Network Name"/>
-    </LinearLayout>
-
     <TextView
-        android:id="@+id/tvIndicatorName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
+        android:layout_margin="@dimen/activity_vertical_margin"
         android:textColor="@android:color/black"
-        android:textSize="13sp"
-        tools:text="Trends in manufaction"/>
+        android:visibility="gone"
+        android:id="@+id/empty_message"
+        android:text="@string/no_indicators"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <LinearLayout
+        android:id="@+id/container"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/tvIndicatorLevel"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/indicator_green"
-            android:gravity="center_vertical"
-            android:padding="10dp"
-            android:textColor="@android:color/white"
-            android:textSize="13sp"
-            tools:text="Potential challenges n risk"/>
+        android:layout_height="wrap_content">
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="20dp"
-            android:layout_marginStart="20dp"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/tvIndicatorNextUpdate"
+                android:id="@+id/tvIndicatorGeo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/next_update"
-                android:textColor="@color/alertGreen"
-                android:textSize="12sp"/>
-
-            <TextView
-                android:id="@+id/tvIndicatorDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/alertGreen"
+                android:layout_marginBottom="2dp"
+                android:textColor="@color/grey_title"
                 android:textSize="12sp"
-                tools:text="09 Nov 2017"/>
+                tools:text="National indicator"/>
 
+            <TextView
+                android:id="@+id/tvIndicatorNetworkName"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:gravity="end"
+                android:textColor="@color/grey_title"
+                android:textSize="12sp"
+                android:visibility="gone"
+                tools:text="Network Name"/>
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/tvIndicatorName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:textColor="@android:color/black"
+            android:textSize="13sp"
+            tools:text="Trends in manufaction"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvIndicatorLevel"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/indicator_green"
+                android:gravity="center_vertical"
+                android:padding="10dp"
+                android:textColor="@android:color/white"
+                android:textSize="13sp"
+                tools:text="Potential challenges n risk"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvIndicatorNextUpdate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/next_update"
+                    android:textColor="@color/alertGreen"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/tvIndicatorDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/alertGreen"
+                    android:textSize="12sp"
+                    tools:text="09 Nov 2017"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
     </LinearLayout>
+
 
 </LinearLayout>

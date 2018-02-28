@@ -7,17 +7,20 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseNetworkCountryRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseNetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.LocalNetworkRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.NetworkCountryRef;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.ClockSetting;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 import org.alertpreparedness.platform.alert.utils.SynchronizedCounter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -39,12 +42,13 @@ public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterLis
     public DatabaseReference countryOfficeRef;
 
     @Inject
-    @LocalNetworkRef
-    public DatabaseReference localNetworkRef;
+    @BaseNetworkCountryRef
+    public DatabaseReference baseNetworkCountryRef;
 
     @Inject
-    @NetworkCountryRef
-    public DatabaseReference networkCountryRef;
+    @BaseNetworkRef
+    public DatabaseReference baseNetworkRef;
+
 
     private boolean failed = false;
 
@@ -70,26 +74,36 @@ public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterLis
         actionFetcherResult = new ActionFetcherResult();
 
         actionCounter = new SynchronizedCounter(
-                    (country ? 2 : 0) +
-                        (networkCountry ? 2 : 0) +
-                        (localNetwork ? 2 : 0)
+                (country ? 2 : 0) + ((networkCountry || localNetwork) ? 1 : 0)
+
         );
         actionCounter.addListener(this);
 
         if(country) {
             baseActionRef.child(user.getCountryID()).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ActionListener(baseActionRef, ActionType.COUNTRY, user.getCountryID(), actionFetcherResult, actionCounter));
-            countryOfficeRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(countryOfficeRef, ActionType.COUNTRY, actionFetcherResult, actionCounter));
+            countryOfficeRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(countryOfficeRef, user.getCountryID(), ActionType.COUNTRY, actionFetcherResult, actionCounter));
         }
 
-        if(networkCountry) {
-            baseActionRef.child(user.getNetworkCountryID()).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ActionListener(baseActionRef, ActionType.NETWORK_COUNTRY, user.getNetworkCountryID(), actionFetcherResult, actionCounter));
-            networkCountryRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(networkCountryRef, ActionType.NETWORK_COUNTRY, actionFetcherResult, actionCounter));
-        }
+        new NetworkFetcher(networkFetcherResult -> {
+            if(networkCountry) {
+                actionCounter.increment(networkFetcherResult.getNetworksCountries().size() * 2);
+                for(String networkCountryId : networkFetcherResult.getNetworksCountries()) {
+                    baseActionRef.child(networkCountryId).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ActionListener(baseActionRef, ActionType.NETWORK_COUNTRY, networkCountryId, actionFetcherResult, actionCounter));
+                    baseNetworkCountryRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(countryOfficeRef, networkCountryId, ActionType.COUNTRY, actionFetcherResult, actionCounter));
+                }
+            }
 
-        if(localNetwork) {
-            baseActionRef.child(user.getLocalNetworkID()).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ActionListener(baseActionRef, ActionType.LOCAL_NETWORK, user.getLocalNetworkID(), actionFetcherResult, actionCounter));
-            localNetworkRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(localNetworkRef, ActionType.LOCAL_NETWORK, actionFetcherResult, actionCounter));
-        }
+            if(localNetwork) {
+                actionCounter.increment(networkFetcherResult.getLocalNetworks().size() * 2);
+                for(String localNetworkId : networkFetcherResult.getLocalNetworks()) {
+                    baseActionRef.child(localNetworkId).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ActionListener(baseActionRef, ActionType.LOCAL_NETWORK, localNetworkId, actionFetcherResult, actionCounter));
+                    baseNetworkRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(countryOfficeRef, localNetworkId, ActionType.LOCAL_NETWORK, actionFetcherResult, actionCounter));
+                }
+            }
+
+            actionCounter.decrement();
+        }).fetch();
+
     }
 
     @Override
@@ -107,8 +121,6 @@ public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterLis
         void actionFetchSuccess(ActionFetcherResult actionFetcherResult);
         void actionFetchFail();
     }
-
-
 
     private class ActionListener implements ValueEventListener {
         private final String groupId;
@@ -154,9 +166,9 @@ public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterLis
 
     public class ActionFetcherResult{
         private List<ActionFetcherModel> models = new ArrayList<>();
-        private ClockSetting networkCountryClockSettings;
-        private ClockSetting localNetworkClockSettings;
-        private ClockSetting countryClockSettings;
+        private Map<String, ClockSetting> networkCountryClockSettings = new HashMap<>();
+        private Map<String, ClockSetting> localNetworkClockSettings = new HashMap<>();
+        private Map<String, ClockSetting> countryClockSettings = new HashMap<>();
 
         public List<ActionFetcherModel> getModels() {
             return models;
@@ -166,28 +178,28 @@ public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterLis
             this.models = models;
         }
 
-        public ClockSetting getNetworkCountryClockSettings() {
-            return networkCountryClockSettings;
+        public ClockSetting getNetworkCountryClockSettings(String id) {
+            return networkCountryClockSettings.get(id);
         }
 
-        public void setNetworkCountryClockSettings(ClockSetting networkCountryClockSettings) {
-            this.networkCountryClockSettings = networkCountryClockSettings;
+        public void setNetworkCountryClockSettings(String id, ClockSetting networkCountryClockSettings) {
+            this.networkCountryClockSettings.put(id, networkCountryClockSettings);
         }
 
-        public ClockSetting getLocalNetworkClockSettings() {
-            return localNetworkClockSettings;
+        public ClockSetting getLocalNetworkClockSettings(String id) {
+            return localNetworkClockSettings.get(id);
         }
 
-        public void setLocalNetworkClockSettings(ClockSetting localNetworkClockSettings) {
-            this.localNetworkClockSettings = localNetworkClockSettings;
+        public void setLocalNetworkClockSettings(String id, ClockSetting localNetworkClockSettings) {
+            this.localNetworkClockSettings.put(id, localNetworkClockSettings);
         }
 
-        public ClockSetting getCountryClockSettings() {
-            return countryClockSettings;
+        public ClockSetting getCountryClockSettings(String id) {
+            return countryClockSettings.get(id);
         }
 
-        public void setCountryClockSettings(ClockSetting countryClockSettings) {
-            this.countryClockSettings = countryClockSettings;
+        public void setCountryClockSettings(String id, ClockSetting countryClockSettings) {
+            this.countryClockSettings.put(id, countryClockSettings);
         }
     }
 
@@ -226,12 +238,14 @@ public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterLis
         private final ActionFetcherResult actionFetcherResult;
         private final SynchronizedCounter actionCounter;
         private final DatabaseReference dbRef;
+        private final String id;
 
-        public ClockSettingsListener(DatabaseReference dbRef, ActionType actionType, ActionFetcherResult actionFetcherResult, SynchronizedCounter actionCounter) {
+        public ClockSettingsListener(DatabaseReference dbRef, String id, ActionType actionType, ActionFetcherResult actionFetcherResult, SynchronizedCounter actionCounter) {
             this.actionType = actionType;
             this.actionFetcherResult = actionFetcherResult;
             this.actionCounter = actionCounter;
             this.dbRef = dbRef;
+            this.id = id;
         }
 
         @Override
@@ -242,13 +256,13 @@ public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterLis
             switch (actionType) {
 
                 case NETWORK_COUNTRY:
-                    actionFetcherResult.setNetworkCountryClockSettings(clockSetting);
+                    actionFetcherResult.setNetworkCountryClockSettings(id, clockSetting);
                     break;
                 case LOCAL_NETWORK:
-                    actionFetcherResult.setLocalNetworkClockSettings(clockSetting);
+                    actionFetcherResult.setLocalNetworkClockSettings(id, clockSetting);
                     break;
                 case COUNTRY:
-                    actionFetcherResult.setCountryClockSettings(clockSetting);
+                    actionFetcherResult.setCountryClockSettings(id, clockSetting);
                     break;
             }
 

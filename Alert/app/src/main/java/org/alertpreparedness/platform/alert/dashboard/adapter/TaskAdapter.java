@@ -13,17 +13,12 @@ import android.widget.TextView;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
-import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
-import org.alertpreparedness.platform.alert.dashboard.model.Tasks;
-import org.alertpreparedness.platform.alert.firebase.ActionModel;
+import org.alertpreparedness.platform.alert.dashboard.model.Task;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,20 +26,24 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import butterknife.OnClick;
+
 /**
  * Created by faizmohideen on 13/11/2017.
  */
 
-public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> implements Comparable<Tasks> {
-    private HashMap<String, Tasks> items = new HashMap<>();
+public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> implements Comparable<Task> {
+    private HashMap<String, Task> items = new HashMap<>();
     private String dateFormat = "MMM dd,yyyy";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
     private List<String> keys = new ArrayList<>();
 
     @Inject
     User user;
+    private TaskSelectListener listener;
 
-    public TaskAdapter() {
+    public TaskAdapter(TaskSelectListener listener) {
+        this.listener = listener;
         DependencyInjector.applicationComponent().inject(this);
     }
 
@@ -56,17 +55,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
 
     @Override
     public void onBindViewHolder(TaskAdapter.ViewHolder holder, int position) {
-        Tasks tasks = items.get(keys.get(position));
-        holder.bind(tasks);
+        Task task = items.get(keys.get(position));
+        holder.bind(task);
     }
 
     @Override
-    public int compareTo(@NonNull Tasks tasks) {
-        int dueDate = (int) tasks.getDueDate();
+    public int compareTo(@NonNull Task task) {
+        int dueDate = (int) task.getDueDate();
         return Integer.compare(dueDate, dueDate);
     }
 
-    public void add(String key, Tasks task) {
+    public void add(String key, Task task) {
         items.put(key, task);
         int index = keys.indexOf(key);
         if(index == -1) {
@@ -99,41 +98,42 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
             txt_taskName = (TextView) itemView.findViewById(R.id.task_name);
         }
 
-        private void bind(Tasks tasks) {
-            //System.out.println("tasks.getActionType() = " + tasks.getActionType());
-            if (tasks.getTaskType().equals("action") && DateHelper.isDueToday(tasks.dueDate)) {
-                txt_taskName.setText(tasks.getTaskName());
-                txt_taskStatus.setText(dueTodayString(tasks.getAlertLevel(), "action"));
+        private void bind(Task task) {
+            //System.out.println("task.getActionType() = " + task.getActionType());
+            itemView.setOnClickListener((v) -> listener.onTaskSelected(keys.get(getAdapterPosition()), items.get(keys.get(getAdapterPosition()))));
+            if (task.getTaskType().equals("action") && DateHelper.isDueToday(task.dueDate)) {
+                txt_taskName.setText(task.getTaskName());
+                txt_taskStatus.setText(dueTodayString(task.getAlertLevel(), "action"));
                 img_task.setImageResource(R.drawable.home_task_red);
             }
-            else if (tasks.getTaskType().equals("indicator") && DateHelper.isDueToday(tasks.dueDate)) {
-                txt_taskName.setText(tasks.getTaskName());
-                txt_taskStatus.setText(dueTodayString(tasks.getAlertLevel(), "indicator"));
+            else if (task.getTaskType().equals("indicator") && DateHelper.isDueToday(task.dueDate)) {
+                txt_taskName.setText(task.getTaskName());
+                txt_taskStatus.setText(dueTodayString(task.getAlertLevel(), "indicator"));
                 img_task.setImageResource(R.drawable.home_task_red);
             }
-            else if (tasks.getTaskType().equals("action") && DateHelper.isDueInWeek(tasks.dueDate)) {
-                txt_taskName.setText(tasks.getTaskName());
-                txt_taskStatus.setText(dueWeekString(tasks.getAlertLevel(), "action"));
+            else if (task.getTaskType().equals("action") && DateHelper.isDueInWeek(task.dueDate)) {
+                txt_taskName.setText(task.getTaskName());
+                txt_taskStatus.setText(dueWeekString(task.getAlertLevel(), "action"));
                 img_task.setImageResource(R.drawable.home_task_amber);
             }
-            else if (tasks.getTaskType().equals("indicator") && DateHelper.isDueInWeek(tasks.dueDate)) {
-                txt_taskName.setText(tasks.getTaskName());
-                txt_taskStatus.setText(dueWeekString(tasks.getAlertLevel(), "indicator"));
+            else if (task.getTaskType().equals("indicator") && DateHelper.isDueInWeek(task.dueDate)) {
+                txt_taskName.setText(task.getTaskName());
+                txt_taskStatus.setText(dueWeekString(task.getAlertLevel(), "indicator"));
                 img_task.setImageResource(R.drawable.home_task_amber);
             }
-            else if (tasks.getTaskType().equals("action") && DateHelper.itWasDue(tasks.dueDate)) {
-                txt_taskName.setText(tasks.getTaskName());
-                txt_taskStatus.setText(dueBeforeString(tasks.getAlertLevel(), "action", format.format(new Date(tasks.dueDate))));
+            else if (task.getTaskType().equals("action") && DateHelper.itWasDue(task.dueDate)) {
+                txt_taskName.setText(task.getTaskName());
+                txt_taskStatus.setText(dueBeforeString(task.getAlertLevel(), "action", format.format(new Date(task.dueDate))));
                 img_task.setImageResource(R.drawable.home_task_red);
             }
-            else if (tasks.getTaskType().equals("indicator") && DateHelper.itWasDue(tasks.dueDate)) {
-                txt_taskName.setText(tasks.getTaskName());
-                txt_taskStatus.setText(dueBeforeString(tasks.getAlertLevel(), "indicator", format.format(new Date(tasks.dueDate))));
+            else if (task.getTaskType().equals("indicator") && DateHelper.itWasDue(task.dueDate)) {
+                txt_taskName.setText(task.getTaskName());
+                txt_taskStatus.setText(dueBeforeString(task.getAlertLevel(), "indicator", format.format(new Date(task.dueDate))));
                 img_task.setImageResource(R.drawable.home_task_red);
             }
             else {
-                txt_taskName.setText(tasks.getTaskName());
-                txt_taskStatus.setText(dueBeforeString(tasks.getAlertLevel(), "indicator", format.format(new Date(tasks.dueDate))));
+                txt_taskName.setText(task.getTaskName());
+                txt_taskStatus.setText(dueBeforeString(task.getAlertLevel(), "indicator", format.format(new Date(task.dueDate))));
                 img_task.setImageResource(R.drawable.home_task_blue);
 //                txt_taskName.setVisibility(View.GONE);
 //                txt_taskStatus.setVisibility(View.GONE);
@@ -191,6 +191,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         } else {
             return "A " + getLevelAsString(level)  + " " + type + " was due on" + setBoldText(date);
         }
+    }
+
+    public interface TaskSelectListener {
+        void onTaskSelected(String id, Task task);
     }
 
 }

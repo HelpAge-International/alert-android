@@ -42,14 +42,17 @@ import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
+import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseExpiredFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -61,24 +64,22 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAInactiveFragment extends Fragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener {
+public class APAInactiveFragment extends Fragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
 
     private ArrayList<Integer> alertHazardTypes = new ArrayList<>();
     private String actionID;
+    private List<String> networkIds;
 
     public APAInactiveFragment() {
         // Required empty public constructor
     }
 
-    @Nullable
     @BindView(R.id.rvAdvAction)
     RecyclerView mAdvActionRV;
 
-    @Nullable
     @BindView(R.id.imgStatus)
     ImageView imgActionInactive;
 
-    @Nullable
     @BindView(R.id.tvStatus)
     TextView tvActionInactive;
 
@@ -145,9 +146,7 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
     private Boolean isInProgress = false;
     private int freqBase = 0;
     private int freqValue = 0;
-    private AgencyListener agencyListener = new AgencyListener();
     private AlertListener alertListener = new AlertListener();
-    private NetworkListener networkListener = new NetworkListener();
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
 
 
@@ -179,7 +178,13 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        networkRef.addValueEventListener(networkListener);
+        new NetworkFetcher(this).fetch();
+
+        handleFab();
+
+    }
+
+    private void handleFab() {
         AdvPreparednessFragment xFragment = null;
         for(Fragment fragment : getFragmentManager().getFragments()){
             if(fragment instanceof AdvPreparednessFragment){
@@ -197,11 +202,6 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
                     if (dy > 0 && fab.isShown()) {
                         fab.hide();
                     }
-//                    else if (!fab.isShown() && dy <= 0) {
-//                        fab.show();
-//                    }
-                    System.out.println("dy = " + dy);
-
                 }
 
                 @Override
@@ -213,7 +213,6 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
                 }
             });
         }
-
     }
 
     protected APActionAdapter getAPAdapter() {
@@ -231,10 +230,10 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
         actionID = key;
         SheetMenu.with(getContext()).setMenu(R.menu.menu_archived).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
-                case R.id.reactive_action:
-                    //TODO
-                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reactivate Clicked", Snackbar.LENGTH_LONG).show();
-                    break;
+//                case R.id.reactive_action:
+//                    //TODO
+//                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reactivate Clicked", Snackbar.LENGTH_LONG).show();
+//                    break;
                 case R.id.action_notes:
                     Intent intent2 = new Intent(getActivity(), AddNotesActivity.class);
                     intent2.putExtra(AddNotesActivity.PARENT_ACTION_ID, mAPAdapter.getItem(pos).getId());
@@ -440,6 +439,15 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
         mAPAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
+        this.networkIds = networkFetcherResult.all();
+        alertRef.addValueEventListener(alertListener);
+        for (String id : networkFetcherResult.all()) {
+            baseAlertRef.child(id).addValueEventListener(alertListener);
+        }
+    }
+
     private class InactiveAPAListener implements ChildEventListener {
 
         private String id;
@@ -502,46 +510,6 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
 
     }
 
-    private class NetworkListener implements ValueEventListener {
-
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            onNetworkRetrieved(dataSnapshot);
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    }
-
-    private void onNetworkRetrieved(DataSnapshot snapshot) {
-        agencyRef.addListenerForSingleValueEvent(agencyListener);
-        alertRef.addValueEventListener(alertListener);
-    }
-
-    private class AgencyListener implements ValueEventListener {
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            HashMap<String, Boolean> networks = (HashMap<String, Boolean>) dataSnapshot.child("networks").getValue();
-
-            if (networks != null) {
-                for (String id : networks.keySet()) {
-                    System.out.println("networkidid = " + id);
-                    DatabaseReference ref = baseAlertRef.child(id);
-
-                    ref.addValueEventListener(alertListener);
-                }
-            }
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    }
-
     private class AlertListener implements ValueEventListener {
 
         private void process(DataSnapshot dataSnapshot) {
@@ -572,13 +540,13 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
                 dbActionRef.removeEventListener(this);
             }
             catch (Exception e) {}
-            String[] ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
 
-            for (String id : ids) {
+            for (String id : networkIds) {
                 if(id != null) {
                     dbActionBaseRef.child(id).addChildEventListener(new InactiveAPAListener(id));
                 }
             }
+            dbActionBaseRef.child(user.countryID).addChildEventListener(new InactiveAPAListener(user.countryID));
         }
 
         @Override

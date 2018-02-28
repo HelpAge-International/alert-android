@@ -3,7 +3,6 @@ package org.alertpreparedness.platform.alert.adv_preparedness.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,16 +32,16 @@ import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseInProgressFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -54,10 +53,11 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 05/01/2018.
  */
 
-public class APAInProgressFragment extends BaseInProgressFragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener {
+public class APAInProgressFragment extends BaseInProgressFragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
 
     private ArrayList<Integer> alertHazardTypes = new ArrayList<>();
     private String actionID;
+    private List<String> networkIds;
 
     public APAInProgressFragment() {
         // Required empty public constructor
@@ -92,9 +92,7 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
     DatabaseReference baseAlertRef;
 
     private APActionAdapter mAPAdapter;
-    private AgencyListener agencyListener = new AgencyListener();
     private AlertListener alertListener = new AlertListener();
-    private NetworkListener networkListener = new NetworkListener();
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
 
     @Nullable
@@ -119,7 +117,9 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
         mAdvActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
-        networkRef.addValueEventListener(networkListener);
+
+        new NetworkFetcher(this).fetch();
+
         handleAdvFab();
     }
 
@@ -135,6 +135,7 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
             switch (menuItem.getItemId()) {
                 case R.id.complete_action:
                     Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
+                    intent.putExtra(CompleteActionActivity.REQUIRE_DOC, getAdapter().getItem(pos).getRequireDoc());
                     startActivity(intent);
                     break;
                 case R.id.reassign_action:
@@ -181,41 +182,12 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
         return txtNoAction;
     }
 
-    private class NetworkListener implements ValueEventListener {
-
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            onNetworkRetrieved(dataSnapshot);
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    }
-
-    private void onNetworkRetrieved(DataSnapshot snapshot) {
-        agencyRef.addListenerForSingleValueEvent(agencyListener);
+    @Override
+    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
+        this.networkIds = networkFetcherResult.all();
         alertRef.addValueEventListener(alertListener);
-    }
-
-    private class AgencyListener implements ValueEventListener {
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            HashMap<String, Boolean> networks = (HashMap<String, Boolean>) dataSnapshot.child("networks").getValue();
-
-            if (networks != null) {
-                for (String id : networks.keySet()) {
-                    DatabaseReference ref = baseAlertRef.child(id);
-                    ref.addValueEventListener(alertListener);
-                }
-            }
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
+        for (String id : networkFetcherResult.all()) {
+            baseAlertRef.child(id).addValueEventListener(alertListener);
         }
     }
 
@@ -249,14 +221,14 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
                 dbActionRef.removeEventListener(this);
             }
             catch (Exception e) {}
-            ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
 
-            for (String id : ids) {
+            for (String id : networkIds) {
                 if(id != null) {
                     dbActionBaseRef.child(id).addChildEventListener(new InProgressListener(id));
                 }
-
             }
+            dbActionBaseRef.child(user.countryID).addChildEventListener(new InProgressListener(user.countryID));
+
         }
 
         @Override

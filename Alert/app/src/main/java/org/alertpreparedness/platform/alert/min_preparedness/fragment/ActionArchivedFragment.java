@@ -24,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
@@ -32,6 +33,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.adapter.Preparednes
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,7 +43,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionArchivedFragment extends BaseArchivedFragment implements ActionAdapter.ItemSelectedListener {
+public class ActionArchivedFragment extends BaseArchivedFragment implements ActionAdapter.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
 
     @BindView(R.id.rvMinAction)
     RecyclerView mActionRV;
@@ -75,7 +77,7 @@ public class ActionArchivedFragment extends BaseArchivedFragment implements Acti
         assert imgArchived != null;
         imgArchived.setImageResource(R.drawable.ic_close_round_gray);
         assert tvActionArchived != null;
-        tvActionArchived.setText(R.string.archived);
+        tvActionArchived.setText(R.string.archived_title);
         tvActionArchived.setTextColor(getResources().getColor(R.color.alertGray));
 
         mAdapter = new ActionAdapter(getContext(), dbActionRef, this);
@@ -85,15 +87,10 @@ public class ActionArchivedFragment extends BaseArchivedFragment implements Acti
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-//        dbActionRef.addChildEventListener(this);
 
-        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
+        new NetworkFetcher(this).fetch();
 
-        for (String id : ids) {
-            if(id != null) {
-                dbActionBaseRef.child(id).addChildEventListener(new ArchivedChildListener(id));
-            }
-        }
+        dbActionBaseRef.child(user.countryID).addChildEventListener(new ArchivedChildListener(user.countryID));
 
     }
 
@@ -101,10 +98,10 @@ public class ActionArchivedFragment extends BaseArchivedFragment implements Acti
     public void onActionItemSelected(int pos, String key, String userTypeID) {
         SheetMenu.with(getContext()).setMenu(R.menu.menu_archived).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
-                case R.id.reactive_action:
-                    //TODO
-                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reactivate Clicked", Snackbar.LENGTH_LONG).show();
-                    break;
+//                case R.id.reactive_action:
+//                    //TODO
+//                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reactivate Clicked", Snackbar.LENGTH_LONG).show();
+//                    break;
                 case R.id.action_notes:
                     Intent intent2 = new Intent(getActivity(), AddNotesActivity.class);
                     intent2.putExtra(AddNotesActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
@@ -140,5 +137,14 @@ public class ActionArchivedFragment extends BaseArchivedFragment implements Acti
     @Override
     protected TextView getNoActionView() {
         return txtNoAction;
+    }
+
+    @Override
+    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
+        for (String id : networkFetcherResult.all()) {
+            if(id != null) {
+                dbActionBaseRef.child(id).addChildEventListener(new ArchivedChildListener(id));
+            }
+        }
     }
 }

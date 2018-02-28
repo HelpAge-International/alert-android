@@ -30,6 +30,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttach
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -47,7 +48,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionUnassignedFragment extends BaseUnassignedFragment implements UsersListDialogFragment.ItemSelectedListener, ActionAdapter.ItemSelectedListener {
+public class ActionUnassignedFragment extends BaseUnassignedFragment implements UsersListDialogFragment.ItemSelectedListener, ActionAdapter.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
 
     @BindView(R.id.rvMinAction)
     RecyclerView mActionRV;
@@ -97,28 +98,23 @@ public class ActionUnassignedFragment extends BaseUnassignedFragment implements 
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
+        new NetworkFetcher(this).fetch();
 
-        for (String id : ids) {
-            if(id != null) {
-                dbActionBaseRef.child(id).addChildEventListener(new UnassignedChildListener(id));
-                dbActionBaseRef.child(id).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.getValue() == null) {
-                            getCHSForNewUser(id);
-                            getMandatedForNewUser(id);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+        dbActionBaseRef.child(user.countryID).addChildEventListener(new UnassignedChildListener(user.countryID));
+        dbActionBaseRef.child(user.countryID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() == null) {
+                    getCHSForNewUser(user.countryID);
+                    getMandatedForNewUser(user.countryID);
+                }
             }
 
-        }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -207,6 +203,28 @@ public class ActionUnassignedFragment extends BaseUnassignedFragment implements 
         dbActionRef.child(actionID).child("updatedAt").setValue(millis);
         mUnassignedAdapter.removeItem(actionID);
         mUnassignedAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
+        for (String id : networkFetcherResult.all()) {
+            dbActionBaseRef.child(id).addChildEventListener(new UnassignedChildListener(id));
+            dbActionBaseRef.child(id).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.getValue() == null) {
+                        getCHSForNewUser(id);
+                        getMandatedForNewUser(id);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+        }
     }
     //endregion
 }

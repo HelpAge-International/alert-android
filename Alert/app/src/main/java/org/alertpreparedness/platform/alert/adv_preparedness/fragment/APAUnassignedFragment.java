@@ -43,6 +43,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import javax.inject.Inject;
 
@@ -54,7 +55,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAUnassignedFragment extends BaseUnassignedFragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener {
+public class APAUnassignedFragment extends BaseUnassignedFragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
 
     public APAUnassignedFragment() {
         // Required empty public constructor
@@ -107,27 +108,24 @@ public class APAUnassignedFragment extends BaseUnassignedFragment implements APA
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        ids = new String[]{user.getCountryID(), user.getNetworkID(), user.getLocalNetworkID(), user.getNetworkCountryID()};
+        new NetworkFetcher(this).fetch();
 
-        for (String id : ids) {
-            if(id != null) {
-                dbActionBaseRef.child(id).addChildEventListener(new UnassignedChildListener(id));
-                dbActionBaseRef.child(id).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.getValue() == null) {
-                            getCHSForNewUser(id);
-                            getMandatedForNewUser(id);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+        dbActionBaseRef.child(user.countryID).addChildEventListener(new UnassignedChildListener(user.countryID));
+        dbActionBaseRef.child(user.countryID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() == null) {
+                    getCHSForNewUser(user.countryID);
+                    getMandatedForNewUser(user.countryID);
+                }
             }
-        }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         handleAdvFab();
     }
 
@@ -181,5 +179,29 @@ public class APAUnassignedFragment extends BaseUnassignedFragment implements APA
     @Override
     protected RecyclerView getListView() {
         return mAdvActionRV;
+    }
+
+    @Override
+    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
+
+        for (String id : networkFetcherResult.all()) {
+            if(id != null) {
+                dbActionBaseRef.child(id).addChildEventListener(new UnassignedChildListener(id));
+                dbActionBaseRef.child(id).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.getValue() == null) {
+                            getCHSForNewUser(id);
+                            getMandatedForNewUser(id);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+        }
     }
 }

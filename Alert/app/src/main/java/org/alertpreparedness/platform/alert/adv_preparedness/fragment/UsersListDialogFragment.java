@@ -26,6 +26,7 @@ import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.StaffRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
+import org.alertpreparedness.platform.alert.model.User;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +59,9 @@ public class UsersListDialogFragment extends DialogFragment implements UserListA
     @StaffRef
     DatabaseReference staffRef;
 
+    @Inject
+    User user;
+
     private ItemSelectedListener listener;
     private UserModel mUser;
 
@@ -73,6 +77,8 @@ public class UsersListDialogFragment extends DialogFragment implements UserListA
         mAdapter = new UserListAdapter(getContext(), dbUserPublicRef, this);
         mList.setAdapter(mAdapter);
         mList.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        dbUserPublicRef.child(user.countryID).addValueEventListener(this);
 
         staffRef.addValueEventListener(this);
 
