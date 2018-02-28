@@ -99,7 +99,6 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
         new ActionFetcher(Constants.MPA, ActionFetcher.ACTION_STATE.EXPIRED, this).fetch((ids -> {
-            mExpiredAdapter.bindChildListeners(ids);
         }));
     }
 

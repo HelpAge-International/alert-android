@@ -78,7 +78,7 @@ public class UsersListDialogFragment extends DialogFragment implements UserListA
         mList.setAdapter(mAdapter);
         mList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        dbUserPublicRef.child(user.countryID).addValueEventListener(this);
+        dbUserPublicRef.child(user.countryID).addValueEventListener(new UserListener());
 
         staffRef.addValueEventListener(this);
 
@@ -123,6 +123,8 @@ public class UsersListDialogFragment extends DialogFragment implements UserListA
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            System.out.println("uselistdataSnapshot = " + dataSnapshot.getRef());
+            System.out.println("uselistdataSnapshot = " + dataSnapshot);
             String firstname = (String) dataSnapshot.child("firstName").getValue();
             String lastname = (String) dataSnapshot.child("lastName").getValue();
             String fullname = String.format("%s %s", firstname, lastname);

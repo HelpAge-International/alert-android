@@ -16,10 +16,12 @@ import java.util.List;
 public class ActionAPAInProgressProcessor extends ActionInProgressProcessor {
 
     private final List<Integer> alertHazardTypes;
+    private final List<Integer> networkHazardTypes;
 
-    public ActionAPAInProgressProcessor(int type, DataSnapshot snapshot, DataModel model, String id, String parentId, ActionProcessorListener listener, List<Integer> alertHazardTypes) {
+    public ActionAPAInProgressProcessor(int type, DataSnapshot snapshot, DataModel model, String id, String parentId, ActionProcessorListener listener, List<Integer> alertHazardTypes, List<Integer> networkHazardTypes) {
         super(type, snapshot, model, id, parentId, listener);
         this.alertHazardTypes = alertHazardTypes;
+        this.networkHazardTypes = networkHazardTypes;
     }
     @Override
     protected void addObjects(String name, Long createdAt, Long level,
@@ -49,8 +51,8 @@ public class ActionAPAInProgressProcessor extends ActionInProgressProcessor {
                 && name != null)) {
 
             if(model.getAssignHazard() != null
-                    && alertHazardTypes.indexOf(model.getAssignHazard().get(0)) != -1) {
-
+                    && ((networkHazardTypes.indexOf(model.getAssignHazard().get(0)) != -1 && model.isNetworkLevel())
+                    || (alertHazardTypes.indexOf(model.getAssignHazard().get(0)) != -1 && !model.isNetworkLevel())) && !model.getIsArchived() && model.getAsignee() != null) {
 
                 listener.onAddAction(getChild.getKey(), new Action(
                         id,

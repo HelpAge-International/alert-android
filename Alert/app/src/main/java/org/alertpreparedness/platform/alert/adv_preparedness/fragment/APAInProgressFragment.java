@@ -3,7 +3,6 @@ package org.alertpreparedness.platform.alert.adv_preparedness.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,15 +30,14 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
+import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseAPAFragment;
-import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseInProgressFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
+import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
@@ -62,6 +60,7 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
     private ArrayList<Integer> alertHazardTypes = new ArrayList<>();
     private String actionID;
     private List<String> networkIds;
+    private ArrayList<Integer> networkAlertHazardTypes = new ArrayList<>();
 
     public APAInProgressFragment() {
         // Required empty public constructor
@@ -96,6 +95,9 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
     @Inject
     @ActionRef
     DatabaseReference dbActionRef;
+
+    @Inject
+    User user;
 
     private APActionAdapter mAPAdapter;
     private AlertListener alertListener = new AlertListener();
@@ -190,7 +192,7 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
 
     @Override
     public void onActionRetrieved(String key, Action action) {
-        txtNoAction.setVisibility(View.VISIBLE);
+        txtNoAction.setVisibility(View.GONE);
         mAPAdapter.addItems(key, action);
     }
 
@@ -220,7 +222,7 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
             model.setParentKey(dataSnapshot.getRef().getParent().getKey());
 
             if (model.getAlertLevel() == Constants.TRIGGER_RED && model.getHazardScenario() != null) {
-                update(model);
+                update(!(dataSnapshot.getRef().getParent().getKey().equals(user.countryID)), model);
             }
 
         }
@@ -235,8 +237,9 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
             }
             catch (Exception e) {}
 
-            new ActionFetcher(Constants.APA, ActionFetcher.ACTION_STATE.APA_IN_PROGRESS, APAInProgressFragment.this, alertHazardTypes).fetchWithIds(networkIds, (ids -> {
-                mAPAdapter.bindChildListeners(ids);
+
+//            System.out.println("alertHazardTypes = " + alertHazardTypes);
+            new ActionFetcher(Constants.APA, ActionFetcher.ACTION_STATE.APA_IN_PROGRESS, APAInProgressFragment.this, alertHazardTypes, networkAlertHazardTypes).fetchWithIds(networkIds, (ids -> {
             }));
 
         }
@@ -247,8 +250,13 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
         }
     }
 
-    private void update(AlertModel model) {
-        alertHazardTypes.add(model.getHazardScenario());
+    private void update(boolean isNetwork, AlertModel model) {
+        if(!isNetwork) {
+            alertHazardTypes.add(model.getHazardScenario());
+        }
+        else {
+            networkAlertHazardTypes.add(model.getHazardScenario());
+        }
     }
 
 }

@@ -40,6 +40,7 @@ public class DataModel {
     public DatabaseReference db;
     public DatabaseReference userRef;
     private String id;
+    private boolean isNetworkLevel;
 
     @Override
     public String toString() {
@@ -63,8 +64,10 @@ public class DataModel {
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", path=" + path +
+                ", assignHazard=" + assignHazard +
                 ", db=" + db +
                 ", userRef=" + userRef +
+                ", id='" + id + '\'' +
                 '}';
     }
 
@@ -104,7 +107,7 @@ public class DataModel {
     }
 
     public Boolean getIsArchived() {
-        return isArchived;
+        return (isArchived == null? false : isArchived);
     }
 
     public void setIsArchived(Boolean archived) {
@@ -153,7 +156,7 @@ public class DataModel {
 
     @Exclude
     public Long getFrequencyValue() {
-        return frequencyValue;
+        return (frequencyValue == null ? 0 : frequencyValue);
     }
 
     @Exclude
@@ -269,5 +272,13 @@ public class DataModel {
 
     public void setAssignHazard(ArrayList<Integer> assignHazard) {
         this.assignHazard = assignHazard;
+    }
+
+    public void setIsNetworkLevel(boolean isNetworkLevel) {
+        this.isNetworkLevel = isNetworkLevel;
+    }
+
+    public boolean isNetworkLevel() {
+        return isNetworkLevel;
     }
 }

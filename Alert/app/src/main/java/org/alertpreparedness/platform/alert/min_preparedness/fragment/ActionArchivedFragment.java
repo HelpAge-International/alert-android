@@ -76,7 +76,7 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        new ActionFetcher(Constants.MPA, ActionFetcher.ACTION_STATE.ARCHIVED, this).fetch((ids -> mAdapter.bindChildListeners(ids)));
+        new ActionFetcher(Constants.MPA, ActionFetcher.ACTION_STATE.ARCHIVED, this).fetch((ids)-> {});
 
     }
 

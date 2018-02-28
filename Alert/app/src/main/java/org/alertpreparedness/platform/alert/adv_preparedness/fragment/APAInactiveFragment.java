@@ -66,6 +66,7 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
     private ArrayList<Integer> alertHazardTypes = new ArrayList<>();
     private String actionID;
     private List<String> networkIds;
+    private ArrayList<Integer> networkAlertHazardTypes = new ArrayList<>();
 
     public APAInactiveFragment() {
         // Required empty public constructor
@@ -143,7 +144,6 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
     private Boolean isInProgress = false;
     private int freqBase = 0;
     private int freqValue = 0;
-    private AlertListener alertListener = new AlertListener();
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
 
 
@@ -259,9 +259,7 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
                         alertLevel,
                         getChild,
                         isCHS,
-                        isCHSAssigned,
-                        isMandated,
-                        isMandatedAssigned);
+                        isMandated);
 //                }
 
             }
@@ -283,7 +281,6 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
                         Long CHSlevel = (Long) getChild.child("level").getValue();
                         Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
                         isCHS = true;
-                        isCHSAssigned = true;
 
                         dbAlertRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -298,9 +295,7 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
                                         alertLevel,
                                         getChild,
                                         isCHS,
-                                        isCHSAssigned,
-                                        isMandated,
-                                        isMandatedAssigned);
+                                        isMandated);
 
 //                                }
 
@@ -334,9 +329,7 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
                         Long manLevel = (Long) getChild.child("level").getValue();
 
                         isMandated = true;
-                        isMandatedAssigned = true;
                         isCHS = false;
-                        isCHSAssigned = false;
 
                         dbAlertRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -351,9 +344,7 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
                                         alertLevel,
                                         getChild,
                                         isCHS,
-                                        isCHSAssigned,
-                                        isMandated,
-                                        isMandatedAssigned);
+                                        isMandated);
 
 //                                }
 
@@ -376,22 +367,28 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
     }
 
     private void addObjects(String name, Long createdAt, Long level,
-                            DataModel model, Long alertLevel, DataSnapshot getChild, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
+                            DataModel model, Long alertLevel, DataSnapshot getChild, Boolean isCHS, Boolean isMandated) {
 
 
         if (model.getLevel() != null
                 && model.getLevel() == Constants.APA
-                || (isCHS && isCHSAssigned //APA CHS inactive for logged in user.
-                && user.getUserID().equals(model.getAsignee())
+                || (isCHS //APA CHS inactive for logged in user.
                 && model.getLevel() != null
                 && model.getLevel() == Constants.APA)
-                || (isMandated && isMandatedAssigned //APA Mandated inactive for logged in user.
-                && user.getUserID().equals(model.getAsignee())
+                || (isMandated
                 && model.getLevel() != null
                 && model.getLevel() == Constants.APA)) {
 
             if(model.getAssignHazard() != null
-                    && alertHazardTypes.indexOf(model.getAssignHazard().get(0)) == -1) {
+                    && ((networkAlertHazardTypes.indexOf(model.getAssignHazard().get(0)) == -1 && model.isNetworkLevel())
+                    || (alertHazardTypes.indexOf(model.getAssignHazard().get(0)) == -1 && !model.isNetworkLevel())) && !model.getIsArchived()
+            ) {
+
+                boolean isInNetwork = networkAlertHazardTypes.indexOf(model.getAssignHazard().get(0)) == -1 && model.isNetworkLevel();
+                boolean isInCountryLevel = alertHazardTypes.indexOf(model.getAssignHazard().get(0)) == -1 && !model.isNetworkLevel();
+                System.out.println("isNotInCountryLevel = " + isInCountryLevel);
+                System.out.println("isNotInNetwork = " + isInNetwork);
+
                 txtNoAction.setVisibility(View.GONE);
                 mAPAdapter.addItems(getChild.getKey(), new Action(
                         model.getId(),
@@ -436,9 +433,9 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
     @Override
     public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
         this.networkIds = networkFetcherResult.all();
-        alertRef.addValueEventListener(alertListener);
+        alertRef.addValueEventListener(new AlertListener(false));
         for (String id : networkFetcherResult.all()) {
-            baseAlertRef.child(id).addValueEventListener(alertListener);
+            baseAlertRef.child(id).addValueEventListener(new AlertListener(true));
         }
     }
 
@@ -452,7 +449,6 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
         private String id;
 
         public InactiveAPAListener(String id) {
-
             this.id = id;
         }
 
@@ -480,36 +476,49 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
         public void onCancelled(DatabaseError databaseError) {
 
         }
-    }
 
-    private void process(DataSnapshot dataSnapshot) {
-        String actionIDs = dataSnapshot.getKey();
-        DataModel model = dataSnapshot.getValue(DataModel.class);
+        private void process(DataSnapshot dataSnapshot) {
+            String actionIDs = dataSnapshot.getKey();
+            DataModel model = dataSnapshot.getValue(DataModel.class);
 
-        if(model != null) {
+            if(model != null) {
 
-            if (dataSnapshot.child("frequencyBase").getValue() != null) {
-                model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
-            }
-            if (dataSnapshot.child("frequencyValue").getValue() != null) {
-                model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
+                boolean isNetwork = !dataSnapshot.getRef().getParent().getKey().equals(user.countryID);
+
+                model.setIsNetworkLevel(isNetwork);
+
+                if (dataSnapshot.child("frequencyBase").getValue() != null) {
+                    model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
+                }
+                if (dataSnapshot.child("frequencyValue").getValue() != null) {
+                    model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
+                }
+
+                if (model.getType() != null && model.getType() == 0) {
+                    getCHS(model, actionIDs);
+                }
+                else if (model.getType() != null && model.getType() == 1) {
+                    getMandated(model, actionIDs);
+                }
+                else {
+                    System.out.println("model = " + model);
+                    getCustom(model, dataSnapshot);
+                }
             }
 
-            if (model.getType() != null && model.getType() == 0) {
-                getCHS(model, actionIDs);
-            }
-            else if (model.getType() != null && model.getType() == 1) {
-                getMandated(model, actionIDs);
-            }
-            else {
-                System.out.println("model = " + model);
-                getCustom(model, dataSnapshot);
-            }
         }
-
     }
+
+
 
     private class AlertListener implements ValueEventListener {
+
+        private boolean isNetwork;
+
+        public AlertListener(boolean isNetwork) {
+
+            this.isNetwork = isNetwork;
+        }
 
         private void process(DataSnapshot dataSnapshot) {
 
@@ -525,7 +534,7 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
             model.setParentKey(dataSnapshot.getRef().getParent().getKey());
 
             if (model.getAlertLevel() == Constants.TRIGGER_RED && model.getHazardScenario() != null) {
-                update(model);
+                update(isNetwork, model);
             }
 
         }
@@ -554,8 +563,13 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
         }
     }
 
-    private void update(AlertModel model) {
-        alertHazardTypes.add(model.getHazardScenario());
+    private void update(boolean isNetwork, AlertModel model) {
+        if(!isNetwork) {
+            alertHazardTypes.add(model.getHazardScenario());
+        }
+        else {
+            networkAlertHazardTypes.add(model.getHazardScenario());
+        }
     }
 
 }

@@ -17,6 +17,8 @@ import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
@@ -41,9 +43,7 @@ import butterknife.ButterKnife;
 public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHolder> implements ChildEventListener, PreparednessAdapter {
 
     private final ArrayList<String> keys;
-    private Context context;
     private HashMap<String, Action> items;
-    private HashMap<String, UserModel> users;
     private APAAdapterListener listener;
     private String dateFormat = "MMM dd,yyyy";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
@@ -51,6 +51,14 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     @Inject
     @BaseActionRef
     DatabaseReference dbRef;
+
+    @Inject
+    @UserPublicRef
+    DatabaseReference userPublic;
+
+    @Inject
+    @CountryOfficeRef
+    DatabaseReference countryRef;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -88,16 +96,14 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     }
 
     public void bindChildListeners(List<String> ids) {
-        for (String id : ids) {
-            dbRef.child(id).addChildEventListener(this);
-        }
+//        for (String id : ids) {
+//            dbRef.child(id).addChildEventListener(this);
+//        }
     }
 
     public APActionAdapter(Context context, APAAdapterListener listener) {
-        this.context = context;
         this.items = new HashMap<>();
-        this.users = new HashMap<>();
-        this.listener = listener;
+         this.listener = listener;
         this.keys = new ArrayList<>(items.keySet());
         DependencyInjector.applicationComponent().inject(this);
     }
@@ -128,7 +134,7 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
         Action action = items.get(keys.get(position));
 
         try {
-            getDepartment(action.db, action.userRef, action.getDepartment(), action.getAssignee(), holder);
+            getDepartment(action.db, action.getDepartment(), action.getAssignee(), holder);
 
             holder.tvActionType.setText(getActionType((int) action.getActionType()));
             holder.tvActionName.setText(action.getTaskName());
@@ -158,17 +164,32 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
     }
 
-    private void getDepartment(DatabaseReference db, DatabaseReference userRef, String departmentID, String assignee, APActionAdapter.ViewHolder holder) {
-
+    private void getDepartment(DatabaseReference db, String departmentID, String assignee, APActionAdapter.ViewHolder holder) {
         db.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (departmentID != null) {
                     String department = (String) dataSnapshot.child("departments").child(departmentID).child("name").getValue();
-                    setUser(holder, userRef, assignee, department);
+                    if(department == null) {
+                           countryRef.child("departments").child(departmentID).addListenerForSingleValueEvent(new ValueEventListener() {
+                               @Override
+                               public void onDataChange(DataSnapshot dataSnapshot) {
+                                   String department = (String) dataSnapshot.child("name").getValue();
+                                   setUser(holder, assignee, department);
+                               }
+
+                               @Override
+                               public void onCancelled(DatabaseError databaseError) {
+
+                               }
+                           });
+                    }
+                    else {
+                        setUser(holder, assignee, department);
+                    }
                 } else {
-                    setUser(holder, userRef, assignee, null);
+                    setUser(holder, assignee, null);
                 }
             }
 
@@ -180,16 +201,21 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
     }
 
-    private void setUser(APActionAdapter.ViewHolder holder, DatabaseReference userRef, String assignee, String department) {
-        System.out.println("department = " + department);
-        if (assignee != null && department != null) {
-            userRef.child(assignee).addListenerForSingleValueEvent(new ValueEventListener() {
+    private void setUser(APActionAdapter.ViewHolder holder, String assignee, String department) {
+        if (assignee != null) {
+            userPublic.child(assignee).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     String firstname = (String) dataSnapshot.child("firstName").getValue();
                     String lastname = (String) dataSnapshot.child("lastName").getValue();
                     String fullname = String.format("%s %s", firstname, lastname);
-                    holder.tvUserName.setText(fullname + ", " + department);
+                    if(department == null) {
+                        holder.tvUserName.setText(String.format("%s", fullname));
+
+                    }
+                    else {
+                        holder.tvUserName.setText(String.format("%s, %s", fullname, department));
+                    }
                 }
 
                 @Override

@@ -82,7 +82,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        new ActionFetcher(Constants.MPA, ActionFetcher.ACTION_STATE.IN_PROGRESS, this).fetch((ids -> mAdapter.bindChildListeners(ids)));
+        new ActionFetcher(Constants.MPA, ActionFetcher.ACTION_STATE.IN_PROGRESS, this).fetch((ids)-> {});
 
     }
 

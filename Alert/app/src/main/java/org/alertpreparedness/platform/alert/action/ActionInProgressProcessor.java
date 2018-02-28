@@ -241,29 +241,31 @@ public class ActionInProgressProcessor extends BaseActionProcessor {
                 && (model.getIsCompleteAt() == null && model.getIsComplete() == null || model.getIsCompleteAt() == null && !model.getIsComplete())
                 && name != null)) {
 
-            listener.onAddAction(getChild.getKey(), new Action(
-                    id,
-                    name,
-                    model.getDepartment(),
-                    model.getAsignee(),
-                    model.getCreatedByAgencyId(),
-                    model.getCreatedByCountryId(),
-                    model.getNetworkId(),
-                    model.getIsArchived(),
-                    model.getIsComplete(),
-                    createdAt,
-                    model.getUpdatedAt(),
-                    model.getType(),
-                    model.getDueDate(),
-                    model.getBudget(),
-                    level,
-                    model.getFrequencyBase(),
-                    freqValue,
-                    user,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef(),
-                    dbNetworkRef.getRef())
-            );
+            if(!model.getIsArchived()) {
+                listener.onAddAction(getChild.getKey(), new Action(
+                        id,
+                        name,
+                        model.getDepartment(),
+                        model.getAsignee(),
+                        model.getCreatedByAgencyId(),
+                        model.getCreatedByCountryId(),
+                        model.getNetworkId(),
+                        model.getIsArchived(),
+                        model.getIsComplete(),
+                        createdAt,
+                        model.getUpdatedAt(),
+                        model.getType(),
+                        model.getDueDate(),
+                        model.getBudget(),
+                        level,
+                        model.getFrequencyBase(),
+                        freqValue,
+                        user,
+                        dbAgencyRef.getRef(),
+                        dbUserPublicRef.getRef(),
+                        dbNetworkRef.getRef())
+                );
+            }
         }
         else {
             listener.tryRemoveAction(getChild.getKey());

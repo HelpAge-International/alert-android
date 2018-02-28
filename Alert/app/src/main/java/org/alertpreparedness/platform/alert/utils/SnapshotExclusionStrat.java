@@ -26,7 +26,6 @@ public class SnapshotExclusionStrat implements ExclusionStrategy {
 
     @Override
     public boolean shouldSkipField(FieldAttributes f) {
-        System.out.println("f.getDeclaringClass() = " + f.getDeclaringClass());
         return (f.getDeclaredType() == DataSnapshot.class
                 || f.getDeclaredType() == DatabaseReference.class
                 || f.getDeclaredType() == User.class

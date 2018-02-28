@@ -83,7 +83,6 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
         new ActionFetcher(Constants.APA, ActionFetcher.ACTION_STATE.ARCHIVED, this).fetch((ids) -> {
-            mAPAdapter.bindChildListeners(ids);
         });
 
         handleAdvFab();

@@ -10,9 +10,11 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -26,6 +28,7 @@ public class ActionFetcher implements ActionProcessorListener {
     private ACTION_STATE state;
     private ActionRetrievalListener listener;
     private List<Integer> alertHazardTypes;
+    private List<Integer> networkHazardTypes;
 
     @Inject
     User user;
@@ -42,7 +45,8 @@ public class ActionFetcher implements ActionProcessorListener {
         EXPIRED,
         APA_EXPIRED,
         APA_IN_PROGRESS,
-        ARCHIVED
+        ARCHIVED,
+        APA_UNASSIGNED
     }
 
     /**
@@ -57,26 +61,28 @@ public class ActionFetcher implements ActionProcessorListener {
         DependencyInjector.applicationComponent().inject(this);
     }
 
-    public ActionFetcher(int type, ACTION_STATE state, ActionRetrievalListener listener, List<Integer> alertHazardTypes) {
+    public ActionFetcher(int type, ACTION_STATE state, ActionRetrievalListener listener, List<Integer> alertHazardTypes, List<Integer> networkHazardTypes) {
         this.type = type;
         this.state = state;
         this.listener = listener;
         this.alertHazardTypes = alertHazardTypes;
+        this.networkHazardTypes = networkHazardTypes;
         DependencyInjector.applicationComponent().inject(this);
     }
 
-    public void fetchWithIds(List<String> ids, ActionFetcher.IdFetcherListener networkFetcherListener) {
-        networkFetcherListener.onIdResult(ids);
+    public void fetchWithIds(List<String> ids, ActionFetcher.IdFetcherListener idFetcherListener) {
+        ids.add(user.countryID);
+        idFetcherListener.onIdResult(ids);
         for (String id : ids) {
             dbActionBaseRef.child(id).addChildEventListener(new ActionListener(id));
         }
     }
 
-    public void fetch(ActionFetcher.IdFetcherListener networkFetcherListener) {
+    public void fetch(ActionFetcher.IdFetcherListener idFetcherListener) {
         new NetworkFetcher((n) -> {
             List<String> ids = n.all();
             ids.add(user.countryID);
-            networkFetcherListener.onIdResult(ids);
+            idFetcherListener.onIdResult(ids);
             for (String id : ids) {
                 dbActionBaseRef.child(id).addChildEventListener(new ActionListener(id));
             }
@@ -90,15 +96,17 @@ public class ActionFetcher implements ActionProcessorListener {
             case EXPIRED:
                 return new ActionExpiredProcessor(type, snapshot, model, actionId, parentId, this);
             case APA_EXPIRED:
-                return new ActionAPAExpiredProcessor(type, snapshot, model, actionId, parentId, this, alertHazardTypes);
+                return new ActionAPAExpiredProcessor(type, snapshot, model, actionId, parentId, this, alertHazardTypes, networkHazardTypes);
             case APA_IN_PROGRESS:
-                return new ActionAPAInProgressProcessor(type, snapshot, model, actionId, parentId, this, alertHazardTypes);
+                return new ActionAPAInProgressProcessor(type, snapshot, model, actionId, parentId, this, alertHazardTypes, networkHazardTypes);
             case ARCHIVED:
                 return new ActionArchivedProcessor(type, snapshot, model, actionId, parentId, this);
             case COMPLETED:
                 return new ActionCompletedProcessor(type, snapshot, model, actionId, parentId, this);
             case UNASSIGNED:
                 return new ActionUnassignedProcessor(type, snapshot, model, actionId, parentId, this);
+            case APA_UNASSIGNED:
+                return new ActionAPAUnassignedProcessor(type, snapshot, model, actionId, parentId, this, alertHazardTypes, networkHazardTypes);
             default:
                 return new ActionInProgressProcessor(type, snapshot, model, actionId, parentId, this);
         }
@@ -122,7 +130,10 @@ public class ActionFetcher implements ActionProcessorListener {
             String actionID = dataSnapshot.getKey();
 
             DataModel model = dataSnapshot.getValue(DataModel.class);
+
             if(model != null) {
+                boolean isNetwork = !dataSnapshot.getRef().getParent().getKey().equals(user.countryID);
+                model.setIsNetworkLevel(isNetwork);
                 if (dataSnapshot.child("frequencyBase").getValue() != null) {
                     model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
                 }
@@ -132,7 +143,7 @@ public class ActionFetcher implements ActionProcessorListener {
 
                 ActionProcessor processor = makeProcessor(dataSnapshot, model, actionID, parentId);
 
-                if (model.getType() != null && model.getType() == 0) {
+                if (model.getType() != null && model.getType() == 0 && type == Constants.MPA) {
                     processor.getCHS();
                 }
                 else if (model.getType() != null && model.getType() == 1) {
@@ -143,13 +154,17 @@ public class ActionFetcher implements ActionProcessorListener {
                 }
                 else if (state == ACTION_STATE.UNASSIGNED){
                     if (dataSnapshot.getValue() == null) {
-                        ((ActionUnassignedProcessor)processor).getCHSForNewUser();
+                        if (type != Constants.APA) {
+                            ((ActionUnassignedProcessor) processor).getCHSForNewUser();
+                        }
                         ((ActionUnassignedProcessor)processor).getMandatedForNewUser();
                     }
                     if (model.getType() != null && model.getType() == 2) {
                         processor.getCustom();
                     }
-                    processor.getCHS();
+                    if(type != Constants.APA) {
+                        processor.getCHS();
+                    }
                     processor.getMandated();
                 }
             }

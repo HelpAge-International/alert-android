@@ -110,8 +110,6 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
             keys.add(dataSnapshot.getKey());
         }
         items.put(dataSnapshot.getKey(), note);
-        System.out.println("keys = " + keys);
-        System.out.println("items = " + items);
         notifyDataSetChanged();
     }
 
@@ -145,7 +143,6 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
         Notes note = items.get(keys.get(position));
         holder.tvName.setText(note.getUploadBy());
         holder.tvContent.setText(note.getContent());
-        System.out.println("note = " + note);
         holder.tvDate.setText(format.format(new Date(note.getTime())));
         holder.itemView.setOnClickListener((v) -> listener.onNoteItemSelected(position));
     }

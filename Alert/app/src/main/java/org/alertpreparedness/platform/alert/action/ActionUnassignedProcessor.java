@@ -35,29 +35,20 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
                             Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
                             Long manLevel = (Long) getChild.child("level").getValue();
 
-                            listener.onAddAction(getChild.getKey(), new Action(
-                                    parentId,
-                                    taskNameMandated,
-                                    departmentMandated,
+                            addObject(taskNameMandated, departmentMandated, manCreatedAt, manLevel, getChild.getKey(),
                                     null,
                                     null,
                                     null,
                                     null,
                                     null,
                                     null,
-                                    manCreatedAt,
-                                    null,
-                                    (long) 1, //Mandated always 1
+                                    1L,
                                     null,
                                     null,
-                                    manLevel,
                                     null,
                                     null,
-                                    user,
-                                    dbAgencyRef.getRef(),
-                                    dbUserPublicRef.getRef(),
-                                    dbNetworkRef)
-                            );
+                                    null);
+
 
                         } catch (Exception exception) {
                             listener.tryRemoveAction(getChild.getKey());
@@ -76,6 +67,50 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
         });
     }
 
+    protected void addObject(
+            String taskName,
+            String department,
+            Long createdAt,
+            Long level,
+            String key,
+            String assignee,
+            String agencyId,
+            String countryId,
+            String networkId,
+            Boolean isArchived,
+            Boolean isComplete,
+            Long updatedAt,
+            Long actionType,
+            Long dueDate,
+            Long budget,
+            Long frequencyBase,
+            Integer frequencyValue
+            ) {
+        listener.onAddAction(key, new Action(
+                parentId,
+                taskName,
+                department,
+                assignee,
+                agencyId,
+                countryId,
+                networkId,
+                isArchived,
+                isComplete,
+                createdAt,
+                updatedAt,
+                actionType,
+                dueDate,
+                budget,
+                level,
+                frequencyBase,
+                frequencyValue,
+                user,
+                dbAgencyRef.getRef(),
+                dbUserPublicRef.getRef(),
+                dbNetworkRef)
+        );
+    }
+
     @Override
     public void getCHS() {
         dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -84,34 +119,29 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
                 for (DataSnapshot getChild : dataSnapshot.getChildren()) {
 
                     if (!actionId.equals(getChild.getKey())) {
-                        System.out.println("getChild.getKey() = " + getChild.getKey());
 
                         String CHSTaskName = (String) getChild.child("task").getValue();
                         Long CHSlevel = (Long) getChild.child("level").getValue();
                         Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
 
-                        listener.onAddAction(getChild.getKey(), new Action(
-                                parentId,
+                        addObject(
                                 CHSTaskName,
                                 null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
                                 CHSCreatedAt,
-                                null,
-                                (long) 0, //CHS always 0
-                                null,
-                                null,
                                 CHSlevel,
+                                getChild.getKey(),
                                 null,
                                 null,
-                                user,
-                                dbAgencyRef.getRef(),
-                                dbUserPublicRef.getRef(),
-                                dbNetworkRef)
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                0L,
+                                null,
+                                null,
+                                null,
+                                null
                         );
 
                     }
@@ -135,28 +165,25 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
                 && model.getAsignee() == null
                 && model.getTask() != null) {
 
-            listener.onAddAction(snapshot.getKey(), new Action(
-                    parentId,
+
+            addObject(
                     model.getTask(),
                     model.getDepartment(),
+                    model.getCreatedAt(),
+                    model.getLevel(),
+                    snapshot.getKey(),
                     model.getAsignee(),
                     model.getCreatedByAgencyId(),
                     model.getCreatedByCountryId(),
                     model.getNetworkId(),
                     model.getIsArchived(),
                     model.getIsComplete(),
-                    model.getCreatedAt(),
                     model.getUpdatedAt(),
                     model.getType(),
                     model.getDueDate(),
                     model.getBudget(),
-                    model.getLevel(),
                     model.getFrequencyBase(),
-                    freqValue,
-                    user,
-                    dbAgencyRef.getRef(),
-                    dbUserPublicRef.getRef(),
-                    dbNetworkRef)
+                    model.getFrequencyValue().intValue()
             );
         }
         else {
@@ -177,29 +204,19 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
                         Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
                         Long manLevel = (Long) getChild.child("level").getValue();
 
-                                listener.onAddAction(getChild.getKey(), new Action(
-                                parentId,
-                                taskNameMandated,
-                                departmentMandated,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                manCreatedAt,
-                                null,
-                                (long) 1, //Mandated always 1
-                                null,
-                                null,
-                                manLevel,
-                                null,
-                                null,
-                                user,
-                                dbAgencyRef.getRef(),
-                                dbUserPublicRef.getRef(),
-                                dbNetworkRef)
-                        );
+                        addObject(taskNameMandated, departmentMandated, manCreatedAt, manLevel, getChild.getKey(),
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            1L,
+                            null,
+                            null,
+                            null,
+                            null,
+                         null);
 
                     } catch (Exception exception) {
                         listener.tryRemoveAction(getChild.getKey());
@@ -227,28 +244,24 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
                     Long CHSlevel = (Long) getChild.child("level").getValue();
                     Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
 
-                    listener.onAddAction(getChild.getKey(), new Action(
-                            parentId,
+                    addObject(
                             CHSTaskName,
                             null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
                             CHSCreatedAt,
-                            null,
-                            (long) 0, //CHS always 0
-                            null,
-                            null,
                             CHSlevel,
+                            getChild.getKey(),
                             null,
                             null,
-                            user,
-                            dbAgencyRef.getRef(),
-                            dbUserPublicRef.getRef(),
-                            dbNetworkRef)
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            0L,
+                            null,
+                            null,
+                            null,
+                            null
                     );
                 }
             }

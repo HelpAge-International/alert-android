@@ -3,7 +3,6 @@ package org.alertpreparedness.platform.alert.adv_preparedness.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,12 +23,9 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseAPAFragment;
-import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseCompletedFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.Constants;
-import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import javax.inject.Inject;
 
@@ -97,7 +93,6 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
         new ActionFetcher(Constants.APA, ActionFetcher.ACTION_STATE.COMPLETED, this).fetch((ids) -> {
-            mAPAdapter.bindChildListeners(ids);
         });
 
         handleAdvFab();
@@ -134,7 +129,7 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
 
     @Override
     public void onAdapterItemRemoved(String key) {
-        if(mAPAdapter.getItemCount() ==0) {
+        if(mAPAdapter.getItemCount() == 0) {
             txtNoAction.setVisibility(View.VISIBLE);
         }
     }

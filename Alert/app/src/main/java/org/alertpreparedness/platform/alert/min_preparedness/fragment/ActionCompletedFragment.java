@@ -95,7 +95,6 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
         new ActionFetcher(Constants.MPA, ActionFetcher.ACTION_STATE.COMPLETED, this).fetch((ids) -> {
-            mAdapter.bindChildListeners(ids);
         });
 
     }

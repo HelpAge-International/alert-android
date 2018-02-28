@@ -106,12 +106,8 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
         dbNoteRef.child(actionParentKey).child(actionKey).addValueEventListener(this);
     }
 
-    protected AddNotesAdapter getmAdapter() {
-        return new AddNotesAdapter(getApplicationContext(), dbNoteRef.child(actionParentKey).child(actionKey), this);
-    }
-
     private void initView() {
-        addNotesAdapter = getmAdapter();
+        addNotesAdapter = new AddNotesAdapter(getApplicationContext(), dbNoteRef.child(actionParentKey).child(actionKey), this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);

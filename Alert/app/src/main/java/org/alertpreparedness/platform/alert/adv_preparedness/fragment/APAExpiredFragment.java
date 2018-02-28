@@ -4,7 +4,6 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -37,11 +35,8 @@ import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseAPAFragment;
-import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseExpiredFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
@@ -118,8 +113,8 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
 
     private APActionAdapter mAPAdapter;
     private int freqValue = 0;
-
     private AlertListener alertListener = new AlertListener();
+    private ArrayList<Integer> networkAlertHazardTypes = new ArrayList<>();
     private ArrayList<Integer> alertHazardTypes = new ArrayList<>();
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
 
@@ -202,22 +197,19 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog pickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-                String givenDateString = i2 + " " + i1 + " " + i + " 23:59:00";//due the end of the day.
-                SimpleDateFormat sdf = new SimpleDateFormat("dd mm yyyy HH:mm:ss", Locale.getDefault());
-                try {
-                    Date mDate = sdf.parse(givenDateString);
-                    long timeInMilliseconds = mDate.getTime();
-                    long millis = System.currentTimeMillis();
+        DatePickerDialog pickerDialog = new DatePickerDialog(getContext(), (datePicker, i, i1, i2) -> {
+            String givenDateString = i2 + " " + i1 + " " + i + " 23:59:00";//due the end of the day.
+            SimpleDateFormat sdf = new SimpleDateFormat("dd mm yyyy HH:mm:ss", Locale.getDefault());
+            try {
+                Date mDate = sdf.parse(givenDateString);
+                long timeInMilliseconds = mDate.getTime();
+                long millis = System.currentTimeMillis();
 
-                    dbActionRef.child(key).child("dueDate").setValue(timeInMilliseconds);//save due date in milliSec.
-                    dbActionRef.child(key).child("updatedAt").setValue(millis);
+                dbActionRef.child(key).child("dueDate").setValue(timeInMilliseconds);//save due date in milliSec.
+                dbActionRef.child(key).child("updatedAt").setValue(millis);
 
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
         }, year, month, day);
         pickerDialog.show();
@@ -243,7 +235,6 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
             baseAlertRef.child(id).addValueEventListener(alertListener);
         }
 
-        mAPAdapter.bindChildListeners(ids);
     }
 
     @Override
@@ -267,7 +258,7 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
             model.setParentKey(dataSnapshot.getRef().getParent().getKey());
 
             if (model.getAlertLevel() == Constants.TRIGGER_RED && model.getHazardScenario() != null) {
-                update(model);
+                update(!(dataSnapshot.getRef().getParent().getKey().equals(user.countryID)), model);
             }
 
         }
@@ -282,8 +273,8 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
             }
             catch (Exception e) {}
 
-            new ActionFetcher(Constants.APA, ActionFetcher.ACTION_STATE.APA_EXPIRED, APAExpiredFragment.this, alertHazardTypes).fetchWithIds(networkIds, (ids -> {
-                mAPAdapter.bindChildListeners(ids);
+            new ActionFetcher(Constants.APA, ActionFetcher.ACTION_STATE.APA_EXPIRED, APAExpiredFragment.this, alertHazardTypes, networkAlertHazardTypes).fetchWithIds(networkIds, (ids -> {
+
             }));
         }
 
@@ -296,7 +287,7 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
 
     @Override
     public void onActionRetrieved(String key, Action action) {
-        txtNoAction.setVisibility(View.VISIBLE);
+        txtNoAction.setVisibility(View.GONE);
         mAPAdapter.addItems(key, action);
     }
 
@@ -305,8 +296,13 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
         mAPAdapter.removeItem(key);
     }
 
-    private void update(AlertModel model) {
-        alertHazardTypes.add(model.getHazardScenario());
+    private void update(boolean isNetwork, AlertModel model) {
+        if(!isNetwork) {
+            alertHazardTypes.add(model.getHazardScenario());
+        }
+        else {
+            networkAlertHazardTypes.add(model.getHazardScenario());
+        }
     }
 
 }

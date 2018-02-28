@@ -39,7 +39,7 @@ import butterknife.ButterKnife;
  * Created by faizmohideen on 20/12/2017.
  */
 
-public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder> implements ChildEventListener, PreparednessAdapter {
+public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder> implements PreparednessAdapter {
 
     private final ArrayList<String> keys;
     private Context context;
@@ -83,12 +83,6 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
         this.listener = listener;
         this.keys = new ArrayList<>(items.keySet());
         DependencyInjector.applicationComponent().inject(this);
-    }
-
-    public void bindChildListeners(List<String> ids) {
-        for(String id : ids) {
-            dbRef.child(id).addChildEventListener(this);
-        }
     }
 
     public Action getItem(int index) {
@@ -156,7 +150,6 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
                     }
                     setUser(holder, userRef, assignee, department);
                 } else if (assignee!=null && networkID != null && networkID.equals(user.getNetworkID())){
-                    System.out.println("networkID = " + networkID);
                     setNetworkUser(holder, userRef, networkRef, assignee, networkID, user);
                 } else if (assignee!=null && id != null && id.equals(user.getLocalNetworkID())){
                     setLocalNetworkUser(holder, userRef, networkRef, assignee, id, user);
@@ -334,30 +327,6 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
         return items.size();
     }
 
-    @Override
-    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-    }
-
-    @Override
-    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-    }
-
-    @Override
-    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-    }
-
-    @Override
-    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-    }
-
-    @Override
-    public void onCancelled(DatabaseError databaseError) {
-
-    }
 
     public interface ActionAdapterListener {
         void onActionItemSelected(int pos, String key, String userTypeID);

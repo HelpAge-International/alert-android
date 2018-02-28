@@ -22,10 +22,12 @@ import java.util.List;
 public class ActionAPAExpiredProcessor extends ActionExpiredProcessor {
 
     private final List<Integer> alertHazardTypes;
+    private List<Integer> networkHazardTypes;
 
-    public ActionAPAExpiredProcessor(int type, DataSnapshot snapshot, DataModel model, String id, String parentId, ActionProcessorListener listener, List<Integer> alertHazardTypes) {
+    public ActionAPAExpiredProcessor(int type, DataSnapshot snapshot, DataModel model, String id, String parentId, ActionProcessorListener listener, List<Integer> alertHazardTypes, List<Integer> networkHazardTypes) {
         super(type, snapshot, model, id, parentId, listener);
         this.alertHazardTypes = alertHazardTypes;
+        this.networkHazardTypes = networkHazardTypes;
     }
 
     @Override
@@ -51,9 +53,11 @@ public class ActionAPAExpiredProcessor extends ActionExpiredProcessor {
                 && model.getTask() != null)) {
 
             if(model.getAssignHazard() != null
-                    && alertHazardTypes.indexOf(model.getAssignHazard().get(0)) != -1) {
+                    && ((networkHazardTypes.indexOf(model.getAssignHazard().get(0)) != -1 && model.isNetworkLevel())
+                    || (alertHazardTypes.indexOf(model.getAssignHazard().get(0)) != -1 && !model.isNetworkLevel()))
+                    && !model.getIsArchived()
+                    ) {
 
-                System.out.println("ID = " + id + " actionIDs = " + actionIDs);
                 listener.onAddAction(getChild.getKey(), new Action(
                         id,
                         name,
