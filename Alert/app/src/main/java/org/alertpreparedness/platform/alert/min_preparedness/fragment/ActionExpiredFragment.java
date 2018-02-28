@@ -4,7 +4,6 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,7 +24,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttach
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.utils.Constants;
-import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

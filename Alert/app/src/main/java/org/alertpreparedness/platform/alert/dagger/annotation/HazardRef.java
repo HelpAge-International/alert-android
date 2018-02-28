@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import javax.inject.Qualifier;
 
 /**
- * Created by Tj on 17/01/2018.
+ * Hazards for the current user's country ID, e.g. /sand/hazard/<countryId>
  */
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)

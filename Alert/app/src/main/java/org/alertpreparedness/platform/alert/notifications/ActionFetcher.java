@@ -14,7 +14,7 @@ import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.ClockSetting;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
-import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 import org.alertpreparedness.platform.alert.utils.SynchronizedCounter;
 
 import java.util.ArrayList;

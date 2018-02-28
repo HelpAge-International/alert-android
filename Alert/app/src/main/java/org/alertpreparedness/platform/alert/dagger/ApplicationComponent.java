@@ -16,14 +16,13 @@ import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivi
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.HazardsFetcher;
 import org.alertpreparedness.platform.alert.helper.DataHandler;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.login.activity.SplashActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
-import org.alertpreparedness.platform.alert.helper.UserInfo;
-import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
@@ -54,7 +53,7 @@ import org.alertpreparedness.platform.alert.responseplan.ResponsePlanFragment;
 import org.alertpreparedness.platform.alert.settings.ChangeEmailActivity;
 import org.alertpreparedness.platform.alert.settings.ChangePasswordActivity;
 import org.alertpreparedness.platform.alert.settings.SettingsFragment;
-import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 
 import javax.inject.Singleton;
 
@@ -104,6 +103,7 @@ public interface ApplicationComponent {
     void inject(OfflineSyncHandler offlineSyncHandler);
     void inject(IndicatorUpdateNotificationHandler indicatorUpdateNotificationHandler);
     void inject(IndicatorFetcher indicatorFetcher);
+    void inject(HazardsFetcher hazardsFetcher);
     void inject(IndicatorNotificationService indicatorNotificationService);
     void inject(ActionFetcher actionFetcher);
     void inject(ActionNotificationService actionNotificationService);

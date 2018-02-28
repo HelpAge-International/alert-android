@@ -15,7 +15,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseLogRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 
 import java.util.HashMap;
 import java.util.Set;

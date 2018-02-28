@@ -22,7 +22,7 @@ import org.alertpreparedness.platform.alert.firebase.ClockSetting;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
-import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
 import java.util.ArrayList;
@@ -32,7 +32,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.internal.Utils;
 import timber.log.Timber;
 
 public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetcherListener {

@@ -51,10 +51,9 @@ import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.risk_monitoring.view.ActiveRiskFragment;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.UpdateIndicatorActivity;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
-import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 
 import javax.inject.Inject;
 
@@ -386,6 +385,8 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         intent.putExtra("indicator_id", id);
 
         startActivity(intent);
+
+
     }
 
     private class HazardListener implements ChildEventListener {
@@ -655,5 +656,4 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         agencyRef.addListenerForSingleValueEvent(agencyListener);
         alertRef.addChildEventListener(alertListener);
     }
-
 }

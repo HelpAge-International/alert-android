@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.utils;
+package org.alertpreparedness.platform.alert.firebase.data_fetchers;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -7,14 +7,13 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import io.realm.internal.Util;
 
 public class NetworkFetcher implements ValueEventListener {
 
@@ -63,6 +62,7 @@ public class NetworkFetcher implements ValueEventListener {
     public class NetworkFetcherResult{
         private List<String> localNetworks;
         private List<String> globalNetworks;
+        private List<String> networksCountries;
 
         @Override
         public String toString() {
@@ -72,8 +72,6 @@ public class NetworkFetcher implements ValueEventListener {
                     ", networksCountries=" + networksCountries +
                     '}';
         }
-
-        private List<String> networksCountries;
 
         public NetworkFetcherResult(List<String> localNetworks, List<String> globalNetworks, List<String> networksCountries) {
             this.localNetworks = localNetworks;
