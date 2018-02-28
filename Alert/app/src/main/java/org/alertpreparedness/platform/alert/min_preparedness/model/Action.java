@@ -47,6 +47,8 @@ public class Action {
 
     @Exclude
     public DatabaseReference networkRef;
+    private boolean hasCHSInfo;
+    private boolean isCHS;
 
     public Action() {
     }
@@ -273,5 +275,21 @@ public class Action {
 
     public void setRequireDoc(boolean requireDoc) {
         this.requireDoc = requireDoc;
+    }
+
+    public void setHasCHSInfo(boolean hasCHSInfo) {
+        this.hasCHSInfo = hasCHSInfo;
+    }
+
+    public boolean hasCHSInfo() {
+        return hasCHSInfo;
+    }
+
+    public void setIsCHS(boolean isCHS) {
+        this.isCHS = isCHS;
+    }
+
+    public boolean isCHS() {
+        return isCHS;
     }
 }

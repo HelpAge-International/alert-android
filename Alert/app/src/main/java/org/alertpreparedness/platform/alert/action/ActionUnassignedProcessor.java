@@ -111,43 +111,107 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
         );
     }
 
+    protected void addObject(
+            String taskName,
+            String department,
+            Long createdAt,
+            Long level,
+            String key,
+            String assignee,
+            String agencyId,
+            String countryId,
+            String networkId,
+            Boolean isArchived,
+            Boolean isComplete,
+            Long updatedAt,
+            Long actionType,
+            Long dueDate,
+            Long budget,
+            Long frequencyBase,
+            Integer frequencyValue,
+            boolean chsHasInfo
+    ) {
+        Action action = new Action(
+                parentId,
+                taskName,
+                department,
+                assignee,
+                agencyId,
+                countryId,
+                networkId,
+                isArchived,
+                isComplete,
+                createdAt,
+                updatedAt,
+                actionType,
+                dueDate,
+                budget,
+                level,
+                frequencyBase,
+                frequencyValue,
+                user,
+                dbAgencyRef.getRef(),
+                dbUserPublicRef.getRef(),
+                dbNetworkRef);
+
+        action.setHasCHSInfo(chsHasInfo);
+
+        action.setIsCHS(true);
+
+        listener.onAddAction(key, action);
+    }
+
     @Override
     public void getCHS() {
         dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+                    dbActionRef.child(getChild.getKey()).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    if (!actionId.equals(getChild.getKey())) {
+                            if (!actionId.equals(getChild.getKey())) {
 
-                        String CHSTaskName = (String) getChild.child("task").getValue();
-                        Long CHSlevel = (Long) getChild.child("level").getValue();
-                        Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
+                                String CHSTaskName = (String) getChild.child("task").getValue();
+                                Long CHSlevel = (Long) getChild.child("level").getValue();
+                                Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
 
-                        addObject(
-                                CHSTaskName,
-                                null,
-                                CHSCreatedAt,
-                                CHSlevel,
-                                getChild.getKey(),
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                null,
-                                0L,
-                                null,
-                                null,
-                                null,
-                                null
-                        );
+                                System.out.println("getCHSdataSnapshot = " + dataSnapshot);
 
-                    }
-                    else {
-                        listener.tryRemoveAction(getChild.getKey());
-                    }
+                                addObject(
+                                        CHSTaskName,
+                                        null,
+                                        CHSCreatedAt,
+                                        CHSlevel,
+                                        getChild.getKey(),
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        0L,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        dataSnapshot.exists()
+                                );
+
+                            }
+                            else {
+                                listener.tryRemoveAction(getChild.getKey());
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
                 }
             }
 

@@ -28,6 +28,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttach
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -113,8 +114,12 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
                     showDatePicker(key);
                     break;
                 case R.id.assign_action:
-                    dialog.show(getActivity().getFragmentManager(), "users_list");
-                    break;
+                    if(!mUnassignedAdapter.getItem(pos).hasCHSInfo() && mUnassignedAdapter.getItem(pos).isCHS()) {
+                        SnackbarHelper.show(getActivity(), "The action needs more information from the web portal");
+                    }
+                    else {
+                        dialog.show(getActivity().getFragmentManager(), "users_list");
+                    }                    break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
                     intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, mUnassignedAdapter.getItem(pos).getId());
