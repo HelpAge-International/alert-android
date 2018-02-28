@@ -30,6 +30,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.HazardOtherRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NotificationSettingsRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.PermissionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ProgrammeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
@@ -85,6 +86,12 @@ public class FirebaseModule {
     @AgencyRef
     public DatabaseReference provideAgencyRef(@BaseDatabaseRef DatabaseReference db, Context context) {
         return db.child("agency").child(PreferHelper.getString(context, Constants.AGENCY_ID));
+    }
+
+    @Provides
+    @NotificationSettingsRef
+    public DatabaseReference provideNotificationSettingsRef(@BaseDatabaseRef DatabaseReference db, User user) {
+        return db.child("staff").child(user.getCountryID()).child(user.getUserID()).child("notification");
     }
 
     @Provides
