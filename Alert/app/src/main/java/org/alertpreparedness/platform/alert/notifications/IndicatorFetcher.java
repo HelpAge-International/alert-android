@@ -8,7 +8,6 @@ import com.google.firebase.database.ValueEventListener;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseHazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.HazardRef;
 import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.SynchronizedCounter;
@@ -80,7 +79,7 @@ public class IndicatorFetcher implements SynchronizedCounter.SynchronizedCounter
     private void fetchIndicators() {
         indicators = new ArrayList<>();
         indicatorCounter = new SynchronizedCounter(hazardIds.size());
-        indicatorCounter.ad dListener(this);
+        indicatorCounter.addListener(this);
 
         for (String hazardId : hazardIds) {
             baseIndicatorRef.child(hazardId).orderByChild("assignee").equalTo(user.getUserID()).addListenerForSingleValueEvent(new IndicatorListener(indicators, indicatorCounter, hazardId));

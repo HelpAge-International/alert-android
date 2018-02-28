@@ -19,6 +19,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseHazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseLogRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseResponsePlansRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseNoteRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseUserRef;
@@ -66,6 +67,12 @@ public class FirebaseModule {
     @BaseResponsePlansRef
     public DatabaseReference provideBaseResponsePlansRef(@BaseDatabaseRef DatabaseReference db, User user) {
         return db.child("responsePlan");
+    }
+
+    @Provides
+    @BaseLogRef
+    public DatabaseReference provideBaseLogRef(@BaseDatabaseRef DatabaseReference db) {
+        return db.child("log");
     }
 
     @Provides

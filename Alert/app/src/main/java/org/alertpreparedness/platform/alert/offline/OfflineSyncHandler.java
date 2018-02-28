@@ -11,10 +11,14 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseLogRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -23,28 +27,54 @@ import timber.log.Timber;
 
 public class OfflineSyncHandler {
 
-    /** Alerts for country ID (e.g. /sand/alert/<countryId> - COUNTRY LEVEL */
+    /**
+     * Alerts for country office ID (e.g. /sand/alert/<countryId>
+     */
     @Inject
     @AlertRef
     DatabaseReference alertRef;
 
-    /** Base alert reference (e.g. /sand/alert/ */
+    /**
+     * Base alert reference (e.g. /sand/alert/
+     */
     @Inject
     @BaseAlertRef
     DatabaseReference baseAlertRef;
 
-    /** Current user's agency (e.g. /sand/agency/<agencyId>) - GET AGENCY - GET NETWORK - GET NETWORK STUFF */
+    /**
+     * Current user's agency (e.g. /sand/agency/<agencyId>) - GET AGENCY - GET NETWORK - GET NETWORK STUFF
+     */
     @Inject
     @AgencyRef
     DatabaseReference agencyRef;
 
+    /**
+     * Base action reference (e.g. /sand/action)
+     */
     @Inject
     @BaseActionRef
     DatabaseReference baseActionRef;
 
+    /**
+     * Base indicator reference (e.g. /sand/indicator)
+     */
     @Inject
     @BaseIndicatorRef
     DatabaseReference baseIndicatorRef;
+
+    /**
+     * Indicators for country office ID (e.g. /sand/indicator/<countryId>
+     * */
+    @Inject
+    @IndicatorRef
+    DatabaseReference countryIndicatorRef;
+
+    /**
+     * Base indicator log reference (e.g. /sand/log)
+     */
+    @Inject
+    @BaseLogRef
+    DatabaseReference baseLogRef;
 
     @Inject
     User user;
@@ -89,12 +119,9 @@ public class OfflineSyncHandler {
 
         fetchTasks();
 
+        fetchIndicators();
 
-        /* Home */
-
-        /* Tasks = indicators and actions */
-
-        // HomeFragment
+        fetchIndicatorLogs();
 
          /* Risk Monitoring */
 
@@ -103,13 +130,47 @@ public class OfflineSyncHandler {
         // ActiveFragment
     }
 
-    /**
-     * 1. Fetch a snapshot of the user's agency node<br>
-     * 2. Fetch the IDs of the networks<br>
-     * 3. For each network ID, fetch the actions<br>
-     * 4. For each network ID, fetch the indicators<br>
-     * */
     private void fetchTasks() {
+        fetchNetworks(networkIds -> {
+            for (String networkId : networkIds) {
+                baseActionRef.child(networkId).keepSynced(true);
+                baseActionRef
+                        .child(networkId)
+                        .addListenerForSingleValueEvent(getValueListenerForOfflineCaching());
+            }
+        });
+    }
+
+    private void fetchIndicators() {
+        fetchNetworks(networkIds -> {
+            for (String networkId : networkIds) {
+                baseIndicatorRef.child(networkId).keepSynced(true);
+                baseIndicatorRef
+                        .child(networkId)
+                        .addListenerForSingleValueEvent(getValueListenerForOfflineCaching());
+
+            }
+        });
+
+        countryIndicatorRef.keepSynced(true);
+        countryIndicatorRef.addListenerForSingleValueEvent(getValueListenerForOfflineCaching());
+        new NetworkFetcher(networkFetcherResult -> {
+
+        });
+    }
+    
+    private void fetchIndicatorLogs() {
+        fetchNetworks(networkIds -> {
+            for (String networkId : networkIds) {
+                baseLogRef.child(networkId).keepSynced(true);
+                baseLogRef
+                        .child(networkId)
+                        .addListenerForSingleValueEvent(getValueListenerForOfflineCaching());
+            }
+        });
+    }
+
+    private void fetchNetworks(NetworkIdsFetchedListener listener) {
         ValueEventListener agencyListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -118,17 +179,7 @@ public class OfflineSyncHandler {
 
                 if (networks != null) {
                     Timber.d("Fetched networks: %s", networks);
-                    for (String networkId : networks.keySet()) {
-                        baseActionRef.child(networkId).keepSynced(true);
-                        baseActionRef
-                                .child(networkId)
-                                .addListenerForSingleValueEvent(getValueListenerForOfflineCaching());
-
-                        baseIndicatorRef.child(networkId).keepSynced(true);
-                        baseIndicatorRef
-                                .child(networkId)
-                                .addListenerForSingleValueEvent(getValueListenerForOfflineCaching());
-                    }
+                    listener.onNetworkIdsFetched(networks.keySet());
                 }
             }
 
@@ -228,5 +279,9 @@ public class OfflineSyncHandler {
                 Timber.d("Going offline..");
             }
         }
+    }
+
+    private interface NetworkIdsFetchedListener {
+        void onNetworkIdsFetched(Set<String> networkIds);
     }
 }
