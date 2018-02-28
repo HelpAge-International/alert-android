@@ -3,6 +3,7 @@ package org.alertpreparedness.platform.alert.adv_preparedness.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,9 +22,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.action.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
@@ -33,6 +36,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesAc
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseAPAFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseInProgressFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
@@ -53,7 +57,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 05/01/2018.
  */
 
-public class APAInProgressFragment extends BaseInProgressFragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
+public class APAInProgressFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener, ActionFetcher.ActionRetrievalListener {
 
     private ArrayList<Integer> alertHazardTypes = new ArrayList<>();
     private String actionID;
@@ -63,11 +67,9 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
         // Required empty public constructor
     }
 
-    @Nullable
     @BindView(R.id.rvAdvAction)
     RecyclerView mAdvActionRV;
 
-    @Nullable
     @BindView(R.id.tvAPANoAction)
     TextView txtNoAction;
 
@@ -91,11 +93,14 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
     @BaseAlertRef
     DatabaseReference baseAlertRef;
 
+    @Inject
+    @ActionRef
+    DatabaseReference dbActionRef;
+
     private APActionAdapter mAPAdapter;
     private AlertListener alertListener = new AlertListener();
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.content_advanced, container, false);
@@ -111,7 +116,7 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
     }
 
     private void initViews() {
-        mAPAdapter = new APActionAdapter(getContext(), dbActionRef, this);
+        mAPAdapter = new APActionAdapter(getContext(), this);
         assert mAdvActionRV != null;
         mAdvActionRV.setAdapter(mAPAdapter);
         mAdvActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -135,7 +140,7 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
             switch (menuItem.getItemId()) {
                 case R.id.complete_action:
                     Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
-                    intent.putExtra(CompleteActionActivity.REQUIRE_DOC, getAdapter().getItem(pos).getRequireDoc());
+                    intent.putExtra(CompleteActionActivity.REQUIRE_DOC, mAPAdapter.getItem(pos).getRequireDoc());
                     startActivity(intent);
                     break;
                 case R.id.reassign_action:
@@ -143,13 +148,13 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
                     break;
                 case R.id.action_notes:
                     Intent intent3 = new Intent(getActivity(), AddNotesActivity.class);
-                    intent3.putExtra(AddNotesActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent3.putExtra(AddNotesActivity.PARENT_ACTION_ID, mAPAdapter.getItem(pos).getId());
                     intent3.putExtra(AddNotesActivity.ACTION_ID, key);
                     startActivity(intent3);
                     break;
                 case R.id.attachments:
                     Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
-                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, mAPAdapter.getItem(pos).getId());
                     intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
                     startActivity(intent2);
             }
@@ -157,30 +162,22 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
         }).show();
     }
 
-    //region UsersListDialogFragment.ItemSelectedListener
+    @Override
+    public void onAdapterItemRemoved(String key) {
+        if (mAPAdapter.getItemCount() == 0) {
+            txtNoAction.setVisibility(View.VISIBLE);
+        }
+    }
+
+    //region UsersListDialogFragment.ActionAdapterListener
     @Override
     public void onItemSelected(UserModel model) {
         long millis = System.currentTimeMillis();
         dbActionRef.child(actionID).child("asignee").setValue(model.getUserID());
         dbActionRef.child(actionID).child("updatedAt").setValue(millis);
-        ((APActionAdapter)getAdapter()).notifyDataSetChanged();
+        mAPAdapter.notifyDataSetChanged();
     }
     //endregion
-
-    @Override
-    protected int getType() {
-        return Constants.APA;
-    }
-
-    @Override
-    protected PreparednessAdapter getAdapter() {
-        return mAPAdapter;
-    }
-
-    @Override
-    protected TextView getNoActionView() {
-        return txtNoAction;
-    }
 
     @Override
     public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
@@ -189,6 +186,22 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
         for (String id : networkFetcherResult.all()) {
             baseAlertRef.child(id).addValueEventListener(alertListener);
         }
+    }
+
+    @Override
+    public void onActionRetrieved(String key, Action action) {
+        txtNoAction.setVisibility(View.VISIBLE);
+        mAPAdapter.addItems(key, action);
+    }
+
+    @Override
+    public void onActionRemoved(String key) {
+        mAPAdapter.removeItem(key);
+    }
+
+    @Override
+    protected RecyclerView getListView() {
+        return mAdvActionRV;
     }
 
     private class AlertListener implements ValueEventListener{
@@ -222,12 +235,9 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
             }
             catch (Exception e) {}
 
-            for (String id : networkIds) {
-                if(id != null) {
-                    dbActionBaseRef.child(id).addChildEventListener(new InProgressListener(id));
-                }
-            }
-            dbActionBaseRef.child(user.countryID).addChildEventListener(new InProgressListener(user.countryID));
+            new ActionFetcher(Constants.APA, ActionFetcher.ACTION_STATE.APA_IN_PROGRESS, APAInProgressFragment.this, alertHazardTypes).fetchWithIds(networkIds, (ids -> {
+                mAPAdapter.bindChildListeners(ids);
+            }));
 
         }
 
@@ -237,77 +247,8 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
         }
     }
 
-    @Override
-    protected void addObjects(String name, Long createdAt, Long level,
-                              DataModel model, DataSnapshot getChild, String id, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
-        if (user.getUserID().equals(model.getAsignee()) //MPA Custom assigned and in-progress for logged in user.
-                && model.getAsignee() != null
-                && level != null
-                && level == getType()
-                && model.getDueDate() != null
-                && (model.getIsCompleteAt() == null && model.getIsComplete() == null || model.getIsCompleteAt() == null && !model.getIsComplete()) // isComplete can be set to false :D, and when it's false, isCreatedAt will disappear.
-                && name != null
-                || (isCHS && isCHSAssigned //MPA CHS assigned and in-progress for logged in user.
-                && user.getUserID().equals(model.getAsignee())
-                && model.getAsignee() != null
-                && level != null
-                && level == getType()
-                && model.getDueDate() != null
-                && (model.getIsCompleteAt() == null && model.getIsComplete() == null || model.getIsCompleteAt() == null && !model.getIsComplete())
-                && name != null)
-                || (isMandated && isMandatedAssigned //MPA Mandated assigned and in-progress for logged in user.
-                && user.getUserID().equals(model.getAsignee())
-                && model.getAsignee() != null
-                && level != null
-                && level == getType()
-                && model.getDueDate() != null
-                && (model.getIsCompleteAt() == null && model.getIsComplete() == null || model.getIsCompleteAt() == null && !model.getIsComplete())
-                && name != null)) {
-
-                if(model.getAssignHazard() != null
-                    && alertHazardTypes.indexOf(model.getAssignHazard().get(0)) != -1) {
-
-                    getNoActionView().setVisibility(View.GONE);
-
-                    getAdapter().addItems(getChild.getKey(), new Action(
-                            id,
-                            name,
-                            model.getDepartment(),
-                            model.getAsignee(),
-                            model.getCreatedByAgencyId(),
-                            model.getCreatedByCountryId(),
-                            model.getNetworkId(),
-                            model.getIsArchived(),
-                            model.getIsComplete(),
-                            createdAt,
-                            model.getUpdatedAt(),
-                            model.getType(),
-                            model.getDueDate(),
-                            model.getBudget(),
-                            level,
-                            model.getFrequencyBase(),
-                            freqValue,
-                            user,
-                            dbAgencyRef.getRef(),
-                            dbUserPublicRef.getRef(),
-                            dbNetworkRef.getRef())
-                    );
-                }
-                else {
-                    getAdapter().removeItem(getChild.getKey());
-                }
-        }
-        else {
-            getAdapter().removeItem(getChild.getKey());
-        }
-    }
-
     private void update(AlertModel model) {
         alertHazardTypes.add(model.getHazardScenario());
     }
 
-    @Override
-    protected RecyclerView getListView() {
-        return mAdvActionRV;
-    }
 }

@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -16,15 +15,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
-import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
-import org.alertpreparedness.platform.alert.dashboard.adapter.AlertFieldsAdapter;
-import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
-import org.alertpreparedness.platform.alert.dashboard.model.Alert;
-import org.alertpreparedness.platform.alert.firebase.ActionModel;
-import org.alertpreparedness.platform.alert.firebase.AlertModel;
-import org.alertpreparedness.platform.alert.helper.DateHelper;
-import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
@@ -34,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -51,10 +44,13 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     private Context context;
     private HashMap<String, Action> items;
     private HashMap<String, UserModel> users;
-    private DatabaseReference dbRef;
-    private APActionAdapter.ItemSelectedListener listener;
+    private APAAdapterListener listener;
     private String dateFormat = "MMM dd,yyyy";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
+
+    @Inject
+    @BaseActionRef
+    DatabaseReference dbRef;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -91,14 +87,19 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
         }
     }
 
-    public APActionAdapter(Context context, DatabaseReference dbRef, APActionAdapter.ItemSelectedListener listener) {
+    public void bindChildListeners(List<String> ids) {
+        for (String id : ids) {
+            dbRef.child(id).addChildEventListener(this);
+        }
+    }
+
+    public APActionAdapter(Context context, APAAdapterListener listener) {
         this.context = context;
         this.items = new HashMap<>();
         this.users = new HashMap<>();
         this.listener = listener;
-        this.dbRef = dbRef;
         this.keys = new ArrayList<>(items.keySet());
-        this.dbRef.addChildEventListener(this);
+        DependencyInjector.applicationComponent().inject(this);
     }
 
     public Action getItem(int index) {
@@ -111,6 +112,7 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
             items.remove(keys.get(index));
             keys.remove(index);
             notifyItemRemoved(index);
+            listener.onAdapterItemRemoved(key);
         }
     }
 
@@ -290,7 +292,8 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
     }
 
-    public interface ItemSelectedListener {
+    public interface APAAdapterListener {
         void onActionItemSelected(int pos, String key);
+        void onAdapterItemRemoved(String key);
     }
 }

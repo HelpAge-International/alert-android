@@ -1,143 +1,31 @@
-package org.alertpreparedness.platform.alert.min_preparedness.fragment;
+package org.alertpreparedness.platform.alert.action;
 
-
-import android.content.Intent;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.widget.TextView;
-
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
-import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.adv_preparedness.fragment.AdvPreparednessFragment;
-import org.alertpreparedness.platform.alert.dagger.annotation.ActionCHSRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.ActionMandatedRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.BaseCountryOfficeRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
-import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
-import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
-import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
-import javax.inject.Inject;
-
-import ru.whalemare.sheetmenu.SheetMenu;
-
 /**
- * Created by Tj on 01/02/2018.
+ * Created by Tj on 28/02/2018.
  */
 
-public abstract class BaseInProgressFragment extends Fragment {
+public class ActionInProgressProcessor extends BaseActionProcessor {
 
-    @Inject
-    @ActionCHSRef
-    public DatabaseReference dbCHSRef;
-
-    @Inject
-    @ActionMandatedRef
-    public DatabaseReference dbMandatedRef;
-
-    @Inject
-    @BaseActionRef
-    public DatabaseReference dbActionBaseRef;
-
-    @Inject
-    @UserPublicRef
-    public DatabaseReference dbUserPublicRef;
-
-    @Inject
-    @BaseCountryOfficeRef
-    public DatabaseReference countryOffice;
-
-    @Inject
-    @NetworkRef
-    public DatabaseReference dbNetworkRef;
-
-    @Inject
-    @ActionRef
-    public DatabaseReference dbActionRef;
-
-    @Inject
-    @AgencyRef
-    public DatabaseReference dbAgencyRef;
-
-    @Inject
-    public User user;
-
-    protected Boolean isCHS = false;
-    protected Boolean isCHSAssigned = false;
-    protected Boolean isMandated = false;
-    protected Boolean isMandatedAssigned = false;
-    protected Boolean isInProgress = false;
-    protected int freqBase = 0;
-    protected int freqValue = 0;
-
-    protected abstract int getType();
-
-    protected abstract PreparednessAdapter getAdapter();
-    protected abstract RecyclerView getListView();
-
-    public void handleAdvFab() {
-        AdvPreparednessFragment xFragment = null;
-        for(Fragment fragment : getFragmentManager().getFragments()){
-            if(fragment instanceof AdvPreparednessFragment){
-                xFragment = (AdvPreparednessFragment) fragment;
-                break;
-            }
-        }
-        if(xFragment != null) {
-            FloatingActionButton fab = xFragment.fabCreateAPA;
-            fab.show();
-
-            getListView().addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    if (dy > 0 && fab.isShown()) {
-                        fab.hide();
-                    }
-//                    else if (!fab.isShown() && dy <= 0) {
-//                        fab.show();
-//                    }
-                    System.out.println("dy = " + dy);
-
-                }
-
-                @Override
-                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        fab.show();
-                    }
-                    super.onScrollStateChanged(recyclerView, newState);
-                }
-            });
-        }
+    public ActionInProgressProcessor(int type, DataSnapshot snapshot, DataModel model, String id, String parentId, ActionProcessorListener listener) {
+        super(type, snapshot, model, id, parentId, listener);
     }
 
-    private void getMandated(DataModel model, String actionIDs, String id) {
+    @Override
+    public void getMandated() {
         dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    if (actionIDs.contains(getChild.getKey())) {
+                    if (actionId.contains(getChild.getKey())) {
                         String taskNameMandated = (String) getChild.child("task").getValue();
                         //String departmentMandated = (String) getChild.child("department").getValue();
                         Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
@@ -154,13 +42,13 @@ public abstract class BaseInProgressFragment extends Fragment {
                                     manLevel,
                                     model,
                                     getChild,
-                                    id,
+                                    parentId,
                                     isCHS,
                                     isCHSAssigned,
                                     isMandated,
                                     isMandatedAssigned);
                         } else {
-                            getAdapter().removeItem(dataSnapshot.getKey());
+                            listener.tryRemoveAction(dataSnapshot.getKey());
                         }
                     }
                 }
@@ -173,12 +61,13 @@ public abstract class BaseInProgressFragment extends Fragment {
         });
     }
 
-    private void getCHS(DataModel model, String actionIDs, String id) {
+    @Override
+    public void getCHS() {
         dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    if (actionIDs.contains(getChild.getKey())) {
+                    if (actionId.contains(getChild.getKey())) {
                         String CHSTaskName = (String) getChild.child("task").getValue();
                         Long CHSlevel = (Long) getChild.child("level").getValue();
                         Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
@@ -232,13 +121,13 @@ public abstract class BaseInProgressFragment extends Fragment {
                                             CHSlevel,
                                             model,
                                             getChild,
-                                            id,
+                                            parentId,
                                             isCHS,
                                             isCHSAssigned,
                                             isMandated,
                                             isMandatedAssigned);
                                 } else {
-                                    getAdapter().removeItem(dataSnapshot.getKey());
+                                    listener.tryRemoveAction(dataSnapshot.getKey());
                                 }
 
                             }
@@ -259,9 +148,9 @@ public abstract class BaseInProgressFragment extends Fragment {
         });
     }
 
-    private void getCustom(DataModel model, DataSnapshot getChild, String id) {
+    @Override
+    public void getCustom() {
         countryOffice.child(user.agencyAdminID).child(user.countryID).child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ValueEventListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Long durationType = (Long) dataSnapshot.child("durationType").getValue();
@@ -306,14 +195,14 @@ public abstract class BaseInProgressFragment extends Fragment {
                             model.getCreatedAt(),
                             model.getLevel(),
                             model,
-                            getChild,
-                            id,
+                            snapshot,
+                            parentId,
                             isCHS,
                             isCHSAssigned,
                             isMandated,
                             isMandatedAssigned);
                 } else {
-                    getAdapter().removeItem(dataSnapshot.getKey());
+                    listener.tryRemoveAction(dataSnapshot.getKey());
                 }
 
             }
@@ -326,10 +215,8 @@ public abstract class BaseInProgressFragment extends Fragment {
 
     }
 
-    protected abstract TextView getNoActionView();
-
     protected void addObjects(String name, Long createdAt, Long level,
-                            DataModel model, DataSnapshot getChild, String id, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
+                              DataModel model, DataSnapshot getChild, String id, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
         if (user.getUserID().equals(model.getAsignee()) //MPA Custom assigned and in-progress for logged in user.
                 && model.getAsignee() != null
                 && level != null
@@ -354,9 +241,7 @@ public abstract class BaseInProgressFragment extends Fragment {
                 && (model.getIsCompleteAt() == null && model.getIsComplete() == null || model.getIsCompleteAt() == null && !model.getIsComplete())
                 && name != null)) {
 
-            getNoActionView().setVisibility(View.GONE);
-
-            getAdapter().addItems(getChild.getKey(), new Action(
+            listener.onAddAction(getChild.getKey(), new Action(
                     id,
                     name,
                     model.getDepartment(),
@@ -381,68 +266,11 @@ public abstract class BaseInProgressFragment extends Fragment {
             );
         }
         else {
-            getAdapter().removeItem(getChild.getKey());
+            listener.tryRemoveAction(getChild.getKey());
         }
     }
 
-    protected class InProgressListener implements ChildEventListener {
-        private String id;
-
-        public InProgressListener(String id) {
-            this.id = id;
-        }
-
-
-        protected void process(DataSnapshot dataSnapshot) {
-
-            System.out.println("InProgressListenerdataSnapshot = " + dataSnapshot);
-
-            String actionIDs = dataSnapshot.getKey();
-
-            DataModel model = dataSnapshot.getValue(DataModel.class);
-
-            if (dataSnapshot.child("frequencyBase").getValue() != null) {
-                model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
-            }
-            if (dataSnapshot.child("frequencyValue").getValue() != null) {
-                model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
-            }
-
-            if (model.getType() != null && model.getType() == 0) {
-                getCHS(model, actionIDs, id);
-            } else if (model.getType() != null && model.getType() == 1) {
-                getMandated(model, actionIDs, id);
-            } else if (model.getType() != null && model.getType() == 2){
-                System.out.println("model = " + model);
-                getCustom(model, dataSnapshot, id);
-            }
-        }
-
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            process(dataSnapshot);
-
-        }
-
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            process(dataSnapshot);
-
-        }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-        }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
+    public int getType() {
+        return type;
     }
 }

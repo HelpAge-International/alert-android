@@ -4,7 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,9 +25,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.action.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
@@ -35,11 +37,12 @@ import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseAPAFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseExpiredFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
+import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
@@ -49,7 +52,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -63,7 +65,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAExpiredFragment extends BaseExpiredFragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
+public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener, ActionFetcher.ActionRetrievalListener{
 
     private String actionID;
     private List<String> networkIds;
@@ -84,7 +86,6 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
     @BindView(R.id.tvStatus)
     TextView tvActionExpired;
 
-    @Nullable
     @BindView(R.id.tvAPANoAction)
     TextView txtNoAction;
 
@@ -108,13 +109,14 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
     @BaseAlertRef
     DatabaseReference baseAlertRef;
 
+    @Inject
+    @ActionRef
+    DatabaseReference dbActionRef;
+
+    @Inject
+    User user;
+
     private APActionAdapter mAPAdapter;
-    private Boolean isCHS = false;
-    private Boolean isCHSAssigned = false;
-    private Boolean isMandated = false;
-    private Boolean isMandatedAssigned = false;
-    private Boolean isInProgress = false;
-    private int freqBase = 0;
     private int freqValue = 0;
 
     private AlertListener alertListener = new AlertListener();
@@ -141,7 +143,7 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
         assert tvActionExpired != null;
         tvActionExpired.setText("Expired");
         tvActionExpired.setTextColor(getResources().getColor(R.color.alertRed));
-        mAPAdapter = getAPAdapter();
+        mAPAdapter = new APActionAdapter(getContext(), this);
         assert mAdvActionRV != null;
         mAdvActionRV.setAdapter(mAPAdapter);
 
@@ -153,11 +155,6 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
 
         handleAdvFab();
     }
-
-    protected APActionAdapter getAPAdapter() {
-        return new APActionAdapter(getContext(), dbActionRef, this);
-    }
-
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -177,19 +174,26 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
-                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, mAPAdapter.getItem(pos).getId());
                     intent.putExtra(AddNotesActivity.ACTION_ID, key);
                     startActivity(intent);
                     break;
                 case R.id.attachments:
                     Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
-                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, mAPAdapter.getItem(pos).getId());
                     intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
                     startActivity(intent2);
                     break;
             }
             return false;
         }).show();
+    }
+
+    @Override
+    public void onAdapterItemRemoved(String key) {
+        if (mAPAdapter.getItemCount() == 0) {
+            txtNoAction.setVisibility(View.VISIBLE);
+        }
     }
 
     private void showDatePicker(String key) {
@@ -219,41 +223,35 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
         pickerDialog.show();
     }
 
-    @Override
-    protected int getType() {
-        return Constants.APA;
-    }
-
-    @Override
-    protected PreparednessAdapter getAdapter() {
-        return mAPAdapter;
-    }
-
-    @Override
-    protected TextView getNoActionView() {
-        return txtNoAction;
-    }
-
-    //region UsersListDialogFragment.ItemSelectedListener
+    //region UsersListDialogFragment.ActionAdapterListener
     @Override
     public void onItemSelected(UserModel model) {
         long millis = System.currentTimeMillis();
         dbActionRef.child(actionID).child("asignee").setValue(model.getUserID());
         dbActionRef.child(actionID).child("updatedAt").setValue(millis);
-        ((APActionAdapter)getAdapter()).notifyDataSetChanged();
+        mAPAdapter.notifyDataSetChanged();
     }
     //endregion
 
     @Override
     public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
-        this.networkIds = networkFetcherResult.all();
+        List<String> ids = networkFetcherResult.all();
+        this.networkIds = ids;
+        ids.add(user.countryID);
         alertRef.addValueEventListener(alertListener);
-        for (String id : networkFetcherResult.all()) {
+        for (String id : networkIds) {
             baseAlertRef.child(id).addValueEventListener(alertListener);
         }
+
+        mAPAdapter.bindChildListeners(ids);
     }
 
-    private class AlertListener implements ValueEventListener{
+    @Override
+    protected RecyclerView getListView() {
+        return mAdvActionRV;
+    }
+
+    private class AlertListener implements ValueEventListener {
 
         private void process(DataSnapshot dataSnapshot) {
 
@@ -284,88 +282,32 @@ public class APAExpiredFragment extends BaseExpiredFragment implements APActionA
             }
             catch (Exception e) {}
 
-            for (String id : networkIds) {
-                if(id != null) {
-                    dbActionBaseRef.child(id).addChildEventListener(new ExpiredChildListener(id));
-                }
-            }
-            dbActionBaseRef.child(user.countryID).addChildEventListener(new ExpiredChildListener(user.countryID));
+            new ActionFetcher(Constants.APA, ActionFetcher.ACTION_STATE.APA_EXPIRED, APAExpiredFragment.this, alertHazardTypes).fetchWithIds(networkIds, (ids -> {
+                mAPAdapter.bindChildListeners(ids);
+            }));
         }
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
 
         }
+
     }
 
     @Override
-    protected void addObjects(String name, String department, Long createdAt, Long level,
-                            DataModel model, DataSnapshot getChild, String id, String actionIDs, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
+    public void onActionRetrieved(String key, Action action) {
+        txtNoAction.setVisibility(View.VISIBLE);
+        mAPAdapter.addItems(key, action);
+    }
 
-        if (user.getUserID().equals(model.getAsignee()) //MPA CUSTOM assigned and EXPIRED for logged in user.
-                && model.getLevel() != null
-                && model.getLevel() == getType()
-                && model.getDueDate() != null
-                && model.getTask() != null
-                || (user.getUserID().equals(model.getAsignee()) //MPA CHS assigned and EXPIRED for logged in user.
-                && isCHSAssigned && isCHS
-                && model.getLevel() != null
-                && model.getLevel() == getType()
-                && model.getDueDate() != null
-                && model.getTask() != null)
-                || (user.getUserID().equals(model.getAsignee()) //MPA Mandated assigned and EXPIRED for logged in user.
-                && isMandatedAssigned && isMandated
-                && model.getLevel() != null
-                && model.getLevel() == getType()
-                && model.getDueDate() != null
-                && model.getTask() != null)) {
-
-            if(model.getAssignHazard() != null
-                    && alertHazardTypes.indexOf(model.getAssignHazard().get(0)) != -1) {
-
-                getNoActionView().setVisibility(View.GONE);
-                System.out.println("ID = " + id + " actionIDs = " + actionIDs);
-                getAdapter().addItems(getChild.getKey(), new Action(
-                        id,
-                        name,
-                        department,
-                        model.getAsignee(),
-                        model.getCreatedByAgencyId(),
-                        model.getCreatedByCountryId(),
-                        model.getNetworkId(),
-                        model.getIsArchived(),
-                        model.getIsComplete(),
-                        createdAt,
-                        model.getUpdatedAt(),
-                        model.getType(),
-                        model.getDueDate(),
-                        model.getBudget(),
-                        level,
-                        model.getFrequencyBase(),
-                        freqValue,
-                        user,
-                        dbAgencyRef.getRef(),
-                        dbUserPublicRef.getRef(),
-                        dbNetworkRef)
-
-                );
-            }
-            else {
-                getAdapter().removeItem(getChild.getKey());
-            }
-        }
-        else {
-            getAdapter().removeItem(getChild.getKey());
-        }
+    @Override
+    public void onActionRemoved(String key) {
+        mAPAdapter.removeItem(key);
     }
 
     private void update(AlertModel model) {
         alertHazardTypes.add(model.getHazardScenario());
     }
 
-    @Override
-    protected RecyclerView getListView() {
-        return mAdvActionRV;
-    }
 }
 

@@ -4,7 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,14 +16,19 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.action.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.UsersListDialogFragment;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
@@ -33,6 +38,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.whalemare.sheetmenu.SheetMenu;
@@ -41,29 +48,28 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionExpiredFragment extends BaseExpiredFragment implements UsersListDialogFragment.ItemSelectedListener, ActionAdapter.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
+public class ActionExpiredFragment extends Fragment implements UsersListDialogFragment.ItemSelectedListener, ActionAdapter.ActionAdapterListener, ActionFetcher.ActionRetrievalListener {
 
-    @Nullable
     @BindView(R.id.rvMinAction)
     RecyclerView mActionRV;
 
-    @Nullable
     @BindView(R.id.tvStatus)
     TextView tvActionExpired;
 
-    @Nullable
     @BindView(R.id.imgStatus)
     ImageView imgExpired;
 
-    @Nullable
     @BindView(R.id.tvNoAction)
     TextView txtNoAction;
+
+    @Inject
+    @ActionRef
+    public DatabaseReference dbActionRef;
 
     protected ActionAdapter mExpiredAdapter;
     private String actionID;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.content_minimum, container, false);
@@ -85,32 +91,16 @@ public class ActionExpiredFragment extends BaseExpiredFragment implements UsersL
         tvActionExpired.setText("Expired");
         tvActionExpired.setTextColor(getResources().getColor(R.color.alertRed));
 
-        mExpiredAdapter = new ActionAdapter(getContext(), dbActionBaseRef, this);
+        mExpiredAdapter = new ActionAdapter(getContext(), this);
         mActionRV.setAdapter(mExpiredAdapter);
 
         mActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        new NetworkFetcher(this).fetch();
-
-        dbActionBaseRef.child(user.countryID).addChildEventListener(new ExpiredChildListener(user.countryID));
-
-    }
-
-    @Override
-    protected int getType() {
-        return Constants.MPA;
-    }
-
-    @Override
-    protected PreparednessAdapter getAdapter() {
-        return mExpiredAdapter;
-    }
-
-    @Override
-    protected RecyclerView getListView() {
-        return mActionRV;
+        new ActionFetcher(Constants.MPA, ActionFetcher.ACTION_STATE.EXPIRED, this).fetch((ids -> {
+            mExpiredAdapter.bindChildListeners(ids);
+        }));
     }
 
     @Override
@@ -126,13 +116,13 @@ public class ActionExpiredFragment extends BaseExpiredFragment implements UsersL
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
-                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, mExpiredAdapter.getItem(pos).getId());
                     intent.putExtra(AddNotesActivity.ACTION_ID, key);
                     startActivity(intent);
                     break;
                 case R.id.attachments:
                     Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
-                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, mExpiredAdapter.getItem(pos).getId());
                     intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
                     startActivity(intent2);
                     break;
@@ -141,20 +131,22 @@ public class ActionExpiredFragment extends BaseExpiredFragment implements UsersL
         }).show();
     }
 
-    //region UsersListDialogFragment.ItemSelectedListener
+    @Override
+    public void itemRemoved(String key) {
+        if (mExpiredAdapter.getItemCount() == 0) {
+            txtNoAction.setVisibility(View.VISIBLE);
+        }
+    }
+
+    //region UsersListDialogFragment.ActionAdapterListener
     @Override
     public void onItemSelected(UserModel model) {
         long millis = System.currentTimeMillis();
         dbActionRef.child(actionID).child("asignee").setValue(model.getUserID());
         dbActionRef.child(actionID).child("updatedAt").setValue(millis);
-        ((ActionAdapter)getAdapter()).notifyDataSetChanged();
+        mExpiredAdapter.notifyDataSetChanged();
     }
     //endregion
-
-    @Override
-    protected TextView getNoActionView() {
-        return txtNoAction;
-    }
 
     private void showDatePicker(String key) {
         Calendar calendar = Calendar.getInstance();
@@ -184,11 +176,13 @@ public class ActionExpiredFragment extends BaseExpiredFragment implements UsersL
     }
 
     @Override
-    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
-        for (String id : networkFetcherResult.all()) {
-            if (id != null) {
-                dbActionBaseRef.child(id).addChildEventListener(new ExpiredChildListener(id));
-            }
-        }
+    public void onActionRetrieved(String key, Action action) {
+        txtNoAction.setVisibility(View.GONE);
+        mExpiredAdapter.addItems(key, action);
+    }
+
+    @Override
+    public void onActionRemoved(String key) {
+        mExpiredAdapter.removeItem(key);
     }
 }

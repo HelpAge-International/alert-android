@@ -3,45 +3,33 @@ package org.alertpreparedness.platform.alert.adv_preparedness.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.action.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
-import org.alertpreparedness.platform.alert.dagger.annotation.ActionCHSRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.ActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
-import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseAPAFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseUnassignedFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
-import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
@@ -55,7 +43,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAUnassignedFragment extends BaseUnassignedFragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
+public class APAUnassignedFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener, ActionFetcher.ActionRetrievalListener {
 
     public APAUnassignedFragment() {
         // Required empty public constructor
@@ -73,6 +61,9 @@ public class APAUnassignedFragment extends BaseUnassignedFragment implements APA
     @BindView(R.id.tvAPANoAction)
     TextView txtNoAction;
 
+    @Inject
+    @ActionRef
+    DatabaseReference dbActionRef;
 
     private APActionAdapter mAPAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
@@ -100,7 +91,7 @@ public class APAUnassignedFragment extends BaseUnassignedFragment implements APA
         assert tvActionUnassigned != null;
         tvActionUnassigned.setText("Unassigned");
         tvActionUnassigned.setTextColor(getResources().getColor(R.color.alertRed));
-        mAPAdapter = new APActionAdapter(getContext(), dbActionRef, this);
+        mAPAdapter = new APActionAdapter(getContext(), this);
         assert mAdvActionRV != null;
         mAdvActionRV.setAdapter(mAPAdapter);
 
@@ -108,24 +99,9 @@ public class APAUnassignedFragment extends BaseUnassignedFragment implements APA
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        new NetworkFetcher(this).fetch();
-
-        dbActionBaseRef.child(user.countryID).addChildEventListener(new UnassignedChildListener(user.countryID));
-        dbActionBaseRef.child(user.countryID).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() == null) {
-                    getCHSForNewUser(user.countryID);
-                    getMandatedForNewUser(user.countryID);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
+        new ActionFetcher(Constants.APA, ActionFetcher.ACTION_STATE.UNASSIGNED, this).fetch((ids) -> {
+            mAPAdapter.bindChildListeners(ids);
         });
-
         handleAdvFab();
     }
 
@@ -153,6 +129,11 @@ public class APAUnassignedFragment extends BaseUnassignedFragment implements APA
     }
 
     @Override
+    public void onAdapterItemRemoved(String key) {
+
+    }
+
+    @Override
     public void onItemSelected(UserModel userModel) {
         long millis = System.currentTimeMillis();
         dbActionRef.child(actionID).child("asignee").setValue(userModel.getUserID());
@@ -162,46 +143,18 @@ public class APAUnassignedFragment extends BaseUnassignedFragment implements APA
     }
 
     @Override
-    protected int getType() {
-        return Constants.APA;
+    public void onActionRetrieved(String key, Action action) {
+        txtNoAction.setVisibility(View.VISIBLE);
+        mAPAdapter.addItems(key, action);
     }
 
     @Override
-    protected PreparednessAdapter getAdapter() {
-        return mAPAdapter;
-    }
-
-    @Override
-    protected TextView getNoActionView() {
-        return txtNoAction;
+    public void onActionRemoved(String key) {
+        mAPAdapter.removeItem(key);
     }
 
     @Override
     protected RecyclerView getListView() {
         return mAdvActionRV;
-    }
-
-    @Override
-    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
-
-        for (String id : networkFetcherResult.all()) {
-            if(id != null) {
-                dbActionBaseRef.child(id).addChildEventListener(new UnassignedChildListener(id));
-                dbActionBaseRef.child(id).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.getValue() == null) {
-                            getCHSForNewUser(id);
-                            getMandatedForNewUser(id);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-            }
-        }
     }
 }

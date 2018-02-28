@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -40,9 +39,8 @@ import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseExpiredFragment;
+import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseAPAFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.model.User;
@@ -51,7 +49,6 @@ import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -64,7 +61,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAInactiveFragment extends Fragment implements APActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
+public class APAInactiveFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
 
     private ArrayList<Integer> alertHazardTypes = new ArrayList<>();
     private String actionID;
@@ -171,7 +168,7 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
         assert tvActionInactive != null;
         tvActionInactive.setText("Inactive");
         tvActionInactive.setTextColor(getResources().getColor(R.color.alertGray));
-        mAPAdapter = getAPAdapter();
+        mAPAdapter = new APActionAdapter(getContext(), this);
         assert mAdvActionRV != null;
         mAdvActionRV.setAdapter(mAPAdapter);
         mAdvActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -215,16 +212,6 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
         }
     }
 
-    protected APActionAdapter getAPAdapter() {
-        return new APActionAdapter(getContext(), dbActionRef, this);
-    }
-
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
-
     @Override
     public void onActionItemSelected(int pos, String key) {
         actionID = key;
@@ -249,6 +236,13 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
             }
             return false;
         }).show();
+    }
+
+    @Override
+    public void onAdapterItemRemoved(String key) {
+        if(mAPAdapter.getItemCount() == 0) {
+            txtNoAction.setVisibility(View.VISIBLE);
+        }
     }
 
     private void getCustom(DataModel model, DataSnapshot getChild) {
@@ -446,6 +440,11 @@ public class APAInactiveFragment extends Fragment implements APActionAdapter.Ite
         for (String id : networkFetcherResult.all()) {
             baseAlertRef.child(id).addValueEventListener(alertListener);
         }
+    }
+
+    @Override
+    protected RecyclerView getListView() {
+        return mAdvActionRV;
     }
 
     private class InactiveAPAListener implements ChildEventListener {

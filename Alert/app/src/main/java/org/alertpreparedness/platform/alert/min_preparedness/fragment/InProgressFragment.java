@@ -14,17 +14,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.UsersListDialogFragment;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
-import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
+import org.alertpreparedness.platform.alert.action.ActionFetcher;
 import org.alertpreparedness.platform.alert.utils.Constants;
-import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,9 +38,13 @@ import ru.whalemare.sheetmenu.SheetMenu;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class InProgressFragment extends BaseInProgressFragment implements ActionAdapter.ItemSelectedListener, UsersListDialogFragment.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
+public class InProgressFragment extends Fragment implements ActionAdapter.ActionAdapterListener, UsersListDialogFragment.ItemSelectedListener, ActionFetcher.ActionRetrievalListener {
 
     private String actionID;
+
+    @Inject
+    @ActionRef
+    public DatabaseReference dbActionRef;
 
     public InProgressFragment() {
         // Required empty public constructor
@@ -65,7 +74,7 @@ public class InProgressFragment extends BaseInProgressFragment implements Action
     }
 
     private void initViews() {
-        mAdapter = new ActionAdapter(getContext(), dbActionBaseRef, this);
+        mAdapter = new ActionAdapter(getContext(), this);
         assert mActionRV != null;
         mActionRV.setAdapter(mAdapter);
 
@@ -73,9 +82,7 @@ public class InProgressFragment extends BaseInProgressFragment implements Action
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        new NetworkFetcher(this).fetch();
-
-        dbActionBaseRef.child(user.countryID).addChildEventListener(new InProgressListener(user.countryID));
+        new ActionFetcher(Constants.MPA, ActionFetcher.ACTION_STATE.IN_PROGRESS, this).fetch((ids -> mAdapter.bindChildListeners(ids)));
 
     }
 
@@ -87,7 +94,7 @@ public class InProgressFragment extends BaseInProgressFragment implements Action
             switch (menuItem.getItemId()) {
                 case R.id.complete_action:
                     Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
-                    intent.putExtra(CompleteActionActivity.REQUIRE_DOC, getAdapter().getItem(pos).getRequireDoc());
+                    intent.putExtra(CompleteActionActivity.REQUIRE_DOC, mAdapter.getItem(pos).getRequireDoc());
                     intent.putExtra("ACTION_KEY", key);
                     intent.putExtra("USER_KEY", userTypeID);
                     startActivity(intent);
@@ -97,13 +104,13 @@ public class InProgressFragment extends BaseInProgressFragment implements Action
                     break;
                 case R.id.action_notes:
                     Intent intent3 = new Intent(getActivity(), AddNotesActivity.class);
-                    intent3.putExtra(AddNotesActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent3.putExtra(AddNotesActivity.PARENT_ACTION_ID, mAdapter.getItem(pos).getId());
                     intent3.putExtra(AddNotesActivity.ACTION_ID, key);
                     startActivity(intent3);
                     break;
                 case R.id.attachments:
                     Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
-                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, mAdapter.getItem(pos).getId());
                     intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
                     startActivity(intent2);
                     break;
@@ -113,39 +120,31 @@ public class InProgressFragment extends BaseInProgressFragment implements Action
     }
 
     @Override
-    protected int getType() {
-        return Constants.MPA;
+    public void itemRemoved(String key) {
+        if(mAdapter.getItemCount() == 0) {
+            txtNoAction.setVisibility(View.VISIBLE);
+        }
     }
 
-    @Override
-    protected PreparednessAdapter getAdapter() {
-        return mAdapter;
-    }
 
-    @Override
-    protected RecyclerView getListView() {
-        return mActionRV;
-    }
-
-    @Override
-    protected TextView getNoActionView() {
-        return txtNoAction;
-    }
-
-    //region UsersListDialogFragment.ItemSelectedListener
+    //region UsersListDialogFragment.ActionAdapterListener
     @Override
     public void onItemSelected(UserModel model) {
         long millis = System.currentTimeMillis();
         dbActionRef.child(actionID).child("asignee").setValue(model.getUserID());
         dbActionRef.child(actionID).child("updatedAt").setValue(millis);
-        ((ActionAdapter)getAdapter()).notifyDataSetChanged();
+        mAdapter.notifyDataSetChanged();
     }
     //endregion
 
     @Override
-    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
-        for (String id : networkFetcherResult.all()) {
-            dbActionBaseRef.child(id).addChildEventListener(new InProgressListener(id));
-        }
+    public void onActionRetrieved(String key, Action action) {
+        txtNoAction.setVisibility(View.GONE);
+        mAdapter.addItems(key, action);
+    }
+
+    @Override
+    public void onActionRemoved(String key) {
+        mAdapter.removeItem(key);
     }
 }

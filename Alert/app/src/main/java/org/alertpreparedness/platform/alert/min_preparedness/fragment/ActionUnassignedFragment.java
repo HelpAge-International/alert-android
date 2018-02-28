@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,14 +22,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.action.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.UsersListDialogFragment;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
@@ -48,7 +52,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionUnassignedFragment extends BaseUnassignedFragment implements UsersListDialogFragment.ItemSelectedListener, ActionAdapter.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
+public class ActionUnassignedFragment extends Fragment implements UsersListDialogFragment.ItemSelectedListener, ActionAdapter.ActionAdapterListener, ActionFetcher.ActionRetrievalListener {
 
     @BindView(R.id.rvMinAction)
     RecyclerView mActionRV;
@@ -65,6 +69,10 @@ public class ActionUnassignedFragment extends BaseUnassignedFragment implements 
 
     @BindView(R.id.tvNoAction)
     TextView txtNoAction;
+
+    @Inject
+    @ActionRef
+    public DatabaseReference dbActionRef;
 
     private ActionAdapter mUnassignedAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
@@ -92,47 +100,15 @@ public class ActionUnassignedFragment extends BaseUnassignedFragment implements 
         tvActionUnassigned.setText("Unassigned");
         tvActionUnassigned.setTextColor(getResources().getColor(R.color.alertRed));
 
-        mUnassignedAdapter = new ActionAdapter(getContext(), dbActionBaseRef, this);
+        mUnassignedAdapter = new ActionAdapter(getContext(), this);
         mActionRV.setAdapter(mUnassignedAdapter);
         mActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        new NetworkFetcher(this).fetch();
-
-        dbActionBaseRef.child(user.countryID).addChildEventListener(new UnassignedChildListener(user.countryID));
-        dbActionBaseRef.child(user.countryID).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() == null) {
-                    getCHSForNewUser(user.countryID);
-                    getMandatedForNewUser(user.countryID);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        new ActionFetcher(Constants.MPA, ActionFetcher.ACTION_STATE.UNASSIGNED, this).fetch((ids -> mUnassignedAdapter.bindChildListeners(ids)));
 
     }
-
-    @Override
-    protected int getType() {
-        return Constants.MPA;
-    }
-
-    @Override
-    protected PreparednessAdapter getAdapter() {
-        return mUnassignedAdapter;
-    }
-
-    @Override
-    protected RecyclerView getListView() {
-        return mActionRV;
-    }
-
 
     @Override
     public void onActionItemSelected(int pos, String key, String userTypeID) {
@@ -148,13 +124,13 @@ public class ActionUnassignedFragment extends BaseUnassignedFragment implements 
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
-                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, mUnassignedAdapter.getItem(pos).getId());
                     intent.putExtra(AddNotesActivity.ACTION_ID, key);
                     startActivity(intent);
                     break;
                 case R.id.attachments:
                     Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
-                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, mUnassignedAdapter.getItem(pos).getId());
                     intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
                     startActivity(intent2);
                     break;
@@ -163,39 +139,39 @@ public class ActionUnassignedFragment extends BaseUnassignedFragment implements 
         }).show();
     }
 
+    @Override
+    public void itemRemoved(String key) {
+        if(mUnassignedAdapter.getItemCount() == 0) {
+            txtNoAction.setVisibility(View.VISIBLE);
+        }
+    }
+
     private void showDatePicker(String key) {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog pickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-                String givenDateString = i2 + " " + i1 + " " + i + " 23:59:00";//due the end of the day.
-                SimpleDateFormat sdf = new SimpleDateFormat("dd mm yyyy HH:mm:ss", Locale.getDefault());
-                try {
-                    Date mDate = sdf.parse(givenDateString);
-                    long timeInMilliseconds = mDate.getTime();
-                    long millis = System.currentTimeMillis();
+        DatePickerDialog pickerDialog = new DatePickerDialog(getContext(), (datePicker, i, i1, i2) -> {
+            String givenDateString = i2 + " " + i1 + " " + i + " 23:59:00";//due the end of the day.
+            SimpleDateFormat sdf = new SimpleDateFormat("dd mm yyyy HH:mm:ss", Locale.getDefault());
+            try {
+                Date mDate = sdf.parse(givenDateString);
+                long timeInMilliseconds = mDate.getTime();
+                long millis = System.currentTimeMillis();
 
-                    dbActionRef.child(key).child("dueDate").setValue(timeInMilliseconds);//save due date in milliSec.
-                    dbActionRef.child(key).child("updatedAt").setValue(millis);
+                dbActionRef.child(key).child("dueDate").setValue(timeInMilliseconds);//save due date in milliSec.
+                dbActionRef.child(key).child("updatedAt").setValue(millis);
 
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
         }, year, month, day);
         pickerDialog.show();
     }
 
-    @Override
-    protected TextView getNoActionView() {
-        return txtNoAction;
-    }
 
-    //region UsersListDialogFragment.ItemSelectedListener
+    //region UsersListDialogFragment.ActionAdapterListener
     @Override
     public void onItemSelected(UserModel model) {
         long millis = System.currentTimeMillis();
@@ -204,27 +180,17 @@ public class ActionUnassignedFragment extends BaseUnassignedFragment implements 
         mUnassignedAdapter.removeItem(actionID);
         mUnassignedAdapter.notifyDataSetChanged();
     }
+    //endregion
+
 
     @Override
-    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
-        for (String id : networkFetcherResult.all()) {
-            dbActionBaseRef.child(id).addChildEventListener(new UnassignedChildListener(id));
-            dbActionBaseRef.child(id).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.getValue() == null) {
-                        getCHSForNewUser(id);
-                        getMandatedForNewUser(id);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-
-        }
+    public void onActionRetrieved(String key, Action action) {
+        txtNoAction.setVisibility(View.GONE);
+        mUnassignedAdapter.addItems(key, action);
     }
-    //endregion
+
+    @Override
+    public void onActionRemoved(String key) {
+        mUnassignedAdapter.removeItem(key);
+    }
 }

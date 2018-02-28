@@ -3,7 +3,7 @@ package org.alertpreparedness.platform.alert.min_preparedness.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,16 +14,23 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.action.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.UsersListDialogFragment;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
+import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,7 +40,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionCompletedFragment extends BaseCompletedFragment implements UsersListDialogFragment.ItemSelectedListener, ActionAdapter.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
+public class ActionCompletedFragment extends Fragment implements UsersListDialogFragment.ItemSelectedListener, ActionAdapter.ActionAdapterListener, ActionFetcher.ActionRetrievalListener {
 
     @BindView(R.id.rvMinAction)
     RecyclerView mActionRV;
@@ -47,6 +54,9 @@ public class ActionCompletedFragment extends BaseCompletedFragment implements Us
     @BindView(R.id.tvNoAction)
     TextView txtNoAction;
 
+    @Inject
+    @ActionRef
+    public DatabaseReference dbActionRef;
 
     private ActionAdapter mAdapter;
 
@@ -76,7 +86,7 @@ public class ActionCompletedFragment extends BaseCompletedFragment implements Us
         tvActionCompleted.setText("Completed");
         tvActionCompleted.setTextColor(getResources().getColor(R.color.alertGreen));
 
-        mAdapter = new ActionAdapter(getContext(), dbActionBaseRef, this);
+        mAdapter = new ActionAdapter(getContext(), this);
         assert mActionRV != null;
         mActionRV.setAdapter(mAdapter);
 
@@ -84,27 +94,10 @@ public class ActionCompletedFragment extends BaseCompletedFragment implements Us
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        new NetworkFetcher(this).fetch();
+        new ActionFetcher(Constants.MPA, ActionFetcher.ACTION_STATE.COMPLETED, this).fetch((ids) -> {
+            mAdapter.bindChildListeners(ids);
+        });
 
-        dbActionBaseRef.child(user.countryID).addChildEventListener(new CompletedListener(user.countryID));
-
-    }
-
-
-
-    @Override
-    protected int getType() {
-        return Constants.MPA;
-    }
-
-    @Override
-    protected PreparednessAdapter getAdapter() {
-        return mAdapter;
-    }
-
-    @Override
-    protected RecyclerView getListView() {
-        return mActionRV;
     }
 
     @Override
@@ -117,13 +110,13 @@ public class ActionCompletedFragment extends BaseCompletedFragment implements Us
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
-                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, mAdapter.getItem(pos).getId());
                     intent.putExtra(AddNotesActivity.ACTION_ID, key);
                     startActivity(intent);
                     break;
                 case R.id.attachments:
                     Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
-                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, getAdapter().getItem(pos).getId());
+                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, mAdapter.getItem(pos).getId());
                     intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
                     startActivity(intent2);
                     break;
@@ -133,11 +126,13 @@ public class ActionCompletedFragment extends BaseCompletedFragment implements Us
     }
 
     @Override
-    protected TextView getNoActionView() {
-        return txtNoAction;
+    public void itemRemoved(String key) {
+        if (mAdapter.getItemCount()==0) {
+            txtNoAction.setVisibility(View.VISIBLE);
+        }
     }
 
-    //region UsersListDialogFragment.ItemSelectedListener
+    //region UsersListDialogFragment.ActionAdapterListener
     @Override
     public void onItemSelected(UserModel model) {
         long millis = System.currentTimeMillis();
@@ -148,11 +143,13 @@ public class ActionCompletedFragment extends BaseCompletedFragment implements Us
     //endregion
 
     @Override
-    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
-        for (String id : networkFetcherResult.all()) {
-            if (id != null) {
-                dbActionBaseRef.child(id).addChildEventListener(new CompletedListener(id));
-            }
-        }
+    public void onActionRetrieved(String key, Action action) {
+        txtNoAction.setVisibility(View.GONE);
+        mAdapter.addItems(key, action);
+    }
+
+    @Override
+    public void onActionRemoved(String key) {
+        mAdapter.removeItem(key);
     }
 }

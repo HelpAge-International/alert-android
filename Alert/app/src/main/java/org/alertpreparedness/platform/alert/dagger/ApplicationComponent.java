@@ -2,6 +2,7 @@ package org.alertpreparedness.platform.alert.dagger;
 
 
 import org.alertpreparedness.platform.alert.MainDrawer;
+import org.alertpreparedness.platform.alert.action.BaseActionProcessor;
 import org.alertpreparedness.platform.alert.adv_preparedness.activity.CreateAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.APAArchivedFragment;
@@ -119,4 +120,8 @@ public interface ApplicationComponent {
     void inject(ResponsePlanFetcher responsePlanFetcher);
     void inject(ResponsePlanNotificationService responsePlanNotificationService);
     void inject(ResponsePlanUpdateNotificationHandler responsePlanUpdateNotificationHandler);
+
+    void inject(org.alertpreparedness.platform.alert.action.ActionFetcher actionFetcher);
+
+    void inject(BaseActionProcessor baseActionProcessor);
 }

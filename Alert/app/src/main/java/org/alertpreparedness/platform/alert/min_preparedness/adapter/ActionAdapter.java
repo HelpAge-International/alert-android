@@ -15,18 +15,19 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
-import org.alertpreparedness.platform.alert.min_preparedness.fragment.InProgressFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.interfaces.OnItemsChangedListener;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.model.User;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -43,8 +44,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     private final ArrayList<String> keys;
     private Context context;
     private HashMap<String, Action> items;
-    private DatabaseReference dbRef;
-    private ItemSelectedListener listener;
+    private ActionAdapterListener listener;
     private OnItemsChangedListener changedListener;
     private String dateFormat = "MMM dd,yyyy";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
@@ -60,6 +60,10 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     @CountryOfficeRef
     DatabaseReference countryOfficeRef;
 
+    @Inject
+    @BaseActionRef
+    public DatabaseReference dbRef;
+
 
     public void addItems(String key, Action action) {
         if (keys.indexOf(key) == -1) {
@@ -72,15 +76,19 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
         }
     }
 
-    public ActionAdapter(Context context, DatabaseReference dbRef, ItemSelectedListener listener) {
+    public ActionAdapter(Context context, ActionAdapterListener listener) {
         this.context = context;
         this.items = new HashMap<>();
         this.listener = listener;
-        this.dbRef = dbRef;
         this.listener = listener;
         this.keys = new ArrayList<>(items.keySet());
-        this.dbRef.addChildEventListener(this);
         DependencyInjector.applicationComponent().inject(this);
+    }
+
+    public void bindChildListeners(List<String> ids) {
+        for(String id : ids) {
+            dbRef.child(id).addChildEventListener(this);
+        }
     }
 
     public Action getItem(int index) {
@@ -93,6 +101,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
             items.remove(keys.get(index));
             keys.remove(index);
             notifyItemRemoved(index);
+            listener.itemRemoved(key);
         }
     }
 
@@ -350,8 +359,10 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     }
 
-    public interface ItemSelectedListener {
+    public interface ActionAdapterListener {
         void onActionItemSelected(int pos, String key, String userTypeID);
+
+        void itemRemoved(String key);
     }
 
 

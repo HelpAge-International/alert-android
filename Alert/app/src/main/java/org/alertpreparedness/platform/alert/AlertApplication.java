@@ -74,7 +74,7 @@ public class AlertApplication extends Application implements ValueEventListener 
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.SAND;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING;
 
     @Override
     public void onCreate() {
@@ -105,14 +105,14 @@ public class AlertApplication extends Application implements ValueEventListener 
         }
 
         // Live-Only additions
-        if (!IS_LIVE && CURRENT_STATUS != APP_STATUS.SAND) {
+        if (!IS_LIVE && CURRENT_STATUS == APP_STATUS.SAND) {
             // Leak Canary
-            if (LeakCanary.isInAnalyzerProcess(this)) {
-                // This process is dedicated to LeakCanary for heap analysis.
-                // You should not init your app in this process.
-                return;
-            }
-            LeakCanary.install(this);
+//            if (LeakCanary.isInAnalyzerProcess(this)) {
+//                // This process is dedicated to LeakCanary for heap analysis.
+//                // You should not init your app in this process.
+//                return;
+//            }
+//            LeakCanary.install(this);
         }
 
         // Debug-Only builds
