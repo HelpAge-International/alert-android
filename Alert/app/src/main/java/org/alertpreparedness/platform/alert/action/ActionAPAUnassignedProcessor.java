@@ -44,7 +44,9 @@ public class ActionAPAUnassignedProcessor extends ActionUnassignedProcessor {
     ) {
 
 
-        if(model.getAssignHazard() != null && !model.getIsArchived() && model.getAsignee() == null) {
+        if(model.getAssignHazard() != null
+                && ((networkHazardTypes.indexOf(model.getAssignHazard().get(0)) != -1 && model.isNetworkLevel())
+                || (alertHazardTypes.indexOf(model.getAssignHazard().get(0)) != -1 && !model.isNetworkLevel())) && !model.getIsArchived() && model.getAsignee() == null) {
             super.addObject(taskName, department, createdAt, level, key, assignee, agencyId, countryId, networkId, isArchived, isComplete, updatedAt, actionType, dueDate, budget, frequencyBase, frequencyValue);
         }
 

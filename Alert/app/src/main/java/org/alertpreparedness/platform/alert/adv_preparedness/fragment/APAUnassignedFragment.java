@@ -177,7 +177,7 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
             }
             catch (Exception e) {}
 
-            new ActionFetcher(Constants.APA, ActionFetcher.ACTION_STATE.APA_EXPIRED, APAUnassignedFragment.this, alertHazardTypes, networkAlertHazardTypes).fetchWithIds(networkIds, (ids -> {
+            new ActionFetcher(Constants.APA, ActionFetcher.ACTION_STATE.APA_UNASSIGNED, APAUnassignedFragment.this, alertHazardTypes, networkAlertHazardTypes).fetchWithIds(networkIds, (ids -> {
 
             }));
         }
