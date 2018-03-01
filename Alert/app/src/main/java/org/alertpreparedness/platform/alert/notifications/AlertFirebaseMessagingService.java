@@ -64,24 +64,6 @@ public class AlertFirebaseMessagingService extends FirebaseMessagingService {
             }
         }
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(getApplicationContext(), "alert")
-                        .setContentTitle("Title")
-                        .setContentText("Content")
-                        .setSmallIcon(R.drawable.alert_logo)
-                        .setPriority(NotificationCompat.PRIORITY_HIGH)
-                        .setAutoCancel(true);
-
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (notificationManager != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                NotificationChannel channel = new NotificationChannel("alert",
-                        "Default Alert Notification Channel",
-                        NotificationManager.IMPORTANCE_DEFAULT);
-                notificationManager.createNotificationChannel(channel);
-            }
-            notificationManager.notify(new Random().nextInt(), mBuilder.build());
-        }
 
     }
 
