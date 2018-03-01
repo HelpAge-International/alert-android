@@ -54,6 +54,7 @@ class RiskMonitoringService(private val context : Context) {
 
         val hazardsRef = FirebaseHelper.getHazardsRef(mAppStatus, countryId)
         return RxFirebaseDatabase.observeValueEvent(hazardsRef, { snap ->
+            println("hazardsRefsnap = ${snap}")
             if (snap.value != null && snap.children.count() > 0) {
                 snap.children.map {
                     val toJson = gson.toJson(it.value)

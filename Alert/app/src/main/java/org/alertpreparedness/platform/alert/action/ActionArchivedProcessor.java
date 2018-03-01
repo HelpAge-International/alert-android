@@ -46,7 +46,7 @@ public class ActionArchivedProcessor extends BaseActionProcessor {
                                 && model.getIsArchived()
                                 && model.getDueDate() != null) {
 
-                            listener.onAddAction(childSnapshot.getKey(), childSnapshot, new Action(
+                            listener.onAddAction(childSnapshot, new Action(
                                     parentId,
                                     taskNameMandated,
                                     model.getDepartment(),
@@ -71,7 +71,7 @@ public class ActionArchivedProcessor extends BaseActionProcessor {
                             );
                         }
                         else {
-                            listener.tryRemoveAction(childSnapshot.getKey());
+                            listener.tryRemoveAction(childSnapshot);
                         }
                     }
                 }
@@ -106,7 +106,7 @@ public class ActionArchivedProcessor extends BaseActionProcessor {
                                 && model.getIsArchived()
                                 && model.getDueDate() != null) {
 
-                            listener.onAddAction(childSnapshot.getKey(), childSnapshot, new Action(
+                            listener.onAddAction(childSnapshot, new Action(
                                     parentId,
                                     CHSTaskName,
                                     model.getDepartment(),
@@ -131,7 +131,7 @@ public class ActionArchivedProcessor extends BaseActionProcessor {
                             );
                         }
                         else {
-                            listener.tryRemoveAction(childSnapshot.getKey());
+                            listener.tryRemoveAction(childSnapshot);
                         }
                     }
                 }
@@ -154,7 +154,7 @@ public class ActionArchivedProcessor extends BaseActionProcessor {
                 && model.getIsArchived()
                 && model.getDueDate() != null) {
 
-            listener.onAddAction(snapshot.getKey(), snapshot, new Action(
+            listener.onAddAction(snapshot, new Action(
                     parentId,
                     model.getTask(),
                     model.getDepartment(),
@@ -179,7 +179,7 @@ public class ActionArchivedProcessor extends BaseActionProcessor {
             );
         }
         else {
-            listener.tryRemoveAction(snapshot.getKey());
+            listener.tryRemoveAction(snapshot);
         }
     }
 

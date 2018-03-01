@@ -70,7 +70,7 @@ public class ActionFetcher implements ActionProcessorListener {
         DependencyInjector.applicationComponent().inject(this);
     }
 
-    public void fetchWithIds(List<String> ids, ActionFetcher.IdFetcherListener idFetcherListener) {
+    public void fetchWithIds(List<String> ids, IdFetcherListener idFetcherListener) {
         ids.add(user.countryID);
         idFetcherListener.onIdResult(ids);
         for (String id : ids) {
@@ -78,7 +78,7 @@ public class ActionFetcher implements ActionProcessorListener {
         }
     }
 
-    public void fetch(ActionFetcher.IdFetcherListener idFetcherListener) {
+    public void fetch(IdFetcherListener idFetcherListener) {
         new NetworkFetcher((n) -> {
             List<String> ids = n.all();
             ids.add(user.countryID);
@@ -110,10 +110,6 @@ public class ActionFetcher implements ActionProcessorListener {
             default:
                 return new ActionInProgressProcessor(type, snapshot, model, actionId, parentId, this);
         }
-    }
-
-    public interface IdFetcherListener {
-        void onIdResult(List<String> ids);
     }
 
     protected class ActionListener implements ChildEventListener {

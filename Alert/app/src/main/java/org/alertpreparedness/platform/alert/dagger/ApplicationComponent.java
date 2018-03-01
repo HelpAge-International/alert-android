@@ -55,6 +55,7 @@ import org.alertpreparedness.platform.alert.responseplan.ResponsePlanFragment;
 import org.alertpreparedness.platform.alert.settings.ChangeEmailActivity;
 import org.alertpreparedness.platform.alert.settings.ChangePasswordActivity;
 import org.alertpreparedness.platform.alert.settings.SettingsFragment;
+import org.alertpreparedness.platform.alert.utils.AlertFetcher;
 import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 
 import javax.inject.Singleton;
@@ -124,4 +125,6 @@ public interface ApplicationComponent {
     void inject(org.alertpreparedness.platform.alert.action.ActionFetcher actionFetcher);
 
     void inject(BaseActionProcessor baseActionProcessor);
+
+    void inject(AlertFetcher alertFetcher);
 }
