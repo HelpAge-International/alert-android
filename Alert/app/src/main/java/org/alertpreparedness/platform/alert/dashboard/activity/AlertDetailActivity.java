@@ -112,7 +112,6 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
         countryID = user.countryID;
         isCountryDirector = user.isCountryDirector();
-        System.out.println("user = " + user);
         toolbar = (Toolbar) findViewById(R.id.action_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -413,7 +412,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (isApproved) {
-                    DatabaseReference rf = countryAlertRef.push();
+                    DatabaseReference rf = countryAlertRef.child(alert.getKey());
                     rf.setValue(alert);
                     mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_APPROVED);
                     mReference.child("alertLevel").setValue(Constants.TRIGGER_RED);

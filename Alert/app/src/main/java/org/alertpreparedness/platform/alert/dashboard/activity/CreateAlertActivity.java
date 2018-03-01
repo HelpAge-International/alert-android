@@ -151,14 +151,14 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
                 user.getUserID(),
                 mCurrentAffectedAreas
         );
-
+        m.setUpdatedBy(user.getUserID());
         ApprovalModel approval = new ApprovalModel();
         approval.setCountryDirector(new HashMap<String, Integer>() {{
             if (isRedAlert) {
-                put(user.getCountryID(), 1);
+                put(user.getCountryID(), 0);
             }
             else {
-                put(user.getCountryID(), 2);
+//                put(user.getCountryID(), 2);
             }
         }});
 

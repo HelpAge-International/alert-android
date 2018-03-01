@@ -294,7 +294,9 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
             AlertModel model = alertAdapter.getModel(a);
             switch (model.getAlertLevel()) {
                 case 2:
-                    redPresent = true;
+                    if(!model.wasRedAlertRequested()) {//means is has approval
+                        redPresent = true;
+                    }
                     break;
                 case 1:
                     amberPresent = true;
@@ -447,13 +449,17 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
             model.setParentKey(dataSnapshot.getRef().getParent().getKey());
 
             if (!isNetworkAlert) {
+                if(model.getEstimatedPopulation() == 6464) {
+                    System.out.println("AlertModelmodel = " + dataSnapshot.getRef());
+                }
+
                 if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
                     updateAlert(dataSnapshot.getKey(), model);
                 }
             }
             else {
 //            else if (!model.hasNetworkApproval()) {
-                System.out.println("AlertModelmodel = " + model);
+//                System.out.println("AlertModelmodel = " + model);
 
                 model.setLeadAgencyId(networkLeadId);
                 model.setAgencyAdminId(agencyAdminId);
