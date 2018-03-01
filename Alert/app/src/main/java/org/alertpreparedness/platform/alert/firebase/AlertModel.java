@@ -13,8 +13,6 @@ public class AlertModel extends FirebaseModel implements Serializable {
 
     private String agencyAdminId;
 
-    private String key;
-
     private String parentKey;
 
     private List<AffectedAreaModel> affectedAreas = new ArrayList<>();
@@ -63,7 +61,6 @@ public class AlertModel extends FirebaseModel implements Serializable {
                 "isNetwork=" + isNetwork +
                 ", leadAgencyId='" + leadAgencyId + '\'' +
                 ", agencyAdminId='" + agencyAdminId + '\'' +
-                ", key='" + key + '\'' +
                 ", parentKey='" + parentKey + '\'' +
                 ", affectedAreas=" + affectedAreas +
                 ", alertLevel=" + alertLevel +
@@ -187,14 +184,6 @@ public class AlertModel extends FirebaseModel implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 
     public String getParentKey() {

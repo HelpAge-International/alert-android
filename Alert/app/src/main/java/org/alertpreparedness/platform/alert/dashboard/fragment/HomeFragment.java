@@ -435,7 +435,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
             AlertModel model = AppUtils.getValueFromDataSnapshot(dataSnapshot, AlertModel.class);
 
             assert model != null;
-            model.setKey(dataSnapshot.getKey());
+            model.setId(dataSnapshot.getKey());
             model.setParentKey(dataSnapshot.getRef().getParent().getKey());
 
             if (!isNetworkAlert) {
@@ -450,7 +450,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                 model.setLeadAgencyId(networkLeadId);
                 model.setAgencyAdminId(agencyAdminId);
                 if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
-                    updateNetworkAlert(model.getKey(), model);
+                    updateNetworkAlert(model.getId(), model);
                 }
             }
         }

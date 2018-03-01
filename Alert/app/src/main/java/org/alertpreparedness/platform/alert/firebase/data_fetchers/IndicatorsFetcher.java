@@ -5,6 +5,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
 import org.alertpreparedness.platform.alert.model.User;
 
@@ -25,6 +26,7 @@ public class IndicatorsFetcher implements FirebaseDataFetcher {
 
     public IndicatorsFetcher(IndicatorsFetcherListener indicatorsFetcherListener) {
         this.indicatorsFetcherListener = indicatorsFetcherListener;
+        DependencyInjector.applicationComponent().inject(this);
     }
 
     //region FirebaseDataFetcher
@@ -49,7 +51,7 @@ public class IndicatorsFetcher implements FirebaseDataFetcher {
         new HazardsFetcher(hazardSnapshot -> {
             String hazardId = hazardSnapshot.getKey();
             baseIndicatorRef.child(hazardId).addValueEventListener(indicatorsValueEventListener);
-        });
+        }).fetch();
 
         new NetworkFetcher(networkFetcherResult -> {
             for (String networkId : networkFetcherResult.all()) {
@@ -57,7 +59,7 @@ public class IndicatorsFetcher implements FirebaseDataFetcher {
                         .child(networkId)
                         .addValueEventListener(indicatorsValueEventListener);
             }
-        });
+        }).fetch();
 
         String countryId = user.countryID;
         baseIndicatorRef

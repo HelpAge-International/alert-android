@@ -2,7 +2,6 @@ package org.alertpreparedness.platform.alert.firebase;
 
 public class IndicatorModel extends FirebaseModel {
 
-    private String id;
     private String assignee;
     private String name;
     private Long triggerSelected;
@@ -15,8 +14,7 @@ public class IndicatorModel extends FirebaseModel {
     @Override
     public String toString() {
         return "IndicatorModel{" +
-                "id='" + id + '\'' +
-                ", assignee='" + assignee + '\'' +
+                "assignee='" + assignee + '\'' +
                 ", name='" + name + '\'' +
                 ", triggerSelected=" + triggerSelected +
                 ", dueDate=" + dueDate +
@@ -63,13 +61,5 @@ public class IndicatorModel extends FirebaseModel {
 
     public void setHazardId(String hazardId) {
         this.hazardId = hazardId;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 }

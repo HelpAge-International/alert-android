@@ -17,7 +17,6 @@ public class ProgrammeModel extends FirebaseModel implements Parcelable {
         }
     };
 
-    private String key;
     private String agencyId;
     private int level1;
     private String level2;
@@ -42,8 +41,7 @@ public class ProgrammeModel extends FirebaseModel implements Parcelable {
     @Override
     public String toString() {
         return "ProgrammeModel{" +
-                "key='" + key + '\'' +
-                ", agencyId='" + agencyId + '\'' +
+                "agencyId='" + agencyId + '\'' +
                 ", level1=" + level1 +
                 ", level2='" + level2 + '\'' +
                 ", sector=" + sector +
@@ -124,13 +122,5 @@ public class ProgrammeModel extends FirebaseModel implements Parcelable {
         parcel.writeString(toWho);
         parcel.writeString(what);
         parcel.writeLong(when);
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 }

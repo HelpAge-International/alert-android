@@ -203,7 +203,7 @@ public class APAInProgressFragment extends BaseInProgressFragment implements APA
             AlertModel model = gson.fromJson(reader, AlertModel.class);
 
             assert model != null;
-            model.setKey(dataSnapshot.getKey());
+            model.setId(dataSnapshot.getKey());
             model.setParentKey(dataSnapshot.getRef().getParent().getKey());
 
             if (model.getAlertLevel() == Constants.TRIGGER_RED && model.getHazardScenario() != null) {

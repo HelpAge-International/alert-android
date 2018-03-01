@@ -65,7 +65,7 @@ public class HazardsFetcher implements FirebaseDataFetcher {
             baseHazardRef
                     .child(user.countryID)
                     .addValueEventListener(hazardsValueListener);
-        });
+        }).fetch();
     }
     //endregion
 

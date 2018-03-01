@@ -2,7 +2,6 @@ package org.alertpreparedness.platform.alert.firebase;
 
 public class HazardModel extends FirebaseModel {
 
-    private String id;
     private int hazardScenario;
     private boolean isActive;
     private boolean isSeasonal;
@@ -14,21 +13,12 @@ public class HazardModel extends FirebaseModel {
     @Override
     public String toString() {
         return "HazardModel{" +
-                "id='" + id + '\'' +
                 ", hazardScenario=" + hazardScenario +
                 ", isActive=" + isActive +
                 ", isSeasonal=" + isSeasonal +
                 ", risk=" + risk +
                 '}' +
                 super.toString();
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public int getHazardScenario() {

@@ -1,6 +1,5 @@
 package org.alertpreparedness.platform.alert.mycountry;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.NestedScrollView;
@@ -16,10 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -347,7 +344,7 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
         for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
             ProgrammeModel model = snapshot.getValue(ProgrammeModel.class);
             assert model != null;
-            model.setKey(snapshot.getKey());
+            model.setId(snapshot.getKey());
 //            assert filter.getLevel1() != null;
             boolean hasLevel1 = filter.getLevel1() != null && filter.getLevel1() != -1;
             boolean hasLevel2 = filter.getLevel2() != null && filter.getLevel2() != -1;

@@ -17,6 +17,7 @@ import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.HazardsFetcher;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.IndicatorsFetcher;
 import org.alertpreparedness.platform.alert.helper.DataHandler;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
@@ -104,6 +105,7 @@ public interface ApplicationComponent {
     void inject(IndicatorUpdateNotificationHandler indicatorUpdateNotificationHandler);
     void inject(IndicatorFetcher indicatorFetcher);
     void inject(HazardsFetcher hazardsFetcher);
+    void inject(IndicatorsFetcher indicatorsFetcher);
     void inject(IndicatorNotificationService indicatorNotificationService);
     void inject(ActionFetcher actionFetcher);
     void inject(ActionNotificationService actionNotificationService);

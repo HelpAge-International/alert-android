@@ -13,12 +13,13 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseLogRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
+import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.IndicatorsFetcher;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.notifications.IndicatorFetcher;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 
 import java.util.HashMap;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -64,7 +65,7 @@ public class OfflineSyncHandler {
 
     /**
      * Indicators for country office ID (e.g. /sand/indicator/<countryId>
-     * */
+     */
     @Inject
     @IndicatorRef
     DatabaseReference countryIndicatorRef;
@@ -111,17 +112,18 @@ public class OfflineSyncHandler {
 
         databaseReferenceOfflineHandler = new DatabaseReferenceOfflineHandler(2);
 
-        DatabaseReference.goOnline();
+        // TODO: Figure out if it's worthwhile going online and offline
+        // DatabaseReference.goOnline();
 
-        fetchCountryLevelAlerts();
+        // fetchCountryLevelAlerts();
 
-        fetchNetworkLevelAlerts();
+        // fetchNetworkLevelAlerts();
 
-        fetchTasks();
+        // fetchTasks();
 
         fetchIndicators();
 
-        fetchIndicatorLogs();
+        // fetchIndicatorLogs();
 
          /* Risk Monitoring */
 
@@ -135,17 +137,11 @@ public class OfflineSyncHandler {
     }
 
     private void fetchIndicators() {
-        new IndicatorFetcher(new IndicatorFetcher.IndicatorFetcherListener() {
-            @Override
-            public void indicatorFetchSuccess(List<IndicatorFetcher.IndicatorFetcherResult> models) {
-
-            }
-
-            @Override
-            public void indicatorFetchFail() {
-
-            }
-        });
+        new IndicatorsFetcher(indicatorSnapshot -> {
+            IndicatorModel indicatorModel =
+                    AppUtils.getFirebaseModelFromDataSnapshot(indicatorSnapshot, IndicatorModel.class);
+            Timber.d("Fetched indicator: %1$s", indicatorModel.getName());
+        }).fetch();
     }
 
     private void fetchIndicatorLogs() {
@@ -234,7 +230,8 @@ public class OfflineSyncHandler {
 
         private void checkFinished() {
             if (!cancelled && num <= 0) {
-                DatabaseReference.goOffline();
+                // TODO: Figure out if it's worthwhile going online and offline
+                // DatabaseReference.goOffline();
                 Timber.d("Going offline..");
             }
         }
