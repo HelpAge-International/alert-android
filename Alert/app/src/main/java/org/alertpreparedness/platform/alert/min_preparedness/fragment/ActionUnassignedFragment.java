@@ -25,10 +25,12 @@ import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
+import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
+import org.alertpreparedness.platform.alert.utils.ClockSettingsFetcher;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 import org.joda.time.DateTime;
@@ -164,9 +166,21 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
             else {
                 dbActionRef.child(key).child("dueDate").setValue(newDate.getMillis());//save due date in milliSec.
 
-//                new ClockSettingsFetcher(((value, durationType) -> {
-                dbActionRef.child(key).child("updatedAt").setValue(newDate.getMillis());
-//                })).fetch();
+                new ClockSettingsFetcher(((value, durationType) -> {
+                    Long clocker;
+                    if(mUnassignedAdapter.getItem(actionID).getFrequencyValue() != null) {
+                        clocker = DateHelper.clockCalculation(
+                                mUnassignedAdapter.getItem(actionID).getFrequencyValue().longValue(),
+                                mUnassignedAdapter.getItem(actionID).getFrequencyBase()
+                        );
+                    }
+                    else {
+                        clocker = DateHelper.clockCalculation(value, durationType);
+                    }
+
+                    dbActionRef.child(key).child("createdAt").setValue(newDate.plusMillis(clocker.intValue()).getMillis());
+                    dbActionRef.child(key).child("updatedAt").setValue(newDate.plusMillis(clocker.intValue()).getMillis());
+                })).fetch();
             }
         }, year, month, day);
         pickerDialog.show();

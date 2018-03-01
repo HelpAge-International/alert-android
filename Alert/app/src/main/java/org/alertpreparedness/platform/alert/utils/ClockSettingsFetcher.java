@@ -16,6 +16,7 @@ import org.alertpreparedness.platform.alert.model.User;
 
 import javax.inject.Inject;
 
+import durdinapps.rxfirebase2.RxFirebaseDatabase;
 import io.reactivex.Observable;
 
 /**
@@ -33,11 +34,17 @@ public class ClockSettingsFetcher {
     @Inject
     User user;
 
+    @Deprecated
     public ClockSettingsFetcher(ClockSettingsRetrievedListener listener) {
         this.listener = listener;
         DependencyInjector.applicationComponent().inject(this);
     }
 
+    public ClockSettingsFetcher() {
+        DependencyInjector.applicationComponent().inject(this);
+    }
+
+    @Deprecated
     public void fetch() {
         countryOffice.child(user.agencyAdminID).child(user.countryID).child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -58,8 +65,38 @@ public class ClockSettingsFetcher {
         });
     }
 
+    public Observable<ClockSettingsModel> rxFetch() {
+
+        DatabaseReference ref = countryOffice
+                .child(user.agencyAdminID)
+                .child(user.countryID)
+                .child("clockSettings")
+                .child("preparedness");
+
+        return RxFirebaseDatabase.observeSingleValueEvent(ref, ClockSettingsModel.class).toObservable();
+
+    }
+
     public interface ClockSettingsRetrievedListener {
         void onClockSettingsRetrieved(Long value, Long durationType);
     }
 
+    public class ClockSettingsModel {
+        private final Long value;
+        private final Long durationType;
+
+        public ClockSettingsModel(Long value, Long durationType) {
+
+            this.value = value;
+            this.durationType = durationType;
+        }
+
+        public Long getValue() {
+            return value;
+        }
+
+        public Long getDurationType() {
+            return durationType;
+        }
+    }
 }

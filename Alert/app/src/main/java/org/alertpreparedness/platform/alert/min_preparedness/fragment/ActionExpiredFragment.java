@@ -180,8 +180,7 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
                     else {
                         clocker = DateHelper.clockCalculation(value, durationType);
                     }
-                    System.out.println("clocker = " + clocker);
-                    System.out.println(" mExpiredAdapter = " + mExpiredAdapter.getItem(actionID).getFrequencyValue() + " " + mExpiredAdapter.getItem(actionID).getFrequencyBase());
+
                     dbActionRef.child(key).child("createdAt").setValue(newDate.plusMillis(clocker.intValue()).getMillis());
                     dbActionRef.child(key).child("updatedAt").setValue(newDate.plusMillis(clocker.intValue()).getMillis());
                 })).fetch();

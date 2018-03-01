@@ -211,9 +211,21 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
             else {
                 dbActionRef.child(key).child("dueDate").setValue(newDate.getMillis());//save due date in milliSec.
 
-//                new ClockSettingsFetcher(((value, durationType) -> {
-                dbActionRef.child(key).child("updatedAt").setValue(newDate.getMillis());
-//                })).fetch();
+              new ClockSettingsFetcher(((value, durationType) -> {
+                    Long clocker;
+                    if(mAPAdapter.getItem(actionID).getFrequencyValue() != null) {
+                        clocker = DateHelper.clockCalculation(
+                                mAPAdapter.getItem(actionID).getFrequencyValue().longValue(),
+                                mAPAdapter.getItem(actionID).getFrequencyBase()
+                        );
+                    }
+                    else {
+                        clocker = DateHelper.clockCalculation(value, durationType);
+                    }
+
+                    dbActionRef.child(key).child("createdAt").setValue(newDate.plusMillis(clocker.intValue()).getMillis());
+                    dbActionRef.child(key).child("updatedAt").setValue(newDate.plusMillis(clocker.intValue()).getMillis());
+                })).fetch();
             }
 
         }, year, month, day);

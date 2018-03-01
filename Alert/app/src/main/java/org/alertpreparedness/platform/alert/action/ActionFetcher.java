@@ -18,6 +18,8 @@ import java.util.Objects;
 
 import javax.inject.Inject;
 
+import durdinapps.rxfirebase2.RxFirebaseDatabase;
+
 /**
  * Created by Tj on 28/02/2018.
  */
@@ -87,6 +89,8 @@ public class ActionFetcher implements ActionProcessorListener {
                 dbActionBaseRef.child(id).addChildEventListener(new ActionListener(id));
             }
         }).fetch();
+
+        
     }
 
     private ActionProcessor makeProcessor(DataSnapshot snapshot, DataModel model, String actionId, String parentId) {
