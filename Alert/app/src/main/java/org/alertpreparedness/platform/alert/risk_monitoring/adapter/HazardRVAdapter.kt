@@ -123,7 +123,7 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener,
                     indicatorDue.textColor = context.resources.getColor(R.color.alertRed)
                 }
             }
-            
+
             if(indicator.trigger.size > indicator.triggerSelected) {
                 indicatorLevel.text = indicator.trigger[indicator.triggerSelected].triggerValue;
             }
