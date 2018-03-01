@@ -15,10 +15,10 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseLogRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
+import org.alertpreparedness.platform.alert.notifications.IndicatorFetcher;
 
 import java.util.HashMap;
-import java.util.Set;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -131,65 +131,24 @@ public class OfflineSyncHandler {
     }
 
     private void fetchTasks() {
-        fetchNetworks(networkIds -> {
-            for (String networkId : networkIds) {
-                baseActionRef.child(networkId).keepSynced(true);
-                baseActionRef
-                        .child(networkId)
-                        .addListenerForSingleValueEvent(getValueListenerForOfflineCaching());
-            }
-        });
+
     }
 
     private void fetchIndicators() {
-        fetchNetworks(networkIds -> {
-            for (String networkId : networkIds) {
-                baseIndicatorRef.child(networkId).keepSynced(true);
-                baseIndicatorRef
-                        .child(networkId)
-                        .addListenerForSingleValueEvent(getValueListenerForOfflineCaching());
+        new IndicatorFetcher(new IndicatorFetcher.IndicatorFetcherListener() {
+            @Override
+            public void indicatorFetchSuccess(List<IndicatorFetcher.IndicatorFetcherResult> models) {
 
             }
-        });
 
-        countryIndicatorRef.keepSynced(true);
-        countryIndicatorRef.addListenerForSingleValueEvent(getValueListenerForOfflineCaching());
-        new NetworkFetcher(networkFetcherResult -> {
+            @Override
+            public void indicatorFetchFail() {
 
+            }
         });
     }
 
     private void fetchIndicatorLogs() {
-        fetchNetworks(networkIds -> {
-            for (String networkId : networkIds) {
-                baseLogRef.child(networkId).keepSynced(true);
-                baseLogRef
-                        .child(networkId)
-                        .addListenerForSingleValueEvent(getValueListenerForOfflineCaching());
-            }
-        });
-    }
-
-    private void fetchNetworks(NetworkIdsFetchedListener listener) {
-        ValueEventListener agencyListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                HashMap<String, Boolean> networks =
-                        (HashMap<String, Boolean>) dataSnapshot.child("networks").getValue();
-
-                if (networks != null) {
-                    Timber.d("Fetched networks: %s", networks);
-                    listener.onNetworkIdsFetched(networks.keySet());
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Timber.d("Error downloading offline data: %s", databaseError.getMessage());
-            }
-        };
-
-        agencyRef.addListenerForSingleValueEvent(agencyListener);
     }
 
     private void fetchNetworkLevelAlerts() {
@@ -279,9 +238,5 @@ public class OfflineSyncHandler {
                 Timber.d("Going offline..");
             }
         }
-    }
-
-    private interface NetworkIdsFetchedListener {
-        void onNetworkIdsFetched(Set<String> networkIds);
     }
 }

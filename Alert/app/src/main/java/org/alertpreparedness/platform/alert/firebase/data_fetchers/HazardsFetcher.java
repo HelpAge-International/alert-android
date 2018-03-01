@@ -27,10 +27,10 @@ public class HazardsFetcher implements FirebaseDataFetcher {
     @Inject
     User user;
 
-    private HazardFetcherListener hazardFetcherListener;
+    private HazardsFetcherListener hazardsFetcherListener;
 
-    public HazardsFetcher(HazardFetcherListener hazardFetcherListener) {
-        this.hazardFetcherListener = hazardFetcherListener;
+    public HazardsFetcher(HazardsFetcherListener hazardsFetcherListener) {
+        this.hazardsFetcherListener = hazardsFetcherListener;
         DependencyInjector.applicationComponent().inject(this);
     }
 
@@ -49,13 +49,14 @@ public class HazardsFetcher implements FirebaseDataFetcher {
                                 AppUtils.getValueFromDataSnapshot(hazardWithIdSnapshot, HazardModel.class);
                         hazardModel.setId(hazardWithIdSnapshot.getKey());
 
-                        hazardFetcherListener.onHazardFetcherResult(hazardModel);
+                        hazardsFetcherListener.onHazardsFetcherResult(hazardModel);
                     }
                 }
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-                    Timber.e("Error fetching hazards for nerwork / country office: %s", databaseError);
+                    Timber.e("Error fetching hazards for network / country office: %s",
+                            databaseError.getMessage());
                 }
             };
 
@@ -74,9 +75,9 @@ public class HazardsFetcher implements FirebaseDataFetcher {
     }
     //endregion
 
-    //region HazardFetcherListener
-    public interface HazardFetcherListener {
-        void onHazardFetcherResult(HazardModel hazardFetcherResult);
+    //region HazardsFetcherListener
+    public interface HazardsFetcherListener {
+        void onHazardsFetcherResult(HazardModel hazardModel);
     }
     //endregion
 }
