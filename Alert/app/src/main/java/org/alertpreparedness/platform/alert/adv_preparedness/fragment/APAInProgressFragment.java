@@ -191,14 +191,14 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
     }
 
     @Override
-    public void onActionRetrieved(String key, Action action) {
+    public void onActionRetrieved(DataSnapshot snapshot, Action action) {
         txtNoAction.setVisibility(View.GONE);
-        mAPAdapter.addItems(key, action);
+        mAPAdapter.addItems(snapshot.getKey(), action);
     }
 
     @Override
-    public void onActionRemoved(String key) {
-        mAPAdapter.removeItem(key);
+    public void onActionRemoved(DataSnapshot snapshot) {
+        mAPAdapter.removeItem(snapshot.getKey());
     }
 
     @Override
@@ -209,6 +209,8 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
     private class AlertListener implements ValueEventListener{
 
         private void process(DataSnapshot dataSnapshot) {
+
+            System.out.println("AlertListenerdataSnapshot = " + dataSnapshot.getRef());
 
             final GsonBuilder gsonBuilder = new GsonBuilder();
             final Gson gson = gsonBuilder.create();

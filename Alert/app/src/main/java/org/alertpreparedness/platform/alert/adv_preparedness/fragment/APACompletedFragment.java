@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
@@ -135,14 +136,14 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
     }
 
     @Override
-    public void onActionRetrieved(String key, Action action) {
+    public void onActionRetrieved(DataSnapshot snapshot, Action action) {
         txtNoAction.setVisibility(View.GONE);
-        mAPAdapter.addItems(key, action);
+        mAPAdapter.addItems(snapshot.getKey(), action);
     }
 
     @Override
-    public void onActionRemoved(String key) {
-        mAPAdapter.removeItem(key);
+    public void onActionRemoved(DataSnapshot snapshot) {
+        mAPAdapter.removeItem(snapshot.getKey());
     }
 
     //region UsersListDialogFragment.ActionAdapterListener

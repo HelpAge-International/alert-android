@@ -32,7 +32,7 @@ public class ActionAPAExpiredProcessor extends ActionExpiredProcessor {
 
     @Override
     protected void addObjects(String name, String department, Long createdAt, Long level,
-                              DataModel model, DataSnapshot getChild, String id, String actionIDs, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
+                              DataModel model, DataSnapshot childSnapshot, String id, String actionIDs, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
 
         if (user.getUserID().equals(model.getAsignee()) //MPA CUSTOM assigned and EXPIRED for logged in user.
                 && model.getLevel() != null
@@ -58,7 +58,7 @@ public class ActionAPAExpiredProcessor extends ActionExpiredProcessor {
                     && !model.getIsArchived()
                     ) {
 
-                listener.onAddAction(getChild.getKey(), new Action(
+                listener.onAddAction(childSnapshot, new Action(
                         id,
                         name,
                         department,
@@ -84,11 +84,11 @@ public class ActionAPAExpiredProcessor extends ActionExpiredProcessor {
                 );
             }
             else {
-                listener.tryRemoveAction(getChild.getKey());
+                listener.tryRemoveAction(childSnapshot);
             }
         }
         else {
-            listener.tryRemoveAction(getChild.getKey());
+            listener.tryRemoveAction(childSnapshot);
         }
     }
 

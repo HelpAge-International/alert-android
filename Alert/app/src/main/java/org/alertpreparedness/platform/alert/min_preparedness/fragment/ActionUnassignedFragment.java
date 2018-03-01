@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
@@ -183,13 +185,13 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
 
 
     @Override
-    public void onActionRetrieved(String key, Action action) {
+    public void onActionRetrieved(DataSnapshot snapshot, Action action) {
         txtNoAction.setVisibility(View.GONE);
-        mUnassignedAdapter.addItems(key, action);
+        mUnassignedAdapter.addItems(snapshot.getKey(), action);
     }
 
     @Override
-    public void onActionRemoved(String key) {
-        mUnassignedAdapter.removeItem(key);
+    public void onActionRemoved(DataSnapshot snapshot) {
+        mUnassignedAdapter.removeItem(snapshot.getKey());
     }
 }

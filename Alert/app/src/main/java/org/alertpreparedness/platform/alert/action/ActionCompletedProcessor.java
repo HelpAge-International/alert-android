@@ -26,11 +26,11 @@ public class ActionCompletedProcessor extends BaseActionProcessor {
         dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    if (actionId.contains(getChild.getKey())) {
-                        String CHSTaskName = (String) getChild.child("task").getValue();
-                        Long CHSlevel = (Long) getChild.child("level").getValue();
-                        Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    if (actionId.contains(childSnapshot.getKey())) {
+                        String CHSTaskName = (String) childSnapshot.child("task").getValue();
+                        Long CHSlevel = (Long) childSnapshot.child("level").getValue();
+                        Long CHSCreatedAt = (Long) childSnapshot.child("createdAt").getValue();
                         isCHS = true;
                         isCHSAssigned = true;
 
@@ -42,7 +42,7 @@ public class ActionCompletedProcessor extends BaseActionProcessor {
                                 && model.getIsComplete() != null
                                 && model.getIsComplete()) {
 
-                            listener.onAddAction(getChild.getKey(), new Action(
+                            listener.onAddAction(childSnapshot, new Action(
                                     parentId,
                                     CHSTaskName,
                                     model.getDepartment(),
@@ -67,7 +67,7 @@ public class ActionCompletedProcessor extends BaseActionProcessor {
                             );
                         }
                         else {
-                            listener.tryRemoveAction(getChild.getKey());
+                            listener.tryRemoveAction(childSnapshot);
                         }
                     }
                 }
@@ -85,12 +85,12 @@ public class ActionCompletedProcessor extends BaseActionProcessor {
         dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    if (actionId.contains(getChild.getKey())) {
-                        String taskNameMandated = (String) getChild.child("task").getValue();
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    if (actionId.contains(childSnapshot.getKey())) {
+                        String taskNameMandated = (String) childSnapshot.child("task").getValue();
                         //String departmentMandated = (String) getChild.child("department").getValue(); //Department is also found under "action"
-                        Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
-                        Long manLevel = (Long) getChild.child("level").getValue();
+                        Long manCreatedAt = (Long) childSnapshot.child("createdAt").getValue();
+                        Long manLevel = (Long) childSnapshot.child("level").getValue();
 
                         isMandated = true;
                         isMandatedAssigned = true;
@@ -105,7 +105,7 @@ public class ActionCompletedProcessor extends BaseActionProcessor {
                                 && model.getIsComplete() != null
                                 && model.getIsComplete()) {
 
-                            listener.onAddAction(getChild.getKey(), new Action(
+                            listener.onAddAction(childSnapshot, new Action(
                                     parentId,
                                     taskNameMandated,
                                     model.getDepartment(),
@@ -130,7 +130,7 @@ public class ActionCompletedProcessor extends BaseActionProcessor {
                             );
                         }
                         else {
-                            listener.tryRemoveAction(getChild.getKey());
+                            listener.tryRemoveAction(childSnapshot);
                         }
                     }
                 }
@@ -153,7 +153,7 @@ public class ActionCompletedProcessor extends BaseActionProcessor {
                 && model.getIsComplete() != null
                 && model.getIsComplete()) {
 
-            listener.onAddAction(snapshot.getKey(), new Action(
+            listener.onAddAction(snapshot, new Action(
                     parentId,
                     model.getTask(),
                     model.getDepartment(),
@@ -178,7 +178,7 @@ public class ActionCompletedProcessor extends BaseActionProcessor {
             );
         }
         else {
-            listener.tryRemoveAction(snapshot.getKey());
+            listener.tryRemoveAction(snapshot);
         }
     }
 

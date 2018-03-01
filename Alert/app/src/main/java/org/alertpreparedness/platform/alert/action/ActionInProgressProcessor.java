@@ -48,7 +48,7 @@ public class ActionInProgressProcessor extends BaseActionProcessor {
                                     isMandated,
                                     isMandatedAssigned);
                         } else {
-                            listener.tryRemoveAction(dataSnapshot.getKey());
+                            listener.tryRemoveAction(dataSnapshot);
                         }
                     }
                 }
@@ -127,7 +127,7 @@ public class ActionInProgressProcessor extends BaseActionProcessor {
                                             isMandated,
                                             isMandatedAssigned);
                                 } else {
-                                    listener.tryRemoveAction(dataSnapshot.getKey());
+                                    listener.tryRemoveAction(dataSnapshot);
                                 }
 
                             }
@@ -202,7 +202,7 @@ public class ActionInProgressProcessor extends BaseActionProcessor {
                             isMandated,
                             isMandatedAssigned);
                 } else {
-                    listener.tryRemoveAction(dataSnapshot.getKey());
+                    listener.tryRemoveAction(dataSnapshot);
                 }
 
             }
@@ -216,7 +216,7 @@ public class ActionInProgressProcessor extends BaseActionProcessor {
     }
 
     protected void addObjects(String name, Long createdAt, Long level,
-                              DataModel model, DataSnapshot getChild, String id, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
+                              DataModel model, DataSnapshot childSnapshot, String id, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
         if (user.getUserID().equals(model.getAsignee()) //MPA Custom assigned and in-progress for logged in user.
                 && model.getAsignee() != null
                 && level != null
@@ -242,7 +242,7 @@ public class ActionInProgressProcessor extends BaseActionProcessor {
                 && name != null)) {
 
             if(!model.getIsArchived()) {
-                listener.onAddAction(getChild.getKey(), new Action(
+                listener.onAddAction(childSnapshot, new Action(
                         id,
                         name,
                         model.getDepartment(),
@@ -268,7 +268,7 @@ public class ActionInProgressProcessor extends BaseActionProcessor {
             }
         }
         else {
-            listener.tryRemoveAction(getChild.getKey());
+            listener.tryRemoveAction(childSnapshot);
         }
     }
 

@@ -16,6 +16,7 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
@@ -175,13 +176,13 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
     }
 
     @Override
-    public void onActionRetrieved(String key, Action action) {
+    public void onActionRetrieved(DataSnapshot snapshot, Action action) {
         txtNoAction.setVisibility(View.GONE);
-        mExpiredAdapter.addItems(key, action);
+        mExpiredAdapter.addItems(snapshot.getKey(), action);
     }
 
     @Override
-    public void onActionRemoved(String key) {
-        mExpiredAdapter.removeItem(key);
+    public void onActionRemoved(DataSnapshot snapshot) {
+        mExpiredAdapter.removeItem(snapshot.getKey());
     }
 }

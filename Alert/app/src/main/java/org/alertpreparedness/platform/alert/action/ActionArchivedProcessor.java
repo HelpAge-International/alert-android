@@ -26,12 +26,12 @@ public class ActionArchivedProcessor extends BaseActionProcessor {
         dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    if (actionId.contains(getChild.getKey())) {
-                        String taskNameMandated = (String) getChild.child("task").getValue();
-                        //String departmentMandated = (String) getChild.child("department").getValue();
-                        Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
-                        Long manLevel = (Long) getChild.child("level").getValue();
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    if (actionId.contains(childSnapshot.getKey())) {
+                        String taskNameMandated = (String) childSnapshot.child("task").getValue();
+                        //String departmentMandated = (String) childSnapshot.child("department").getValue();
+                        Long manCreatedAt = (Long) childSnapshot.child("createdAt").getValue();
+                        Long manLevel = (Long) childSnapshot.child("level").getValue();
 
                         isMandated = true;
                         isMandatedAssigned = true;
@@ -46,7 +46,7 @@ public class ActionArchivedProcessor extends BaseActionProcessor {
                                 && model.getIsArchived()
                                 && model.getDueDate() != null) {
 
-                            listener.onAddAction(getChild.getKey(), new Action(
+                            listener.onAddAction(childSnapshot.getKey(), childSnapshot, new Action(
                                     parentId,
                                     taskNameMandated,
                                     model.getDepartment(),
@@ -71,7 +71,7 @@ public class ActionArchivedProcessor extends BaseActionProcessor {
                             );
                         }
                         else {
-                            listener.tryRemoveAction(getChild.getKey());
+                            listener.tryRemoveAction(childSnapshot.getKey());
                         }
                     }
                 }
@@ -90,11 +90,11 @@ public class ActionArchivedProcessor extends BaseActionProcessor {
         dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    if (actionId.contains(getChild.getKey())) {
-                        String CHSTaskName = (String) getChild.child("task").getValue();
-                        Long CHSlevel = (Long) getChild.child("level").getValue();
-                        Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    if (actionId.contains(childSnapshot.getKey())) {
+                        String CHSTaskName = (String) childSnapshot.child("task").getValue();
+                        Long CHSlevel = (Long) childSnapshot.child("level").getValue();
+                        Long CHSCreatedAt = (Long) childSnapshot.child("createdAt").getValue();
                         isCHS = true;
                         isCHSAssigned = true;
 
@@ -106,7 +106,7 @@ public class ActionArchivedProcessor extends BaseActionProcessor {
                                 && model.getIsArchived()
                                 && model.getDueDate() != null) {
 
-                            listener.onAddAction(getChild.getKey(), new Action(
+                            listener.onAddAction(childSnapshot.getKey(), childSnapshot, new Action(
                                     parentId,
                                     CHSTaskName,
                                     model.getDepartment(),
@@ -131,7 +131,7 @@ public class ActionArchivedProcessor extends BaseActionProcessor {
                             );
                         }
                         else {
-                            listener.tryRemoveAction(getChild.getKey());
+                            listener.tryRemoveAction(childSnapshot.getKey());
                         }
                     }
                 }
@@ -154,7 +154,7 @@ public class ActionArchivedProcessor extends BaseActionProcessor {
                 && model.getIsArchived()
                 && model.getDueDate() != null) {
 
-            listener.onAddAction(snapshot.getKey(), new Action(
+            listener.onAddAction(snapshot.getKey(), snapshot, new Action(
                     parentId,
                     model.getTask(),
                     model.getDepartment(),

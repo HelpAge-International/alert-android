@@ -200,19 +200,18 @@ public class ActionFetcher implements ActionProcessorListener {
     }
 
     @Override
-    public void onAddAction(String key, Action action) {
-        listener.onActionRetrieved(key, action);
+    public void onAddAction(DataSnapshot snapshot, Action action) {
+        listener.onActionRetrieved(snapshot, action);
     }
 
     @Override
-    public void tryRemoveAction(String key) {
-        listener.onActionRemoved(key);
+    public void tryRemoveAction(DataSnapshot snapshot) {
+        listener.onActionRemoved(snapshot);
     }
 
     public interface ActionRetrievalListener {
-        void onActionRetrieved(String key, Action action);
-//        void onActionChanged(Action action);
-        void onActionRemoved(String key);
+        void onActionRetrieved(DataSnapshot snapshot, Action action);
+        void onActionRemoved(DataSnapshot snapshot);
     }
 
 }

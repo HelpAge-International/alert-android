@@ -28,12 +28,12 @@ public class ActionExpiredProcessor extends BaseActionProcessor {
         dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    if (actionId.contains(getChild.getKey())) {
-                        String taskNameMandated = (String) getChild.child("task").getValue();
-                        String departmentMandated = (String) getChild.child("department").getValue();
-                        Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
-                        Long manLevel = (Long) getChild.child("level").getValue();
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    if (actionId.contains(childSnapshot.getKey())) {
+                        String taskNameMandated = (String) childSnapshot.child("task").getValue();
+                        String departmentMandated = (String) childSnapshot.child("department").getValue();
+                        Long manCreatedAt = (Long) childSnapshot.child("createdAt").getValue();
+                        Long manLevel = (Long) childSnapshot.child("level").getValue();
 
                         isMandated = true;
                         isMandatedAssigned = true;
@@ -46,7 +46,7 @@ public class ActionExpiredProcessor extends BaseActionProcessor {
                                     manCreatedAt,
                                     manLevel,
                                     model,
-                                    getChild,
+                                    childSnapshot,
                                     parentId,
                                     actionId,
                                     isCHS,
@@ -55,7 +55,7 @@ public class ActionExpiredProcessor extends BaseActionProcessor {
                                     isMandatedAssigned);
                         }
                         else {
-                            listener.tryRemoveAction(getChild.getKey());
+                            listener.tryRemoveAction(childSnapshot);
                         }
                     }
                 }
@@ -127,7 +127,7 @@ public class ActionExpiredProcessor extends BaseActionProcessor {
                                             isMandatedAssigned);
                                 }
                                 else {
-                                   listener.tryRemoveAction(getChild.getKey());
+                                   listener.tryRemoveAction(getChild);
                                 }
 
                             }
@@ -213,7 +213,7 @@ public class ActionExpiredProcessor extends BaseActionProcessor {
                             isMandatedAssigned);
                 }
                 else {
-                    listener.tryRemoveAction(snapshot.getKey());
+                    listener.tryRemoveAction(snapshot);
                 }
 
             }
@@ -226,7 +226,7 @@ public class ActionExpiredProcessor extends BaseActionProcessor {
     }
 
     protected void addObjects(String name, String department, Long createdAt, Long level,
-                              DataModel model, DataSnapshot getChild, String id, String actionIDs, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
+                              DataModel model, DataSnapshot childSnapshot, String id, String actionIDs, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
 
         if (user.getUserID().equals(model.getAsignee()) //MPA CUSTOM assigned and EXPIRED for logged in user.
                 && model.getLevel() != null
@@ -247,7 +247,7 @@ public class ActionExpiredProcessor extends BaseActionProcessor {
                 && model.getTask() != null)) {
 
 
-            listener.onAddAction(getChild.getKey(), new Action(
+            listener.onAddAction(childSnapshot, new Action(
                     id,
                     name,
                     department,
@@ -272,7 +272,7 @@ public class ActionExpiredProcessor extends BaseActionProcessor {
             );
         }
         else {
-            listener.tryRemoveAction(getChild.getKey());
+            listener.tryRemoveAction(childSnapshot);
         }
     }
 

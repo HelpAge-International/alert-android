@@ -1,5 +1,9 @@
 package org.alertpreparedness.platform.alert.action;
 
+import android.service.autofill.Dataset;
+
+import com.google.firebase.database.DataSnapshot;
+
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 
 /**
@@ -8,8 +12,8 @@ import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 
 interface ActionProcessorListener {
 
-    void onAddAction(String key, Action action);
+    void onAddAction(DataSnapshot snapshot, Action action);
 
-    void tryRemoveAction(String key);
+    void tryRemoveAction(DataSnapshot snapshot);
 
 }

@@ -22,16 +22,16 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
         dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    if (!actionId.contains(getChild.getKey())) {
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    if (!actionId.contains(childSnapshot.getKey())) {
 
                         try {
-                            String taskNameMandated = (String) getChild.child("task").getValue();
-                            String departmentMandated = (String) getChild.child("department").getValue();
-                            Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
-                            Long manLevel = (Long) getChild.child("level").getValue();
+                            String taskNameMandated = (String) childSnapshot.child("task").getValue();
+                            String departmentMandated = (String) childSnapshot.child("department").getValue();
+                            Long manCreatedAt = (Long) childSnapshot.child("createdAt").getValue();
+                            Long manLevel = (Long) childSnapshot.child("level").getValue();
 
-                            addObject(taskNameMandated, departmentMandated, manCreatedAt, manLevel, getChild.getKey(),
+                            addObject(childSnapshot, taskNameMandated, departmentMandated, manCreatedAt, manLevel, childSnapshot.getKey(),
                                     null,
                                     null,
                                     null,
@@ -47,11 +47,11 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
 
 
                         } catch (Exception exception) {
-                            listener.tryRemoveAction(getChild.getKey());
+                            listener.tryRemoveAction(childSnapshot);
                         }
                     }
                     else {
-                       listener.tryRemoveAction(getChild.getKey());
+                       listener.tryRemoveAction(childSnapshot);
                     }
                 }
             }
@@ -64,6 +64,7 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
     }
 
     protected void addObject(
+            DataSnapshot snapshot,
             String taskName,
             String department,
             Long createdAt,
@@ -82,7 +83,7 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
             Long frequencyBase,
             Integer frequencyValue
             ) {
-        listener.onAddAction(key, new Action(
+        listener.onAddAction(snapshot, new Action(
                 parentId,
                 taskName,
                 department,
@@ -108,6 +109,7 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
     }
 
     protected void addObject(
+            DataSnapshot snapshot,
             String taskName,
             Long createdAt,
             Long level,
@@ -141,7 +143,7 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
 
         action.setIsCHS(true);
 
-        listener.onAddAction(key, action);
+        listener.onAddAction(snapshot, action);
     }
 
     @Override
@@ -150,29 +152,30 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
 
-                    dbActionRef.child(getChild.getKey()).addValueEventListener(new ValueEventListener() {
+                    dbActionRef.child(childSnapshot.getKey()).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            if (!actionId.equals(getChild.getKey())) {
+                            if (!actionId.equals(childSnapshot.getKey())) {
 
-                                String CHSTaskName = (String) getChild.child("task").getValue();
-                                Long CHSlevel = (Long) getChild.child("level").getValue();
-                                Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
+                                String CHSTaskName = (String) childSnapshot.child("task").getValue();
+                                Long CHSlevel = (Long) childSnapshot.child("level").getValue();
+                                Long CHSCreatedAt = (Long) childSnapshot.child("createdAt").getValue();
 
                                 addObject(
+                                        childSnapshot,
                                         CHSTaskName,
                                         CHSCreatedAt,
                                         CHSlevel,
-                                        getChild.getKey(),
+                                        childSnapshot.getKey(),
                                         dataSnapshot.exists()
                                 );
 
                             }
                             else {
-                                listener.tryRemoveAction(getChild.getKey());
+                                listener.tryRemoveAction(childSnapshot);
                             }
 
                         }
@@ -201,6 +204,7 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
 
 
             addObject(
+                    snapshot,
                     model.getTask(),
                     model.getDepartment(),
                     model.getCreatedAt(),
@@ -221,7 +225,7 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
             );
         }
         else {
-            listener.tryRemoveAction(snapshot.getKey());
+            listener.tryRemoveAction(snapshot);
         }
 
     }
@@ -230,15 +234,21 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
         dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
 
                     try {
-                        String taskNameMandated = (String) getChild.child("task").getValue();
-                        String departmentMandated = (String) getChild.child("department").getValue();
-                        Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
-                        Long manLevel = (Long) getChild.child("level").getValue();
+                        String taskNameMandated = (String) childSnapshot.child("task").getValue();
+                        String departmentMandated = (String) childSnapshot.child("department").getValue();
+                        Long manCreatedAt = (Long) childSnapshot.child("createdAt").getValue();
+                        Long manLevel = (Long) childSnapshot.child("level").getValue();
 
-                        addObject(taskNameMandated, departmentMandated, manCreatedAt, manLevel, getChild.getKey(),
+                        addObject(
+                            childSnapshot,
+                            taskNameMandated,
+                            departmentMandated,
+                            manCreatedAt,
+                            manLevel,
+                            childSnapshot.getKey(),
                             null,
                             null,
                             null,
@@ -250,10 +260,10 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
                             null,
                             null,
                             null,
-                         null);
+                            null);
 
                     } catch (Exception exception) {
-                        listener.tryRemoveAction(getChild.getKey());
+                        listener.tryRemoveAction(childSnapshot);
                         System.out.println("exception = " + exception);
                     }
                 }
@@ -272,18 +282,19 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
         dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
 
-                    String CHSTaskName = (String) getChild.child("task").getValue();
-                    Long CHSlevel = (Long) getChild.child("level").getValue();
-                    Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
+                    String CHSTaskName = (String) childSnapshot.child("task").getValue();
+                    Long CHSlevel = (Long) childSnapshot.child("level").getValue();
+                    Long CHSCreatedAt = (Long) childSnapshot.child("createdAt").getValue();
 
                     addObject(
+                            childSnapshot,
                             CHSTaskName,
                             null,
                             CHSCreatedAt,
                             CHSlevel,
-                            getChild.getKey(),
+                            childSnapshot.getKey(),
                             null,
                             null,
                             null,

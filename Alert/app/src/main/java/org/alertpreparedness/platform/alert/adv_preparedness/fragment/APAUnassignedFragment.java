@@ -222,14 +222,14 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
     }
 
     @Override
-    public void onActionRetrieved(String key, Action action) {
+    public void onActionRetrieved(DataSnapshot snapshot, Action action) {
         txtNoAction.setVisibility(View.GONE);
-        mAPAdapter.addItems(key, action);
+        mAPAdapter.addItems(snapshot.getKey(), action);
     }
 
     @Override
-    public void onActionRemoved(String key) {
-        mAPAdapter.removeItem(key);
+    public void onActionRemoved(DataSnapshot snapshot) {
+        mAPAdapter.removeItem(snapshot.getKey());
     }
 
     @Override

@@ -25,7 +25,7 @@ public class ActionAPAInProgressProcessor extends ActionInProgressProcessor {
     }
     @Override
     protected void addObjects(String name, Long createdAt, Long level,
-                              DataModel model, DataSnapshot getChild, String id, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
+                              DataModel model, DataSnapshot childSnapshot, String id, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
         if (user.getUserID().equals(model.getAsignee()) //MPA Custom assigned and in-progress for logged in user.
                 && model.getAsignee() != null
                 && level != null
@@ -54,7 +54,7 @@ public class ActionAPAInProgressProcessor extends ActionInProgressProcessor {
                     && ((networkHazardTypes.indexOf(model.getAssignHazard().get(0)) != -1 && model.isNetworkLevel())
                     || (alertHazardTypes.indexOf(model.getAssignHazard().get(0)) != -1 && !model.isNetworkLevel())) && !model.getIsArchived() && model.getAsignee() != null) {
 
-                listener.onAddAction(getChild.getKey(), new Action(
+                listener.onAddAction(childSnapshot, new Action(
                         id,
                         name,
                         model.getDepartment(),
@@ -79,11 +79,11 @@ public class ActionAPAInProgressProcessor extends ActionInProgressProcessor {
                 );
             }
             else {
-                listener.tryRemoveAction(getChild.getKey());
+                listener.tryRemoveAction(childSnapshot);
             }
         }
         else {
-            listener.tryRemoveAction(getChild.getKey());
+            listener.tryRemoveAction(childSnapshot);
         }
     }
 

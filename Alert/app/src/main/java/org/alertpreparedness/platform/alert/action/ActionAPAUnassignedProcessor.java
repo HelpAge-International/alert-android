@@ -24,7 +24,8 @@ public class ActionAPAUnassignedProcessor extends ActionUnassignedProcessor {
 
 
     @Override
-    protected void addObject( String taskName,
+    protected void addObject( DataSnapshot snapshot,
+                              String taskName,
                               String department,
                               Long createdAt,
                               Long level,
@@ -47,7 +48,7 @@ public class ActionAPAUnassignedProcessor extends ActionUnassignedProcessor {
         if(model.getAssignHazard() != null
                 && ((networkHazardTypes.indexOf(model.getAssignHazard().get(0)) != -1 && model.isNetworkLevel())
                 || (alertHazardTypes.indexOf(model.getAssignHazard().get(0)) != -1 && !model.isNetworkLevel())) && !model.getIsArchived() && model.getAsignee() == null) {
-            super.addObject(taskName, department, createdAt, level, key, assignee, agencyId, countryId, networkId, isArchived, isComplete, updatedAt, actionType, dueDate, budget, frequencyBase, frequencyValue);
+            super.addObject(snapshot, taskName, department, createdAt, level, key, assignee, agencyId, countryId, networkId, isArchived, isComplete, updatedAt, actionType, dueDate, budget, frequencyBase, frequencyValue);
         }
 
     }

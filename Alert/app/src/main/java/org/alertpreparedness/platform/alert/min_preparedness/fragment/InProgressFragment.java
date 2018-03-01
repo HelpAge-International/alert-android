@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
@@ -138,13 +139,13 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
     //endregion
 
     @Override
-    public void onActionRetrieved(String key, Action action) {
+    public void onActionRetrieved(DataSnapshot snapshot, Action action) {
         txtNoAction.setVisibility(View.GONE);
-        mAdapter.addItems(key, action);
+        mAdapter.addItems(snapshot.getKey(), action);
     }
 
     @Override
-    public void onActionRemoved(String key) {
-        mAdapter.removeItem(key);
+    public void onActionRemoved(DataSnapshot snapshot) {
+        mAdapter.removeItem(snapshot.getKey());
     }
 }
