@@ -36,7 +36,6 @@ import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
-import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -190,7 +189,7 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
     }
 
     @Override
-    public void onActionItemSelected(int pos, String key) {
+    public void onActionItemSelected(int pos, String key, String parentId) {
         this.actionID = key;
         SheetMenu.with(getContext()).setMenu(R.menu.menu_unassigned_apa).setClick(menuItem -> {
             switch (menuItem.getItemId()) {

@@ -89,15 +89,15 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
 
 
     @Override
-    public void onActionItemSelected(int pos, String key, String userTypeID) {
+    public void onActionItemSelected(int pos, String key, String parentId) {
         this.actionID = key;
         SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.complete_action:
                     Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
                     intent.putExtra(CompleteActionActivity.REQUIRE_DOC, mAdapter.getItem(pos).getRequireDoc());
-                    intent.putExtra("ACTION_KEY", key);
-                    intent.putExtra("USER_KEY", userTypeID);
+                    intent.putExtra(CompleteActionActivity.ACTION_KEY, key);
+                    intent.putExtra(CompleteActionActivity.PARENT_KEY, parentId);
                     startActivity(intent);
                     break;
                 case R.id.reassign_action:

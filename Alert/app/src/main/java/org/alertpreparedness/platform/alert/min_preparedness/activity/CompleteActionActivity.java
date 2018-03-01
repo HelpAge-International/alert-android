@@ -43,6 +43,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.model.FileInfo;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Notes;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SimpleAdapter;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
@@ -50,6 +51,7 @@ import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -101,12 +103,16 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     private static final long KB = 1024;
     private static final int REQUEST_CODE = 6384;
     private static final int VIDEO_REQUEST_CODE = 104;
+    public static final String PARENT_KEY = "PARENT_KEY";
+    public static final String ACTION_KEY = "ACTION_KEY";
     private static final int IMG_REQUEST_CODE = 0;
     private DatabaseReference ref;
     private StorageReference riversRef;
 
     SimpleAdapter simpleAdapter;
     private boolean needsDoc;
+    private String parentId;
+    private String key;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +133,8 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
         addAttachments.setOnClickListener(this);
 
         needsDoc = getIntent().getBooleanExtra(REQUIRE_DOC, true);
+        key = getIntent().getStringExtra(ACTION_KEY);
+        parentId = getIntent().getStringExtra(PARENT_KEY);
 
         initView();
 
@@ -271,60 +279,55 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
 
     private void saveData(String texts) {
         Intent intent = getIntent();
-        String key = intent.getStringExtra("ACTION_KEY");
-        String userTypeID = intent.getStringExtra("USER_KEY");
-        saveNote(texts, key, userTypeID);
 
-        for (int i = 0; i < imgList.size(); i++) {
+        new NetworkFetcher((networkFetcherResult -> {
 
-            if(userTypeID.equals(user.getCountryID())) {
-                ref = dbActionRef.child(key).child("documents").push();
-                ref.setValue(true);
-                riversRef = mStorageRef.child("documents/" + user.getCountryID() + "/" + ref.getKey() + "/" + imgList.get(i));
-            } else if(userTypeID.equals(user.getLocalNetworkID())){
-                ref = dbActionBaseRef.child(user.getLocalNetworkID()).child(key).child("documents").push();
-                ref.setValue(true);
-                riversRef = mStorageRef.child("documents/" + user.getLocalNetworkID() + "/" + ref.getKey() + "/" + imgList.get(i));
-            } else if(userTypeID.equals(user.getNetworkID())){
-                ref = dbActionBaseRef.child(user.getNetworkID()).child(key).child("documents").push();
-                ref.setValue(true);
-                riversRef = mStorageRef.child("documents/" + user.getNetworkID() + "/" + ref.getKey() + "/" + imgList.get(i));
-            }  else if (userTypeID.equals(user.getNetworkCountryID())){
-                ref = dbActionBaseRef.child(user.getNetworkCountryID()).child(key).child("documents").push();
-                ref.setValue(true);
-                riversRef = mStorageRef.child("documents/" + user.getNetworkCountryID() + "/" + ref.getKey() + "/" + imgList.get(i));
+            List<String> networkIds = networkFetcherResult.all();
+
+            saveNote(texts, key, parentId, networkIds);
+
+            for (int i = 0; i < imgList.size(); i++) {
+
+                if(parentId.equals(user.getCountryID())) {
+                    ref = dbActionRef.child(key).child("documents").push();
+                    ref.setValue(true);
+                    riversRef = mStorageRef.child("documents/" + user.getCountryID() + "/" + ref.getKey() + "/" + imgList.get(i));
+                }
+                else {
+                    ref = dbActionBaseRef.child(parentId).child(key).child("documents").push();
+                    ref.setValue(true);
+                    riversRef = mStorageRef.child("documents/" + parentId + "/" + ref.getKey() + "/" + imgList.get(i));
+                }
+
+                riversRef.putFile(Uri.parse("file://" + pathList.get(i)))
+                        .addOnSuccessListener(taskSnapshot -> {
+
+                            String title = taskSnapshot.getMetadata().getName();
+                            String downloadUri = taskSnapshot.getMetadata().getDownloadUrl().toString();
+                            System.out.println("downloadUri = " + downloadUri);
+                            Long size = taskSnapshot.getMetadata().getSizeBytes();
+                            double sizeInKb = size / KB;
+                            Long time = System.currentTimeMillis();
+                            //TODO Bug fix: Documents must be saved to the right node under document/[parentId]/actionID/.setValue(info);
+                            FileInfo info = new FileInfo(title, downloadUri, Long.valueOf(0), sizeInKb, Long.valueOf(0), time, title, user.getUserID());
+                            dbDocRef.child(ref.getKey()).setValue(info);
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                exception.printStackTrace();
+                            }
+                        });
             }
 
-            System.out.println("ref = " + ref);
+            imgList.clear();
+            editTextNote.setText("");
+            simpleAdapter.notifyDataSetChanged();
 
-
-            riversRef.putFile(Uri.parse("file://" + pathList.get(i)))
-                    .addOnSuccessListener(taskSnapshot -> {
-
-                        String title = taskSnapshot.getMetadata().getName();
-                        String downloadUri = taskSnapshot.getMetadata().getDownloadUrl().toString();
-                        System.out.println("downloadUri = " + downloadUri);
-                        Long size = taskSnapshot.getMetadata().getSizeBytes();
-                        double sizeInKb = size / KB;
-                        Long time = System.currentTimeMillis();
-                        //TODO Bug fix: Documents must be saved to the right node under document/[userTypeID]/actionID/.setValue(info);
-                        FileInfo info = new FileInfo(title, downloadUri, Long.valueOf(0), sizeInKb, Long.valueOf(0), time, title, user.getUserID());
-                        dbDocRef.child(ref.getKey()).setValue(info);
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            exception.printStackTrace();
-                        }
-                    });
-        }
-
-        imgList.clear();
-        editTextNote.setText("");
-        simpleAdapter.notifyDataSetChanged();
+        })).fetch();
     }
 
-    public void saveNote(String texts, String key, String userTypeID) {
+    public void saveNote(String texts, String key, String userTypeID, List<String> networkIds) {
         if (!TextUtils.isEmpty(texts)) {
             String id = dbNoteRef.child(key).push().getKey();
             String userID = PreferHelper.getString(getApplicationContext(), Constants.AGENCY_ID);
@@ -336,17 +339,9 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
                 dbActionRef.child(key).child("isComplete").setValue(true);
                 dbActionRef.child(key).child("isCompleteAt").setValue(millis);
             }
-            else if (userTypeID.equals(user.getNetworkID())) {
-                dbActionBaseRef.child(user.getNetworkID()).child(key).child("isComplete").setValue(true);
-                dbActionBaseRef.child(user.getNetworkID()).child(key).child("isCompleteAt").setValue(millis);
-            }
-            else if (userTypeID.equals(user.getNetworkCountryID())){
-                dbActionBaseRef.child(user.getNetworkCountryID()).child(key).child("isComplete").setValue(true);
-                dbActionBaseRef.child(user.getNetworkCountryID()).child(key).child("isCompleteAt").setValue(millis);
-            }
-            else if (userTypeID.equals(user.getLocalNetworkID())){
-                dbActionBaseRef.child(user.getLocalNetworkID()).child(key).child("isComplete").setValue(true);
-                dbActionBaseRef.child(user.getLocalNetworkID()).child(key).child("isCompleteAt").setValue(millis);
+            else {
+                dbActionBaseRef.child(parentId).child(key).child("isComplete").setValue(true);
+                dbActionBaseRef.child(parentId).child(key).child("isCompleteAt").setValue(millis);
             }
             dbNoteRef.child(key).child(id).setValue(notes);
 

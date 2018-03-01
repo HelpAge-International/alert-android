@@ -3,7 +3,6 @@ package org.alertpreparedness.platform.alert.adv_preparedness.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -96,7 +95,7 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
     }
 
     @Override
-    public void onActionItemSelected(int pos, String key) {
+    public void onActionItemSelected(int pos, String key, String parentId) {
         SheetMenu.with(getContext()).setMenu(R.menu.menu_archived).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
 //                case R.id.reactive_action:

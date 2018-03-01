@@ -83,7 +83,7 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
     }
 
     @Override
-    public void onActionItemSelected(int pos, String key, String userTypeID) {
+    public void onActionItemSelected(int pos, String key, String parentId) {
         SheetMenu.with(getContext()).setMenu(R.menu.menu_archived).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
 //                case R.id.reactive_action:

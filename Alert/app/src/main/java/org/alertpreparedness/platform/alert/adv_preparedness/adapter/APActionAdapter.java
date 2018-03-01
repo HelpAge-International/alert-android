@@ -14,7 +14,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
@@ -140,7 +139,7 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
             holder.tvActionName.setText(action.getTaskName());
             holder.tvBudget.setText(getBudget(action.getBudget()));
             holder.tvDueDate.setText(getDate(action.getDueDate()));
-            holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position, keys.get(position)));
+            holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position, keys.get(position), action.getId()));
 
             if (action.getDueDate() == null) {
                 holder.tvDueDate.setVisibility(View.GONE);
@@ -319,7 +318,7 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     }
 
     public interface APAAdapterListener {
-        void onActionItemSelected(int pos, String key);
+        void onActionItemSelected(int pos, String key, String parentId);
         void onAdapterItemRemoved(String key);
     }
 }

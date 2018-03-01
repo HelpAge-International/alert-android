@@ -213,7 +213,7 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
     }
 
     @Override
-    public void onActionItemSelected(int pos, String key) {
+    public void onActionItemSelected(int pos, String key, String parentId) {
         actionID = key;
         SheetMenu.with(getContext()).setMenu(R.menu.menu_archived).setClick(menuItem -> {
             switch (menuItem.getItemId()) {

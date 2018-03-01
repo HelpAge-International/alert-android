@@ -329,7 +329,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
 
     public interface ActionAdapterListener {
-        void onActionItemSelected(int pos, String key, String userTypeID);
+        void onActionItemSelected(int pos, String key, String parentId);
 
         void itemRemoved(String key);
     }

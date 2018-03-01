@@ -32,6 +32,8 @@ import org.alertpreparedness.platform.alert.min_preparedness.adapter.Preparednes
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
+import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
+import org.joda.time.DateTime;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -104,7 +106,7 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
     }
 
     @Override
-    public void onActionItemSelected(int pos, String key, String userTypeID) {
+    public void onActionItemSelected(int pos, String key, String parentId) {
         this.actionID = key;
         SheetMenu.with(getContext()).setMenu(R.menu.menu_expired).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
@@ -154,23 +156,19 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog pickerDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-                String givenDateString = i2 + " " + i1 + " " + i + " 23:59:00";//due the end of the day.
-                SimpleDateFormat sdf = new SimpleDateFormat("dd mm yyyy HH:mm:ss", Locale.getDefault());
-                try {
-                    Date mDate = sdf.parse(givenDateString);
-                    long timeInMilliseconds = mDate.getTime();
-                    long millis = System.currentTimeMillis();
+        DatePickerDialog pickerDialog = new DatePickerDialog(getContext(), (datePicker, i, i1, i2) -> {
 
-                    dbActionRef.child(key).child("dueDate").setValue(timeInMilliseconds);//save due date in milliSec.
-                    dbActionRef.child(key).child("updatedAt").setValue(millis);
+            Long newDate = new DateTime().withYear(i).withMonthOfYear(i1+1).withDayOfMonth(i2).getMillis();
+            long millis = System.currentTimeMillis();
 
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+            if(newDate <= millis) {
+                SnackbarHelper.show(getActivity(), getString(R.string.past_date_error));
             }
+            else {
+                dbActionRef.child(key).child("dueDate").setValue(newDate);//save due date in milliSec.
+                dbActionRef.child(key).child("updatedAt").setValue(millis);
+            }
+
         }, year, month, day);
         pickerDialog.show();
     }

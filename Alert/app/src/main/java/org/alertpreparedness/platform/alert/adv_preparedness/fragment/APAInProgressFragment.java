@@ -30,7 +30,6 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
-import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
@@ -136,13 +135,15 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
     }
 
     @Override
-    public void onActionItemSelected(int pos, String key) {
+    public void onActionItemSelected(int pos, String key, String parentId) {
         this.actionID = key;
         SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.complete_action:
                     Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
                     intent.putExtra(CompleteActionActivity.REQUIRE_DOC, mAPAdapter.getItem(pos).getRequireDoc());
+                    intent.putExtra(CompleteActionActivity.ACTION_KEY, key);
+                    intent.putExtra(CompleteActionActivity.PARENT_KEY, parentId);
                     startActivity(intent);
                     break;
                 case R.id.reassign_action:

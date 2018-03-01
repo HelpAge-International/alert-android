@@ -4,12 +4,10 @@ import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
-import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.HAZARD_EMPTY
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelCountry
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelHazard
@@ -339,10 +337,6 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
                                                                             }
                                                                         } else {
                                                                             if (it.isActive == isActive && group.items.isNotEmpty()) {
-//                                                                                val v = ModelIndicator(modelType = HAZARD_EMPTY)
-//                                                                                v.modelType = HAZARD_EMPTY
-//                                                                                group.items.add(v)
-//                                                                                mGroups.add(group)
                                                                                 mGroups.add(group)
                                                                             }
                                                                         }
@@ -422,8 +416,10 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
                                                         Timber.d("local network hazards: %s", hazards?.size ?: 0)
                                                         hazards?.forEach {
                                                             //get network indicators for hazard
+
                                                             if (it.id != null) {
                                                                 if (it.id != localNetworkId) {
+
                                                                     when (it.hazardScenario) {
                                                                         -1 -> {
                                                                             if (!mHazardNameMapNetworkLocal.containsKey(it.id!!)) {
@@ -435,12 +431,15 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
                                                                         }
                                                                     }
 
-                                                                    mDisposables.add(RiskMonitoringService(getApplication()).getIndicatorsForLocalNetwork(it.id!!, network)
+                                                                    println("mHazardNameMapNetworkLocal1 = ${it.id!!}")
+
+                                                                    mDisposables.add(RiskMonitoringService(getApplication()).getIndicatorsForLocalNetwork(it.id!!, network, mHazardNameMapNetworkLocal[it.id!!])
                                                                             .subscribe({ indicators ->
-                                                                                Timber.d("local network indicator size: %s", indicators.size)
                                                                                 mIndicatorMapNetworkLocal.put(it.id!!, indicators)
                                                                                 val group = ExpandableGroup(mHazardNameMapNetworkLocal[it.id!!], indicators)
                                                                                 val groupIndex = getGroupIndex(group.title, mGroups)
+                                                                                println("mHazardNameMapNetworkLocal2 = ${it.id!!}")
+
                                                                                 if (groupIndex != -1) {
                                                                                     val existItems = mGroups[groupIndex].items
                                                                                     var totalItems = existItems
@@ -464,10 +463,9 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
                                                                                     } else {
                                                                                         mGroups.removeAt(groupIndex)
                                                                                     }
-                                                                                } else {
-                                                                                    if (it.isActive == isActive && group.items.isNotEmpty()) {
-                                                                                        mGroups.add(group)
-                                                                                    }
+                                                                                }
+                                                                                else if (it.isActive == isActive && group.items.isNotEmpty()) {
+                                                                                    mGroups.add(group)
                                                                                 }
                                                                                 mLiveData.value = mGroups
                                                                             }, { error ->

@@ -239,4 +239,5 @@
     <string name="add_attachment_not_required">+ Add attachments</string>
     <string name="attachment_required_error">An attachment is required to complete this action</string>
     <string name="unassigned_title">Unassigned</string>
+    <string name="past_date_error">You cannot select a date in the past</string>
 </resources>

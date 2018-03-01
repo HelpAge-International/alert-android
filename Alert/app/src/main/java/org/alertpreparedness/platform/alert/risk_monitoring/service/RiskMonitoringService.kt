@@ -7,7 +7,6 @@ import durdinapps.rxfirebase2.RxFirebaseDatabase
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Observable
-import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.risk_monitoring.model.*
 import org.alertpreparedness.platform.alert.utils.AppUtils
 import org.alertpreparedness.platform.alert.utils.Constants
@@ -124,22 +123,24 @@ class RiskMonitoringService(private val context : Context) {
         })
     }
 
-    fun getIndicatorsForLocalNetwork(hazardId: String, network: ModelNetwork?): Flowable<List<ModelIndicator>> {
+    fun getIndicatorsForLocalNetwork(hazardId: String, network: ModelNetwork?, s: String?): Flowable<List<ModelIndicator>> {
+//        println("getIndicatorsForLocalNetworks = ${s}")
         val indicatorRef = FirebaseHelper.getIndicatorsRef(mAppStatus, hazardId).orderByChild("assignee")
         return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
-            snap.children.filter {
+            snap.children
+            .filter {
                 item ->
                 return@filter item.child("assignee").value.toString() == PreferHelper.getString(context, Constants.UID)
                     || item.child("assignee").value.toString() == PreferHelper.getString(context, Constants.COUNTRY_ID)
             }
             .map {
-
+//                println("mHazardNameMapNetworkLocal = ${s + hazardId}")
                 val toJson = gson.toJson(it.value)
                 val reader = JsonReader(StringReader(toJson.trim()))
                 reader.isLenient = true
                 val fromJson = gson.fromJson<ModelIndicator>(reader, ModelIndicator::class.java)
+                fromJson.hazardId = hazardId
                 if (network != null) {
-                    Timber.d("network id: %s, name: %s", network.id, network.name)
                     return@map fromJson.copy(id = it.key, networkId = network.id, networkName = network.name)
                 } else {
                     return@map fromJson.copy(id = it.key)

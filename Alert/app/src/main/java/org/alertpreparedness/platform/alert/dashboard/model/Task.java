@@ -6,11 +6,13 @@ package org.alertpreparedness.platform.alert.dashboard.model;
 
 public class Task {
 
+    private String parentId;
     private int alertLevel;
     private int actionType;
     private String taskType;
     private String taskName;
     public long dueDate;
+    private boolean requireDoc;
     private String hazardId;
 
     public Task(boolean isCompleteTask) {
@@ -27,13 +29,25 @@ public class Task {
 
     private boolean isCompleteTask;
 
-    public Task(int alertLevel, String taskType, String taskName, long dueDate) {
+    public Task(String parentId, int alertLevel, String taskType, String taskName, long dueDate) {
+        this.parentId = parentId;
         this.alertLevel = alertLevel;
         this.taskType = taskType;
         this.taskName = taskName;
         this.dueDate = dueDate;
     }
-    public Task(int alertLevel, String taskType, String taskName, long dueDate, int actionType) {
+
+    public Task(String parentId, int alertLevel, String taskType, String taskName, long dueDate, boolean requireDoc) {
+        this.parentId = parentId;
+        this.alertLevel = alertLevel;
+        this.taskType = taskType;
+        this.taskName = taskName;
+        this.dueDate = dueDate;
+        this.requireDoc = requireDoc;
+    }
+
+    public Task(String parentId, int alertLevel, String taskType, String taskName, long dueDate, int actionType) {
+        this.parentId = parentId;
         this.alertLevel = alertLevel;
         this.taskType = taskType;
         this.taskName = taskName;
@@ -87,5 +101,21 @@ public class Task {
 
     public void setHazardId(String hazardId) {
         this.hazardId = hazardId;
+    }
+
+    public boolean isRequireDoc() {
+        return requireDoc;
+    }
+
+    public void setRequireDoc(boolean requireDoc) {
+        this.requireDoc = requireDoc;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
     }
 }
