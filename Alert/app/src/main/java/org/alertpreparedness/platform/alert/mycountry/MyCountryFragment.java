@@ -23,7 +23,6 @@ import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
-import org.alertpreparedness.platform.alert.dagger.annotation.ProgrammeRef;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.OnCountrySelectedListener;
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.OnLevel1SelectedListener;
@@ -142,7 +141,7 @@ public class MyCountryFragment extends Fragment implements OnCountrySelectedList
             if(countryJsonData != null) {
                 mCountryDataList = new ArrayList<>(countryJsonData);
 
-                if (mCountryDataList.size() > 240) {
+                if (mCountryDataList.size() == 248) {
 
                     agency.child("country").addListenerForSingleValueEvent(this);
                 }

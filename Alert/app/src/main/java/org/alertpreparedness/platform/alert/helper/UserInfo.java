@@ -246,7 +246,7 @@ public class UserInfo implements ValueEventListener {
             if (countryJsonData != null) {
                 mCountryDataList = new ArrayList<>(countryJsonData);
 
-                if (mCountryDataList.size() > 240) {
+                if (mCountryDataList.size() == 248) {
                     String country = Constants.COUNTRIES[((int) (long) dataSnapshot.child("location").getValue())];
                     userObj.setCountryName(country);
                     userObj.setCountryListId(((int) (long) dataSnapshot.child("location").getValue()));

@@ -144,8 +144,8 @@ public class FirebaseModule {
 
     @Provides
     @ProgrammeRef
-    public DatabaseReference providePrgrammes(@BaseDatabaseRef DatabaseReference db, User user) {
-        return db.child("countryOfficeProfile").child("programme").child(user.countryID).child("4WMapping");
+    public DatabaseReference providePrgrammes(@BaseDatabaseRef DatabaseReference db) {
+        return db.child("countryOfficeProfile").child("programme");
     }
 
     @Provides

@@ -3,6 +3,10 @@ package org.alertpreparedness.platform.alert.firebase;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.database.Exclude;
+
+import java.util.List;
+
 /**
  * Created by Tj on 09/01/2018.
  */
@@ -16,8 +20,15 @@ public class ProgrammeModel implements Parcelable {
     private int sector;
     private String toWho;
     private String what;
+    private long toDate;
 //    private String where;
     private long when;
+
+    private String countryName;
+    @Exclude
+    private String level1Name;
+    @Exclude
+    private String level2Name;
 
     public ProgrammeModel(){}
 
@@ -132,5 +143,37 @@ public class ProgrammeModel implements Parcelable {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public long getToDate() {
+        return toDate;
+    }
+
+    public void setToDate(long toDate) {
+        this.toDate = toDate;
+    }
+
+    public void setLevel1Name(String level1Name) {
+        this.level1Name = level1Name;
+    }
+
+    public void setLevel2Name(String level2Name) {
+        this.level2Name = level2Name;
+    }
+
+    public String getLevel1Name() {
+        return level1Name;
+    }
+
+    public String getLevel2Name() {
+        return level2Name;
+    }
+
+    public String getCountryName() {
+        return countryName;
+    }
+
+    public void setCountryName(String countryName) {
+        this.countryName = countryName;
     }
 }

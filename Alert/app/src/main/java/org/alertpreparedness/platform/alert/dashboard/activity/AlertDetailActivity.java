@@ -226,7 +226,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             if(countryJsonData != null) {
                 mCountryDataList = new ArrayList<>(countryJsonData);
 
-                if (mCountryDataList.size() > 240) {
+                if (mCountryDataList.size() == 248) {
 
                     StringBuilder res = new StringBuilder();
                     for(AffectedAreaModel m : alert.getAffectedAreas()) {

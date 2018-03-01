@@ -21,6 +21,34 @@ fun getLevel2Values(countryId: Int, level1Id: Int, mCountryDataList : ArrayList<
     return selectedCountry.levelOneValues?.first { it.id == level1Id }?.levelTwoValues?.map { it.value }
 }
 
+fun GetProgrammeSector(sector : Int) : String =
+        when(sector) {
+            0 -> {
+                "Wash"
+            }
+            1 -> {
+                "Health"
+            }
+            2 -> {
+                "Shelter"
+            }
+            3 -> {
+                "Nutrition"
+            }
+            4 -> {
+                "Food Security and Livelihoods"
+            }
+            5 -> {
+                "Protection"
+            }
+            6 -> {
+                "Camp Management"
+            }
+            else -> {
+                "Other"
+            }
+        }
+
 fun GroupViewHolder.getHazardImg(title: String): Int =
         when (title) {
             "Cold Wave" -> {

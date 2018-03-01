@@ -15,11 +15,17 @@ import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder;
 import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder;
 
+import org.alertpreparedness.platform.alert.ExtensionHelperKt;
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.firebase.ProgrammeModel;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,11 +39,14 @@ public class ProgrammesAdapter extends ExpandableRecyclerViewAdapter<ProgrammesA
 
     private final LayoutInflater inflater;
     private Context context;
+    @Inject
+    SimpleDateFormat dateFormatter;
 
     public ProgrammesAdapter(Context context, List<? extends ExpandableGroup> groups) {
         super(groups);
         inflater = LayoutInflater.from(context);
         this.context = context;
+        DependencyInjector.applicationComponent().inject(this);
     }
 
     @Override
@@ -57,7 +66,7 @@ public class ProgrammesAdapter extends ExpandableRecyclerViewAdapter<ProgrammesA
     public void onBindChildViewHolder(ProgrammeInfoViewHolder holder, int flatPosition, ExpandableGroup group,
                                       int childIndex) {
         final ProgrammeModel programme = ((ProgrammeInfo) group).getItems().get(childIndex);
-
+        holder.bind(programme);
     }
 
     @Override
@@ -88,7 +97,16 @@ public class ProgrammesAdapter extends ExpandableRecyclerViewAdapter<ProgrammesA
         }
 
         public void bind(ProgrammeModel model) {
-
+            from.setText(
+                    String.format("%s - %s",
+                            dateFormatter.format(new Date(model.getWhen())),
+                            dateFormatter.format(new Date(model.getToDate()))
+                    )
+            );
+            to.setText(model.getToWho());
+            title.setText(ExtensionHelperKt.GetProgrammeSector(model.getSector()));
+            desc.setText(model.getWhat());
+            in.setText(String.format("%s, %s", model.getCountryName(), model.getLevel1Name()));
         }
     }
 

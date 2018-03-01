@@ -35,6 +35,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.fragment.ActionUnas
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.InProgressFragment;
 import org.alertpreparedness.platform.alert.mycountry.MyCountryFragment;
 import org.alertpreparedness.platform.alert.mycountry.ProgramResultsActivity;
+import org.alertpreparedness.platform.alert.mycountry.ProgrammesAdapter;
 import org.alertpreparedness.platform.alert.notifications.ActionFetcher;
 import org.alertpreparedness.platform.alert.notifications.ActionNotificationService;
 import org.alertpreparedness.platform.alert.notifications.ActionUpdateNotificationHandler;
@@ -127,4 +128,6 @@ public interface ApplicationComponent {
     void inject(BaseActionProcessor baseActionProcessor);
 
     void inject(AlertFetcher alertFetcher);
+
+    void inject(ProgrammesAdapter programmesAdapter);
 }

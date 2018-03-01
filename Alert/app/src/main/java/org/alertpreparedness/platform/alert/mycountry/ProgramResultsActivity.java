@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.mycountry;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
@@ -25,6 +27,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import org.alertpreparedness.platform.alert.ExtensionHelperKt;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyBaseRef;
@@ -32,7 +35,9 @@ import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ProgrammeRef;
 import org.alertpreparedness.platform.alert.firebase.AgencyModel;
 import org.alertpreparedness.platform.alert.firebase.ProgrammeModel;
+import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
+import org.alertpreparedness.platform.alert.risk_monitoring.view_model.SelectAreaViewModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,6 +92,12 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
     @BindView(R.id.revealCon)
     CardView revealCon;
 
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
+
+    @BindView(R.id.noResults)
+    TextView noResults;
+
     @Inject
     @ProgrammeRef
     DatabaseReference programmesRef;
@@ -112,6 +123,7 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
     private ProgrammesAdapter mProgrammesAdapter;
     private ArrayList<ProgrammeInfo> mProgrammes;
     private HashMap<String, AgencyModel> agencyList = new HashMap<>();
+    private ArrayList<CountryJsonData> mCountryDataList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,7 +143,23 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
         mTitle1 = getIntent().getStringExtra(TITLE_1);
         mTitle2 = getIntent().getStringExtra(TITLE_2);
 
-        programmesRef.addValueEventListener(this);
+        SelectAreaViewModel mViewModel = ViewModelProviders.of(this).get(SelectAreaViewModel.class);
+
+        mViewModel.getCountryJsonDataLive().observe(this, countryJsonData -> {
+
+            if(countryJsonData != null) {
+                mCountryDataList = new ArrayList<>(countryJsonData);
+
+                if (mCountryDataList.size() == 248) {
+                    progressBar.setVisibility(View.GONE);
+                    noResults.setVisibility(View.VISIBLE);
+                    programmesRef.addValueEventListener(this);
+                }
+            }
+
+        });
+
+
 
         initViews();
     }
@@ -344,28 +372,45 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
 
-        for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
-            ProgrammeModel model = snapshot.getValue(ProgrammeModel.class);
-            assert model != null;
-            model.setKey(snapshot.getKey());
-//            assert filter.getLevel1() != null;
-            boolean hasLevel1 = filter.getLevel1() != null && filter.getLevel1() != -1;
-            boolean hasLevel2 = filter.getLevel2() != null && filter.getLevel2() != -1;
+        for (DataSnapshot child : dataSnapshot.getChildren()) {
+            for(DataSnapshot programmSnapshot : child.child("4WMapping").getChildren()) {
+                ProgrammeModel model = programmSnapshot.getValue(ProgrammeModel.class);
+                assert model != null;
+                model.setKey(programmSnapshot.getKey());
 
-            if((!hasLevel1 || filter.getLevel1() == model.getLevel1()) && (!hasLevel2 || filter.getLevel2().toString().equals(model.getLevel2()))) {
-                ArrayList<ProgrammeModel> models = programmes.get(model.getAgencyId());
+                model.setCountryName(mTitle1);
 
-                if (programmes.get(model.getAgencyId()) == null) {
-                    models = new ArrayList<>();
+                model.setLevel1Name(
+                        ExtensionHelperKt.getLevel1Values(filter.getCountry(),
+                                mCountryDataList
+                        ).get(model.getLevel1()));
+                if(model.getLevel2() != null) {
+                    model.setLevel2Name(
+                            ExtensionHelperKt.getLevel2Values(
+                                    filter.getCountry(),
+                                    model.getLevel1(),
+                                    mCountryDataList
+                            ).get(Integer.parseInt(model.getLevel2()))
+                    );
                 }
-                models.add(model);
-                programmes.put(model.getAgencyId(), models);
-                agencyRequests.put(model.getAgencyId(), false);
+
+                boolean hasLevel1 = filter.getLevel1() != null && filter.getLevel1() != -1;
+                boolean hasLevel2 = filter.getLevel2() != null && filter.getLevel2() != -1;
+
+                if((!hasLevel1 || filter.getLevel1() == model.getLevel1()) && (!hasLevel2 || filter.getLevel2().toString().equals(model.getLevel2()))) {
+                    ArrayList<ProgrammeModel> models = programmes.get(model.getAgencyId());
+
+                    if (programmes.get(model.getAgencyId()) == null) {
+                        models = new ArrayList<>();
+                    }
+                    models.add(model);
+                    programmes.put(model.getAgencyId(), models);
+                    agencyRequests.put(model.getAgencyId(), false);
+                }
             }
         }
 
         if(agencyRequests.size() > 0) {
-            System.out.println("agencyRequests = " + agencyRequests);
             for (String id : agencyRequests.keySet()) {
                 if(id != null) {
                     agencyRef.child(id).addValueEventListener(new AgencyListener());
