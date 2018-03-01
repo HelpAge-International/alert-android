@@ -72,6 +72,7 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener,
     }
 
     fun onBind(indicator: ModelIndicator) {
+
         container.visibility = View.VISIBLE
         emptyMessage.visibility = View.GONE
         if (indicator.modelType == HAZARD_NOT_EMPTY) {
@@ -87,6 +88,8 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener,
             } else {
                 indicatorNetworkId.visibility = View.GONE
             }
+
+
 
             when (indicator.triggerSelected) {
                 Constants.TRIGGER_GREEN -> {
@@ -120,6 +123,11 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener,
                     indicatorDue.textColor = context.resources.getColor(R.color.alertRed)
                 }
             }
+            
+            if(indicator.trigger.size > indicator.triggerSelected) {
+                indicatorLevel.text = indicator.trigger[indicator.triggerSelected].triggerValue;
+            }
+
             indicatorLevel.setOnClickListener {
                 //            Timber.d("hazardId: %s, indicatorId: %s", indicator.hazardScenario.key?:"", indicator.id)
                 Timber.d("indicator model: %s", indicator)
