@@ -5,9 +5,11 @@ import android.content.Context;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class NotificationSettingsListener implements ValueEventListener {
 
@@ -25,9 +27,9 @@ public class NotificationSettingsListener implements ValueEventListener {
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        HashMap<String, Integer> notificationSettings = (HashMap<String, Integer>) dataSnapshot.getValue();
+        List<Integer> notificationSettings = dataSnapshot.getValue(new GenericTypeIndicator<List<Integer>>());
 
-        if(notificationSettings.containsKey(String.valueOf(notificationSetting)) && notificationSettings.get(String.valueOf(notificationSetting)) == 1){
+        if(notificationSettings != null && notificationSettings.contains(notificationSetting)){
             //Enabled
             AppUtils.sendNotification(context,notificationTag, notification);
         }
