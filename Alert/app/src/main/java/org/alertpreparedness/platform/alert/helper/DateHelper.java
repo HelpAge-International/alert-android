@@ -1,5 +1,8 @@
 package org.alertpreparedness.platform.alert.helper;
 
+import org.alertpreparedness.platform.alert.utils.Constants;
+import org.joda.time.DateTime;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -90,5 +93,20 @@ public class DateHelper {
         Calendar now = Calendar.getInstance();
 
         return date.after(now);
+    }
+
+    public static Long clockCalculation(Long value, Long type) {
+        Long val = (long) (1000 * 60 * 60 * 24); // Milliseconds in one day
+        val = val * value;
+        if (type == Constants.DUE_WEEK) {
+            val = val * 7;
+        }
+        if (type == Constants.DUE_MONTH) {
+            val = val * 30;
+        }
+        if (type == Constants.DUE_YEAR) {
+            val = val * 365;
+        }
+        return val;
     }
 }

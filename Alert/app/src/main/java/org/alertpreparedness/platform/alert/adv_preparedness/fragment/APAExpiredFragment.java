@@ -33,13 +33,17 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
+import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseAPAFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.ClockSettingsFetcher;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
+import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
+import org.joda.time.DateTime;
 
 import java.io.StringReader;
 import java.text.ParseException;
@@ -198,19 +202,20 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         DatePickerDialog pickerDialog = new DatePickerDialog(getContext(), (datePicker, i, i1, i2) -> {
-            String givenDateString = i2 + " " + i1 + " " + i + " 23:59:00";//due the end of the day.
-            SimpleDateFormat sdf = new SimpleDateFormat("dd mm yyyy HH:mm:ss", Locale.getDefault());
-            try {
-                Date mDate = sdf.parse(givenDateString);
-                long timeInMilliseconds = mDate.getTime();
-                long millis = System.currentTimeMillis();
+            DateTime newDate = new DateTime().withYear(i).withMonthOfYear(i1+1).withDayOfMonth(i2);
+            long millis = System.currentTimeMillis();
 
-                dbActionRef.child(key).child("dueDate").setValue(timeInMilliseconds);//save due date in milliSec.
-                dbActionRef.child(key).child("updatedAt").setValue(millis);
-
-            } catch (ParseException e) {
-                e.printStackTrace();
+            if(newDate.getMillis() <= millis) {
+                SnackbarHelper.show(getActivity(), getString(R.string.past_date_error));
             }
+            else {
+                dbActionRef.child(key).child("dueDate").setValue(newDate.getMillis());//save due date in milliSec.
+
+//                new ClockSettingsFetcher(((value, durationType) -> {
+                dbActionRef.child(key).child("updatedAt").setValue(newDate.getMillis());
+//                })).fetch();
+            }
+
         }, year, month, day);
         pickerDialog.show();
     }

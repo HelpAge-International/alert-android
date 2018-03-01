@@ -25,11 +25,13 @@ import org.alertpreparedness.platform.alert.adv_preparedness.fragment.UsersListD
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
+import org.alertpreparedness.platform.alert.utils.ClockSettingsFetcher;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
@@ -158,15 +160,31 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
 
         DatePickerDialog pickerDialog = new DatePickerDialog(getContext(), (datePicker, i, i1, i2) -> {
 
-            Long newDate = new DateTime().withYear(i).withMonthOfYear(i1+1).withDayOfMonth(i2).getMillis();
+            DateTime newDate = new DateTime().withYear(i).withMonthOfYear(i1+1).withDayOfMonth(i2);
             long millis = System.currentTimeMillis();
 
-            if(newDate <= millis) {
+            if(newDate.getMillis() <= millis) {
                 SnackbarHelper.show(getActivity(), getString(R.string.past_date_error));
             }
             else {
-                dbActionRef.child(key).child("dueDate").setValue(newDate);//save due date in milliSec.
-                dbActionRef.child(key).child("updatedAt").setValue(millis);
+                dbActionRef.child(key).child("dueDate").setValue(newDate.getMillis());//save due date in milliSec.
+
+                new ClockSettingsFetcher(((value, durationType) -> {
+                    Long clocker;
+                    if(mExpiredAdapter.getItem(actionID).getFrequencyValue() != null) {
+                        clocker = DateHelper.clockCalculation(
+                                mExpiredAdapter.getItem(actionID).getFrequencyValue().longValue(),
+                                mExpiredAdapter.getItem(actionID).getFrequencyBase()
+                        );
+                    }
+                    else {
+                        clocker = DateHelper.clockCalculation(value, durationType);
+                    }
+                    System.out.println("clocker = " + clocker);
+                    System.out.println(" mExpiredAdapter = " + mExpiredAdapter.getItem(actionID).getFrequencyValue() + " " + mExpiredAdapter.getItem(actionID).getFrequencyBase());
+                    dbActionRef.child(key).child("createdAt").setValue(newDate.plusMillis(clocker.intValue()).getMillis());
+                    dbActionRef.child(key).child("updatedAt").setValue(newDate.plusMillis(clocker.intValue()).getMillis());
+                })).fetch();
             }
 
         }, year, month, day);

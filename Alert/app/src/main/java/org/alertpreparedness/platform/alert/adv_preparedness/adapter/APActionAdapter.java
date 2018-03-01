@@ -111,6 +111,11 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
         return items.get(keys.get(index));
     }
 
+    public Action getItem(String key) {
+        return items.get(key);
+    }
+
+
     public void removeItem(String key) {
         int index = keys.indexOf(key);
         if(index != -1) {

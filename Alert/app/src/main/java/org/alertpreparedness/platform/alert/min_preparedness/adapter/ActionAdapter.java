@@ -89,6 +89,10 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
         return items.get(keys.get(index));
     }
 
+    public Action getItem(String key) {
+        return items.get(key);
+    }
+
     public void removeItem(String key) {
         int index = keys.indexOf(key);
         if(index != -1) {

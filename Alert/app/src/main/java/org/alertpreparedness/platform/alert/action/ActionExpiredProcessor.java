@@ -155,12 +155,11 @@ public class ActionExpiredProcessor extends BaseActionProcessor {
     public void getCustom() {
 
         countryOffice.child(user.agencyAdminID).child(user.countryID).child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ValueEventListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
+
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Long durationType = (Long) dataSnapshot.child("durationType").getValue();
                 Long value = (Long) dataSnapshot.child("value").getValue();
-                System.out.println("model Custom Action = " + model);
 
                 if (value != null) {
                     if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_WEEK) {
@@ -174,7 +173,9 @@ public class ActionExpiredProcessor extends BaseActionProcessor {
                     } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_YEAR) {
                         isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), value.intValue());
                     } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_YEAR) {
+                        System.out.println("FAILED2");
                         isInProgress = DateHelper.isInProgressYear(model.getUpdatedAt(), value.intValue());
+                        System.out.println("isInProgress = " + isInProgress);
                     }
                 }
 
