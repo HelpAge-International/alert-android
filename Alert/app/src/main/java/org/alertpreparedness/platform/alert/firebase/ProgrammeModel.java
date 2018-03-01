@@ -3,35 +3,7 @@ package org.alertpreparedness.platform.alert.firebase;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * Created by Tj on 09/01/2018.
- */
-
-public class ProgrammeModel implements Parcelable {
-
-    private String key;
-    private String agencyId;
-    private int level1;
-    private String level2;
-    private int sector;
-    private String toWho;
-    private String what;
-//    private String where;
-    private long when;
-
-    public ProgrammeModel(){}
-
-
-    protected ProgrammeModel(Parcel in) {
-        agencyId = in.readString();
-        level1 = in.readInt();
-        level2 = in.readString();
-        sector = in.readInt();
-        toWho = in.readString();
-        what = in.readString();
-//        where = in.readString();
-        when = in.readLong();
-    }
+public class ProgrammeModel extends FirebaseModel implements Parcelable {
 
     public static final Creator<ProgrammeModel> CREATOR = new Creator<ProgrammeModel>() {
         @Override
@@ -44,6 +16,43 @@ public class ProgrammeModel implements Parcelable {
             return new ProgrammeModel[size];
         }
     };
+
+    private String key;
+    private String agencyId;
+    private int level1;
+    private String level2;
+    private int sector;
+    private String toWho;
+    private String what;
+    private long when;
+
+    public ProgrammeModel() {
+    }
+
+    protected ProgrammeModel(Parcel in) {
+        agencyId = in.readString();
+        level1 = in.readInt();
+        level2 = in.readString();
+        sector = in.readInt();
+        toWho = in.readString();
+        what = in.readString();
+        when = in.readLong();
+    }
+
+    @Override
+    public String toString() {
+        return "ProgrammeModel{" +
+                "key='" + key + '\'' +
+                ", agencyId='" + agencyId + '\'' +
+                ", level1=" + level1 +
+                ", level2='" + level2 + '\'' +
+                ", sector=" + sector +
+                ", toWho='" + toWho + '\'' +
+                ", what='" + what + '\'' +
+                ", when=" + when +
+                '}' +
+                super.toString();
+    }
 
     public int getLevel1() {
         return level1;
@@ -85,14 +94,6 @@ public class ProgrammeModel implements Parcelable {
         this.what = what;
     }
 
-//    public String getWhere() {
-//        return where;
-//    }
-//
-//    public void setWhere(String where) {
-//        this.where = where;
-//    }
-
     public long getWhen() {
         return when;
     }
@@ -122,7 +123,6 @@ public class ProgrammeModel implements Parcelable {
         parcel.writeInt(sector);
         parcel.writeString(toWho);
         parcel.writeString(what);
-//        parcel.writeString(where);
         parcel.writeLong(when);
     }
 

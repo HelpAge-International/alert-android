@@ -7,9 +7,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseHazardRef;
-import org.alertpreparedness.platform.alert.firebase.HazardModel;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.utils.AppUtils;
 
 import javax.inject.Inject;
 
@@ -45,11 +43,7 @@ public class HazardsFetcher implements FirebaseDataFetcher {
                 @Override
                 public void onDataChange(DataSnapshot hazardsSnapshot) {
                     for (DataSnapshot hazardWithIdSnapshot : hazardsSnapshot.getChildren()) {
-                        HazardModel hazardModel =
-                                AppUtils.getValueFromDataSnapshot(hazardWithIdSnapshot, HazardModel.class);
-                        hazardModel.setId(hazardWithIdSnapshot.getKey());
-
-                        hazardsFetcherListener.onHazardsFetcherResult(hazardModel);
+                        hazardsFetcherListener.onHazardsFetcherResult(hazardWithIdSnapshot);
                     }
                 }
 
@@ -77,7 +71,7 @@ public class HazardsFetcher implements FirebaseDataFetcher {
 
     //region HazardsFetcherListener
     public interface HazardsFetcherListener {
-        void onHazardsFetcherResult(HazardModel hazardModel);
+        void onHazardsFetcherResult(DataSnapshot hazardSnapshot);
     }
     //endregion
 }

@@ -4,9 +4,6 @@ import android.os.Parcel
 import android.os.Parcelable
 import org.alertpreparedness.platform.alert.HAZARD_NOT_EMPTY
 
-/**
- * Created by fei on 07/11/2017.
- */
 data class ModelIndicator(val id: String?, var hazardScenario: ModelHazard, val triggerSelected: Int,
                           var name: String, var assignee: String?, var geoLocation: Int,
                           var updatedAt: Long, var dueDate: Long, var source: List<ModelSource>, var trigger: List<ModelTrigger>, val networkId: String?, val agencyId: String?, val countryOfficeId: String?,

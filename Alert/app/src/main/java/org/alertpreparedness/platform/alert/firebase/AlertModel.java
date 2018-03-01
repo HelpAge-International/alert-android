@@ -1,18 +1,11 @@
 package org.alertpreparedness.platform.alert.firebase;
 
-
-import com.google.firebase.database.DataSnapshot;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by Tj on 19/12/2017.
- */
-
-public class AlertModel implements Serializable {
+public class AlertModel extends FirebaseModel implements Serializable {
 
     private boolean isNetwork;
 
@@ -50,11 +43,11 @@ public class AlertModel implements Serializable {
 
     private String name;
 
-//    private transient DataSnapshot snapshot;
+    public AlertModel() {
+    }
 
-    public AlertModel() {}
-
-    public AlertModel(int alertLevel, int hazardScenario, int estimatedPopulation, String infoNotes, String createdBy, ArrayList<AffectedAreaModel> affectedAreas) {
+    public AlertModel(int alertLevel, int hazardScenario, int estimatedPopulation, String infoNotes, String
+            createdBy, ArrayList<AffectedAreaModel> affectedAreas) {
 
         this.alertLevel = alertLevel;
         this.hazardScenario = hazardScenario;
@@ -62,6 +55,31 @@ public class AlertModel implements Serializable {
         this.infoNotes = infoNotes;
         this.createdBy = createdBy;
         this.affectedAreas = affectedAreas;
+    }
+
+    @Override
+    public String toString() {
+        return "AlertModel{" +
+                "isNetwork=" + isNetwork +
+                ", leadAgencyId='" + leadAgencyId + '\'' +
+                ", agencyAdminId='" + agencyAdminId + '\'' +
+                ", key='" + key + '\'' +
+                ", parentKey='" + parentKey + '\'' +
+                ", affectedAreas=" + affectedAreas +
+                ", alertLevel=" + alertLevel +
+                ", hazardScenario=" + hazardScenario +
+                ", infoNotes='" + infoNotes + '\'' +
+                ", timeCreated=" + timeCreated +
+                ", createdBy='" + createdBy + '\'' +
+                ", estimatedPopulation=" + estimatedPopulation +
+                ", reasonForRedAlert='" + reasonForRedAlert + '\'' +
+                ", approval=" + approval +
+                ", timeUpdated=" + timeUpdated +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", otherName='" + otherName + '\'' +
+                ", name='" + name + '\'' +
+                '}' +
+                super.toString();
     }
 
     public Integer getAlertLevel() {
@@ -177,28 +195,6 @@ public class AlertModel implements Serializable {
 
     public void setKey(String key) {
         this.key = key;
-    }
-
-    @Override
-    public String toString() {
-        return "AlertModel{" +
-                "isNetwork=" + isNetwork +
-                ", key='" + key + '\'' +
-                ", parentKey='" + parentKey + '\'' +
-                ", affectedAreas=" + affectedAreas +
-                ", alertLevel=" + alertLevel +
-                ", hazardScenario=" + hazardScenario +
-                ", infoNotes='" + infoNotes + '\'' +
-                ", timeCreated=" + timeCreated +
-                ", createdBy='" + createdBy + '\'' +
-                ", estimatedPopulation=" + estimatedPopulation +
-                ", reasonForRedAlert='" + reasonForRedAlert + '\'' +
-                ", approval=" + approval +
-                ", timeUpdated=" + timeUpdated +
-                ", updatedBy='" + updatedBy + '\'' +
-                ", otherName='" + otherName + '\'' +
-                ", name='" + name + '\'' +
-                '}';
     }
 
     public String getParentKey() {

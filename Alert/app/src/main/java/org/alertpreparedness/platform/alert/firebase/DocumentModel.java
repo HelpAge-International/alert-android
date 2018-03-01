@@ -3,11 +3,7 @@ package org.alertpreparedness.platform.alert.firebase;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 
-/**
- * Created by Tj on 21/02/2018.
- */
-
-public class DocumentModel {
+public class DocumentModel extends FirebaseModel {
 
     private String fileName;
     private String filePath;
@@ -29,7 +25,10 @@ public class DocumentModel {
                 ", filePath='" + filePath + '\'' +
                 ", time=" + time +
                 ", uploadedBy='" + uploadedBy + '\'' +
-                '}';
+                ", ref=" + ref +
+                ", key='" + key + '\'' +
+                '}' +
+                super.toString();
     }
 
     public String getFileName() {

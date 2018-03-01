@@ -1,10 +1,6 @@
 package org.alertpreparedness.platform.alert.firebase;
 
-/**
- * Created by Tj on 27/12/2017.
- */
-
-public class IndicatorModel {
+public class IndicatorModel extends FirebaseModel {
 
     private String id;
     private String assignee;
@@ -14,7 +10,6 @@ public class IndicatorModel {
     private String hazardId;
 
     public IndicatorModel() {
-
     }
 
     @Override
@@ -26,7 +21,8 @@ public class IndicatorModel {
                 ", triggerSelected=" + triggerSelected +
                 ", dueDate=" + dueDate +
                 ", hazardId='" + hazardId + '\'' +
-                '}';
+                '}' +
+                super.toString();
     }
 
     public String getAssignee() {
@@ -61,12 +57,12 @@ public class IndicatorModel {
         this.dueDate = dueDate;
     }
 
-    public void setHazardId(String hazardId) {
-        this.hazardId = hazardId;
-    }
-
     public String getHazardId() {
         return hazardId;
+    }
+
+    public void setHazardId(String hazardId) {
+        this.hazardId = hazardId;
     }
 
     public String getId() {

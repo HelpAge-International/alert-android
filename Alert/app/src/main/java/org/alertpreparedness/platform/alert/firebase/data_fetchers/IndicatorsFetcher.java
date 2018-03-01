@@ -6,9 +6,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
-import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.utils.AppUtils;
 
 import javax.inject.Inject;
 
@@ -37,11 +35,7 @@ public class IndicatorsFetcher implements FirebaseDataFetcher {
                     @Override
                     public void onDataChange(DataSnapshot indicatorsSnapshot) {
                         for (DataSnapshot indicatorSnapshot : indicatorsSnapshot.getChildren()) {
-                            IndicatorModel indicatorModel =
-                                    AppUtils.getValueFromDataSnapshot(indicatorSnapshot, IndicatorModel.class);
-                            indicatorModel.setId(indicatorSnapshot.getKey());
-
-                            indicatorsFetcherListener.onIndicatorsFetcherResult(indicatorModel);
+                            indicatorsFetcherListener.onIndicatorsFetcherResult(indicatorSnapshot);
                         }
                     }
 
@@ -52,8 +46,8 @@ public class IndicatorsFetcher implements FirebaseDataFetcher {
                     }
                 };
 
-        new HazardsFetcher(hazardModel -> {
-            String hazardId = hazardModel.getId();
+        new HazardsFetcher(hazardSnapshot -> {
+            String hazardId = hazardSnapshot.getKey();
             baseIndicatorRef.child(hazardId).addValueEventListener(indicatorsValueEventListener);
         });
 
@@ -66,13 +60,15 @@ public class IndicatorsFetcher implements FirebaseDataFetcher {
         });
 
         String countryId = user.countryID;
-        baseIndicatorRef.child(countryId).addValueEventListener(indicatorsValueEventListener);
+        baseIndicatorRef
+                .child(countryId)
+                .addValueEventListener(indicatorsValueEventListener);
     }
     //endregion
 
     //region IndicatorsFetcherListener
     public interface IndicatorsFetcherListener {
-        void onIndicatorsFetcherResult(IndicatorModel indicatorModel);
+        void onIndicatorsFetcherResult(DataSnapshot indicatorSnapshot);
     }
     //endregion
 }

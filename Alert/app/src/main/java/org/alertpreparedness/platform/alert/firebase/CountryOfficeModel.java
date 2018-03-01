@@ -1,12 +1,16 @@
 package org.alertpreparedness.platform.alert.firebase;
 
-/**
- * Created by Tj on 27/12/2017.
- */
-
-public class CountryOfficeModel {
+public class CountryOfficeModel extends FirebaseModel {
 
     private ClockSettings clockSettings;
+
+    @Override
+    public String toString() {
+        return "CountryOfficeModel{" +
+                "clockSettings=" + clockSettings +
+                '}' +
+                super.toString();
+    }
 
     public ClockSettings getClockSettings() {
         return clockSettings;

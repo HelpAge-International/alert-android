@@ -23,19 +23,20 @@ public class NetworkFetcher implements ValueEventListener {
 
     private NetworkFetcherListener networkFetcherListener;
 
-    public NetworkFetcher(NetworkFetcherListener networkFetcherListener){
+    public NetworkFetcher(NetworkFetcherListener networkFetcherListener) {
         this.networkFetcherListener = networkFetcherListener;
         DependencyInjector.applicationComponent().inject(this);
     }
 
-    public void fetch(){
+    public void fetch() {
         countryOfficeRef.addListenerForSingleValueEvent(this);
     }
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
         //noinspection unchecked
-        HashMap<String, Boolean> localNetworks = dataSnapshot.child("localNetworks").exists() ? (HashMap<String, Boolean>) dataSnapshot.child("localNetworks").getValue() : new HashMap<>();
+        HashMap<String, Boolean> localNetworks = dataSnapshot.child("localNetworks").exists() ? (HashMap<String,
+                Boolean>) dataSnapshot.child("localNetworks").getValue() : new HashMap<>();
 
 
         List<String> globalNetworks = new ArrayList<>();
@@ -46,7 +47,8 @@ public class NetworkFetcher implements ValueEventListener {
             networkCountries.add((String) network.child("networkCountryId").getValue());
         }
 
-        networkFetcherListener.onNetworkFetcherResult(new NetworkFetcherResult(new ArrayList<>(localNetworks.keySet()), globalNetworks, networkCountries));
+        networkFetcherListener.onNetworkFetcherResult(new NetworkFetcherResult(new ArrayList<>(localNetworks.keySet()
+        ), globalNetworks, networkCountries));
 
     }
 
@@ -55,14 +57,21 @@ public class NetworkFetcher implements ValueEventListener {
 
     }
 
-    public interface NetworkFetcherListener{
+    public interface NetworkFetcherListener {
         void onNetworkFetcherResult(NetworkFetcherResult networkFetcherResult);
     }
 
-    public class NetworkFetcherResult{
+    public class NetworkFetcherResult {
         private List<String> localNetworks;
         private List<String> globalNetworks;
         private List<String> networksCountries;
+
+        public NetworkFetcherResult(List<String> localNetworks, List<String> globalNetworks, List<String>
+                networksCountries) {
+            this.localNetworks = localNetworks;
+            this.globalNetworks = globalNetworks;
+            this.networksCountries = networksCountries;
+        }
 
         @Override
         public String toString() {
@@ -73,13 +82,7 @@ public class NetworkFetcher implements ValueEventListener {
                     '}';
         }
 
-        public NetworkFetcherResult(List<String> localNetworks, List<String> globalNetworks, List<String> networksCountries) {
-            this.localNetworks = localNetworks;
-            this.globalNetworks = globalNetworks;
-            this.networksCountries = networksCountries;
-        }
-
-        public  List<String> all() {
+        public List<String> all() {
             return AppUtils.smartCombine(AppUtils.smartCombine(localNetworks, globalNetworks), networksCountries);
         }
 
