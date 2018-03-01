@@ -91,7 +91,7 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
         assert imgUnassigned != null;
         imgUnassigned.setImageResource(R.drawable.ic_close_round);
         assert tvActionUnassigned != null;
-        tvActionUnassigned.setText("Unassigned");
+        tvActionUnassigned.setText(R.string.unassigned_title);
         tvActionUnassigned.setTextColor(getResources().getColor(R.color.alertRed));
 
         mUnassignedAdapter = new ActionAdapter(getContext(), this);
@@ -100,7 +100,8 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        new ActionFetcher(Constants.MPA, ActionFetcher.ACTION_STATE.UNASSIGNED, this).fetch((ids)-> {});
+        new ActionFetcher(Constants.MPA, ActionFetcher.ACTION_STATE.UNASSIGNED, this).fetch((ids)-> {
+        });
 
     }
 

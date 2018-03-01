@@ -143,13 +143,13 @@ public class ActionFetcher implements ActionProcessorListener {
 
                 ActionProcessor processor = makeProcessor(dataSnapshot, model, actionID, parentId);
 
-                if (model.getType() != null && model.getType() == 0 && type == Constants.MPA) {
+                if (model.getType() != null && model.getType() == 0 && type == Constants.MPA && state != ACTION_STATE.UNASSIGNED) {
                     processor.getCHS();
                 }
-                else if (model.getType() != null && model.getType() == 1) {
+                else if (model.getType() != null && model.getType() == 1 && state != ACTION_STATE.UNASSIGNED) {
                     processor.getMandated();
                 }
-                else if (model.getType() != null && model.getType() == 2) {
+                else if (model.getType() != null && model.getType() == 2 && state != ACTION_STATE.UNASSIGNED) {
                     processor.getCustom();
                 }
                 else if (state == ACTION_STATE.UNASSIGNED){
@@ -163,6 +163,7 @@ public class ActionFetcher implements ActionProcessorListener {
                         processor.getCustom();
                     }
                     if(type != Constants.APA) {
+                        System.out.println("fetchingCHS");
                         processor.getCHS();
                     }
                     processor.getMandated();

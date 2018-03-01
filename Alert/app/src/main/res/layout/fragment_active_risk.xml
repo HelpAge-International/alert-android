@@ -14,6 +14,8 @@
         android:text="@string/no_indicators_have_been_added"/>
 
     <android.support.v7.widget.RecyclerView
+        android:paddingBottom="85dp"
+        android:clipToPadding="false"
         android:id="@+id/rvRiskActive"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

@@ -1,15 +1,11 @@
 package org.alertpreparedness.platform.alert.action;
 
-import android.view.View;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
-import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
-import org.alertpreparedness.platform.alert.utils.Constants;
 
 /**
  * Created by Tj on 28/02/2018.
@@ -113,42 +109,29 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
 
     protected void addObject(
             String taskName,
-            String department,
             Long createdAt,
             Long level,
             String key,
-            String assignee,
-            String agencyId,
-            String countryId,
-            String networkId,
-            Boolean isArchived,
-            Boolean isComplete,
-            Long updatedAt,
-            Long actionType,
-            Long dueDate,
-            Long budget,
-            Long frequencyBase,
-            Integer frequencyValue,
             boolean chsHasInfo
     ) {
         Action action = new Action(
                 parentId,
                 taskName,
-                department,
-                assignee,
-                agencyId,
-                countryId,
-                networkId,
-                isArchived,
-                isComplete,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
                 createdAt,
-                updatedAt,
-                actionType,
-                dueDate,
-                budget,
+                null,
+                0L,
+                null,
+                null,
                 level,
-                frequencyBase,
-                frequencyValue,
+                null,
+                null,
                 user,
                 dbAgencyRef.getRef(),
                 dbUserPublicRef.getRef(),
@@ -166,7 +149,9 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
         dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
                 for (DataSnapshot getChild : dataSnapshot.getChildren()) {
+
                     dbActionRef.child(getChild.getKey()).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -177,26 +162,11 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
                                 Long CHSlevel = (Long) getChild.child("level").getValue();
                                 Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
 
-                                System.out.println("getCHSdataSnapshot = " + dataSnapshot);
-
                                 addObject(
                                         CHSTaskName,
-                                        null,
                                         CHSCreatedAt,
                                         CHSlevel,
                                         getChild.getKey(),
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        0L,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
                                         dataSnapshot.exists()
                                 );
 
