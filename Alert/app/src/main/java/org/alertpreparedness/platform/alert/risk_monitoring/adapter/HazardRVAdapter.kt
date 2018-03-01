@@ -148,6 +148,13 @@ class HazardAdapter(groups: List<ExpandableGroup<ModelIndicator>>, countryLocati
     override fun onBindGroupViewHolder(holder: HazardViewHolder?, flatPosition: Int, group: ExpandableGroup<*>?) {
         @Suppress("UNCHECKED_CAST")
         holder?.setHazardTitle(group as ExpandableGroup<ModelIndicator>)
+        if(group!!.items.size > 1) {
+            val indicator: ModelIndicator = group.items[0] as ModelIndicator
+            if(indicator.modelType == HAZARD_EMPTY) {
+                group.items.removeAt(0)
+            }
+
+        }
     }
 
     override fun onBindChildViewHolder(holder: IndicatorViewHolder?, flatPosition: Int, group: ExpandableGroup<*>?, childIndex: Int) {

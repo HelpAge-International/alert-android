@@ -121,6 +121,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         initData()
         initViews()
         initListeners()
+        println("UPDATINDICATOR")
     }
 
     override fun onResume() {
@@ -149,8 +150,8 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         mAreas = mutableListOf()
 //        mStaff.add()
         mViewModel.getStaffLive().observe(this, Observer { users ->
-            println("users = ${users}")
             mStaff = ArrayList(users)
+            println("mStaff = ${mStaff}")
         })
         mViewModel.getCountryJsonDataLive().observe(this, Observer { countryList ->
             countryList?.let {
@@ -240,6 +241,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
     }
 
     private fun loadDataBack(model: ModelIndicator) {
+        println("LOADINGDATABACK")
         when {
             model.hazardScenario.key == "countryContext" && model.hazardScenario.hazardScenario == -2 -> {
                 tvSelectHazard.text = getString(R.string.country_context)
@@ -273,6 +275,9 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         tvIndicatorRedName.setText(red.triggerValue)
         etIndicatorRedValue.setText(red.frequencyValue)
         tvRedFrequency.text = TRIGGER_FREQUENCY_LIST[red.durationType.toInt()]
+
+        println("model.assignee = ${model.assignee}")
+
         mViewModel.getStaffLive().observe(this, Observer { staffs ->
             model.assignee?.apply {
                 staffs?.find {
@@ -420,6 +425,8 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
             override fun userAssignedTo(user: ModelUserPublic?, position: Int) {
                 user?.let { tvAssignTo.text = String.format("%s %s", user.firstName, user.lastName) }
                 mSelectedAssignPosition = position
+                println("mStaff user.id = ${user}")
+                println("mStaff user.id = ${position}")
                 if (user?.id?.isNotEmpty()!!) {
                     mIndicatorModel.assignee = user.id
                 } else {

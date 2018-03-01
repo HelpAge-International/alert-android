@@ -223,16 +223,12 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
                                 }
                                 val disposableIndicator = RiskMonitoringService(getApplication()).getIndicators(it.id!!)
                                         .subscribe({ indicators ->
-//                                            println("indicatorsit.id = ${it.id}")
-//                                            println("indicators = ${indicators}")
                                             mIndicatorMap.put(it.id!!, indicators)
-                                            println("mIndicatorMap = ${mIndicatorMap}")
                                             val group = ExpandableGroup(mHazardNameMap[it.id!!], indicators)
                                             val groupIndex = getGroupIndex(group.title, mGroups)
                                             if (groupIndex != -1) {
                                                 val existItems = mGroups[groupIndex].items
                                                 var totalItems = existItems
-                                                println("totalItems = ${totalItems}")
                                                 if (it.isActive == isActive) {
 
                                                     indicators.forEach { i ->
@@ -263,10 +259,6 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
                                                     v.modelType = HAZARD_EMPTY
                                                     group.items.add(v)
                                                     mGroups.add(group)
-
-                                                    println("group.items = ${group.items.size}")
-                                                    println("group.items[0].modelType = ${group.items[0].modelType}")
-
                                                 }
                                             }
                                             mLiveData.value = mGroups
@@ -347,6 +339,10 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
                                                                             }
                                                                         } else {
                                                                             if (it.isActive == isActive && group.items.isNotEmpty()) {
+//                                                                                val v = ModelIndicator(modelType = HAZARD_EMPTY)
+//                                                                                v.modelType = HAZARD_EMPTY
+//                                                                                group.items.add(v)
+//                                                                                mGroups.add(group)
                                                                                 mGroups.add(group)
                                                                             }
                                                                         }
@@ -439,7 +435,7 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
                                                                         }
                                                                     }
 
-                                                                    mDisposables.add(RiskMonitoringService(getApplication()).getIndicatorsForAssignee(it.id!!, network)
+                                                                    mDisposables.add(RiskMonitoringService(getApplication()).getIndicatorsForLocalNetwork(it.id!!, network)
                                                                             .subscribe({ indicators ->
                                                                                 Timber.d("local network indicator size: %s", indicators.size)
                                                                                 mIndicatorMapNetworkLocal.put(it.id!!, indicators)
@@ -477,6 +473,7 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
                                                                             }, { error ->
                                                                                 Timber.d(error.message)
                                                                             }))
+
                                                                 }
                                                             }
 
