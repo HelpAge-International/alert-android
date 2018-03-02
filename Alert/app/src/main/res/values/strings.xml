@@ -234,4 +234,5 @@
     <string name="attachments">Attachments</string>
     <string name="download">Download</string>
     <string name="online_error">You need to be online to perform this action</string>
+    <string name="error_logging_out">Error logging out, please try again later.</string>
 </resources>

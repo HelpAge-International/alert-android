@@ -21,6 +21,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.leakcanary.LeakCanary;
 
 import net.danlew.android.joda.JodaTimeAndroid;
@@ -39,6 +40,7 @@ import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.notifications.ActionUpdateNotificationHandler;
 import org.alertpreparedness.platform.alert.notifications.IndicatorFetcher;
 import org.alertpreparedness.platform.alert.notifications.IndicatorUpdateNotificationHandler;
+import org.alertpreparedness.platform.alert.notifications.NotificationIdHandler;
 import org.alertpreparedness.platform.alert.notifications.ResponsePlanUpdateNotificationHandler;
 import org.alertpreparedness.platform.alert.offline.OfflineSyncHandler;
 import org.alertpreparedness.platform.alert.offline.SyncJobService;
@@ -74,7 +76,7 @@ public class AlertApplication extends Application implements ValueEventListener 
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.SAND;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING;
 
     @Override
     public void onCreate() {
@@ -134,7 +136,6 @@ public class AlertApplication extends Application implements ValueEventListener 
             PreferHelper.putString(getApplicationContext(), Constants.APP_STATUS, Constants.APP_STATUS_SAND);
         }
 
-
         if(loggedIn) {
             FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(this));
             Job myJob = dispatcher.newJobBuilder()
@@ -151,6 +152,11 @@ public class AlertApplication extends Application implements ValueEventListener 
             new IndicatorUpdateNotificationHandler(this).scheduleAllNotifications();
             new ActionUpdateNotificationHandler(this).scheduleAllNotifications();
             new ResponsePlanUpdateNotificationHandler(this).scheduleAllNotifications();
+
+            if(FirebaseInstanceId.getInstance().getToken() != null) {
+                new NotificationIdHandler().registerDeviceId(new UserInfo().getUser().getUserID(), FirebaseInstanceId.getInstance().getToken());
+            }
+
         }
         else{
             //TODO: CANCEL ALL NOTIFICATIONS?

@@ -31,6 +31,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.interfaces.AuthCallback;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.notifications.NotificationIdHandler;
 import org.alertpreparedness.platform.alert.realm.UserRealm;
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.SelectAreaViewModel;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -76,6 +77,9 @@ public class UserInfo implements ValueEventListener {
     DatabaseReference userPublic;
 
     @Inject
+    public NotificationIdHandler notificationIdHandler;
+
+    @Inject
     Context context;
 
     private UserAuthenticationListener listener = new UserAuthenticationListener();
@@ -92,18 +96,9 @@ public class UserInfo implements ValueEventListener {
         this.userId = userId;
         this.authCallback = authCallback;
 
-        registerNotificationId(FirebaseInstanceId.getInstance().getToken());
-
         for (String nodeName : users) {
             db = database.child(nodeName);
             db.addListenerForSingleValueEvent(listener);
-        }
-    }
-
-    public void registerNotificationId(String deviceNotificationId) {
-        Timber.d("DEVICE NOTIFICAITON ID: " + deviceNotificationId);
-        if(deviceNotificationId != null) {
-            userPublic.child(userId).child("deviceNotificationId").setValue(deviceNotificationId);
         }
     }
 
@@ -277,6 +272,7 @@ public class UserInfo implements ValueEventListener {
             if (dataSnapshot.child(userId).exists()) {
                 DataSnapshot userNode = dataSnapshot.child(userId);
                 populateUser(dataSnapshot.getKey(), userNode);
+                notificationIdHandler.registerDeviceId(userId, FirebaseInstanceId.getInstance().getToken());
             }
         }
 
