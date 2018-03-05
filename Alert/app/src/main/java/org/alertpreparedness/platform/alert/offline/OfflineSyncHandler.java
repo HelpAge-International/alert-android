@@ -113,7 +113,7 @@ public class OfflineSyncHandler {
         databaseReferenceOfflineHandler = new DatabaseReferenceOfflineHandler(2);
 
         // TODO: Figure out if it's worthwhile going online and offline
-        // DatabaseReference.goOnline();
+         DatabaseReference.goOnline();
 
         // fetchCountryLevelAlerts();
 
