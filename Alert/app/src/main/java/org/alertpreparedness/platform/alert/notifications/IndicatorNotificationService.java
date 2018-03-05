@@ -10,6 +10,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,10 +36,9 @@ public class IndicatorNotificationService extends JobService {
 
     @Override
     public boolean onStartJob(JobParameters job) {
+        if(FirebaseAuth.getInstance().getCurrentUser() != null && job.getExtras() != null) {
+            DependencyInjector.applicationComponent().inject(this);
 
-        DependencyInjector.applicationComponent().inject(this);
-
-        if(job.getExtras() != null) {
             String hazardId = job.getExtras().getString(IndicatorUpdateNotificationHandler.BUNDLE_HAZARD_ID, null);
             String indicatorId = job.getExtras().getString(IndicatorUpdateNotificationHandler.BUNDLE_INDICATOR_ID, null);
             int notificationType = job.getExtras().getInt(IndicatorUpdateNotificationHandler.BUNDLE_NOTIFICATION_TYPE, IndicatorUpdateNotificationHandler.NOTIFICATION_TYPE_PASSED);

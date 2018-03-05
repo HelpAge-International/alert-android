@@ -40,6 +40,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.notifications.NotificationIdHandler;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
@@ -183,6 +184,11 @@ public class FirebaseModule {
     @UserPublicRef
     public DatabaseReference provideUserPublicRef(@BaseDatabaseRef DatabaseReference db) {
         return db.child("userPublic");
+    }
+
+    @Provides
+    public NotificationIdHandler provideNotificationIdHandler() {
+        return new NotificationIdHandler();
     }
 
     @Provides

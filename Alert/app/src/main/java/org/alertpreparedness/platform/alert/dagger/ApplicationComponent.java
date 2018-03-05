@@ -43,6 +43,7 @@ import org.alertpreparedness.platform.alert.notifications.AlertFirebaseInstanceI
 import org.alertpreparedness.platform.alert.notifications.IndicatorFetcher;
 import org.alertpreparedness.platform.alert.notifications.IndicatorNotificationService;
 import org.alertpreparedness.platform.alert.notifications.IndicatorUpdateNotificationHandler;
+import org.alertpreparedness.platform.alert.notifications.NotificationIdHandler;
 import org.alertpreparedness.platform.alert.notifications.ResponsePlanFetcher;
 import org.alertpreparedness.platform.alert.notifications.ResponsePlanNotificationService;
 import org.alertpreparedness.platform.alert.notifications.ResponsePlanUpdateNotificationHandler;
@@ -133,4 +134,6 @@ public interface ApplicationComponent {
     void inject(ProgrammesAdapter programmesAdapter);
 
     void inject(ClockSettingsFetcher clockSettingsFetcher);
+
+    void inject(NotificationIdHandler notificationIdHandler);
 }
