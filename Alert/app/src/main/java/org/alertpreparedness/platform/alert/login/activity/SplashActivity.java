@@ -77,9 +77,9 @@ public class SplashActivity extends BaseActivity {
                 else if(notificationType == NOTIFICATION_ACTION_ASSIGNED)
                 {
                     Intent intent = new Intent(this, HomeScreen.class);
-                    int actionType = Integer.parseInt(getIntent().getExtras().getString("actionType"));
+                    int actionLevel = Integer.parseInt(getIntent().getExtras().getString("actionLevel"));
 
-                    intent.putExtra(HomeScreen.START_SCREEN, actionType == 1 ? HomeScreen.SCREEN_MPA : HomeScreen.SCREEN_APA);
+                    intent.putExtra(HomeScreen.START_SCREEN, actionLevel == 1 ? HomeScreen.SCREEN_MPA : HomeScreen.SCREEN_APA);
                     startActivity(intent);
                     finish();
                 }
