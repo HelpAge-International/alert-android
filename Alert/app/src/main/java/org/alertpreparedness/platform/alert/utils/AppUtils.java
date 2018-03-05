@@ -1,6 +1,9 @@
 package org.alertpreparedness.platform.alert.utils;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -32,6 +35,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -147,6 +151,22 @@ public class AppUtils {
         reader.setLenient(true);
         return gson.fromJson(reader, clazz);
     }
+
+    public static void sendNotification(Context context, String notificationTag, Notification notification) {
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel channel = new NotificationChannel("alert",
+                        "Default Alert Notification Channel",
+                        NotificationManager.IMPORTANCE_DEFAULT);
+                notificationManager.createNotificationChannel(channel);
+            }
+            notificationManager.notify(notificationTag, new Random().nextInt(), notification);
+        }
+    }
+
+
+
 
     public static List<String> smartCombine(List<String> first, List<String> second) {
         first.addAll(second);

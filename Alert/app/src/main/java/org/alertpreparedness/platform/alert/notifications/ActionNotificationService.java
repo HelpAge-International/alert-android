@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.notifications;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -21,12 +22,14 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionCHSRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NotificationSettingsRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.NotificationSettingsListener;
 
 import java.util.Random;
 
@@ -47,6 +50,10 @@ public class ActionNotificationService extends JobService {
     @Inject
     @BaseActionCHSRef
     DatabaseReference baseActionCHSRef;
+
+    @Inject
+    @NotificationSettingsRef
+    DatabaseReference notificationSettingsRef;
 
     @Override
     public boolean onStartJob(JobParameters job) {
@@ -161,8 +168,6 @@ public class ActionNotificationService extends JobService {
                 return;
             }
 
-            Timber.d("Creating intent");
-
             Intent intent = new Intent(getApplicationContext(), HomeScreen.class);
             intent.putExtra("group_id", groupId);
             intent.putExtra("action_id", actionId);
@@ -181,15 +186,13 @@ public class ActionNotificationService extends JobService {
                             .setContentIntent(pendingIntent)
                             .setAutoCancel(true);
 
-            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            if (notificationManager != null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    NotificationChannel channel = new NotificationChannel("alert",
-                            "Default Alert Notification Channel",
-                            NotificationManager.IMPORTANCE_DEFAULT);
-                    notificationManager.createNotificationChannel(channel);
-                }
-                notificationManager.notify(actionId, new Random().nextInt(), mBuilder.build());
+            Notification notification = mBuilder.build();
+
+            if(notificationType == ActionUpdateNotificationHandler.NOTIFICATION_TYPE_EXPIRED) {
+                notificationSettingsRef.addListenerForSingleValueEvent(new NotificationSettingsListener(this, notification, actionId, Constants.NOTIFICATION_SETTING_MPA_APA_EXPIRED));
+            }
+            else {
+                AppUtils.sendNotification(this, actionId, notification);
             }
         }
     }
