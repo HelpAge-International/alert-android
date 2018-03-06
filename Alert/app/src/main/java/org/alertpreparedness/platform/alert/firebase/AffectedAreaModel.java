@@ -4,11 +4,7 @@ import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 
 import java.io.Serializable;
 
-/**
- * Created by Tj on 19/12/2017.
- */
-
-public class AffectedAreaModel implements Serializable {
+public class AffectedAreaModel extends FirebaseModel implements Serializable {
 
     private Integer country;
 
@@ -22,7 +18,8 @@ public class AffectedAreaModel implements Serializable {
     //not set through firebase
     private String level2Name;
 
-    public AffectedAreaModel() {}
+    public AffectedAreaModel() {
+    }
 
     public AffectedAreaModel(ModelIndicatorLocation area) {
         level2 = area.getLevel2();
@@ -31,10 +28,21 @@ public class AffectedAreaModel implements Serializable {
     }
 
     public AffectedAreaModel(int country, int level1, int level2) {
-
         this.country = country;
         this.level1 = level1;
         this.level2 = level2;
+    }
+
+    @Override
+    public String toString() {
+        return "AffectedAreaModel{" +
+                "country=" + country +
+                ", level1=" + level1 +
+                ", level2=" + level2 +
+                ", level1Name='" + level1Name + '\'' +
+                ", level2Name='" + level2Name + '\'' +
+                '}' +
+                super.toString();
     }
 
     public Integer getCountry() {
@@ -59,17 +67,6 @@ public class AffectedAreaModel implements Serializable {
 
     public void setLevel2(Integer level2) {
         this.level2 = level2;
-    }
-
-    @Override
-    public String toString() {
-        return "AffectedAreaModel{" +
-                "country=" + country +
-                ", level1=" + level1 +
-                ", level2=" + level2 +
-                ", level1Name='" + level1Name + '\'' +
-                ", level2Name='" + level2Name + '\'' +
-                '}';
     }
 
     public String getLevel2Name() {

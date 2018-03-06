@@ -61,6 +61,15 @@ public final class Constants {
     public static final int MANDATED = 1;
     public static final int CUSTOM = 2;
 
+    public static final int NOTIFICATION_SETTING_ALERT_LEVEL_CHANGED = 0;
+    public static final int NOTIFICATION_SETTING_RED_ALERT_REQUEST = 1;
+    public static final int NOTIFICATION_SETTING_UPDATE_HAZARD_INDICATOR = 2;
+    public static final int NOTIFICATION_SETTING_MPA_APA_EXPIRED = 3;
+    public static final int NOTIFICATION_SETTING_RESPONSE_PLAN_EXPIRED = 4;
+    public static final int NOTIFICATION_SETTING_RESPONSE_PLAN_REJECTED = 5;
+
+
+
     //INDICATOR-FREQUENCY
 
     //user type

@@ -1,5 +1,11 @@
 package org.alertpreparedness.platform.alert.notifications;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.os.Build;
+import android.support.v4.app.NotificationCompat;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -8,6 +14,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
 import org.alertpreparedness.platform.alert.firebase.ResponsePlanModel;
@@ -17,6 +24,8 @@ import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
+
+import java.util.Random;
 
 import timber.log.Timber;
 
@@ -54,6 +63,8 @@ public class AlertFirebaseMessagingService extends FirebaseMessagingService {
                 rescheduleResponsePlanNotifications();
             }
         }
+
+
     }
 
     @Override

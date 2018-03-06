@@ -13,6 +13,7 @@ import org.alertpreparedness.platform.alert.action.IdFetcherListener;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 import org.alertpreparedness.platform.alert.model.User;
 
 import java.io.StringReader;

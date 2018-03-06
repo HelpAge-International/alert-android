@@ -58,7 +58,7 @@ public class ResponsePlanFetcher implements SynchronizedCounter.SynchronizedCoun
         responsePlanCounter = new SynchronizedCounter(2);
         responsePlanCounter.addListener(this);
 
-        baseResponsePlanRef.child(user.getCountryID()).addValueEventListener(new ResponsePlanFetcher.ResponsePlanListener(baseResponsePlanRef, ResponsePlanFetcher.ResponsePlanType.COUNTRY, user.getCountryID(), responsePlanFetcherResult, responsePlanCounter));
+        baseResponsePlanRef.addValueEventListener(new ResponsePlanFetcher.ResponsePlanListener(baseResponsePlanRef, ResponsePlanFetcher.ResponsePlanType.COUNTRY, user.getCountryID(), responsePlanFetcherResult, responsePlanCounter));
         countryOfficeRef.child("clockSettings").child("responsePlans").addValueEventListener(new ResponsePlanFetcher.ClockSettingsListener(countryOfficeRef, ResponsePlanFetcher.ResponsePlanType.COUNTRY, responsePlanFetcherResult, responsePlanCounter));
     }
 
@@ -77,8 +77,6 @@ public class ResponsePlanFetcher implements SynchronizedCounter.SynchronizedCoun
         void responsePlanFetchSuccess(ResponsePlanFetcherResult responsePlanFetcherResult);
         void responsePlanFetchFail();
     }
-
-
 
     private class ResponsePlanListener implements ValueEventListener {
         private final String groupId;

@@ -1,18 +1,22 @@
 package org.alertpreparedness.platform.alert.firebase;
 
-/**
- * Created by Elliot on 20/02/2018.
- */
-
-public class ResponsePlanModel {
+public class ResponsePlanModel extends FirebaseModel {
 
     private Long timeCreated;
     private Long timeUpdated;
     private String name;
 
-
     public ResponsePlanModel() {
+    }
 
+    @Override
+    public String toString() {
+        return "ResponsePlanModel{" +
+                "timeCreated=" + timeCreated +
+                ", timeUpdated=" + timeUpdated +
+                ", name='" + name + '\'' +
+                '}' +
+                super.toString();
     }
 
     public Long getTimeCreated() {

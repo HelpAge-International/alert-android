@@ -14,15 +14,16 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionCHSRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseCountryOfficeRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseHazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseLogRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseNetworkCountryRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseNetworkRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.BaseResponsePlansRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseNoteRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseResponsePlansRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseUserRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.DocumentRef;
@@ -30,15 +31,17 @@ import org.alertpreparedness.platform.alert.dagger.annotation.HazardOtherRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NotificationSettingsRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.PermissionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ProgrammeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.StaffRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
-import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.notifications.NotificationIdHandler;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
@@ -69,6 +72,12 @@ public class FirebaseModule {
     }
 
     @Provides
+    @BaseLogRef
+    public DatabaseReference provideBaseLogRef(@BaseDatabaseRef DatabaseReference db) {
+        return db.child("log");
+    }
+
+    @Provides
     @AlertRef
     public DatabaseReference providesAlert(@BaseAlertRef DatabaseReference db, User user) {
         return db.child(user.countryID);
@@ -85,6 +94,12 @@ public class FirebaseModule {
     @AgencyRef
     public DatabaseReference provideAgencyRef(@BaseDatabaseRef DatabaseReference db, Context context) {
         return db.child("agency").child(PreferHelper.getString(context, Constants.AGENCY_ID));
+    }
+
+    @Provides
+    @NotificationSettingsRef
+    public DatabaseReference provideNotificationSettingsRef(@BaseDatabaseRef DatabaseReference db, User user) {
+        return db.child("staff").child(user.getCountryID()).child(user.getUserID()).child("notification");
     }
 
     @Provides
@@ -176,6 +191,11 @@ public class FirebaseModule {
     @UserPublicRef
     public DatabaseReference provideUserPublicRef(@BaseDatabaseRef DatabaseReference db) {
         return db.child("userPublic");
+    }
+
+    @Provides
+    public NotificationIdHandler provideNotificationIdHandler() {
+        return new NotificationIdHandler();
     }
 
     @Provides

@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.utils;
+package org.alertpreparedness.platform.alert.firebase.data_fetchers;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -7,6 +7,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

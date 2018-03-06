@@ -2,11 +2,7 @@ package org.alertpreparedness.platform.alert.firebase;
 
 import java.util.ArrayList;
 
-/**
- * Created by Tj on 06/02/2018.
- */
-
-public class APAAction {
+public class APAAction extends FirebaseModel {
 
     private ArrayList<Integer> assignHazard;
 
@@ -30,7 +26,26 @@ public class APAAction {
 
     private Long dueDate;
 
-    public APAAction() {}
+    public APAAction() {
+    }
+
+    @Override
+    public String toString() {
+        return "APAAction{" +
+                "assignHazard=" + assignHazard +
+                ", asignee='" + asignee + '\'' +
+                ", budget=" + budget +
+                ", task='" + task + '\'' +
+                ", requireDoc=" + requireDoc +
+                ", department='" + department + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", type=" + type +
+                ", level=" + level +
+                ", dueDate=" + dueDate +
+                '}' +
+                super.toString();
+    }
 
     public ArrayList<Integer> getAssignHazard() {
         return assignHazard;

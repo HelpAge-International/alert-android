@@ -1,14 +1,10 @@
 package org.alertpreparedness.platform.alert.notifications;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
+import android.app.Notification;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
-import com.firebase.jobdispatcher.Job;
 import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
 import com.google.firebase.database.DataSnapshot;
@@ -21,14 +17,15 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionCHSRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NotificationSettingsRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
+import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
-
-import java.util.Random;
+import org.alertpreparedness.platform.alert.utils.NotificationSettingsListener;
 
 import javax.inject.Inject;
 
@@ -47,6 +44,10 @@ public class ActionNotificationService extends JobService {
     @Inject
     @BaseActionCHSRef
     DatabaseReference baseActionCHSRef;
+
+    @Inject
+    @NotificationSettingsRef
+    DatabaseReference notificationSettingsRef;
 
     @Override
     public boolean onStartJob(JobParameters job) {
@@ -71,7 +72,7 @@ public class ActionNotificationService extends JobService {
                         ActionModel actionModel = AppUtils.getValueFromDataSnapshot(dataSnapshot, ActionModel.class);
                         if(actionModel != null) {
                             if (actionModel.getType() == Constants.CUSTOM) {
-                                showNotificaiton(actionModel, notificationType, groupId, actionId);
+                                showNotification(actionModel, notificationType, groupId, actionId);
                                 jobFinished(job, false);
                             } else {
                                 DatabaseReference dbRef = null;
@@ -88,7 +89,7 @@ public class ActionNotificationService extends JobService {
 
                                             actionModel.setTask(actionModelTask == null ? "" : actionModelTask.getTask());
 
-                                            showNotificaiton(actionModel, notificationType, groupId, actionId);
+                                            showNotification(actionModel, notificationType, groupId, actionId);
                                             jobFinished(job, false);
                                         }
 
@@ -112,7 +113,7 @@ public class ActionNotificationService extends JobService {
         return false;
     }
 
-    private void showNotificaiton(ActionModel actionModel, int notificationType, String groupId, String actionId) {
+    private void showNotification(ActionModel actionModel, int notificationType, String groupId, String actionId) {
         if (actionModel != null) {
             String title;
             String content;
@@ -161,14 +162,19 @@ public class ActionNotificationService extends JobService {
                 return;
             }
 
-            Timber.d("Creating intent");
-
-            Intent intent = new Intent(getApplicationContext(), HomeScreen.class);
-            intent.putExtra("group_id", groupId);
-            intent.putExtra("action_id", actionId);
-            intent.putExtra(HomeScreen.START_SCREEN, actionModel.getType() == 1 ? HomeScreen.SCREEN_MPA : HomeScreen.SCREEN_APA);
-
-            Timber.d("StartScreen Plan: " + (actionModel.getType() == 1 ? HomeScreen.SCREEN_MPA : HomeScreen.SCREEN_APA));
+            Intent intent;
+            if(notificationType == ActionUpdateNotificationHandler.NOTIFICATION_TYPE_EXPIRED) {
+                intent = new Intent(getApplicationContext(), HomeScreen.class);
+                intent.putExtra("group_id", groupId);
+                intent.putExtra("action_id", actionId);
+                intent.putExtra(HomeScreen.START_SCREEN, actionModel.getType() == 1 ? HomeScreen.SCREEN_MPA : HomeScreen.SCREEN_APA);
+            }
+            else{
+                intent = new Intent(getApplicationContext(), CompleteActionActivity.class);
+                intent.putExtra(CompleteActionActivity.ACTION_KEY, actionId);
+                intent.putExtra(CompleteActionActivity.PARENT_KEY, groupId);
+                intent.putExtra(CompleteActionActivity.REQUIRE_DOC, actionModel.getRequireDoc());
+            }
 
             PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -181,15 +187,13 @@ public class ActionNotificationService extends JobService {
                             .setContentIntent(pendingIntent)
                             .setAutoCancel(true);
 
-            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            if (notificationManager != null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    NotificationChannel channel = new NotificationChannel("alert",
-                            "Default Alert Notification Channel",
-                            NotificationManager.IMPORTANCE_DEFAULT);
-                    notificationManager.createNotificationChannel(channel);
-                }
-                notificationManager.notify(actionId, new Random().nextInt(), mBuilder.build());
+            Notification notification = mBuilder.build();
+
+            if(notificationType == ActionUpdateNotificationHandler.NOTIFICATION_TYPE_EXPIRED) {
+                notificationSettingsRef.addListenerForSingleValueEvent(new NotificationSettingsListener(this, notification, actionId, Constants.NOTIFICATION_SETTING_MPA_APA_EXPIRED));
+            }
+            else {
+                AppUtils.sendNotification(this, actionId, notification);
             }
         }
     }

@@ -2,7 +2,6 @@ package org.alertpreparedness.platform.alert.login.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -25,7 +24,6 @@ import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
 import javax.inject.Inject;
 
-import dagger.internal.DaggerCollections;
 import timber.log.Timber;
 
 public class SplashActivity extends BaseActivity {
@@ -77,9 +75,9 @@ public class SplashActivity extends BaseActivity {
                 else if(notificationType == NOTIFICATION_ACTION_ASSIGNED)
                 {
                     Intent intent = new Intent(this, HomeScreen.class);
-                    int actionType = Integer.parseInt(getIntent().getExtras().getString("actionType"));
+                    int actionLevel = Integer.parseInt(getIntent().getExtras().getString("actionLevel"));
 
-                    intent.putExtra(HomeScreen.START_SCREEN, actionType == 1 ? HomeScreen.SCREEN_MPA : HomeScreen.SCREEN_APA);
+                    intent.putExtra(HomeScreen.START_SCREEN, actionLevel == 1 ? HomeScreen.SCREEN_MPA : HomeScreen.SCREEN_APA);
                     startActivity(intent);
                     finish();
                 }
@@ -108,7 +106,7 @@ public class SplashActivity extends BaseActivity {
             AlertModel model = dataSnapshot.getValue(AlertModel.class);
 
             assert model != null;
-            model.setKey(dataSnapshot.getKey());
+            model.setId(dataSnapshot.getKey());
             model.setParentKey(dataSnapshot.getRef().getParent().getKey());
             Intent intent = new Intent(SplashActivity.this, AlertDetailActivity.class);
             intent.putExtra(AlertDetailActivity.EXTRA_ALERT, model);

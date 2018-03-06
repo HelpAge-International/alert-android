@@ -43,7 +43,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.model.FileInfo;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Notes;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
-import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SimpleAdapter;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;

@@ -22,7 +22,7 @@ import org.alertpreparedness.platform.alert.firebase.ClockSetting;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
-import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
 import java.util.ArrayList;
@@ -32,7 +32,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.internal.Utils;
 import timber.log.Timber;
 
 public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetcherListener {
@@ -201,7 +200,7 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
                                     .newJobBuilder()
                                     .setTrigger(Trigger.executionWindow(startTime, startTime + NOTIFICATION_ACCURACY))
                                     .setLifetime(Lifetime.FOREVER)
-                                    .setTag(getTag(actionId, NOTIFICATION_TYPE_7_DAYS, actionModel.getType()))
+                                    .setTag(getTag(actionId, NOTIFICATION_TYPE_7_DAYS, actionModel.getLevel()))
                                     .setReplaceCurrent(true)
                                     .setExtras(bundle)
                                     .setService(ActionNotificationService.class)
@@ -222,7 +221,7 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
                                     .newJobBuilder()
                                     .setTrigger(Trigger.executionWindow(startTime, startTime + NOTIFICATION_ACCURACY))
                                     .setLifetime(Lifetime.FOREVER)
-                                    .setTag(getTag(actionId, NOTIFICATION_TYPE_1_DAY, actionModel.getType()))
+                                    .setTag(getTag(actionId, NOTIFICATION_TYPE_1_DAY, actionModel.getLevel()))
                                     .setReplaceCurrent(true)
                                     .setExtras(bundle)
                                     .setService(ActionNotificationService.class)
@@ -242,7 +241,7 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
                                 .newJobBuilder()
                                 .setTrigger(Trigger.executionWindow(timeFromNow, timeFromNow + NOTIFICATION_ACCURACY))
                                 .setLifetime(Lifetime.FOREVER)
-                                .setTag(getTag(actionId, NOTIFICATION_TYPE_PASSED, actionModel.getType()))
+                                .setTag(getTag(actionId, NOTIFICATION_TYPE_PASSED, actionModel.getLevel()))
                                 .setReplaceCurrent(true)
                                 .setExtras(bundle)
                                 .setService(ActionNotificationService.class)
@@ -308,7 +307,7 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
                                 .newJobBuilder()
                                 .setTrigger(Trigger.executionWindow(timeFromNow, timeFromNow + NOTIFICATION_ACCURACY))
                                 .setLifetime(Lifetime.FOREVER)
-                                .setTag(getTag(actionId, NOTIFICATION_TYPE_EXPIRED, actionModel.getType()))
+                                .setTag(getTag(actionId, NOTIFICATION_TYPE_EXPIRED, actionModel.getLevel()))
                                 .setReplaceCurrent(true)
                                 .setExtras(bundle)
                                 .setService(ActionNotificationService.class)

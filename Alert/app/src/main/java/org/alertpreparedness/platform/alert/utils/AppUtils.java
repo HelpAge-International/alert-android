@@ -1,6 +1,9 @@
 package org.alertpreparedness.platform.alert.utils;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -24,20 +27,16 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
-import org.alertpreparedness.platform.alert.firebase.AlertModel;
-import org.alertpreparedness.platform.alert.min_preparedness.fragment.InProgressFragment;
-import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.firebase.FirebaseModel;
 
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by Fei on 15/06/2016.
- */
 public class AppUtils {
 
     /**
@@ -62,7 +61,8 @@ public class AppUtils {
 
     public static void hideSoftKeyboard(Context context, View view) {
         view.clearFocus();
-        InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context
+                .INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
@@ -79,26 +79,29 @@ public class AppUtils {
     public static void setFragment(AppCompatActivity activity, @IdRes int containerId, Fragment fragment) {
         setFragment(activity, containerId, fragment, null);
     }
+
     public static void setFragment(AppCompatActivity activity, @IdRes int containerId, Fragment fragment, String tag) {
         FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
         if (tag != null) {
             transaction.replace(containerId, fragment, tag);
-        }
-        else {
+        } else {
             transaction.replace(containerId, fragment);
         }
         transaction.commit();
     }
 
     public static void setTaskBarCol(Activity context, int statusBarColor) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && Build.VERSION.SDK_INT < Build.VERSION_CODES
+                .LOLLIPOP) {
             Window w = context.getWindow();
-            w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams
+                    .FLAG_TRANSLUCENT_STATUS);
             //status bar height
             int statusBarHeight = getStatusBarHeight(context);
 
             View view = new View(context);
-            view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup
+                    .LayoutParams.WRAP_CONTENT));
             view.getLayoutParams().height = statusBarHeight;
             ((ViewGroup) w.getDecorView()).addView(view);
             view.setBackgroundColor(statusBarColor);
@@ -146,6 +149,39 @@ public class AppUtils {
         JsonReader reader = new JsonReader(new StringReader(gson.toJson(dataSnapshot.getValue()).trim()));
         reader.setLenient(true);
         return gson.fromJson(reader, clazz);
+    }
+
+    public static void sendNotification(Context context, String notificationTag, Notification notification) {
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel channel = new NotificationChannel("alert",
+                        "Default Alert Notification Channel",
+                        NotificationManager.IMPORTANCE_DEFAULT);
+                notificationManager.createNotificationChannel(channel);
+            }
+            notificationManager.notify(notificationTag, new Random().nextInt(), notification);
+        }
+    }
+
+
+
+
+    /**
+     * Returns a {@link FirebaseModel} POJO instance from the data snapshot.
+     * */
+    public static <T extends FirebaseModel> T getFirebaseModelFromDataSnapshot(DataSnapshot dataSnapshot,
+                                                                               Class<T> clazz) {
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        final Gson gson = gsonBuilder.setExclusionStrategies(new SnapshotExclusionStrat()).create();
+
+        JsonReader reader = new JsonReader(new StringReader(gson.toJson(dataSnapshot.getValue()).trim()));
+        reader.setLenient(true);
+
+        T mappedObject = gson.fromJson(reader, clazz);
+        mappedObject.setId(dataSnapshot.getKey());
+
+        return mappedObject;
     }
 
     public static List<String> smartCombine(List<String> first, List<String> second) {

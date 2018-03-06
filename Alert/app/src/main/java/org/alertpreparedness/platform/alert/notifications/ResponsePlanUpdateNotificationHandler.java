@@ -79,6 +79,7 @@ public class ResponsePlanUpdateNotificationHandler implements ResponsePlanFetche
     }
 
     public void scheduleAllNotifications(){
+        Timber.d("Scheduling Response Plan Notifications");
         new ResponsePlanFetcher(this).fetch();
     }
 
@@ -95,12 +96,12 @@ public class ResponsePlanUpdateNotificationHandler implements ResponsePlanFetche
                     clockSetting = responsePlanFetcherResult.getCountryClockSettings();
                     break;
             }
+
             scheduleNotification(context, model.getResponsePlan(), model.getGroupId(), model.getResponsePlanId(), clockSetting);
         }
-        Timber.d("Scheduled Notifications: " + responsePlanFetcherResult.getModels().size());
+        Timber.d("Scheduled Response Plan Notifications: " + responsePlanFetcherResult.getModels().size());
     }
 
-    //TODO
     public void scheduleNotification(Context context, ResponsePlanModel responsePlanModel, String groupId, String responsePlanId) {
         if(groupId.equals(user.getCountryID())){
             DatabaseReference dbRef = countryOfficeRef.child("clockSettings").child("responsePlans");
@@ -154,6 +155,9 @@ public class ResponsePlanUpdateNotificationHandler implements ResponsePlanFetche
             bundle.putInt(BUNDLE_NOTIFICATION_TYPE, NOTIFICATION_TYPE_EXPIRED);
 
             int timeFromNow = (int) ((expirationDate.getTime() - System.currentTimeMillis())/1000);
+
+            Timber.d("Schedule Response Plan: " + responsePlanId + " - " + startDate.getTime() + " - "  + expirationDate + " - " + timeFromNow);
+
             if(timeFromNow > 0) {
                 dispatcher.schedule(
                         dispatcher

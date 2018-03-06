@@ -6,9 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import javax.inject.Qualifier;
 
 /**
- * Hazards for the current user's country ID, e.g. /sand/hazard/<countryId>
+ * Created by Tj on 13/12/2017.
  */
+
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HazardRef {
+public @interface NotificationSettingsRef {
 }

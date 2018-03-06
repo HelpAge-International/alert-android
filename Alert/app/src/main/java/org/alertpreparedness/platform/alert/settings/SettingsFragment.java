@@ -26,6 +26,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
@@ -35,6 +36,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.notifications.NotificationIdHandler;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlansAdapter;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
@@ -62,6 +64,13 @@ public class SettingsFragment extends Fragment implements ValueEventListener {
 
     @Inject @UserRef @Nullable
     DatabaseReference userRef;
+
+    @Inject
+    public User user;
+
+    @Inject
+    public NotificationIdHandler notificationIdHandler;
+
 
     private String email;
 
@@ -94,15 +103,35 @@ public class SettingsFragment extends Fragment implements ValueEventListener {
         builder.setTitle("Logout")
                 .setMessage("You will be unable to log back into the app unless you have internet connection. Are you sure you want to log out?")
                 .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                    PreferHelper.getInstance(getContext()).edit().remove(UserInfo.PREFS_USER).apply();
-                    FirebaseAuth.getInstance().signOut();
-                    startActivity(new Intent(getContext(), LoginScreen.class));
-                    getActivity().finish();                    })
+                    if(FirebaseInstanceId.getInstance().getToken() != null) {
+                        notificationIdHandler.deregisterDeviceId(user.getUserID(), FirebaseInstanceId.getInstance().getToken(), new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                if(databaseError == null){
+                                    logout();
+                                }
+                                else{
+                                    SnackbarHelper.show(getActivity(), getString(R.string.error_logging_out));
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        logout();
+                    }
+                })
                 .setNegativeButton(android.R.string.no, (dialog, which) -> {
                     // do nothing
                 })
                 .show();
 
+    }
+
+    private void logout() {
+        PreferHelper.getInstance(getContext()).edit().remove(UserInfo.PREFS_USER).apply();
+        FirebaseAuth.getInstance().signOut();
+        startActivity(new Intent(getContext(), LoginScreen.class));
+        getActivity().finish();
     }
 
     @OnClick(R.id.btnChangeEmail)
