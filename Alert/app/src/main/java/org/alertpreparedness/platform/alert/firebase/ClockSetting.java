@@ -1,8 +1,18 @@
 package org.alertpreparedness.platform.alert.firebase;
 
-public class ClockSetting {
+public class ClockSetting extends FirebaseModel {
+
     private int durationType;
     private int value;
+
+    @Override
+    public String toString() {
+        return "ClockSetting{" +
+                "durationType=" + durationType +
+                ", value=" + value +
+                '}' +
+                super.toString();
+    }
 
     public int getDurationType() {
         return durationType;

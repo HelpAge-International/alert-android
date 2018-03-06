@@ -1,21 +1,15 @@
 package org.alertpreparedness.platform.alert;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
-import android.support.annotation.Nullable;
 
 import com.firebase.jobdispatcher.Constraint;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.firebase.jobdispatcher.Job;
-import com.firebase.jobdispatcher.JobTrigger;
 import com.firebase.jobdispatcher.Lifetime;
 import com.firebase.jobdispatcher.Trigger;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,19 +20,12 @@ import com.squareup.leakcanary.LeakCanary;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
-import org.acra.ACRA;
 import org.acra.annotation.AcraMailSender;
-import org.acra.config.CoreConfigurationBuilder;
-import org.acra.config.MailSenderConfiguration;
-import org.acra.data.StringFormat;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
-import org.alertpreparedness.platform.alert.dagger.annotation.BaseUserRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.PermissionRef;
-import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.notifications.ActionUpdateNotificationHandler;
-import org.alertpreparedness.platform.alert.notifications.IndicatorFetcher;
 import org.alertpreparedness.platform.alert.notifications.IndicatorUpdateNotificationHandler;
 import org.alertpreparedness.platform.alert.notifications.NotificationIdHandler;
 import org.alertpreparedness.platform.alert.notifications.ResponsePlanUpdateNotificationHandler;
@@ -48,11 +35,7 @@ import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SettingsFactory;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
 
 import io.realm.Realm;
 import shortbread.Shortbread;

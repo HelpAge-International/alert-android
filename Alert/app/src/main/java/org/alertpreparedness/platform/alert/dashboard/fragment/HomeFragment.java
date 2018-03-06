@@ -52,10 +52,9 @@ import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.risk_monitoring.view.ActiveRiskFragment;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.UpdateIndicatorActivity;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
-import org.alertpreparedness.platform.alert.utils.NetworkFetcher;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 
 import javax.inject.Inject;
 
@@ -445,7 +444,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
             AlertModel model = AppUtils.getValueFromDataSnapshot(dataSnapshot, AlertModel.class);
 
             assert model != null;
-            model.setKey(dataSnapshot.getKey());
+            model.setId(dataSnapshot.getKey());
             model.setParentKey(dataSnapshot.getRef().getParent().getKey());
 
             if (!isNetworkAlert) {
@@ -464,7 +463,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                 model.setLeadAgencyId(networkLeadId);
                 model.setAgencyAdminId(agencyAdminId);
                 if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
-                    updateNetworkAlert(model.getKey(), model);
+                    updateNetworkAlert(model.getId(), model);
                 }
             }
         }
@@ -670,5 +669,4 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         agencyRef.addListenerForSingleValueEvent(agencyListener);
         alertRef.addChildEventListener(alertListener);
     }
-
 }

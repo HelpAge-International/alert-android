@@ -3,7 +3,6 @@ package org.alertpreparedness.platform.alert.dashboard.activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
 import android.view.Window;
 
 import com.google.firebase.database.DataSnapshot;
@@ -12,13 +11,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.firebase.AffectedAreaModel;
-import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
-import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
-import org.alertpreparedness.platform.alert.helper.UserInfo;
-import org.alertpreparedness.platform.alert.dashboard.model.Alert;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity;
@@ -27,7 +24,6 @@ import org.alertpreparedness.platform.alert.utils.DBListener;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -117,7 +113,7 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
     protected void addArea(ModelIndicatorLocation location){
         if (alert == null || location == null) return;
 
-        DatabaseReference db = alertRef.child(alert.getKey());
+        DatabaseReference db = alertRef.child(alert.getId());
 
         db.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -221,7 +217,7 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
     @Override
     public void onSubItemRemoved(int positionInParent, int position) {
         if(positionInParent == getIndex(mFieldsAdapter.isRedAlert(), 3)) {//affected areas
-            DatabaseReference db = alertRef.child(alert.getKey()).child("affectedAreas");
+            DatabaseReference db = alertRef.child(alert.getId()).child("affectedAreas");
             db.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -242,7 +238,7 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
 
     private void update(int alertLevel, String reason, long population, List<AffectedAreaModel> areas, String info) {
 
-        DatabaseReference db = baseAlertRef.child(alert.getParentKey()).child(alert.getKey());
+        DatabaseReference db = baseAlertRef.child(alert.getParentKey()).child(alert.getId());
 
 
            db.addListenerForSingleValueEvent(new ValueEventListener() {

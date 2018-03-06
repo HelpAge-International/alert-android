@@ -1,10 +1,6 @@
 package org.alertpreparedness.platform.alert.firebase;
 
-/**
- * Created by Tj on 27/12/2017.
- */
-
-public class ActionModel {
+public class ActionModel extends FirebaseModel {
 
     private String asignee;
     private String task;
@@ -21,23 +17,27 @@ public class ActionModel {
     private Integer frequencyValue;
 
     public ActionModel() {
-
     }
 
-//    if(isCompleteExist){
-//        boolean isComplete = (boolean) dataSnapshot.child("isComplete").getValue();
-//        Task tasks = new Task(isComplete);
-//
-//    }
-//
-//    if (asignee != null && task != null && !isCompleteExist && asignee.equals(uid)) {
-//        if (dataSnapshot.hasChild("dueDate")) {
-//
-//            long dueDate = (long) dataSnapshot.child("dueDate").getValue();
-//            Task tasks = new Task(0, "action", task, dueDate);
-//            iHome.addTask(tasks);
-//        }
-//    }
+    @Override
+    public String toString() {
+        return "ActionModel{" +
+                "asignee='" + asignee + '\'' +
+                ", task='" + task + '\'' +
+                ", isComplete=" + isComplete +
+                ", isCompleteAt=" + isCompleteAt +
+                ", createdAt=" + createdAt +
+                ", dueDate=" + dueDate +
+                ", updatedAt=" + updatedAt +
+                ", type=" + type +
+                ", level=" + level +
+                ", budget=" + budget +
+                ", requireDoc=" + requireDoc +
+                ", frequencyBase=" + frequencyBase +
+                ", frequencyValue=" + frequencyValue +
+                '}' +
+                super.toString();
+    }
 
     public String getAsignee() {
         return asignee;
@@ -59,8 +59,16 @@ public class ActionModel {
         return (isComplete == null ? false : isComplete);
     }
 
+    public void setComplete(Boolean complete) {
+        isComplete = complete;
+    }
+
     public Long getDueDate() {
         return dueDate;
+    }
+
+    public void setDueDate(Long dueDate) {
+        this.dueDate = dueDate;
     }
 
     public Long getUpdatedAt() {
@@ -95,10 +103,6 @@ public class ActionModel {
         this.requireDoc = requireDoc;
     }
 
-    public void setComplete(Boolean complete) {
-        isComplete = complete;
-    }
-
     public Long getIsCompleteAt() {
         return isCompleteAt;
     }
@@ -113,10 +117,6 @@ public class ActionModel {
 
     public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public void setDueDate(Long dueDate) {
-        this.dueDate = dueDate;
     }
 
     public Integer getFrequencyBase() {

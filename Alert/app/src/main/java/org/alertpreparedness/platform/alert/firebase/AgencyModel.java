@@ -1,21 +1,21 @@
 package org.alertpreparedness.platform.alert.firebase;
 
-import java.util.HashMap;
-
-/**
- * Created by Tj on 09/01/2018.
- */
-
-public class AgencyModel {
+public class AgencyModel extends FirebaseModel {
 
     private String name;
 
     private String logoPath;
 
-//    private HashMap<String, Boolean> networks;
-
     public AgencyModel() {
+    }
 
+    @Override
+    public String toString() {
+        return "AgencyModel{" +
+                "name='" + name + '\'' +
+                ", logoPath='" + logoPath + '\'' +
+                '}' +
+                super.toString();
     }
 
     public String getName() {
@@ -33,12 +33,4 @@ public class AgencyModel {
     public void setLogoPath(String logoPath) {
         this.logoPath = logoPath;
     }
-
-//    public HashMap<String, Boolean> getNetworks() {
-//        return networks;
-//    }
-//
-//    public void setNetworks(HashMap<String, Boolean> networks) {
-//        this.networks = networks;
-//    }
 }

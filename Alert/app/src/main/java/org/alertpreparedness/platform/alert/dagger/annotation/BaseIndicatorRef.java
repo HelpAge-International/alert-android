@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import javax.inject.Qualifier;
 
 /**
- * Created by Tj on 17/01/2018.
+ * All indicators e.g. /sand/indicator
  */
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
