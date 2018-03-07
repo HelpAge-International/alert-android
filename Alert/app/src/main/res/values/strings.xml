@@ -248,4 +248,5 @@
     <string name="permission_note_create_error">You dont have permission to create a note</string>
     <string name="permission_edit_indicator">You dont have permission to edit this indicator</string>
     <string name="note_cannot_be_empty">Note cannot be empty</string>
+    <string name="play_service_error">You must update Google Play Services before logging in</string>
 </resources>

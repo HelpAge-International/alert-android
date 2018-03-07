@@ -20,6 +20,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -61,6 +64,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     private ProgressDialog progressDialog;
     private FirebaseAuth firebaseAuth;
     private boolean isPasswordShowing = false;
+    private boolean validPlayServices = true;
 
     @Inject
     UserInfo userInfo;
@@ -86,26 +90,33 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
         btn_login.setOnClickListener(this);
         txt_forgotPasword.setOnClickListener(this);
-        img_eye.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(isPasswordShowing) {
-                    et_password.setTransformationMethod(new PasswordTransformationMethod());
-                }
-                else {
-                    et_password.setTransformationMethod(null);
-                }
-                isPasswordShowing= !isPasswordShowing;
+        img_eye.setOnClickListener(v -> {
+            if(isPasswordShowing) {
+                et_password.setTransformationMethod(new PasswordTransformationMethod());
             }
+            else {
+                et_password.setTransformationMethod(null);
+            }
+            isPasswordShowing= !isPasswordShowing;
         });
+
+        if(GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getContext()) != ConnectionResult.SUCCESS) {
+            GooglePlayServicesUtil.getErrorDialog(ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED, this, 1).show();
+            validPlayServices = false;
+        }
 
     }
 
     @Override
     public void onClick(View view) {
         if (view == btn_login) {
-            AppUtils.hideKeyboard(this);
-            loginUser();
+            if(validPlayServices) {
+                AppUtils.hideKeyboard(this);
+                loginUser();
+            }
+            else {
+                SnackbarHelper.show(this, getString(R.string.play_service_error));
+            }
         }
 
         if (view == txt_forgotPasword) {

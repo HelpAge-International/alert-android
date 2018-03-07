@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -163,64 +164,6 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
     @BindView(R.id.networkTasks)
     TextView networkTasksTitle;
-
-    @Inject
-    @CountryOfficeRef
-    public DatabaseReference countryOfficeRef;
-
-    Subscriber<DataSnapshot> a = new Subscriber<DataSnapshot>() {
-        @Override
-        public void onSubscribe(Subscription s) {
-//            s.cancel();
-            System.out.println("A: countryOfficeModel Subscribe");
-        }
-
-        @Override
-        public void onNext(DataSnapshot countryOfficeModel) {
-            System.out.println("A: countryOfficeModel = " + countryOfficeModel);
-        }
-
-        @Override
-        public void onError(Throwable t) {
-            System.out.println("A: countryOffice Error");
-        }
-
-        @Override
-        public void onComplete() {
-            System.out.println("A: countryOffice complete");
-
-        }
-    };
-
-
-    Subscriber<DataSnapshot> b = new Subscriber<DataSnapshot>() {
-        @Override
-        public void onSubscribe(Subscription s) {
-            System.out.println("B: countryOfficeModel Subscribe");
-
-        }
-
-        @Override
-        public void onNext(DataSnapshot countryOfficeModel) {
-            System.out.println("B: countryOfficeModel = " + countryOfficeModel);
-
-        }
-
-        @Override
-        public void onError(Throwable t) {
-
-            System.out.println("B: countryOffice Error");
-        }
-
-        @Override
-        public void onComplete() {
-
-            System.out.println("B: countryOffice complete");
-        }
-    };
-
-    Flowable<DataSnapshot> flow;
-
 
     public TaskAdapter taskAdapter;
     public AlertAdapter alertAdapter;

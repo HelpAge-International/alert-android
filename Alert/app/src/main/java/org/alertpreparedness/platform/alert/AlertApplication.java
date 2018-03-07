@@ -22,6 +22,7 @@ import com.squareup.leakcanary.LeakCanary;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
+import org.acra.ACRA;
 import org.acra.annotation.AcraMailSender;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.PermissionRef;
