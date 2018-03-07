@@ -10,7 +10,7 @@ import io.realm.annotations.PrimaryKey;
  * Created by Tj on 04/01/2018.
  */
 
-public class UserRealm extends RealmObject {
+public class UserRealm {
 
     @PrimaryKey
     private String userId;
@@ -128,7 +128,4 @@ public class UserRealm extends RealmObject {
         return new User(userId,userType,agencyAdmin,countryId,systemAdmin, networkCountryId, localNetworkId, networkId, null, isCountryDirector);
     }
 
-    public UserRealm getByPrimaryKey(Realm realm, String id) {
-        return realm.where(getClass()).equalTo("userId", id).findFirst();
-    }
 }

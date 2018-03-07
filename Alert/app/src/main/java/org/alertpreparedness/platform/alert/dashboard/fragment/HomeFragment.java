@@ -37,6 +37,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseHazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
@@ -55,11 +56,15 @@ import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.UpdateIndicatorActivity;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import durdinapps.rxfirebase2.RxFirebaseDatabase;
+import io.reactivex.Flowable;
 
 import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity.EXTRA_ALERT;
 
@@ -159,6 +164,64 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     @BindView(R.id.networkTasks)
     TextView networkTasksTitle;
 
+    @Inject
+    @CountryOfficeRef
+    public DatabaseReference countryOfficeRef;
+
+    Subscriber<DataSnapshot> a = new Subscriber<DataSnapshot>() {
+        @Override
+        public void onSubscribe(Subscription s) {
+//            s.cancel();
+            System.out.println("A: countryOfficeModel Subscribe");
+        }
+
+        @Override
+        public void onNext(DataSnapshot countryOfficeModel) {
+            System.out.println("A: countryOfficeModel = " + countryOfficeModel);
+        }
+
+        @Override
+        public void onError(Throwable t) {
+            System.out.println("A: countryOffice Error");
+        }
+
+        @Override
+        public void onComplete() {
+            System.out.println("A: countryOffice complete");
+
+        }
+    };
+
+
+    Subscriber<DataSnapshot> b = new Subscriber<DataSnapshot>() {
+        @Override
+        public void onSubscribe(Subscription s) {
+            System.out.println("B: countryOfficeModel Subscribe");
+
+        }
+
+        @Override
+        public void onNext(DataSnapshot countryOfficeModel) {
+            System.out.println("B: countryOfficeModel = " + countryOfficeModel);
+
+        }
+
+        @Override
+        public void onError(Throwable t) {
+
+            System.out.println("B: countryOffice Error");
+        }
+
+        @Override
+        public void onComplete() {
+
+            System.out.println("B: countryOffice complete");
+        }
+    };
+
+    Flowable<DataSnapshot> flow;
+
+
     public TaskAdapter taskAdapter;
     public AlertAdapter alertAdapter;
     public AlertAdapter networkAlertAdapter;
@@ -191,8 +254,6 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         initViews();
 
         FirebaseAuth.getInstance().addAuthStateListener(this);
-
-        System.out.println("user = " + user);
 
         return v;
     }
