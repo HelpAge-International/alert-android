@@ -1,6 +1,8 @@
 package org.alertpreparedness.platform.alert;
 
 import android.app.Application;
+import android.support.multidex.MultiDexApplication;
+import android.support.v7.app.AppCompatDelegate;
 
 import com.firebase.jobdispatcher.Constraint;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
@@ -45,7 +47,7 @@ import timber.log.Timber;
  * Created by fei on 06/11/2017.
  */
 @AcraMailSender(mailTo = "tj@rolleragency.co.uk")
-public class AlertApplication extends Application implements ValueEventListener {
+public class AlertApplication extends MultiDexApplication implements ValueEventListener {
 
     public static final boolean IS_LIVE = false;
     private User user;
@@ -59,11 +61,13 @@ public class AlertApplication extends Application implements ValueEventListener 
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING ;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.SAND;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         DependencyInjector.initialize(this);
 
         FirebaseApp.initializeApp(this);

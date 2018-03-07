@@ -4,12 +4,25 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.AdvPreparednessFragment;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
 import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
+import org.alertpreparedness.platform.alert.firebase.CountryOfficeModel;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.MinPreparednessFragment;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.RiskFragment;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
+import javax.inject.Inject;
+
+import durdinapps.rxfirebase2.RxFirebaseDatabase;
+import io.reactivex.Flowable;
 import timber.log.Timber;
 
 
@@ -23,6 +36,8 @@ public class HomeScreen extends MainDrawer {
     public static final int SCREEN_MPA = 3;
 
     public static final String START_SCREEN = "START_SCREEN";
+
+
 
     @Override
     protected void onStart() {
@@ -52,6 +67,7 @@ public class HomeScreen extends MainDrawer {
 
 
         }
+
     }
 
 

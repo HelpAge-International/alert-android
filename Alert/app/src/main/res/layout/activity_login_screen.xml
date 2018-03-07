@@ -31,46 +31,90 @@
             android:layout_marginTop="92dp"
             app:srcCompat="@drawable/alert" />
 
-        <EditText
-            android:id="@+id/email_address"
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:layout_marginTop="52dp"
-            android:background="@drawable/rounded_edittext"
-            android:drawableLeft="@drawable/login_person"
-            android:drawablePadding="15dip"
-            android:ems="10"
-            android:hint="@string/email_address"
-            android:inputType="textEmailAddress"
-            android:paddingLeft="15dp"
-            android:textColor="@color/colorPrimaryDark"
-            android:textColorHint="@color/hintGray"
-            android:textSize="15sp"
-            tools:layout_editor_absoluteX="8dp"
-            tools:layout_editor_absoluteY="0dp" />
+            <!--android:drawableLeft="@drawable/login_person"-->
 
-        <EditText
-            android:id="@+id/password"
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="10dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/rounded_edittext"
-            android:drawableLeft="@drawable/login_lock"
-            android:drawablePadding="15dip"
-            android:drawableRight="@drawable/login_eye"
-            android:ems="10"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:paddingLeft="15dp"
-            android:paddingRight="12dp"
-            android:textColor="@color/colorPrimaryDark"
-            android:textColorHint="@color/hintGray"
-            android:textSize="15dp"
-            tools:layout_editor_absoluteX="8dp"
-            tools:layout_editor_absoluteY="0dp" />
+            android:orientation="horizontal"
+            android:layout_marginTop="52dp">
+
+            <ImageView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:padding="12dp"
+                app:srcCompat="@drawable/login_person"/>
+
+            <EditText
+                android:background="@null"
+                android:id="@+id/email_address"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="44dp"
+                android:drawablePadding="15dip"
+                android:ems="10"
+                android:hint="@string/email_address"
+                android:inputType="textEmailAddress"
+                android:paddingLeft="15dp"
+                android:textColor="@color/colorPrimaryDark"
+                android:textColorHint="@color/hintGray"
+                android:textSize="15sp"
+                tools:layout_editor_absoluteX="8dp"
+                tools:layout_editor_absoluteY="0dp" />
+
+
+        </LinearLayout>
+
+            <!--android:drawableLeft="@drawable/login_lock"-->
+            <!--android:drawableRight="@drawable/login_eye"-->
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_edittext"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+
+            <ImageView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:padding="12dp"
+                app:srcCompat="@drawable/login_lock"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:id="@+id/imgLock"/>
+
+            <EditText
+                android:id="@+id/password"
+                android:layout_width="wrap_content"
+                android:layout_toLeftOf="@+id/imgEye"
+                android:layout_toStartOf="@+id/imgEye"
+                android:layout_height="44dp"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/imgLock"
+                android:layout_toRightOf="@id/imgLock"
+                android:background="@drawable/rounded_edittext"
+                android:drawablePadding="15dip"
+                android:ems="10"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:paddingLeft="15dp"
+                android:paddingRight="12dp"
+                android:textColor="@color/colorPrimaryDark"
+                android:textColorHint="@color/hintGray"
+                android:textSize="15dp"/>
+
+            <ImageView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:padding="12dp"
+                app:srcCompat="@drawable/login_eye"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:id="@+id/imgEye"/>
+        </RelativeLayout>
 
         <Button
             android:id="@+id/btnLogin"

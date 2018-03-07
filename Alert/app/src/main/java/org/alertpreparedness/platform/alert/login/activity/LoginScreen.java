@@ -4,16 +4,20 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.VectorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.SignInButton;
@@ -47,7 +51,9 @@ import timber.log.Timber;
 
 
 public class LoginScreen extends AppCompatActivity implements View.OnClickListener, OnFailureListener, OnCompleteListener<AuthResult>,AuthCallback {
-
+    static {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
     private EditText et_emailAddress;
     private EditText et_password;
     private Button btn_login;
@@ -58,6 +64,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
     @Inject
     UserInfo userInfo;
+    private ImageView img_eye;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -73,14 +80,15 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
         et_emailAddress = (EditText) findViewById(R.id.email_address);
         et_password = (EditText) findViewById(R.id.password);
+        img_eye = (ImageView) findViewById(R.id.imgEye);
         btn_login = (Button) findViewById(R.id.btnLogin);
         txt_forgotPasword = (TextView) findViewById(R.id.forgotPassword);
 
         btn_login.setOnClickListener(this);
         txt_forgotPasword.setOnClickListener(this);
-        et_password.setOnTouchListener(new RightDrawableOnTouchListener(et_password) {
+        img_eye.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onDrawableTouch(final MotionEvent event) {
+            public void onClick(View v) {
                 if(isPasswordShowing) {
                     et_password.setTransformationMethod(new PasswordTransformationMethod());
                 }
@@ -88,7 +96,6 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
                     et_password.setTransformationMethod(null);
                 }
                 isPasswordShowing= !isPasswordShowing;
-                return true;
             }
         });
 
@@ -124,8 +131,13 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
         progressDialog.setMessage("Logging you in...");
         progressDialog.show();
 
-        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, this)
-                .addOnFailureListener(this);
+
+        System.out.println("firebaseAuth = " + firebaseAuth);
+        System.out.println("email = " + email);
+        System.out.println("password = " + password);
+        Task<AuthResult> a = FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password);
+        Task<AuthResult> b = a.addOnCompleteListener(this, this);
+        Task<AuthResult> c = b.addOnFailureListener(this);
     }
 
     @Override
