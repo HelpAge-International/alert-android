@@ -252,7 +252,7 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
                                                 if (it.isActive == isActive && group.items.isNotEmpty()) {
                                                     mGroups.add(group)
                                                 }
-                                                else if(group.items.isEmpty()) {
+                                                else if(it.isActive == isActive && group.items.isEmpty()) {
                                                     val v = ModelIndicator(modelType = HAZARD_EMPTY)
                                                     v.modelType = HAZARD_EMPTY
                                                     group.items.add(v)
