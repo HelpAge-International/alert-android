@@ -17,11 +17,10 @@ import org.alertpreparedness.platform.alert.R
 import org.alertpreparedness.platform.alert.risk_monitoring.adapter.IndicatorLogRVAdapter
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelLog
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.ActiveRiskViewModel
-import org.alertpreparedness.platform.alert.utils.AppUtils
-import org.alertpreparedness.platform.alert.utils.Constants
-import org.alertpreparedness.platform.alert.utils.PreferHelper
+import org.alertpreparedness.platform.alert.utils.*
 import org.joda.time.DateTime
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * A placeholder fragment containing a simple view.
@@ -31,6 +30,9 @@ class IndicatorLogActivityFragment : Fragment() {
     private lateinit var mViewmodel: ActiveRiskViewModel
     private var mTriggerSelection: Int = 0
     private var mIndicatorId: String? = null
+
+    @Inject
+    lateinit var permissions : PermissionsHelper
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -64,11 +66,14 @@ class IndicatorLogActivityFragment : Fragment() {
 
     private fun initListeners(view: View?) {
         view?.ivIndicatorLog?.setOnClickListener {
-            if (view.etIndicatorLog.text.isEmpty()) {
-                Toasty.error(activity, "Note content cannot be empty!").show()
+            if (!permissions.checkCreateNote()) {
+                SnackbarHelper.show(activity, activity.getString(R.string.permission_note_create_error))
                 return@setOnClickListener
             }
-            Timber.d("save log: %s", view.etIndicatorLog.text)
+            if (view.etIndicatorLog.text.isEmpty()) {
+                SnackbarHelper.show(activity, activity.getString(R.string.note_cannot_be_empty))
+                return@setOnClickListener
+            }
             mIndicatorId?.apply {
                 val model = ModelLog(null, PreferHelper.getString(activity, Constants.UID), view.etIndicatorLog.text.toString(), DateTime().millis, mTriggerSelection)
                 mViewmodel.addLogToIndicator(model, mIndicatorId as String)

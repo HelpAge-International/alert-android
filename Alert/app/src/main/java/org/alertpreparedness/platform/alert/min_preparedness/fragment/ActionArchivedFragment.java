@@ -18,6 +18,7 @@ import com.google.firebase.database.DataSnapshot;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.action.ActionFetcher;
+import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
@@ -26,6 +27,9 @@ import org.alertpreparedness.platform.alert.min_preparedness.adapter.Preparednes
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
+import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,6 +54,9 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
     TextView txtNoAction;
 
     private ActionAdapter mAdapter;
+
+    @Inject
+    PermissionsHelper permissions;
 
     @Nullable
     @Override
@@ -84,7 +91,7 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
 
     @Override
     public void onActionItemSelected(int pos, String key, String parentId) {
-        SheetMenu.with(getContext()).setMenu(R.menu.menu_archived).setClick(menuItem -> {
+        SheetMenu.with(getContext()).setMenu(R.menu.menu_archived_mpa).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
 //                case R.id.reactive_action:
 //                    //TODO
@@ -116,8 +123,10 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
 
     @Override
     public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-        txtNoAction.setVisibility(View.GONE);
-        mAdapter.addItems(snapshot.getKey(), action);
+        if(permissions.checkCanViewMPA(action)) {
+            txtNoAction.setVisibility(View.GONE);
+            mAdapter.addItems(snapshot.getKey(), action);
+        }
     }
 
     @Override

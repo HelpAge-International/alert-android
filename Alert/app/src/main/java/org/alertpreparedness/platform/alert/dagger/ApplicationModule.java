@@ -23,6 +23,7 @@ import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.realm.SettingsRealm;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SettingsFactory;
 
@@ -123,4 +124,8 @@ public class ApplicationModule {
         return SettingsFactory.getSettings(user);
     }
 
+    @Provides
+    public PermissionsHelper providerPermissionsHelper(SettingsRealm realm) {
+        return new PermissionsHelper(realm);
+    }
 }

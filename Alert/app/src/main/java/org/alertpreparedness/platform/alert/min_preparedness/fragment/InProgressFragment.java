@@ -29,6 +29,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapt
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.action.ActionFetcher;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 
 import javax.inject.Inject;
 
@@ -56,6 +57,9 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
 
     @BindView(R.id.tvNoAction)
     TextView txtNoAction;
+
+    @Inject
+    PermissionsHelper permissions;
 
     private ActionAdapter mAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
@@ -91,17 +95,21 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
     @Override
     public void onActionItemSelected(int pos, String key, String parentId) {
         this.actionID = key;
-        SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress).setClick(menuItem -> {
+        SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress_mpa).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.complete_action:
-                    Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
-                    intent.putExtra(CompleteActionActivity.REQUIRE_DOC, mAdapter.getItem(pos).getRequireDoc());
-                    intent.putExtra(CompleteActionActivity.ACTION_KEY, key);
-                    intent.putExtra(CompleteActionActivity.PARENT_KEY, parentId);
-                    startActivity(intent);
+                    if(permissions.checkCompleteMPAAction(mAdapter.getItem(pos), getActivity())) {
+                        Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
+                        intent.putExtra(CompleteActionActivity.REQUIRE_DOC, mAdapter.getItem(pos).getRequireDoc());
+                        intent.putExtra(CompleteActionActivity.ACTION_KEY, key);
+                        intent.putExtra(CompleteActionActivity.PARENT_KEY, parentId);
+                        startActivity(intent);
+                    }
                     break;
                 case R.id.reassign_action:
-                    dialog.show(getActivity().getFragmentManager(), "users_list");
+                    if (permissions.checkMPAActionAssign(mAdapter.getItem(pos), getActivity())) {
+                        dialog.show(getActivity().getFragmentManager(), "users_list");
+                    }
                     break;
                 case R.id.action_notes:
                     Intent intent3 = new Intent(getActivity(), AddNotesActivity.class);
@@ -140,8 +148,10 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
 
     @Override
     public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-        txtNoAction.setVisibility(View.GONE);
-        mAdapter.addItems(snapshot.getKey(), action);
+        if(permissions.checkCanViewMPA(action)) {
+            txtNoAction.setVisibility(View.GONE);
+            mAdapter.addItems(snapshot.getKey(), action);
+        }
     }
 
     @Override

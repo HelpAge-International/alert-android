@@ -35,6 +35,7 @@ import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.interfaces.AuthCallback;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.settings.SettingsFragment;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SettingsFactory;
@@ -96,6 +97,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View view) {
         if (view == btn_login) {
+            AppUtils.hideKeyboard(this);
             loginUser();
         }
 

@@ -24,6 +24,7 @@ import com.google.gson.stream.JsonReader;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.action.ActionFetcher;
+import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
@@ -42,6 +43,7 @@ import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.ClockSettingsFetcher;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
+import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 import org.joda.time.DateTime;
 
@@ -115,6 +117,9 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
     @Inject
     User user;
 
+    @Inject
+    PermissionsHelper permissions;
+
     private APActionAdapter mAPAdapter;
     private int freqValue = 0;
     private AlertListener alertListener = new AlertListener();
@@ -165,11 +170,20 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
         this.actionID = key;
         SheetMenu.with(getContext()).setMenu(R.menu.menu_expired).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
+                case R.id.edit:
+                    if(permissions.checkEditAPA(mAPAdapter.getItem(pos), getActivity())) {
+                        Intent i = new Intent(getContext(), EditAPAActivity.class);
+                        i.putExtra(EditAPAActivity.APA_ID, key);
+                        startActivity(i);
+                    }
+                    break;
                 case R.id.update_date:
                     showDatePicker(key);
                     break;
                 case R.id.reassign_action:
-                    dialog.show(getActivity().getFragmentManager(), "users_list");
+                    if(permissions.checkAssignAPA(mAPAdapter.getItem(pos), getActivity())) {
+                        dialog.show(getActivity().getFragmentManager(), "users_list");
+                    }
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
@@ -304,8 +318,10 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
 
     @Override
     public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-        txtNoAction.setVisibility(View.GONE);
-        mAPAdapter.addItems(snapshot.getKey(), action);
+        if(permissions.checkCanViewAPA(action)) {
+            txtNoAction.setVisibility(View.GONE);
+            mAPAdapter.addItems(snapshot.getKey(), action);
+        }
     }
 
     @Override

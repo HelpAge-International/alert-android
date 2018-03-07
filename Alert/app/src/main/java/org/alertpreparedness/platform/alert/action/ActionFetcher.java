@@ -1,5 +1,7 @@
 package org.alertpreparedness.platform.alert.action;
 
+import android.content.Context;
+
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -201,7 +203,9 @@ public class ActionFetcher implements ActionProcessorListener {
 
     @Override
     public void onAddAction(DataSnapshot snapshot, Action action) {
-        listener.onActionRetrieved(snapshot, action);
+        if(!(type == Constants.APA && action.getActionType() == 0)) {//quick fix to remove CHS from APA fragments
+            listener.onActionRetrieved(snapshot, action);
+        }
     }
 
     @Override

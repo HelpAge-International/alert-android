@@ -11,14 +11,22 @@ import kotlinx.android.synthetic.main.fragment_risk_monitoring.*
 import kotlinx.android.synthetic.main.content_risk.*
 import org.alertpreparedness.platform.alert.MainDrawer
 import org.alertpreparedness.platform.alert.R
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector
 import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivity
 import org.alertpreparedness.platform.alert.risk_monitoring.adapter.RiskPagerAdapter
 import org.alertpreparedness.platform.alert.utils.Constants
+import org.alertpreparedness.platform.alert.utils.PermissionsHelper
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 class RiskFragment : Fragment() {
 
+    @Inject
+    lateinit var permissions : PermissionsHelper
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+        DependencyInjector.applicationComponent().inject(this)
 
         val v = inflater?.inflate(R.layout.fragment_risk_monitoring, container, false)
 
@@ -32,9 +40,17 @@ class RiskFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initView()
         initListeners()
+
+        println("permissions = ${permissions}")
+
+        if(!permissions.checkCreateIndicator()) {
+            fabRiskMenu.removeMenuButton(fabRiskIndicator);
+        }
     }
 
     private fun initView() {
+
+
 
         fabRiskMenu.setClosedOnTouchOutside(true)
 

@@ -192,6 +192,8 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
         FirebaseAuth.getInstance().addAuthStateListener(this);
 
+        System.out.println("user = " + user);
+
         return v;
     }
 
@@ -448,18 +450,11 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
             model.setParentKey(dataSnapshot.getRef().getParent().getKey());
 
             if (!isNetworkAlert) {
-                if(model.getEstimatedPopulation() == 6464) {
-                    System.out.println("AlertModelmodel = " + dataSnapshot.getRef());
-                }
-
                 if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
                     updateAlert(dataSnapshot.getKey(), model);
                 }
             }
             else {
-//            else if (!model.hasNetworkApproval()) {
-//                System.out.println("AlertModelmodel = " + model);
-
                 model.setLeadAgencyId(networkLeadId);
                 model.setAgencyAdminId(agencyAdminId);
                 if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {

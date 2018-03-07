@@ -3,6 +3,10 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/edit"
+            android:icon="@drawable/ic_edit_gray_24px"
+            android:title="@string/edit" />
+        <item
             android:id="@+id/complete_action"
             android:icon="@drawable/ic_check_circle_24px"
             android:title="@string/txt_complete_action" />

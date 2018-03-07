@@ -23,11 +23,13 @@ import org.alertpreparedness.platform.alert.risk_monitoring.view.IndicatorLogAct
 import org.alertpreparedness.platform.alert.risk_monitoring.view.UpdateIndicatorActivity
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.ActiveRiskViewModel
 import org.alertpreparedness.platform.alert.utils.Constants
+import org.alertpreparedness.platform.alert.utils.PermissionsHelper
 import org.alertpreparedness.platform.alert.utils.PreferHelper
 import org.jetbrains.anko.find
 import q.rorbin.badgeview.QBadgeView
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 /**
  * Created by fei on 22/11/2017.
@@ -46,6 +48,9 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
     private var mIndicatorId = ""
     private var mNetworkId:String? = null
     private var mNetworkCountryId:String? = null
+
+    @Inject
+    lateinit var permissions : PermissionsHelper
 
     companion object {
         val INDICATOR_MODEL = "indicator_model"
@@ -118,24 +123,20 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
         view.llUpdateIndicator.setOnClickListener {
             Timber.d("update clicked")
             dismiss()
-//            Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).subscribe({
-                UpdateIndicatorActivity.startActivity(activity, mHazardId, mIndicatorId)
-//            })
+            UpdateIndicatorActivity.startActivity(activity, mHazardId, mIndicatorId)
         }
 
         view.llIndicatorLog.setOnClickListener {
             Timber.d("start log activity with id: %s", mIndicatorId)
             dismiss()
-//            Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).subscribe({
+            if(permissions.checkEditIndicator(activity)) {
                 IndicatorLogActivity.startActivity(activity, mIndicatorId, mIndicatorModel.triggerSelected)
-//            })
+            }
         }
 
         view.llEditIndicator.setOnClickListener {
             dismiss()
-//            Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).subscribe({
-                AddIndicatorActivity.startActivityWithValues(activity, mHazardId, mIndicatorId, mNetworkId, mNetworkCountryId)
-//            })
+            AddIndicatorActivity.startActivityWithValues(activity, mHazardId, mIndicatorId, mNetworkId, mNetworkCountryId)
         }
     }
 

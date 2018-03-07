@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.action.ActionFetcher;
+import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.UsersListDialogFragment;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
@@ -30,6 +31,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.adapter.Preparednes
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
+import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 
 import javax.inject.Inject;
 
@@ -58,6 +60,9 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
     @Inject
     @ActionRef
     public DatabaseReference dbActionRef;
+
+    @Inject
+    PermissionsHelper permissions;
 
     private ActionAdapter mAdapter;
 
@@ -103,10 +108,12 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
     @Override
     public void onActionItemSelected(int pos, String key, String parentId) {
         this.actionID = key;
-        SheetMenu.with(getContext()).setMenu(R.menu.menu_completed).setClick(menuItem -> {
+        SheetMenu.with(getContext()).setMenu(R.menu.menu_completed_mpa).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.reassign_action:
-                    dialog.show(getActivity().getFragmentManager(), "users_list");
+                    if(permissions.checkMPAActionAssign(mAdapter.getItem(pos), getActivity())) {
+                        dialog.show(getActivity().getFragmentManager(), "users_list");
+                    }
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
@@ -144,8 +151,10 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
 
     @Override
     public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-        txtNoAction.setVisibility(View.GONE);
-        mAdapter.addItems(snapshot.getKey(), action);
+        if(permissions.checkCanViewMPA(action)) {
+            txtNoAction.setVisibility(View.GONE);
+            mAdapter.addItems(snapshot.getKey(), action);
+        }
     }
 
     @Override

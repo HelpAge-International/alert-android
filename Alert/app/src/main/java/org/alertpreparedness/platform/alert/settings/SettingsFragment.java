@@ -62,7 +62,7 @@ public class SettingsFragment extends Fragment implements ValueEventListener {
     @BindView(R.id.btnChangeEmail)
     Button mChangeEmail;
 
-    @Inject @UserRef @Nullable
+    @Inject @UserRef
     DatabaseReference userRef;
 
     @Inject

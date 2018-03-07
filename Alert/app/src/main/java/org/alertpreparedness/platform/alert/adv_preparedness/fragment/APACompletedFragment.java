@@ -18,6 +18,7 @@ import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.action.ActionFetcher;
+import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
@@ -27,6 +28,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttach
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseAPAFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 
 import javax.inject.Inject;
 
@@ -57,6 +59,9 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
 
     @BindView(R.id.tvAPANoAction)
     TextView txtNoAction;
+
+    @Inject
+    PermissionsHelper permissions;
 
     @Inject
     @ActionRef
@@ -109,8 +114,17 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
         this.actionID = key;
         SheetMenu.with(getContext()).setMenu(R.menu.menu_completed).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
+                case R.id.edit:
+                    if(permissions.checkEditAPA(mAPAdapter.getItem(pos), getActivity())) {
+                        Intent i = new Intent(getContext(), EditAPAActivity.class);
+                        i.putExtra(EditAPAActivity.APA_ID, key);
+                        startActivity(i);
+                    }
+                    break;
                 case R.id.reassign_action:
-                    dialog.show(getActivity().getFragmentManager(), "users_list");
+                    if(permissions.checkAssignAPA(mAPAdapter.getItem(pos), getActivity())) {
+                        dialog.show(getActivity().getFragmentManager(), "users_list");
+                    }
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
@@ -137,8 +151,10 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
 
     @Override
     public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-        txtNoAction.setVisibility(View.GONE);
-        mAPAdapter.addItems(snapshot.getKey(), action);
+        if(permissions.checkCanViewAPA(action)) {
+            txtNoAction.setVisibility(View.GONE);
+            mAPAdapter.addItems(snapshot.getKey(), action);
+        }
     }
 
     @Override

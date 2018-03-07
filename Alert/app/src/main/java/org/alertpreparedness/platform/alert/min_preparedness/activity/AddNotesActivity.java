@@ -28,6 +28,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.AddNotesAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Notes;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SimpleAdapter;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
@@ -73,6 +74,9 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
     AddNotesAdapter addNotesAdapter;
     private String actionKey;
     private String actionParentKey;
+
+    @Inject
+    PermissionsHelper permissions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,7 +159,10 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
 
     public void saveNote(String texts) {
 
-        if(!TextUtils.isEmpty(texts)) {
+        if(permissions.checkCreateNote()) {
+            SnackbarHelper.show(this, getString(R.string.permission_note_create_error));
+        }
+        else if(!TextUtils.isEmpty(texts)) {
             String id = dbNoteRef.child(actionParentKey).child(actionKey).push().getKey();
             String userID = PreferHelper.getString(getApplicationContext(), Constants.AGENCY_ID);
             Long millis = System.currentTimeMillis();
@@ -163,7 +170,8 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
             Notes notes = new Notes(texts, millis, userID);
             dbNoteRef.child(actionParentKey).child(actionKey).child(id).setValue(notes);
 
-        }else {
+        }
+        else {
             SnackbarHelper.show(this, getString(R.string.txt_note_not_empty));
         }
     }

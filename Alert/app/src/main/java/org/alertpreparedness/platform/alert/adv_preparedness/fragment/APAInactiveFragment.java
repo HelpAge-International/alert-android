@@ -25,6 +25,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
@@ -46,6 +47,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
+import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -136,6 +138,9 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
     @BaseActionRef
     public DatabaseReference dbActionBaseRef;
 
+    @Inject
+    PermissionsHelper permissions;
+
     private APActionAdapter mAPAdapter;
     private Boolean isCHS = false;
     private Boolean isCHSAssigned = false;
@@ -217,6 +222,13 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
         actionID = key;
         SheetMenu.with(getContext()).setMenu(R.menu.menu_archived).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
+                case R.id.edit:
+                    if(permissions.checkEditAPA(mAPAdapter.getItem(pos), getActivity())) {
+                        Intent i = new Intent(getContext(), EditAPAActivity.class);
+                        i.putExtra(EditAPAActivity.APA_ID, key);
+                        startActivity(i);
+                    }
+                    break;
 //                case R.id.reactive_action:
 //                    //TODO
 //                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reactivate Clicked", Snackbar.LENGTH_LONG).show();
@@ -389,8 +401,7 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
                 System.out.println("isNotInCountryLevel = " + isInCountryLevel);
                 System.out.println("isNotInNetwork = " + isInNetwork);
 
-                txtNoAction.setVisibility(View.GONE);
-                mAPAdapter.addItems(getChild.getKey(), new Action(
+                Action action = new Action(
                         model.getId(),
                         model.getTask(),
                         model.getDepartment(),
@@ -411,8 +422,12 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
                         user,
                         dbAgencyRef.getRef(),
                         dbUserPublicRef.getRef(),
-                        dbNetworkRef.getRef())
-                );
+                        dbNetworkRef.getRef());
+
+                if(permissions.checkCanViewAPA(action)) {
+                    txtNoAction.setVisibility(View.GONE);
+                    mAPAdapter.addItems(getChild.getKey(), action);
+                }
             }
             else {
                 mAPAdapter.removeItem(getChild.getKey());

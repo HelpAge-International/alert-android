@@ -54,12 +54,15 @@ import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivi
 import org.alertpreparedness.platform.alert.dashboard.activity.UpdateAlertActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.MinPreparednessFragment;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlanFragment;
+import org.alertpreparedness.platform.alert.risk_monitoring.view.RiskFragment;
 import org.alertpreparedness.platform.alert.settings.ChangeEmailActivity;
 import org.alertpreparedness.platform.alert.settings.ChangePasswordActivity;
 import org.alertpreparedness.platform.alert.settings.SettingsFragment;
 import org.alertpreparedness.platform.alert.utils.AlertFetcher;
 import org.alertpreparedness.platform.alert.utils.ClockSettingsFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
+import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
+import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Singleton;
 
@@ -138,4 +141,8 @@ public interface ApplicationComponent {
     void inject(ClockSettingsFetcher clockSettingsFetcher);
 
     void inject(NotificationIdHandler notificationIdHandler);
+
+    void inject(PermissionsHelper permissionsHelper);
+
+    void inject(@NotNull RiskFragment riskFragment);
 }

@@ -109,6 +109,9 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
         assert getSupportActionBar() != null;
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mToolbar.setNavigationOnClickListener((t) -> {
+            finish();
+        });
 
         initData();
         initViews();

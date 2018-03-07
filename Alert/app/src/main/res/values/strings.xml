@@ -241,4 +241,11 @@
     <string name="unassigned_title">Unassigned</string>
     <string name="past_date_error">You cannot select a date in the past</string>
     <string name="error_logging_out">Error logging out, please try again later.</string>
+    <string name="permission_assign_action_error">You dont have permission to assign the action</string>
+    <string name="permission_complete_error">You dont have permission to complete this action</string>
+    <string name="permission_create_action_error" >You dont have permission to create an APA</string>
+    <string name="permission_edit_error">You dont have permission to edit this action</string>
+    <string name="permission_note_create_error">You dont have permission to create a note</string>
+    <string name="permission_edit_indicator">You dont have permission to edit this indicator</string>
+    <string name="note_cannot_be_empty">Note cannot be empty</string>
 </resources>

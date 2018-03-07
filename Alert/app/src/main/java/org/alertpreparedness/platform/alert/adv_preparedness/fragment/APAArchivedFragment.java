@@ -17,6 +17,7 @@ import com.google.firebase.database.DataSnapshot;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.action.ActionFetcher;
+import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
@@ -24,6 +25,9 @@ import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttach
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseAPAFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -55,6 +59,9 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
     TextView txtNoAction;
 
     private APActionAdapter mAPAdapter;
+
+    @Inject
+    PermissionsHelper permissions;
 
     @Nullable
     @Override
@@ -98,10 +105,13 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
     public void onActionItemSelected(int pos, String key, String parentId) {
         SheetMenu.with(getContext()).setMenu(R.menu.menu_archived).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
-//                case R.id.reactive_action:
-//                    //TODO
-//                    Snackbar.make(getActivity().findViewById(R.id.cl_in_progress), "Reactivate Clicked", Snackbar.LENGTH_LONG).show();
-//                    break;
+                case R.id.edit:
+                    if(permissions.checkEditAPA(mAPAdapter.getItem(pos), getActivity())) {
+                        Intent i = new Intent(getContext(), EditAPAActivity.class);
+                        i.putExtra(EditAPAActivity.APA_ID, key);
+                        startActivity(i);
+                    }
+                    break;
                 case R.id.action_notes:
                     Intent intent2 = new Intent(getActivity(), AddNotesActivity.class);
                     intent2.putExtra(AddNotesActivity.PARENT_ACTION_ID, mAPAdapter.getItem(pos).getId());
@@ -128,8 +138,10 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
 
     @Override
     public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-        txtNoAction.setVisibility(View.GONE);
-        mAPAdapter.addItems(snapshot.getKey(), action);
+        if(permissions.checkCanViewAPA(action)) {
+            txtNoAction.setVisibility(View.GONE);
+            mAPAdapter.addItems(snapshot.getKey(), action);
+        }
     }
 
     @Override

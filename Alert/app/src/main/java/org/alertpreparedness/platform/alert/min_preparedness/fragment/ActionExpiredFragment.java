@@ -34,6 +34,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.ClockSettingsFetcher;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
+import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 import org.joda.time.DateTime;
 
@@ -70,6 +71,9 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
     @Inject
     @ActionRef
     public DatabaseReference dbActionRef;
+
+    @Inject
+    PermissionsHelper permissions;
 
     protected ActionAdapter mExpiredAdapter;
     private String actionID;
@@ -110,13 +114,15 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
     @Override
     public void onActionItemSelected(int pos, String key, String parentId) {
         this.actionID = key;
-        SheetMenu.with(getContext()).setMenu(R.menu.menu_expired).setClick(menuItem -> {
+        SheetMenu.with(getContext()).setMenu(R.menu.menu_expired_mpa).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.update_date:
                     showDatePicker(key);
                     break;
                 case R.id.reassign_action:
-                    dialog.show(getActivity().getFragmentManager(), "users_list");
+                    if(permissions.checkMPAActionAssign(mExpiredAdapter.getItem(pos), getActivity())) {
+                        dialog.show(getActivity().getFragmentManager(), "users_list");
+                    }
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
@@ -192,8 +198,10 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
 
     @Override
     public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-        txtNoAction.setVisibility(View.GONE);
-        mExpiredAdapter.addItems(snapshot.getKey(), action);
+        if(permissions.checkCanViewMPA(action)) {
+            txtNoAction.setVisibility(View.GONE);
+            mExpiredAdapter.addItems(snapshot.getKey(), action);
+        }
     }
 
     @Override

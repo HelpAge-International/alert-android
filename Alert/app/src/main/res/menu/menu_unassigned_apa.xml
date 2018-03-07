@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/assign_action"
-            android:icon="@drawable/ic_assignment_24px"
-            android:title="@string/txt_assign_action" />
-        <item
             android:id="@+id/edit_action"
             android:icon="@drawable/ic_edit_gray_24px"
             android:title="@string/txt_edit_action" />
+        <item
+            android:id="@+id/assign_action"
+            android:icon="@drawable/ic_assignment_24px"
+            android:title="@string/txt_assign_action" />
     </group>
 </menu>

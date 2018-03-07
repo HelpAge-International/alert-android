@@ -18,6 +18,10 @@ import com.github.clans.fab.FloatingActionMenu;
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.adv_preparedness.activity.CreateAPAActivity;
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,12 +37,16 @@ public class AdvPreparednessFragment extends Fragment implements View.OnClickLis
     @BindView(R.id.fabAddAPA)
     public android.support.design.widget.FloatingActionButton fabCreateAPA;
 
+    @Inject
+    PermissionsHelper permissions;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_adv_preparedness, container, false);
 
         ButterKnife.bind(this, v);
+        DependencyInjector.applicationComponent().inject(this);
 
         initViews();
 
@@ -49,9 +57,15 @@ public class AdvPreparednessFragment extends Fragment implements View.OnClickLis
     }
 
     private void initViews() {
-        fabCreateAPA.setOnClickListener(this);
+        if(!permissions.checkCreateAPA(getActivity())) {
+            fabCreateAPA.setVisibility(View.GONE);
+        }
+        else {
+            fabCreateAPA.setOnClickListener(this);
+        }
         mPager.setAdapter(new AdvPreparednessFragment.PagerAdapter(getFragmentManager()));
         mPager.setOffscreenPageLimit(6);
+
     }
 
     @Override

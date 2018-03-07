@@ -1,6 +1,8 @@
 package org.alertpreparedness.platform.alert.firebase;
 
-public class FirebaseModel {
+import java.io.Serializable;
+
+public class FirebaseModel implements Serializable{
 
     private String id = null;
 

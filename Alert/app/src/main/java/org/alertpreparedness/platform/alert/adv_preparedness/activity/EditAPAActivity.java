@@ -12,9 +12,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.ExtensionHelperKt;
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.firebase.APAAction;
-import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.AssignToListener;
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.DepartmentListener;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelUserPublic;
@@ -26,10 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Date;
 
-import butterknife.ButterKnife;
-import shortbread.Shortcut;
 
-@Shortcut(id = "createAPA", icon = R.drawable.fab_add, shortLabel = "Create APA")
 public class EditAPAActivity extends CreateAPAActivity implements RadioGroup.OnCheckedChangeListener, AssignToListener, DepartmentListener {
 
     public static final String APA_ID = "apa_id";

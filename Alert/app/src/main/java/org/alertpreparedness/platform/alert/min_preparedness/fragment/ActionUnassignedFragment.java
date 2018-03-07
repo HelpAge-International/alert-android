@@ -32,14 +32,11 @@ import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapt
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.ClockSettingsFetcher;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 import org.joda.time.DateTime;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -72,6 +69,9 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
     @Inject
     @ActionRef
     public DatabaseReference dbActionRef;
+
+    @Inject
+    PermissionsHelper permissions;
 
     private ActionAdapter mUnassignedAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
@@ -114,18 +114,22 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
     public void onActionItemSelected(int pos, String key, String parentId) {
         this.actionID = key;
 
-        SheetMenu.with(getContext()).setMenu(R.menu.menu_unassigned).setClick(menuItem -> {
+        SheetMenu.with(getContext()).setMenu(R.menu.menu_unassigned_mpa).setClick(menuItem -> {
+            Action item = mUnassignedAdapter.getItem(pos);
+
             switch (menuItem.getItemId()) {
                 case R.id.update_date:
                     showDatePicker(key);
                     break;
                 case R.id.assign_action:
-                    if(!mUnassignedAdapter.getItem(pos).hasCHSInfo() && mUnassignedAdapter.getItem(pos).isCHS()) {
-                        SnackbarHelper.show(getActivity(), "The action needs more information from the web portal");
+                    if(permissions.checkMPAActionAssign(item, getActivity())) {
+                        if (!item.hasCHSInfo() && item.isCHS()) {
+                            SnackbarHelper.show(getActivity(), "The action needs more information from the web portal");
+                        } else {
+                            dialog.show(getActivity().getFragmentManager(), "users_list");
+                        }
+                        break;
                     }
-                    else {
-                        dialog.show(getActivity().getFragmentManager(), "users_list");
-                    }                    break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
                     intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, mUnassignedAdapter.getItem(pos).getId());
@@ -201,8 +205,10 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
 
     @Override
     public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-        txtNoAction.setVisibility(View.GONE);
-        mUnassignedAdapter.addItems(snapshot.getKey(), action);
+        if(permissions.checkCanViewMPA(action)) {
+            txtNoAction.setVisibility(View.GONE);
+            mUnassignedAdapter.addItems(snapshot.getKey(), action);
+        }
     }
 
     @Override

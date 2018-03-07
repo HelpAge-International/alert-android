@@ -6,6 +6,22 @@
     android:layout_height="match_parent"
     tools:context="org.alertpreparedness.platform.alert.adv_preparedness.activity.CreateAPAActivity">
 
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/toolbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <include
+            layout="@layout/actionbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/actionBarSize" />
+
+    </android.support.design.widget.AppBarLayout>
+
     <include
         android:id="@+id/create_apa_layout"
         layout="@layout/content_create_apa"
