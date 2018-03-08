@@ -19,6 +19,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserEmail;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseStorageRef;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.realm.SettingsRealm;
@@ -33,6 +34,7 @@ import java.util.Locale;
 import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.Flowable;
 import io.realm.Realm;
 
 /**
@@ -99,6 +101,11 @@ public class ApplicationModule {
     @Provides @Singleton
     public SimpleDateFormat provideDateFomatter() {
         return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+    }
+
+    @Provides @Singleton
+    public Flowable<NetworkFetcher.NetworkFetcherResult> provideNetworkResultFlowable() {
+        return new NetworkFetcher().rxFetch();
     }
 
     @Provides

@@ -22,6 +22,11 @@ import java.util.concurrent.Future;
 
 import javax.inject.Inject;
 
+import durdinapps.rxfirebase2.RxFirebaseChildEvent;
+import durdinapps.rxfirebase2.RxFirebaseDatabase;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+
 /**
  * Created by Tj on 01/03/2018.
  */
@@ -37,8 +42,15 @@ public class AlertFetcher {
     @BaseAlertRef
     DatabaseReference alertRef;
 
+    @Inject
+    Flowable<NetworkFetcher.NetworkFetcherResult> networkResultFlowable;
+
     public AlertFetcher(AlertFetcherListener listener) {
         this.listener = listener;
+        DependencyInjector.applicationComponent().inject(this);
+    }
+
+    public AlertFetcher(){
         DependencyInjector.applicationComponent().inject(this);
     }
 
@@ -59,6 +71,21 @@ public class AlertFetcher {
                 alertRef.child(id).addChildEventListener(new AlertListener(id));
             }
         }).fetch();
+    }
+
+    public Flowable<RxFirebaseChildEvent<DataSnapshot>> rxFetch(){
+        System.out.println("AlertFetcher.rxFetch");
+        return networkResultFlowable.flatMap(networkFetcherResult -> {
+            System.out.println("AlertFetcher.rxFetch2");
+            List<String> networkIds = networkFetcherResult.all();
+            Flowable<RxFirebaseChildEvent<DataSnapshot>> flow = RxFirebaseDatabase.observeChildEvent(alertRef.child(user.countryID));
+            for (String networkId : networkIds) {
+                flow = flow.mergeWith(RxFirebaseDatabase.observeChildEvent(alertRef.child(networkId)));
+            }
+            System.out.println("AlertFetcher.rxFetch3");
+            System.out.println("flow = " + alertRef.child(user.countryID).getRef());
+            return flow;
+        });
     }
 
     public interface AlertFetcherListener {

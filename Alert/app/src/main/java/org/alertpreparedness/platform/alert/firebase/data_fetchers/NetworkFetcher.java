@@ -16,6 +16,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import durdinapps.rxfirebase2.RxFirebaseDatabase;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.realm.internal.Util;
 
@@ -32,33 +33,34 @@ public class NetworkFetcher implements ValueEventListener {
         DependencyInjector.applicationComponent().inject(this);
     }
 
+    public NetworkFetcher() {
+        DependencyInjector.applicationComponent().inject(this);
+    }
+
     @Deprecated
     public void fetch(){
         countryOfficeRef.addListenerForSingleValueEvent(this);
     }
 
-    public Observable<NetworkFetcherResult> rxFetch() {
-        return Observable.create(emitter -> {
-            RxFirebaseDatabase.observeValueEvent(countryOfficeRef).subscribe((countryOffice) -> {
-                HashMap<String, Boolean> localNetworks = countryOffice.child("localNetworks").exists() ? (HashMap<String, Boolean>) countryOffice.child("localNetworks").getValue() : new HashMap<>();
+    public Flowable<NetworkFetcherResult> rxFetch() {
+        return RxFirebaseDatabase.observeValueEvent(countryOfficeRef).map(countryOffice -> {
+            HashMap<String, Boolean> localNetworks = countryOffice.child("localNetworks").exists() ? (HashMap<String, Boolean>) countryOffice.child("localNetworks").getValue() : new HashMap<>();
 
+            List<String> globalNetworks = new ArrayList<>();
+            List<String> networkCountries = new ArrayList<>();
+            for (DataSnapshot network : countryOffice.child("networks").getChildren()) {
+                globalNetworks.add(network.getKey());
 
-                List<String> globalNetworks = new ArrayList<>();
-                List<String> networkCountries = new ArrayList<>();
-                for (DataSnapshot network : countryOffice.child("networks").getChildren()) {
-                    globalNetworks.add(network.getKey());
+                networkCountries.add((String) network.child("networkCountryId").getValue());
+            }
 
-                    networkCountries.add((String) network.child("networkCountryId").getValue());
-                }
+            ArrayList<String> localNetworkArray = new ArrayList<>();
 
-                ArrayList<String> localNetworkArray = new ArrayList<>();
-
-                assert localNetworks != null;
-                if(localNetworks.size() > 0) {
-                    localNetworkArray = new ArrayList<String>(localNetworks.keySet());
-                }
-                emitter.onNext(new NetworkFetcherResult(localNetworkArray, globalNetworks, networkCountries));
-            });
+            assert localNetworks != null;
+            if(localNetworks.size() > 0) {
+                localNetworkArray = new ArrayList<String>(localNetworks.keySet());
+            }
+            return new NetworkFetcherResult(localNetworkArray, globalNetworks, networkCountries);
         });
     }
 
