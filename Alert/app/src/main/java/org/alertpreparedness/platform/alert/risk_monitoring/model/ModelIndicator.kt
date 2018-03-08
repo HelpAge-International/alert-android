@@ -2,12 +2,13 @@ package org.alertpreparedness.platform.alert.risk_monitoring.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.google.firebase.database.Exclude
 import org.alertpreparedness.platform.alert.HAZARD_NOT_EMPTY
 
 data class ModelIndicator(val id: String?, var hazardScenario: ModelHazard, val triggerSelected: Int,
                           var name: String, var assignee: String?, var geoLocation: Int,
                           var updatedAt: Long, var dueDate: Long, var source: List<ModelSource>, var trigger: List<ModelTrigger>, val networkId: String?, val agencyId: String?, val countryOfficeId: String?,
-                          var affectedLocation: List<ModelIndicatorLocation>?, var gps: ModelGps?, val category: Int = 0, val networkName: String? = null, var modelType : Int = HAZARD_NOT_EMPTY) : Parcelable {
+                          var affectedLocation: List<ModelIndicatorLocation>?, var gps: ModelGps?, val category: Int = 0, val networkName: String? = null, @Exclude var modelType : Int = HAZARD_NOT_EMPTY) : Parcelable {
 
 //
 //    constructor(modelType: ModelType = ModelType.NOT_EMPTY) : this() {
@@ -116,6 +117,7 @@ data class ModelIndicator(val id: String?, var hazardScenario: ModelHazard, val 
         }
     }
 
+    @Exclude
     lateinit var hazardId: String
 
 

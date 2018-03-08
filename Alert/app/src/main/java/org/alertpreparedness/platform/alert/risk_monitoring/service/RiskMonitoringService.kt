@@ -91,16 +91,24 @@ class RiskMonitoringService(private val context : Context) {
 
     fun addIndicatorToHazard(indicator: ModelIndicator, countryContext: Boolean) {
         val indicatorRef = FirebaseHelper.getIndicatorsRef(mAppStatus, if (countryContext) PreferHelper.getString(context, Constants.COUNTRY_ID) else indicator.hazardScenario.id)
-        val key = indicatorRef.push().key
+        val ref = indicatorRef.push()
         if (countryContext) {
-            indicatorRef.child(key).setValue(indicator).continueWith {
-                indicatorRef.child(key).child("hazardScenario").setValue(ModelHazardCountryContext())
+            ref.setValue(indicator).continueWith {
+                ref.child("hazardScenario").setValue(ModelHazardCountryContext())
             }
         } else {
-            indicatorRef.child(key).setValue(indicator).continueWith {
-                val update = indicator.hazardScenario
-                val updateMap = mutableMapOf("active" to null, "isActive" to update.isActive, "id" to null, "key" to update.id, "seasonal" to null, "isSeasonal" to update.isSeasonal)
-                indicatorRef.child(key).child("hazardScenario").updateChildren(updateMap)
+            println("indicatorRef.child(key) = ${ref}")
+            println("indicator = ${indicator}")
+            try {
+                indicator.hazardId = indicator.hazardScenario.id!!
+                ref.setValue(indicator).continueWith {
+                    val update = indicator.hazardScenario
+                    val updateMap = mutableMapOf("active" to null, "isActive" to update.isActive, "id" to null, "key" to update.id, "seasonal" to null, "isSeasonal" to update.isSeasonal)
+                    ref.child("hazardScenario").updateChildren(updateMap)
+                }
+            }
+            catch (e : Exception) {
+                e.printStackTrace()
             }
         }
     }
