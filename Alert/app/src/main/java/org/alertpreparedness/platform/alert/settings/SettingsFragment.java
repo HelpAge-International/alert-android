@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
@@ -104,15 +105,15 @@ public class SettingsFragment extends Fragment implements ValueEventListener {
                 .setMessage("You will be unable to log back into the app unless you have internet connection. Are you sure you want to log out?")
                 .setPositiveButton(android.R.string.yes, (dialog, which) -> {
                     if(FirebaseInstanceId.getInstance().getToken() != null) {
-                        notificationIdHandler.deregisterDeviceId(user.getUserID(), FirebaseInstanceId.getInstance().getToken(), new DatabaseReference.CompletionListener() {
-                            @Override
-                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                                if(databaseError == null){
-                                    logout();
-                                }
-                                else{
+                        notificationIdHandler.deregisterDeviceId(user.getUserID(), FirebaseInstanceId.getInstance().getToken(), (databaseError, databaseReference) -> {
+                            if(databaseError == null){
+                                logout();
+                            }
+                            else{
+                                try {
                                     SnackbarHelper.show(getActivity(), getString(R.string.error_logging_out));
                                 }
+                                catch (Exception e){}
                             }
                         });
                     }
