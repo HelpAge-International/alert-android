@@ -58,11 +58,13 @@ import org.alertpreparedness.platform.alert.risk_monitoring.view.RiskFragment;
 import org.alertpreparedness.platform.alert.settings.ChangeEmailActivity;
 import org.alertpreparedness.platform.alert.settings.ChangePasswordActivity;
 import org.alertpreparedness.platform.alert.settings.SettingsFragment;
-import org.alertpreparedness.platform.alert.utils.AlertFetcher;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.AlertFetcher;
 import org.alertpreparedness.platform.alert.utils.ClockSettingsFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Observable;
 
 import javax.inject.Singleton;
 
@@ -73,7 +75,7 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = {ApplicationModule.class, FirebaseModule.class})
+@Component(modules = {ApplicationModule.class, FirebaseModule.class, ObservableModule.class})
 public interface ApplicationComponent {
     void inject(ResponsePlanFragment fragment);
     void inject(HomeFragment fragment);

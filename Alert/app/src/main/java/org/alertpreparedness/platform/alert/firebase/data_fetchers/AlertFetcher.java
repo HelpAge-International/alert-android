@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.utils;
+package org.alertpreparedness.platform.alert.firebase.data_fetchers;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -31,7 +31,7 @@ import io.reactivex.Flowable;
  * Created by Tj on 01/03/2018.
  */
 
-public class AlertFetcher {
+public class AlertFetcher implements RxFirebaseDataFetcher {
 
     private AlertFetcherListener listener;
 
@@ -73,17 +73,14 @@ public class AlertFetcher {
         }).fetch();
     }
 
+    @Override
     public Flowable<RxFirebaseChildEvent<DataSnapshot>> rxFetch(){
-        System.out.println("AlertFetcher.rxFetch");
         return networkResultFlowable.flatMap(networkFetcherResult -> {
-            System.out.println("AlertFetcher.rxFetch2");
             List<String> networkIds = networkFetcherResult.all();
             Flowable<RxFirebaseChildEvent<DataSnapshot>> flow = RxFirebaseDatabase.observeChildEvent(alertRef.child(user.countryID));
             for (String networkId : networkIds) {
                 flow = flow.mergeWith(RxFirebaseDatabase.observeChildEvent(alertRef.child(networkId)));
             }
-            System.out.println("AlertFetcher.rxFetch3");
-            System.out.println("flow = " + alertRef.child(user.countryID).getRef());
             return flow;
         });
     }

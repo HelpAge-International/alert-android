@@ -39,6 +39,7 @@ import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SettingsFactory;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import io.realm.Realm;
 import shortbread.Shortbread;

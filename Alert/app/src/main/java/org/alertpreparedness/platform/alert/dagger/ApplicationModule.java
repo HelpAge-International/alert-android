@@ -103,11 +103,6 @@ public class ApplicationModule {
         return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
     }
 
-    @Provides @Singleton
-    public Flowable<NetworkFetcher.NetworkFetcherResult> provideNetworkResultFlowable() {
-        return new NetworkFetcher().rxFetch();
-    }
-
     @Provides
     @UserId
     public String provideUserId(Context context) {

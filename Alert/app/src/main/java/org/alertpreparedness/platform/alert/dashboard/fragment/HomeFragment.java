@@ -168,13 +168,10 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     private AlertListener networkAlertListener = new AlertListener(true);
     private TaskListener taskListener = new TaskListener();
     private TaskListener networkTaskListener = new NetworkTaskListener();
-    private TaskListener indicatorListener = new TaskListener();
-    private TaskListener hazardTaskListener = new TaskListener();
     private NetworkListener networkListener = new NetworkListener();
     private HazardListener hazardListener = new HazardListener();
     private String agencyAdminId;
     private String networkLeadId;
-    private Task task;
     private TaskAdapter networkTaskAdapter;
 
     @Nullable
