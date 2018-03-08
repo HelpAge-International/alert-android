@@ -1,14 +1,10 @@
-package org.alertpreparedness.platform.alert.utils;
+package org.alertpreparedness.platform.alert.firebase.consumers;
 
 import com.google.firebase.database.DataSnapshot;
 
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 
 import durdinapps.rxfirebase2.RxFirebaseChildEvent;
-import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.functions.Consumer;
 
 public class ConversionConsumer<T> extends FirebaseConsumer<T> {
     private final Class<T> type;

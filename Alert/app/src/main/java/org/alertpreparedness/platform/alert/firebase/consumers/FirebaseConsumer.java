@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.utils;
+package org.alertpreparedness.platform.alert.firebase.consumers;
 
 import com.google.firebase.database.DataSnapshot;
 

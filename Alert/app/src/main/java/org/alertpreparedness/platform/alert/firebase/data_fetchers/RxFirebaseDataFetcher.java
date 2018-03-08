@@ -11,7 +11,7 @@ import io.reactivex.Flowable;
  * Created by Tj on 08/03/2018.
  */
 
-public interface RxFirebaseDataFetcher {
-    public Flowable<RxFirebaseChildEvent<DataSnapshot>> rxFetch();
-    public Flowable<List<DataSnapshot>> rxFetchGroup();
+public interface RxFirebaseDataFetcher<T> {
+    public Flowable<RxFirebaseChildEvent<T>> rxFetch();
+    public Flowable<List<T>> rxFetchGroup();
 }
