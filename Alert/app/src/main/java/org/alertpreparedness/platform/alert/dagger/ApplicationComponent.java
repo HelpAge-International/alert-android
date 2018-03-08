@@ -19,6 +19,7 @@ import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.HazardsFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.IndicatorsFetcher;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.TempActionFetcher;
 import org.alertpreparedness.platform.alert.helper.DataHandler;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
@@ -145,4 +146,6 @@ public interface ApplicationComponent {
     void inject(PermissionsHelper permissionsHelper);
 
     void inject(@NotNull RiskFragment riskFragment);
+
+    void inject(TempActionFetcher tempActionFetcher);
 }

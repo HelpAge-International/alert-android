@@ -47,6 +47,7 @@ import org.alertpreparedness.platform.alert.dashboard.model.Task;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.TempActionFetcher;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
@@ -189,6 +190,9 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
         FirebaseAuth.getInstance().addAuthStateListener(this);
 
+        new TempActionFetcher().rxFetch().subscribe((snapshotRxFirebaseChildEvent -> {
+            System.out.println("snapshotRxFirebaseChildEvent = " + snapshotRxFirebaseChildEvent.getEventType());
+        }));
         return v;
     }
 
