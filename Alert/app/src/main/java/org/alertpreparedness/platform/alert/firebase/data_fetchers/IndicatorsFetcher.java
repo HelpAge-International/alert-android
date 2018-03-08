@@ -96,9 +96,12 @@ public class IndicatorsFetcher implements FirebaseDataFetcher, RxFirebaseDataFet
                 flow = flow.mergeWith(RxFirebaseDatabase.observeChildEvent(baseIndicatorRef.child(networkId)));
             }
             return flow;
-        }).mergeWith(hazardFlowable.flatMap(hazard -> {
-            return RxFirebaseDatabase.observeChildEvent(baseIndicatorRef.child(hazard.getValue().getKey()));
-        }));
+        }).mergeWith(hazardFlowable.flatMap(hazard -> RxFirebaseDatabase.observeChildEvent(baseIndicatorRef.child(hazard.getValue().getKey()))));
+    }
+
+    @Override
+    public Flowable<List<DataSnapshot>> rxFetchGroup() {
+        return null;
     }
     //endregion
 

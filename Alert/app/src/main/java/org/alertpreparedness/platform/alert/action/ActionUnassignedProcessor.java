@@ -230,7 +230,7 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
 
     }
 
-    protected void getMandatedForNewUser() {
+    public void getMandatedForNewUser() {
         dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -278,7 +278,7 @@ public class ActionUnassignedProcessor extends BaseActionProcessor {
 
     }
 
-    protected void getCHSForNewUser() {
+    public void getCHSForNewUser() {
         dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

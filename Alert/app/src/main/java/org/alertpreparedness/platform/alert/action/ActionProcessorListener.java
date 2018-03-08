@@ -10,7 +10,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
  * Created by Tj on 28/02/2018.
  */
 
-interface ActionProcessorListener {
+public interface ActionProcessorListener {
 
     void onAddAction(DataSnapshot snapshot, Action action);
 

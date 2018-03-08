@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.utils;
+package org.alertpreparedness.platform.alert.firebase.data_fetchers;
 
 import android.os.Build;
 import android.support.annotation.RequiresApi;

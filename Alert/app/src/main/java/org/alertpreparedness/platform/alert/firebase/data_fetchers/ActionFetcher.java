@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.action;
+package org.alertpreparedness.platform.alert.firebase.data_fetchers;
 
 import android.content.Context;
 
@@ -7,6 +7,17 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 
+import org.alertpreparedness.platform.alert.action.ActionAPAExpiredProcessor;
+import org.alertpreparedness.platform.alert.action.ActionAPAInProgressProcessor;
+import org.alertpreparedness.platform.alert.action.ActionAPAUnassignedProcessor;
+import org.alertpreparedness.platform.alert.action.ActionArchivedProcessor;
+import org.alertpreparedness.platform.alert.action.ActionCompletedProcessor;
+import org.alertpreparedness.platform.alert.action.ActionExpiredProcessor;
+import org.alertpreparedness.platform.alert.action.ActionInProgressProcessor;
+import org.alertpreparedness.platform.alert.action.ActionProcessor;
+import org.alertpreparedness.platform.alert.action.ActionProcessorListener;
+import org.alertpreparedness.platform.alert.action.ActionUnassignedProcessor;
+import org.alertpreparedness.platform.alert.action.IdFetcherListener;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
@@ -14,19 +25,22 @@ import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
+import org.intellij.lang.annotations.Flow;
 
 import java.util.List;
 import java.util.Objects;
 
 import javax.inject.Inject;
 
+import durdinapps.rxfirebase2.RxFirebaseChildEvent;
 import durdinapps.rxfirebase2.RxFirebaseDatabase;
+import io.reactivex.Flowable;
 
 /**
  * Created by Tj on 28/02/2018.
  */
 
-public class ActionFetcher implements ActionProcessorListener {
+public class ActionFetcher implements ActionProcessorListener, RxFirebaseDataFetcher {
 
     private int type;
     private ACTION_STATE state;
@@ -40,6 +54,10 @@ public class ActionFetcher implements ActionProcessorListener {
     @Inject
     @BaseActionRef
     public DatabaseReference dbActionBaseRef;
+
+    @Inject
+    Flowable<NetworkFetcher.NetworkFetcherResult> networkResultFlowable;
+
 
     public enum ACTION_STATE {
         IN_PROGRESS,
@@ -58,6 +76,7 @@ public class ActionFetcher implements ActionProcessorListener {
      * @param type MPA or APA
      * @param listener
      */
+    @Deprecated
     public ActionFetcher(int type, ACTION_STATE state, ActionRetrievalListener listener) {
         this.type = type;
         this.state = state;
@@ -65,6 +84,7 @@ public class ActionFetcher implements ActionProcessorListener {
         DependencyInjector.applicationComponent().inject(this);
     }
 
+    @Deprecated
     public ActionFetcher(int type, ACTION_STATE state, ActionRetrievalListener listener, List<Integer> alertHazardTypes, List<Integer> networkHazardTypes) {
         this.type = type;
         this.state = state;
@@ -74,6 +94,7 @@ public class ActionFetcher implements ActionProcessorListener {
         DependencyInjector.applicationComponent().inject(this);
     }
 
+    @Deprecated
     public void fetchWithIds(List<String> ids, IdFetcherListener idFetcherListener) {
         ids.add(user.countryID);
         idFetcherListener.onIdResult(ids);
@@ -82,6 +103,7 @@ public class ActionFetcher implements ActionProcessorListener {
         }
     }
 
+    @Deprecated
     public void fetch(IdFetcherListener idFetcherListener) {
         new NetworkFetcher((n) -> {
             List<String> ids = n.all();
@@ -91,8 +113,23 @@ public class ActionFetcher implements ActionProcessorListener {
                 dbActionBaseRef.child(id).addChildEventListener(new ActionListener(id));
             }
         }).fetch();
+    }
 
+    @Override
+    public Flowable<RxFirebaseChildEvent<DataSnapshot>> rxFetch() {
+        return networkResultFlowable.flatMap(networkFetcherResult -> {
+            List<String> networkIds = networkFetcherResult.all();
+            Flowable<RxFirebaseChildEvent<DataSnapshot>> flow = RxFirebaseDatabase.observeChildEvent(dbActionBaseRef.child(user.countryID));
+            for (String networkId : networkIds) {
+                flow = flow.mergeWith(RxFirebaseDatabase.observeChildEvent(dbActionBaseRef.child(networkId)));
+            }
+            return flow;
+        });
+    }
 
+    @Override
+    public Flowable<List<DataSnapshot>> rxFetchGroup() {
+        return null;
     }
 
     private ActionProcessor makeProcessor(DataSnapshot snapshot, DataModel model, String actionId, String parentId) {

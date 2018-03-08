@@ -59,12 +59,10 @@ import org.alertpreparedness.platform.alert.settings.ChangeEmailActivity;
 import org.alertpreparedness.platform.alert.settings.ChangePasswordActivity;
 import org.alertpreparedness.platform.alert.settings.SettingsFragment;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.AlertFetcher;
-import org.alertpreparedness.platform.alert.utils.ClockSettingsFetcher;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.ClockSettingsFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Observable;
 
 import javax.inject.Singleton;
 
@@ -132,7 +130,7 @@ public interface ApplicationComponent {
     void inject(ResponsePlanNotificationService responsePlanNotificationService);
     void inject(ResponsePlanUpdateNotificationHandler responsePlanUpdateNotificationHandler);
 
-    void inject(org.alertpreparedness.platform.alert.action.ActionFetcher actionFetcher);
+    void inject(org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher actionFetcher);
 
     void inject(BaseActionProcessor baseActionProcessor);
 

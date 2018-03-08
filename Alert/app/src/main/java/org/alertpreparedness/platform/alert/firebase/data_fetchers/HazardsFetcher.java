@@ -93,6 +93,11 @@ public class HazardsFetcher implements FirebaseDataFetcher, RxFirebaseDataFetche
             return flow;
         });
     }
+
+    @Override
+    public Flowable<List<DataSnapshot>> rxFetchGroup() {
+        return null;
+    }
     //endregion
 
     //region HazardsFetcherListener
