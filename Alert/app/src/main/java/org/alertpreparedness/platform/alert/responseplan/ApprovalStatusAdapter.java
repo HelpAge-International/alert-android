@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.alert.responseplan;
 
 import android.content.Context;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.min_preparedness.model.Note;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -34,6 +37,9 @@ public class ApprovalStatusAdapter extends RecyclerView.Adapter<ApprovalStatusAd
 
         @BindView(R.id.status)
         TextView status;
+
+        @BindView(R.id.rvNotes)
+        RecyclerView notesView;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -74,13 +80,15 @@ public class ApprovalStatusAdapter extends RecyclerView.Adapter<ApprovalStatusAd
                 break;
             case 0://amber
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertAmber));
-                holder.status.setText(R.string.in_progress);
+                holder.status.setText(R.string.requires_submission);
                 holder.icon.setImageResource(R.drawable.icon_pending_amber);
                 break;
             case 3:
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertRed));
                 holder.status.setText(R.string.needs_reviewing);
                 holder.icon.setImageResource(R.drawable.icon_status_needs_reviewing);
+                holder.notesView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+                holder.notesView.setAdapter(new ApprovalNotesAdapter(new ArrayList<>(model.notes.values())));
                 break;
         }
 

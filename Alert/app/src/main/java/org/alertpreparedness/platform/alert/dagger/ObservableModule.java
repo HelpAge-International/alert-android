@@ -10,11 +10,14 @@ import org.alertpreparedness.platform.alert.dagger.annotation.HazardGroupObserva
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorGroupObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlanObservable;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.AlertFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.HazardsFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.IndicatorsFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.ResponsePlanFetcher;
+import org.alertpreparedness.platform.alert.firebase.wrappers.ResponsePlanResultItem;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.TempActionFetcher;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 
@@ -94,5 +97,12 @@ public class ObservableModule {
     @HazardGroupObservable
     public Flowable<Collection<DataSnapshot>> provideHazardGroupFlowable() {
         return new HazardsFetcher().rxFetchGroup();
+    }
+
+    @Provides
+    @Singleton
+    @ResponsePlanObservable
+    public Flowable<FetcherResultItem<ResponsePlanResultItem>> provideResponsePlans() {
+        return new ResponsePlanFetcher().rxFetch();
     }
 }

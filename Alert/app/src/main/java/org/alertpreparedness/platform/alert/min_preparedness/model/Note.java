@@ -1,25 +1,32 @@
 package org.alertpreparedness.platform.alert.min_preparedness.model;
 
 
+import com.google.firebase.database.Exclude;
+
+import org.alertpreparedness.platform.alert.firebase.FirebaseModel;
+
 /**
  * Created by faizmohideen on 03/01/2018.
  */
 
-public class Notes {
+public class Note extends FirebaseModel {
 
     private Long time;
     private String content;
     private String uploadBy;
     private String actionTaskID;
 
-    public Notes() {
+    @Exclude
+    private String fullName;
+
+    public Note() {
     }
 
-    public Notes(String actionTaskID) {
+    public Note(String actionTaskID) {
         this.actionTaskID = actionTaskID;
     }
 
-    public Notes(String content, Long time, String uploadBy) {
+    public Note(String content, Long time, String uploadBy) {
         this.content = content;
         this.time = time;
         this.uploadBy = uploadBy;
@@ -57,14 +64,24 @@ public class Notes {
         this.actionTaskID = actionTaskID;
     }
 
-
     @Override
     public String toString() {
-        return "Notes{" +
+        return "Note{" +
                 "time=" + time +
                 ", content='" + content + '\'' +
                 ", uploadBy='" + uploadBy + '\'' +
                 ", actionTaskID='" + actionTaskID + '\'' +
+                ", fullName='" + fullName + '\'' +
                 '}';
+    }
+
+    @Exclude
+    public String getFullName() {
+        return fullName;
+    }
+
+    @Exclude
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 }

@@ -38,6 +38,17 @@ public class FetcherResultItem<T> {
         this.eventType = eventType;
     }
 
+    public FetcherResultItem(T value, RxFirebaseChildEvent.EventType eventType){
+        this.value = value;
+        if(eventType == RxFirebaseChildEvent.EventType.REMOVED){
+            this.eventType = EventType.REMOVED;
+        }
+        else{
+            this.eventType = EventType.UPDATED;
+        }
+    }
+
+
     public FetcherResultItem(RxFirebaseChildEvent<T> childEvent){
         this.value = childEvent.getValue();
         if(childEvent.getEventType() == RxFirebaseChildEvent.EventType.REMOVED){

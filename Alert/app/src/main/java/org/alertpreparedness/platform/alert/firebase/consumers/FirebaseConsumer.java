@@ -2,10 +2,12 @@ package org.alertpreparedness.platform.alert.firebase.consumers;
 
 import com.google.firebase.database.DataSnapshot;
 
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
+
 import durdinapps.rxfirebase2.RxFirebaseChildEvent;
 import io.reactivex.functions.Consumer;
 
-public abstract class FirebaseConsumer<T> implements Consumer<RxFirebaseChildEvent<DataSnapshot>> {
+public abstract class FirebaseConsumer<T> implements Consumer<FetcherResultItem<T>> {
 
     private OnChangedListener<T> onChangedListener;
     private OnRemovedListener<T> onRemovedListener;

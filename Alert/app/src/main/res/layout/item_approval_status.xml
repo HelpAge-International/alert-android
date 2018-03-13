@@ -37,4 +37,10 @@
         android:layout_height="wrap_content"
         tools:ignore="RtlHardcoded" />
 
+    <android.support.v7.widget.RecyclerView
+        android:layout_below="@+id/status"
+        android:id="@+id/rvNotes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
 </RelativeLayout>

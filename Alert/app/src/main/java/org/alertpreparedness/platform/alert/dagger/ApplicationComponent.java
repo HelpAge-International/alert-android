@@ -19,6 +19,7 @@ import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.HazardsFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.IndicatorsFetcher;
+import org.alertpreparedness.platform.alert.firebase.wrappers.ResponsePlanResultItem;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.TempActionFetcher;
 import org.alertpreparedness.platform.alert.helper.DataHandler;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
@@ -50,6 +51,7 @@ import org.alertpreparedness.platform.alert.notifications.ResponsePlanNotificati
 import org.alertpreparedness.platform.alert.notifications.ResponsePlanUpdateNotificationHandler;
 import org.alertpreparedness.platform.alert.offline.OfflineSyncHandler;
 import org.alertpreparedness.platform.alert.responseplan.ActiveFragment;
+import org.alertpreparedness.platform.alert.responseplan.ApprovalNotesAdapter;
 import org.alertpreparedness.platform.alert.responseplan.ArchivedFragment;
 import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity;
 import org.alertpreparedness.platform.alert.dashboard.activity.UpdateAlertActivity;
@@ -148,4 +150,10 @@ public interface ApplicationComponent {
     void inject(@NotNull RiskFragment riskFragment);
 
     void inject(TempActionFetcher tempActionFetcher);
+
+    void inject(org.alertpreparedness.platform.alert.firebase.data_fetchers.ResponsePlanFetcher responsePlanFetcher);
+
+    void inject(ResponsePlanResultItem responsePlanResultItem);
+
+    void inject(ApprovalNotesAdapter approvalNotesAdapter);
 }

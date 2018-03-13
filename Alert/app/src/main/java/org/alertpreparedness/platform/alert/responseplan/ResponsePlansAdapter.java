@@ -14,6 +14,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.min_preparedness.model.Note;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -51,6 +52,10 @@ public class ResponsePlansAdapter extends RecyclerView.Adapter<ResponsePlansAdap
         return items.get(keys.get(index));
     }
 
+    public ResponsePlanObj getItem(String key) {
+        return items.get(key);
+    }
+
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
         //handled by activity
@@ -70,7 +75,7 @@ public class ResponsePlansAdapter extends RecyclerView.Adapter<ResponsePlansAdap
         removeItem(dataSnapshot);
     }
 
-    private void removeItem(DataSnapshot dataSnapshot) {
+    public void removeItem(DataSnapshot dataSnapshot) {
         int index = keys.indexOf(dataSnapshot.getKey());
         if(index != -1) {
             notifyItemRemoved(index);
@@ -87,6 +92,18 @@ public class ResponsePlansAdapter extends RecyclerView.Adapter<ResponsePlansAdap
     @Override
     public void onCancelled(DatabaseError databaseError) {
 
+    }
+
+    public void addNote(String planKey, Note note) {
+        if(items.get(planKey) != null) {
+            items.get(planKey).addNote(note.getId(), note);
+        }
+    }
+
+    public void removeNote(String planKey, String key) {
+        if(items.get(planKey) != null) {
+            items.get(planKey).removeNote(key);
+        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

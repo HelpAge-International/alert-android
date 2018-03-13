@@ -1,6 +1,5 @@
 package org.alertpreparedness.platform.alert.min_preparedness.activity;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,7 +7,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -20,17 +18,15 @@ import com.google.firebase.database.ValueEventListener;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseNoteRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.AddNotesAdapter;
-import org.alertpreparedness.platform.alert.min_preparedness.model.Notes;
+import org.alertpreparedness.platform.alert.min_preparedness.model.Note;
+import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
-import org.alertpreparedness.platform.alert.utils.SimpleAdapter;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import javax.inject.Inject;
@@ -70,6 +66,9 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
     @Inject
     @UserRef
     DatabaseReference dbUserRef;
+
+    @Inject
+    User user;
 
     AddNotesAdapter addNotesAdapter;
     private String actionKey;
@@ -137,7 +136,7 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
                 String firstname = (String) dataSnapshot.child("firstName").getValue();
                 String lastname = (String) dataSnapshot.child("lastName").getValue();
                 String fullname = String.format("%s %s", firstname, lastname);
-                addNotesAdapter.addInProgressItem(key, new Notes(
+                addNotesAdapter.addInProgressItem(key, new Note(
                         content,
                         time,
                         fullname
@@ -164,10 +163,10 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
         }
         else if(!TextUtils.isEmpty(texts)) {
             String id = dbNoteRef.child(actionParentKey).child(actionKey).push().getKey();
-            String userID = PreferHelper.getString(getApplicationContext(), Constants.AGENCY_ID);
+            String userID = user.getUserID();
             Long millis = System.currentTimeMillis();
 
-            Notes notes = new Notes(texts, millis, userID);
+            Note notes = new Note(texts, millis, userID);
             dbNoteRef.child(actionParentKey).child(actionKey).child(id).setValue(notes);
 
         }

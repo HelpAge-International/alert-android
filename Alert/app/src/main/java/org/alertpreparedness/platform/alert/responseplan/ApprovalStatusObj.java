@@ -3,6 +3,12 @@ package org.alertpreparedness.platform.alert.responseplan;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.alertpreparedness.platform.alert.min_preparedness.model.Note;
+
+import java.util.HashMap;
+
+import kotlin.Suppress;
+
 /**
  * Created by Tj on 12/12/2017.
  */
@@ -12,16 +18,18 @@ public class ApprovalStatusObj implements Parcelable {
 
     public String permisionLevel;
     public int status;
+    public HashMap<String, Note> notes;
 
-    public ApprovalStatusObj(String permisionLevel, int status) {
-
+    public ApprovalStatusObj(String permisionLevel, int status, HashMap<String, Note> notes) {
         this.permisionLevel = permisionLevel;
         this.status = status;
+        this.notes = notes;
     }
 
     protected ApprovalStatusObj(Parcel in) {
         status = in.readInt();
         permisionLevel = in.readString();
+        notes = (HashMap<String, Note>)in.readSerializable();
     }
 
     public static final Creator<ApprovalStatusObj> CREATOR = new Creator<ApprovalStatusObj>() {
@@ -45,5 +53,6 @@ public class ApprovalStatusObj implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(this.permisionLevel);
         parcel.writeInt(this.status);
+        parcel.writeSerializable(this.notes);
     }
 }

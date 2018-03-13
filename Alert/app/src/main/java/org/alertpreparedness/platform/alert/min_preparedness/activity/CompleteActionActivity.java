@@ -40,7 +40,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
 import org.alertpreparedness.platform.alert.min_preparedness.helper.FileUtils;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.FileInfo;
-import org.alertpreparedness.platform.alert.min_preparedness.model.Notes;
+import org.alertpreparedness.platform.alert.min_preparedness.model.Note;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
@@ -333,7 +333,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
             String userID = PreferHelper.getString(getApplicationContext(), Constants.AGENCY_ID);
             Long millis = System.currentTimeMillis();
 
-            Notes notes = new Notes(texts, millis, userID);
+            Note notes = new Note(texts, millis, userID);
 
             if(userTypeID.equals(user.getCountryID())) {
                 dbActionRef.child(key).child("isComplete").setValue(true);

@@ -1,6 +1,9 @@
 package org.alertpreparedness.platform.alert.responseplan;
 
+import org.alertpreparedness.platform.alert.min_preparedness.model.Note;
+
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Created by Tj on 12/12/2017.
@@ -16,6 +19,8 @@ public class ResponsePlanObj {
     public int regionalApproval;
     public int countryApproval;
     public int globalApproval;
+
+    private HashMap<String, Note> notes = new HashMap<>();
 
     public ResponsePlanObj(
             String hazardType,
@@ -37,4 +42,19 @@ public class ResponsePlanObj {
         this.globalApproval = globalApproval;
     }
 
+    public HashMap<String, Note> getNotes() {
+        return notes;
+    }
+
+    public void setNotes(HashMap<String, Note> notes) {
+        this.notes = notes;
+    }
+
+    public void addNote(String key, Note note) {
+        this.notes.put(key, note);
+    }
+
+    public void removeNote(String key) {
+        notes.remove(key);
+    }
 }

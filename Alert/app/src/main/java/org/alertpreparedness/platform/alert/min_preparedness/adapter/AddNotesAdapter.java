@@ -11,21 +11,15 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
-import org.alertpreparedness.platform.alert.helper.DateHelper;
-import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.min_preparedness.model.Notes;
+import org.alertpreparedness.platform.alert.min_preparedness.model.Note;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -43,7 +37,7 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
     @UserPublicRef
     DatabaseReference dbUserPublicRef;
 
-    private HashMap<String, Notes> items;
+    private HashMap<String, Note> items;
     private final ArrayList<String> keys;
     private Context context;
     private DatabaseReference dbRef;
@@ -81,7 +75,7 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
         }
     }
 
-    public void addInProgressItem(String key, Notes notes) {
+    public void addInProgressItem(String key, Note notes) {
         if (keys.indexOf(key) == -1) {
             keys.add(key);
             items.put(key, notes);
@@ -95,7 +89,7 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
 
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-        Notes note = dataSnapshot.getValue(Notes.class);
+        Note note = dataSnapshot.getValue(Note.class);
         if(keys.indexOf(dataSnapshot.getKey()) == -1) {
             keys.add(dataSnapshot.getKey());
         }
@@ -105,7 +99,7 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
 
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-        Notes note = dataSnapshot.getValue(Notes.class);
+        Note note = dataSnapshot.getValue(Note.class);
         if(keys.indexOf(dataSnapshot.getKey()) == -1) {
             keys.add(dataSnapshot.getKey());
         }
@@ -140,7 +134,7 @@ public class AddNotesAdapter extends RecyclerView.Adapter<AddNotesAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(AddNotesAdapter.ViewHolder holder, int position) {
-        Notes note = items.get(keys.get(position));
+        Note note = items.get(keys.get(position));
         holder.tvName.setText(note.getUploadBy());
         holder.tvContent.setText(note.getContent());
         holder.tvDate.setText(format.format(new Date(note.getTime())));
