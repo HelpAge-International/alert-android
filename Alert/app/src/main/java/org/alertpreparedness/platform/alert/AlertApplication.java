@@ -134,7 +134,7 @@ public class AlertApplication extends MultiDexApplication implements ValueEventL
                     .setConstraints(Constraint.ON_ANY_NETWORK)
                     .setReplaceCurrent(true)
                     .setLifetime(Lifetime.FOREVER)
-                    .setTrigger(Trigger.executionWindow((int) TimeUnit.MINUTES.toSeconds(60), (int) TimeUnit.MINUTES.toSeconds(90)))
+                    .setTrigger(Trigger.executionWindow(/*(int) TimeUnit.MINUTES.toSeconds(60), (int) TimeUnit.MINUTES.toSeconds(90)*/10, 11))
                     .build();
 
             dispatcher.schedule(myJob);

@@ -12,6 +12,7 @@ import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -27,12 +28,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
+import org.alertpreparedness.platform.alert.firebase.ClockSetting;
 import org.alertpreparedness.platform.alert.firebase.FirebaseModel;
+import org.reactivestreams.Subscriber;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -196,5 +202,22 @@ public class AppUtils {
     public static List<String> smartCombine(List<String> first, List<String> second) {
         first.addAll(second);
         return new ArrayList<>(new HashSet<>(first));
+    }
+
+    public static <T> Collection<T> combineDataSnapshotList(Object[] lists) {
+        Collection<T> toReturn = new ArrayList<>();
+        for (Object dataSnapshotList : lists) {
+            toReturn.addAll((Collection<T>) dataSnapshotList);
+        }
+        return toReturn;
+    }
+
+    public static <K, V> Map<K, V> combinePairToMap(Object[] objects) {
+        Map<K, V> map = new HashMap<>();
+        for(Object pairObj : objects){
+            Pair<K, V> pair = (Pair<K, V>)pairObj;
+            map.put(pair.first, pair.second);
+        }
+        return map;
     }
 }

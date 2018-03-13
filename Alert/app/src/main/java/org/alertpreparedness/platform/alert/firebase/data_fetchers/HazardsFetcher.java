@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.firebase.data_fetchers;
 
+import com.google.common.collect.Lists;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -8,7 +9,10 @@ import com.google.firebase.database.ValueEventListener;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseHazardRef;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -21,7 +25,7 @@ import timber.log.Timber;
 /**
  * Fetches all hazard IDs that should be visible to the current user.
  */
-public class HazardsFetcher implements FirebaseDataFetcher, RxFirebaseDataFetcher {
+public class HazardsFetcher implements FirebaseDataFetcher, RxFirebaseDataFetcher<DataSnapshot> {
 
     @Inject
     @BaseHazardRef
@@ -83,20 +87,30 @@ public class HazardsFetcher implements FirebaseDataFetcher, RxFirebaseDataFetche
     }
 
     @Override
-    public Flowable<RxFirebaseChildEvent<DataSnapshot>> rxFetch() {
+    public Flowable<FetcherResultItem<DataSnapshot>> rxFetch() {
         return networkResultFlowable.flatMap(networkFetcherResult -> {
             List<String> networkIds = networkFetcherResult.all();
             Flowable<RxFirebaseChildEvent<DataSnapshot>> flow = RxFirebaseDatabase.observeChildEvent(baseHazardRef.child(user.countryID));
             for (String networkId : networkIds) {
                 flow = flow.mergeWith(RxFirebaseDatabase.observeChildEvent(baseHazardRef.child(networkId)));
             }
-            return flow;
+            return flow.map(FetcherResultItem::new);
         });
     }
 
     @Override
-    public Flowable<List<DataSnapshot>> rxFetchGroup() {
-        return null;
+    public Flowable<Collection<DataSnapshot>> rxFetchGroup() {
+        return networkResultFlowable.flatMap(networkFetcherResult -> {
+            List<String> networkIds = networkFetcherResult.all();
+
+            List<Flowable<List<DataSnapshot>>> flowables = new ArrayList<>();
+            flowables.add(RxFirebaseDatabase.observeValueEvent(baseHazardRef.child(user.countryID)).map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren())));
+
+            for (String networkId : networkIds) {
+                flowables.add(RxFirebaseDatabase.observeValueEvent(baseHazardRef.child(networkId)).map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren())));
+            }
+            return Flowable.combineLatest(flowables, AppUtils::combineDataSnapshotList);
+        });
     }
     //endregion
 

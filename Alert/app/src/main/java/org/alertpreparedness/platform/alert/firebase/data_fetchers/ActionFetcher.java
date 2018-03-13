@@ -2,6 +2,7 @@ package org.alertpreparedness.platform.alert.firebase.data_fetchers;
 
 import android.content.Context;
 
+import com.google.common.collect.Lists;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,10 +24,13 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 import org.intellij.lang.annotations.Flow;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,7 +44,7 @@ import io.reactivex.Flowable;
  * Created by Tj on 28/02/2018.
  */
 
-public class ActionFetcher implements ActionProcessorListener, RxFirebaseDataFetcher {
+public class ActionFetcher implements ActionProcessorListener {
 
     private int type;
     private ACTION_STATE state;
@@ -69,6 +73,9 @@ public class ActionFetcher implements ActionProcessorListener, RxFirebaseDataFet
         APA_IN_PROGRESS,
         ARCHIVED,
         APA_UNASSIGNED
+    }
+
+    public ActionFetcher() {
     }
 
     /**
@@ -115,22 +122,6 @@ public class ActionFetcher implements ActionProcessorListener, RxFirebaseDataFet
         }).fetch();
     }
 
-    @Override
-    public Flowable<RxFirebaseChildEvent<DataSnapshot>> rxFetch() {
-        return networkResultFlowable.flatMap(networkFetcherResult -> {
-            List<String> networkIds = networkFetcherResult.all();
-            Flowable<RxFirebaseChildEvent<DataSnapshot>> flow = RxFirebaseDatabase.observeChildEvent(dbActionBaseRef.child(user.countryID));
-            for (String networkId : networkIds) {
-                flow = flow.mergeWith(RxFirebaseDatabase.observeChildEvent(dbActionBaseRef.child(networkId)));
-            }
-            return flow;
-        });
-    }
-
-    @Override
-    public Flowable<List<DataSnapshot>> rxFetchGroup() {
-        return null;
-    }
 
     private ActionProcessor makeProcessor(DataSnapshot snapshot, DataModel model, String actionId, String parentId) {
         switch (state) {

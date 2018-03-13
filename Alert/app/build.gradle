@@ -108,6 +108,9 @@ dependencies {
 
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
     compile 'com.android.support:multidex:1.0.3'
+    compile 'com.google.guava:guava:24.0-android'
+
+
 
 }
 

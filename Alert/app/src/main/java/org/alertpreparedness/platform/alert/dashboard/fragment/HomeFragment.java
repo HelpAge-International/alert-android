@@ -47,7 +47,9 @@ import org.alertpreparedness.platform.alert.dashboard.model.Task;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.ClockSettingsFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.TempActionFetcher;
+import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
@@ -61,6 +63,8 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.disposables.Disposable;
+import timber.log.Timber;
 
 import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity.EXTRA_ALERT;
 
@@ -174,6 +178,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     private String agencyAdminId;
     private String networkLeadId;
     private TaskAdapter networkTaskAdapter;
+    private Disposable d;
 
     @Nullable
     @Override
@@ -190,9 +195,6 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
         FirebaseAuth.getInstance().addAuthStateListener(this);
 
-        new TempActionFetcher().rxFetch().subscribe((snapshotRxFirebaseChildEvent -> {
-            System.out.println("snapshotRxFirebaseChildEvent = " + snapshotRxFirebaseChildEvent.getEventType());
-        }));
         return v;
     }
 
