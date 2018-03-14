@@ -66,8 +66,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     private boolean isPasswordShowing = false;
     private boolean validPlayServices = true;
 
-    @Inject
-    UserInfo userInfo;
+    UserInfo userInfo = new UserInfo();
     private ImageView img_eye;
 
     @SuppressLint("ClickableViewAccessibility")
@@ -75,8 +74,6 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_screen);
-
-        DependencyInjector.applicationComponent().inject(this);
 
         userInfo.setActivity(this);
         progressDialog = new ProgressDialog(this);
@@ -153,6 +150,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onUserAuthorized(User user) {
+        DependencyInjector.initialize((AlertApplication) getApplication());
         progressDialog.dismiss();
         SettingsFactory.tryMakeBaseSettings(user);
         startActivity(new Intent(this, HomeScreen.class));

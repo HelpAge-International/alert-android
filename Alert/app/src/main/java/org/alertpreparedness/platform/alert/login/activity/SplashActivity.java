@@ -10,6 +10,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
+import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.BaseActivity;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
@@ -90,7 +91,7 @@ public class SplashActivity extends BaseActivity {
                 startActivity(new Intent(this, HomeScreen.class));
                 finish();
             }
-            OfflineSyncHandler.getInstance().sync();
+            OfflineSyncHandler.getInstance().sync((AlertApplication) getApplication(), () -> {});
         } else {
             startActivity(new Intent(this, LoginScreen.class));
             finish();

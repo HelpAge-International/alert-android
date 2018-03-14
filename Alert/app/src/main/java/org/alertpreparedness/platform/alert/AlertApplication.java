@@ -4,6 +4,7 @@ import android.app.Application;
 import android.support.multidex.MultiDexApplication;
 import android.support.v7.app.AppCompatDelegate;
 
+import com.evernote.android.job.JobManager;
 import com.firebase.jobdispatcher.Constraint;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
@@ -33,6 +34,8 @@ import org.alertpreparedness.platform.alert.notifications.IndicatorUpdateNotific
 import org.alertpreparedness.platform.alert.notifications.NotificationIdHandler;
 import org.alertpreparedness.platform.alert.notifications.ResponsePlanUpdateNotificationHandler;
 import org.alertpreparedness.platform.alert.offline.OfflineSyncHandler;
+import org.alertpreparedness.platform.alert.offline.OfflineSyncJob;
+import org.alertpreparedness.platform.alert.offline.OfflineSyncJobCreator;
 import org.alertpreparedness.platform.alert.offline.SyncJobService;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
@@ -126,18 +129,25 @@ public class AlertApplication extends MultiDexApplication implements ValueEventL
         }
 
         if(loggedIn) {
-            FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(this));
-            Job myJob = dispatcher.newJobBuilder()
-                    .setService(SyncJobService.class) // the JobService that will be called
-                    .setTag("sync")        // uniquely identifies the job
-                    .setRecurring(true)
-                    .setConstraints(Constraint.ON_ANY_NETWORK)
-                    .setReplaceCurrent(true)
-                    .setLifetime(Lifetime.FOREVER)
-                    .setTrigger(Trigger.executionWindow(/*(int) TimeUnit.MINUTES.toSeconds(60), (int) TimeUnit.MINUTES.toSeconds(90)*/10, 11))
-                    .build();
+//            FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(this));
+//            Job myJob = dispatcher.newJobBuilder()
+//                    .setService(SyncJobService.class) // the JobService that will be called
+//                    .setTag("sync")        // uniquely identifies the job
+//                    .setRecurring(true)
+//                    .setConstraints(Constraint.ON_ANY_NETWORK)
+//                    .setReplaceCurrent(true)
+//                    .setLifetime(Lifetime.FOREVER)
+//                    .setTrigger(Trigger.executionWindow(/*(int) TimeUnit.MINUTES.toSeconds(60), (int) TimeUnit.MINUTES.toSeconds(90)*/10, 11))
+//                    .build();
+//
+//            dispatcher.schedule(myJob);
 
-            dispatcher.schedule(myJob);
+            DependencyInjector.initialize(this);
+
+            JobManager.create(this).addJobCreator(new OfflineSyncJobCreator());
+
+            OfflineSyncJob.scheduleJob();
+
             new IndicatorUpdateNotificationHandler(this).scheduleAllNotifications();
             new ActionUpdateNotificationHandler(this).scheduleAllNotifications();
             new ResponsePlanUpdateNotificationHandler(this).scheduleAllNotifications();
