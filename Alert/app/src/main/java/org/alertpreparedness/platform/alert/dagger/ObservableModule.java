@@ -10,6 +10,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AlertGroupObservab
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardGroupObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.InActiveActionObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorGroupObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlanObservable;
@@ -71,8 +72,16 @@ public class ObservableModule {
     @Singleton
     @ActiveActionObservable
     public Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> provideActiveActionFlowable() {
-        return new TempActionFetcher().rxActiveItems();
+        return new TempActionFetcher().rxActiveItems(true);
     }
+
+    @Provides
+    @Singleton
+    @InActiveActionObservable
+    public Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> provideInActiveActionFlowable() {
+        return new TempActionFetcher().rxActiveItems(false);
+    }
+
 
     @Provides
     @Singleton

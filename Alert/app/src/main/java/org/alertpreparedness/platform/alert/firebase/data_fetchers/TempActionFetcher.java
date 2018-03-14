@@ -130,7 +130,7 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
         });
     }
 
-    public Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> rxActiveItems() {
+    public Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> rxActiveItems(boolean isActive) {
 
         return alertGroupFlowable.map(dataSnapshots -> {
             Set<Integer> hazardTypes = new HashSet<>();
@@ -146,8 +146,15 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
             ArrayList<ActionItemWrapper> result = new ArrayList<>();
             for (ActionItemWrapper itemWrapper : actionItemWrapperFetcherResultItem) {
                 boolean res = false;
-                if (itemWrapper.getActionSnapshot() != null) {
-                    ActionModel model = AppUtils.getFirebaseModelFromDataSnapshot(itemWrapper.getActionSnapshot(), ActionModel.class);
+
+                DataSnapshot snapshot = itemWrapper.getActionSnapshot();
+                if(itemWrapper.getActionSnapshot() == null) {
+                    snapshot = itemWrapper.getTypeSnapshot();
+                }
+
+                if (snapshot != null) {
+//
+                    ActionModel model = AppUtils.getFirebaseModelFromDataSnapshot(snapshot, ActionModel.class);
                     if (model.getAssignHazard() != null) {
                         for (Integer hazardType : model.getAssignHazard()) {
                             if (hazardTypes.contains(hazardType)) {
@@ -158,10 +165,9 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
                     } else if (model.getAssignHazard() == null || model.getAssignHazard().size() == 0) {
                         res = true;
                     }
-                }
-                if(res) {
-                    result.add(itemWrapper);
-//                    actionItemWrapperFetcherResultItem.remove(itemWrapper);
+                    if(res && isActive || !res && !isActive) {
+                        result.add(itemWrapper);
+                    }
                 }
             }
             return new FetcherResultItem<>(result, RxFirebaseChildEvent.EventType.CHANGED);

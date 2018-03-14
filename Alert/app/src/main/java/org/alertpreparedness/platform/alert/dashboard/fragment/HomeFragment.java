@@ -263,15 +263,23 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         actionFlowable.subscribe(new ItemConsumer<>(actionItemWrappers -> {
             ArrayList<String> networkRes = new ArrayList<>();
             ArrayList<String> countryRes = new ArrayList<>();
+
             for (ActionItemWrapper wrapper : actionItemWrappers) {
-                if(wrapper.getActionSnapshot().getRef().getParent().getKey().equals(user.countryID)) {
-                    countryRes.add(wrapper.getActionSnapshot().getKey());
+                DataSnapshot snapshot = wrapper.getActionSnapshot();
+                if(snapshot == null) {
+                    snapshot = wrapper.getTypeSnapshot();
+                }
+
+                if(snapshot.getRef().getParent().getKey().equals(user.countryID)) {
+                    countryRes.add(snapshot.getKey());
                 }
                 else {
-                    networkRes.add(wrapper.getActionSnapshot().getKey());
+                    networkRes.add(snapshot.getKey());
                 }
-                processTask(wrapper.getActionSnapshot());
+
+                processTask(snapshot);
             }
+
             taskAdapter.updateKeys(countryRes);
             networkTaskAdapter.updateKeys(networkRes);
 

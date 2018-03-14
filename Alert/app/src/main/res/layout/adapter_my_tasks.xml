@@ -8,7 +8,6 @@
     android:paddingEnd="8dp"
     android:paddingRight="8dp">
 
-
     <ImageView
         android:id="@+id/img_task"
         android:layout_width="18dp"

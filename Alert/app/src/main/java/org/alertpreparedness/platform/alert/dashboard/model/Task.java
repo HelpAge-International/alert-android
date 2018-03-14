@@ -15,6 +15,9 @@ public class Task {
     private boolean requireDoc;
     private String hazardId;
 
+    public static final String TASK_ACTION = "action";
+    public static final String TASK_INDICATOR = "indicator";
+
     public Task(boolean isCompleteTask) {
         this.isCompleteTask = isCompleteTask;
     }

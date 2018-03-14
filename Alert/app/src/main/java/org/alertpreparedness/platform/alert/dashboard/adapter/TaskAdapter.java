@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -86,9 +87,23 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         }
     }
 
-    public void updateKeys(ArrayList<String> keys) {
-        for(String newKey : keys) {
-            tryRemove(newKey);
+    public void updateKeys(ArrayList<String> newKeys) {
+        ArrayList<String> itemsToRemove = new ArrayList<>();
+        for(String oldKey : this.keys) {
+            if(!newKeys.contains(oldKey)) {
+                itemsToRemove.add(oldKey);
+            }
+        }
+
+        for (String key : itemsToRemove) {
+            int index = this.keys.indexOf(key);
+            String oldKey = this.keys.get(index);
+            Task task = this.items.get(oldKey);
+            if(task.getTaskType().equals(Task.TASK_ACTION)) {
+                this.items.remove(oldKey);
+                this.keys.remove(index);
+                notifyItemRemoved(index);
+            }
         }
     }
 
