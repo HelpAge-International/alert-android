@@ -59,6 +59,11 @@ public class FetcherResultItem<T> {
         }
     }
 
+    public FetcherResultItem(T value){
+        this.value = value;
+        this.eventType = EventType.UPDATED;
+    }
+
     public T getValue() {
         return value;
     }

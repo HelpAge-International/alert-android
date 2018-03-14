@@ -3,8 +3,6 @@ package org.alertpreparedness.platform.alert.action;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
-import org.alertpreparedness.platform.alert.action.ActionProcessor;
-import org.alertpreparedness.platform.alert.action.ActionProcessorListener;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionCHSRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionMandatedRef;
@@ -14,7 +12,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseCountryOfficeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
-import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
+import org.alertpreparedness.platform.alert.min_preparedness.model.ActionModel;
 import org.alertpreparedness.platform.alert.model.User;
 
 import javax.inject.Inject;
@@ -61,7 +59,7 @@ public abstract class BaseActionProcessor implements ActionProcessor {
 
     protected int type;
     protected DataSnapshot snapshot;
-    protected final DataModel model;
+    protected final ActionModel model;
     protected final String actionId;
     protected final String parentId;
     protected ActionProcessorListener listener;
@@ -73,7 +71,7 @@ public abstract class BaseActionProcessor implements ActionProcessor {
     protected int freqBase = 0;
     protected int freqValue = 0;
 
-    public BaseActionProcessor(int type, DataSnapshot snapshot, DataModel model, String id, String parentId, ActionProcessorListener listener) {
+    public BaseActionProcessor(int type, DataSnapshot snapshot, ActionModel model, String id, String parentId, ActionProcessorListener listener) {
         this.type = type;
         this.snapshot = snapshot;
         this.model = model;

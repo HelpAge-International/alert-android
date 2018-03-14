@@ -6,6 +6,8 @@ import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
+import org.alertpreparedness.platform.alert.firebase.wrappers.AlertResultWrapper;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 
@@ -33,6 +35,10 @@ public class AlertFetcher implements RxFirebaseDataFetcher<DataSnapshot> {
     DatabaseReference alertRef;
 
     @Inject
+    @NetworkRef
+    DatabaseReference networkRef;
+
+    @Inject
     Flowable<NetworkFetcher.NetworkFetcherResult> networkResultFlowable;
 
 
@@ -52,6 +58,33 @@ public class AlertFetcher implements RxFirebaseDataFetcher<DataSnapshot> {
         });
     }
 
+    public Flowable<FetcherResultItem<AlertResultWrapper>> fetchWithExtra() {
+        return networkResultFlowable.flatMap(networkFetcherResult -> {
+            List<String> networkIds = networkFetcherResult.all();
+            Flowable<NetworkResult> flow = RxFirebaseDatabase.observeValueEvent(alertRef.child(user.countryID))
+                    .map(dataSnapshot -> new NetworkResult(false, null, user.countryID));
+            for (String networkId : networkIds) {
+                flow = flow.mergeWith(RxFirebaseDatabase.observeValueEvent(networkRef.child(networkId))
+                        .map(dataSnapshot ->
+                                new NetworkResult(true, dataSnapshot.child("leadAgencyId").getValue(String.class), networkId)
+                        )
+                );
+            }
+            return flow;
+        }).flatMap(networkResult -> {
+            Flowable<RxFirebaseChildEvent<DataSnapshot>> flowable = RxFirebaseDatabase.observeChildEvent(alertRef.child(networkResult.getParentId()));
+            return flowable.map(snapshotRxFirebaseChildEvent -> new FetcherResultItem<>(
+                    new AlertResultWrapper(
+                            networkResult.parentId,
+                            networkResult.isNetwork,
+                            networkResult.networkLeadId,
+                            snapshotRxFirebaseChildEvent.getValue()
+                    ),
+                    snapshotRxFirebaseChildEvent.getEventType()
+            ));
+        });
+    }
+
     @Override
     public Flowable<Collection<DataSnapshot>> rxFetchGroup() {
         return networkResultFlowable.flatMap(networkFetcherResult -> {
@@ -67,5 +100,32 @@ public class AlertFetcher implements RxFirebaseDataFetcher<DataSnapshot> {
         });
     }
 
+    class NetworkResult {
+        private final boolean isNetwork;
+        private final String networkLeadId;
+        private String parentId;
+
+        public NetworkResult(boolean isNetwork, String networkLeadId, String parentId) {
+            this.isNetwork = isNetwork;
+            this.networkLeadId = networkLeadId;
+            this.parentId = parentId;
+        }
+
+        public boolean isNetwork() {
+            return isNetwork;
+        }
+
+        public String getNetworkLeadId() {
+            return networkLeadId;
+        }
+
+        public String getParentId() {
+            return parentId;
+        }
+
+        public void setParentId(String parentId) {
+            this.parentId = parentId;
+        }
+    }
 
 }

@@ -6,7 +6,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
+import org.alertpreparedness.platform.alert.min_preparedness.model.ActionModel;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
 /**
@@ -15,7 +15,7 @@ import org.alertpreparedness.platform.alert.utils.Constants;
 
 public class ActionInProgressProcessor extends BaseActionProcessor {
 
-    public ActionInProgressProcessor(int type, DataSnapshot snapshot, DataModel model, String id, String parentId, ActionProcessorListener listener) {
+    public ActionInProgressProcessor(int type, DataSnapshot snapshot, ActionModel model, String id, String parentId, ActionProcessorListener listener) {
         super(type, snapshot, model, id, parentId, listener);
     }
 
@@ -216,7 +216,7 @@ public class ActionInProgressProcessor extends BaseActionProcessor {
     }
 
     protected void addObjects(String name, Long createdAt, Long level,
-                              DataModel model, DataSnapshot childSnapshot, String id, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
+                              ActionModel model, DataSnapshot childSnapshot, String id, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
         if (user.getUserID().equals(model.getAsignee()) //MPA Custom assigned and in-progress for logged in user.
                 && model.getAsignee() != null
                 && level != null

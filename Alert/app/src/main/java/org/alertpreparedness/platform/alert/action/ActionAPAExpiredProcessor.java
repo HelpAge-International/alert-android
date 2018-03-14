@@ -1,17 +1,9 @@
 package org.alertpreparedness.platform.alert.action;
 
-import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.view.View;
-
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 
-import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
-import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.min_preparedness.model.ActionModel;
 
 import java.util.List;
 
@@ -24,7 +16,7 @@ public class ActionAPAExpiredProcessor extends ActionExpiredProcessor {
     private final List<Integer> alertHazardTypes;
     private List<Integer> networkHazardTypes;
 
-    public ActionAPAExpiredProcessor(int type, DataSnapshot snapshot, DataModel model, String id, String parentId, ActionProcessorListener listener, List<Integer> alertHazardTypes, List<Integer> networkHazardTypes) {
+    public ActionAPAExpiredProcessor(int type, DataSnapshot snapshot, ActionModel model, String id, String parentId, ActionProcessorListener listener, List<Integer> alertHazardTypes, List<Integer> networkHazardTypes) {
         super(type, snapshot, model, id, parentId, listener);
         this.alertHazardTypes = alertHazardTypes;
         this.networkHazardTypes = networkHazardTypes;
@@ -32,7 +24,7 @@ public class ActionAPAExpiredProcessor extends ActionExpiredProcessor {
 
     @Override
     protected void addObjects(String name, String department, Long createdAt, Long level,
-                              DataModel model, DataSnapshot childSnapshot, String id, String actionIDs, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
+                              ActionModel model, DataSnapshot childSnapshot, String id, String actionIDs, Boolean isCHS, Boolean isCHSAssigned, Boolean isMandated, Boolean isMandatedAssigned) {
 
         if (user.getUserID().equals(model.getAsignee()) //MPA CUSTOM assigned and EXPIRED for logged in user.
                 && model.getLevel() != null

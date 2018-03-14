@@ -5,7 +5,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
+import org.alertpreparedness.platform.alert.min_preparedness.model.ActionModel;
 
 /**
  * Created by Tj on 28/02/2018.
@@ -13,7 +13,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
 
 public class ActionUnassignedProcessor extends BaseActionProcessor {
 
-    public ActionUnassignedProcessor(int type, DataSnapshot snapshot, DataModel model, String id, String parentId, ActionProcessorListener listener) {
+    public ActionUnassignedProcessor(int type, DataSnapshot snapshot, ActionModel model, String id, String parentId, ActionProcessorListener listener) {
         super(type, snapshot, model, id, parentId, listener);
     }
 

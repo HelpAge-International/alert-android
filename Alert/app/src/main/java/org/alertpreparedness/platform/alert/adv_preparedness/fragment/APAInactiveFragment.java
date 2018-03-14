@@ -43,7 +43,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesAc
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseAPAFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
+import org.alertpreparedness.platform.alert.min_preparedness.model.ActionModel;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
@@ -257,7 +257,7 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
         }
     }
 
-    private void getCustom(DataModel model, DataSnapshot getChild) {
+    private void getCustom(ActionModel model, DataSnapshot getChild) {
         dbAlertRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -283,7 +283,7 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
         });
     }
 
-    private void getCHS(DataModel model, String actionIDs) {
+    private void getCHS(ActionModel model, String actionIDs) {
         dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -330,7 +330,7 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
         });
     }
 
-    private void getMandated(DataModel model, String actionIDs) {
+    private void getMandated(ActionModel model, String actionIDs) {
         dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -379,7 +379,7 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
     }
 
     private void addObjects(String name, Long createdAt, Long level,
-                            DataModel model, Long alertLevel, DataSnapshot getChild, Boolean isCHS, Boolean isMandated) {
+                            ActionModel model, Long alertLevel, DataSnapshot getChild, Boolean isCHS, Boolean isMandated) {
 
 
         if (model.getLevel() != null
@@ -395,12 +395,6 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
                     && ((networkAlertHazardTypes.indexOf(model.getAssignHazard().get(0)) == -1 && model.isNetworkLevel())
                     || (alertHazardTypes.indexOf(model.getAssignHazard().get(0)) == -1 && !model.isNetworkLevel())) && !model.getIsArchived()
             ) {
-
-                boolean isInNetwork = networkAlertHazardTypes.indexOf(model.getAssignHazard().get(0)) == -1 && model.isNetworkLevel();
-                boolean isInCountryLevel = alertHazardTypes.indexOf(model.getAssignHazard().get(0)) == -1 && !model.isNetworkLevel();
-                System.out.println("isNotInCountryLevel = " + isInCountryLevel);
-                System.out.println("isNotInNetwork = " + isInNetwork);
-
                 Action action = new Action(
                         model.getId(),
                         model.getTask(),
@@ -494,7 +488,7 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
 
         private void process(DataSnapshot dataSnapshot) {
             String actionIDs = dataSnapshot.getKey();
-            DataModel model = dataSnapshot.getValue(DataModel.class);
+            ActionModel model = dataSnapshot.getValue(ActionModel.class);
 
             if(model != null) {
 

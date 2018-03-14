@@ -86,6 +86,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         }
     }
 
+    public void updateKeys(ArrayList<String> keys) {
+        for(String newKey : keys) {
+            tryRemove(newKey);
+        }
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView txt_taskStatus;
         TextView txt_taskName;

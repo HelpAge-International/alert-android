@@ -1,8 +1,5 @@
 package org.alertpreparedness.platform.alert.firebase.data_fetchers;
 
-import android.content.Context;
-
-import com.google.common.collect.Lists;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -22,22 +19,14 @@ import org.alertpreparedness.platform.alert.action.IdFetcherListener;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
+import org.alertpreparedness.platform.alert.min_preparedness.model.ActionModel;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
-import org.intellij.lang.annotations.Flow;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 import javax.inject.Inject;
 
-import durdinapps.rxfirebase2.RxFirebaseChildEvent;
-import durdinapps.rxfirebase2.RxFirebaseDatabase;
 import io.reactivex.Flowable;
 
 /**
@@ -123,7 +112,7 @@ public class ActionFetcher implements ActionProcessorListener {
     }
 
 
-    private ActionProcessor makeProcessor(DataSnapshot snapshot, DataModel model, String actionId, String parentId) {
+    private ActionProcessor makeProcessor(DataSnapshot snapshot, ActionModel model, String actionId, String parentId) {
         switch (state) {
             case IN_PROGRESS:
                 return new ActionInProgressProcessor(type, snapshot, model, actionId, parentId, this);
@@ -159,7 +148,7 @@ public class ActionFetcher implements ActionProcessorListener {
 
             String actionID = dataSnapshot.getKey();
 
-            DataModel model = dataSnapshot.getValue(DataModel.class);
+            ActionModel model = dataSnapshot.getValue(ActionModel.class);
 
             if(model != null) {
                 boolean isNetwork = !dataSnapshot.getRef().getParent().getKey().equals(user.countryID);

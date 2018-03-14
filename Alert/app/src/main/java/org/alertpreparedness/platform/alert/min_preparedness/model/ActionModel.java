@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * Created by faizmohideen on 17/01/2018.
  */
 
-public class DataModel {
+public class ActionModel {
 
     private Boolean isArchived;
     private Boolean isComplete;
@@ -44,7 +44,7 @@ public class DataModel {
 
     @Override
     public String toString() {
-        return "DataModel{" +
+        return "ActionModel{" +
                 "isArchived=" + isArchived +
                 ", isComplete=" + isComplete +
                 ", requireDoc=" + requireDoc +
@@ -71,7 +71,7 @@ public class DataModel {
                 '}';
     }
 
-    public DataModel() {
+    public ActionModel() {
     }
 
     public String getCreatedByAgencyId() {

@@ -4,6 +4,8 @@ import com.google.firebase.database.DataSnapshot;
 
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionGroupObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.AgencyObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertGroupObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardGroupObservable;
@@ -11,12 +13,14 @@ import org.alertpreparedness.platform.alert.dagger.annotation.HazardObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorGroupObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlanObservable;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.AgencyFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.AlertFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.HazardsFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.IndicatorsFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ResponsePlanFetcher;
+import org.alertpreparedness.platform.alert.firebase.wrappers.AlertResultWrapper;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ResponsePlanResultItem;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.TempActionFetcher;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
@@ -65,6 +69,13 @@ public class ObservableModule {
 
     @Provides
     @Singleton
+    @ActiveActionObservable
+    public Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> provideActiveActionFlowable() {
+        return new TempActionFetcher().rxActiveItems();
+    }
+
+    @Provides
+    @Singleton
     @ActionGroupObservable
     public Flowable<Collection<ActionItemWrapper>> provideActionGroupFlowable() {
         return new TempActionFetcher().rxFetchGroup();
@@ -105,4 +116,18 @@ public class ObservableModule {
     public Flowable<FetcherResultItem<ResponsePlanResultItem>> provideResponsePlans() {
         return new ResponsePlanFetcher().rxFetch();
     }
+
+    @Provides
+    @Singleton
+    @AgencyObservable
+    public Flowable<FetcherResultItem<DataSnapshot>> provideAgency() {
+        return new AgencyFetcher().rxFetch();
+    }
+
+    @Provides
+    public Flowable<FetcherResultItem<AlertResultWrapper>> provideAlertsExtraFlowable() {
+        return new AlertFetcher().fetchWithExtra();
+    }
+
+
 }

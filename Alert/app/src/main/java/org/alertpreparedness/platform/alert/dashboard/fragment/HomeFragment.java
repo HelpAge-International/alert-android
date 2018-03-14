@@ -1,5 +1,7 @@
 package org.alertpreparedness.platform.alert.dashboard.fragment;
 
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -23,14 +25,18 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionCHSRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionGroupObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.AgencyObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.AlertGroupObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
@@ -38,6 +44,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseHazardRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseIndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity;
@@ -47,9 +54,10 @@ import org.alertpreparedness.platform.alert.dashboard.model.Task;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.firebase.IndicatorModel;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.ClockSettingsFetcher;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.TempActionFetcher;
+import org.alertpreparedness.platform.alert.firebase.consumers.ItemConsumer;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
+import org.alertpreparedness.platform.alert.firebase.wrappers.AlertResultWrapper;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.interfaces.IHomeActivity;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
@@ -57,14 +65,22 @@ import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteAc
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.UpdateIndicatorActivity;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
+import org.alertpreparedness.platform.alert.utils.ObservableSet;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.disposables.Disposable;
-import timber.log.Timber;
+import durdinapps.rxfirebase2.RxFirebaseChildEvent;
+import durdinapps.rxfirebase2.RxFirebaseDatabase;
+import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
 
 import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity.EXTRA_ALERT;
 
@@ -72,7 +88,7 @@ import static org.alertpreparedness.platform.alert.dashboard.activity.AlertDetai
  * Created by Tj on 13/12/2017.
  */
 
-public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItemClickedListener, FirebaseAuth.AuthStateListener, NestedScrollView.OnScrollChangeListener, NetworkFetcher.NetworkFetcherListener, TaskAdapter.TaskSelectListener {
+public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItemClickedListener, FirebaseAuth.AuthStateListener, NestedScrollView.OnScrollChangeListener, TaskAdapter.TaskSelectListener {
 
     @BindView(R.id.tasks_list_view)
     RecyclerView myTaskRecyclerView;
@@ -150,6 +166,10 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     DatabaseReference baseActionRef;
 
     @Inject
+    @AgencyObservable
+    Flowable<FetcherResultItem<DataSnapshot>> agencyObservable;
+
+    @Inject
     User user;
 
     @BindView(R.id.networkTitle)
@@ -164,21 +184,22 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     @BindView(R.id.networkTasks)
     TextView networkTasksTitle;
 
+    @Inject
+    Flowable<FetcherResultItem<AlertResultWrapper>> alertFlowable;
+
+    @Inject
+    @IndicatorObservable
+    Flowable<FetcherResultItem<DataSnapshot>> indicatorFlowable;
+
+    @Inject
+    @ActiveActionObservable
+    Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> actionFlowable;
+
     public TaskAdapter taskAdapter;
     public AlertAdapter alertAdapter;
     public AlertAdapter networkAlertAdapter;
-
-    private AgencyListener agencyListener = new AgencyListener();
-    private AlertListener alertListener = new AlertListener(false);
-    private AlertListener networkAlertListener = new AlertListener(true);
-    private TaskListener taskListener = new TaskListener();
-    private TaskListener networkTaskListener = new NetworkTaskListener();
-    private NetworkListener networkListener = new NetworkListener();
-    private HazardListener hazardListener = new HazardListener();
-    private String agencyAdminId;
-    private String networkLeadId;
     private TaskAdapter networkTaskAdapter;
-    private Disposable d;
+    private CompositeDisposable disposable;
 
     @Nullable
     @Override
@@ -199,10 +220,6 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     }
 
     private void initViews() {
-        taskRef.addChildEventListener(taskListener);
-        indicatorRef.addChildEventListener(new TaskListener(user.countryID));
-        networkRef.addValueEventListener(networkListener);
-        hazardRef.addChildEventListener(hazardListener);
         alertRecyclerView.setHasFixedSize(true);
 
         alertRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -232,6 +249,36 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         ViewCompat.setNestedScrollingEnabled(alertRecyclerView, false);
         ViewCompat.setNestedScrollingEnabled(myTaskRecyclerView, false);
         scroller.setOnScrollChangeListener(this);
+
+        alertFlowable.subscribe(new ItemConsumer<>(
+                this::processAlert,
+                alertResultWrapper -> removeAlert(alertResultWrapper.getAlertSnapshot().getKey())
+            )
+        );
+
+        indicatorFlowable.subscribe(new ItemConsumer<>(this::processTask, dataSnapshot -> {
+            //handled by the processTask method
+        }));
+
+        actionFlowable.subscribe(new ItemConsumer<>(actionItemWrappers -> {
+            ArrayList<String> networkRes = new ArrayList<>();
+            ArrayList<String> countryRes = new ArrayList<>();
+            for (ActionItemWrapper wrapper : actionItemWrappers) {
+                if(wrapper.getActionSnapshot().getRef().getParent().getKey().equals(user.countryID)) {
+                    countryRes.add(wrapper.getActionSnapshot().getKey());
+                }
+                else {
+                    networkRes.add(wrapper.getActionSnapshot().getKey());
+                }
+                processTask(wrapper.getActionSnapshot());
+            }
+            taskAdapter.updateKeys(countryRes);
+            networkTaskAdapter.updateKeys(networkRes);
+
+        }, actionItemWrappers -> {
+            //not used
+        }));
+
     }
 
     @Override
@@ -361,35 +408,11 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     }
 
     @Override
-    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
-        System.out.println("networkFetcherResult = " + networkFetcherResult);
-        if (networkFetcherResult != null) {
-            for (String id : networkFetcherResult.getNetworksCountries()) {
-               addListenerForNetworkData(id);
-            }
-            for (String id : networkFetcherResult.getGlobalNetworks()) {
-                addListenerForNetworkData(id);
-            }
-            for (String id : networkFetcherResult.getLocalNetworks()) {
-                addListenerForNetworkData(id);
-            }
-        }
-    }
-
-    private void addListenerForNetworkData(String id) {
-        baseAlertRef.child(id).addChildEventListener(networkAlertListener);
-        baseActionRef.child(id).addChildEventListener(networkTaskListener);
-        baseIndicatorRef.child(id).addChildEventListener(new TaskListener(id));
-        baseHazardRef.child(id).addChildEventListener(hazardListener);
-    }
-
-    @Override
     public void onTaskSelected(String id, Task task) {
         if(task.getTaskType().equals("indicator")) {
             Intent intent = new Intent(getActivity(), UpdateIndicatorActivity.class);
-            intent.putExtra("hazard_id", task.getHazardId());
+            intent.putExtra("hazard_id", task.getParentId());
             intent.putExtra("indicator_id", id);
-
             startActivity(intent);
         }
         else {//action
@@ -401,268 +424,73 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         }
     }
 
-    private class HazardListener implements ChildEventListener {
+    private void processAlert(AlertResultWrapper alertResult) {
+        AlertModel model = AppUtils.getValueFromDataSnapshot(alertResult.getAlertSnapshot(), AlertModel.class);
 
-        private void process(DataSnapshot datasnapshot) {
-            baseActionRef.child(datasnapshot.getKey()).addChildEventListener(hazardListener);
-            baseIndicatorRef.child(datasnapshot.getKey()).addChildEventListener(new TaskListener(datasnapshot.getKey()));
+        assert model != null;
+
+        model.setId(alertResult.getAlertSnapshot().getKey());
+        model.setParentKey(alertResult.getAlertSnapshot().getRef().getParent().getKey());
+
+        if (!alertResult.isNetwork()) {
+            if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
+                updateAlert(alertResult.getAlertSnapshot().getKey(), model);
+            }
         }
-
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            process(dataSnapshot);
-        }
-
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            process(dataSnapshot);
-        }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-        }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
+        else {
+            model.setLeadAgencyId(alertResult.getNetworkLeadId());
+            model.setAgencyAdminId(user.agencyAdminID);
+            if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
+                updateNetworkAlert(model.getId(), model);
+            }
         }
     }
 
-    private class AlertListener implements ChildEventListener {
+    protected void processTask(DataSnapshot dataSnapshot) {
+        if(dataSnapshot == null) return;
+        if (dataSnapshot.getRef().getParent().getParent().getKey().equals("action")) {
 
-        private boolean isNetworkAlert;
-
-        public AlertListener(boolean isNetworkAlert) {
-
-            this.isNetworkAlert = isNetworkAlert;
-        }
-
-        private void process(DataSnapshot dataSnapshot, String s) {
-            AlertModel model = AppUtils.getValueFromDataSnapshot(dataSnapshot, AlertModel.class);
+            ActionModel model = AppUtils.getValueFromDataSnapshot(dataSnapshot, ActionModel.class);
 
             assert model != null;
-            model.setId(dataSnapshot.getKey());
-            model.setParentKey(dataSnapshot.getRef().getParent().getKey());
+            boolean shouldAdd = model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null;
 
-            if (!isNetworkAlert) {
-                if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
-                    updateAlert(dataSnapshot.getKey(), model);
-                }
-            }
-            else {
-                model.setLeadAgencyId(networkLeadId);
-                model.setAgencyAdminId(agencyAdminId);
-                if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
-                    updateNetworkAlert(model.getId(), model);
-                }
-            }
-        }
-
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            process(dataSnapshot, s);
-        }
-
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            process(dataSnapshot, s);
-        }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {
-            removeAlert(dataSnapshot.getKey());
-        }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    }
-
-    private class TaskListener implements ChildEventListener {
-
-        private String hazardId;
-
-        public TaskListener() {}
-
-        public TaskListener(String hazardId) {
-            this.hazardId = hazardId;
-        }
-
-        protected void process(DataSnapshot dataSnapshot, String s) {
-            if (dataSnapshot.getRef().getParent().getParent().getKey().equals("action")) {
-                ActionModel model = AppUtils.getValueFromDataSnapshot(dataSnapshot, ActionModel.class);
-
-                assert model != null;
-                boolean shouldAdd = model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null;
-
-                if (shouldAdd) {
-                    if (DateHelper.isDueInWeek(model.getDueDate()) || DateHelper.itWasDue(model.getDueDate())) {
+            if (shouldAdd) {
+                if (DateHelper.isDueInWeek(model.getDueDate()) || DateHelper.itWasDue(model.getDueDate())) {
+                    if(dataSnapshot.getRef().getParent().getKey().equals(user.countryID)) {
                         addTask(dataSnapshot.getKey(), new Task(dataSnapshot.getRef().getParent().getKey(), 0, "action", model.getTask(), model.getDueDate(), model.getRequireDoc()));
                     }
                     else {
-                        taskAdapter.tryRemove(dataSnapshot.getKey());
+                        addNetworkTask(dataSnapshot.getKey(), new Task(dataSnapshot.getRef().getParent().getKey(), 0, "action", model.getTask(), model.getDueDate(), model.getRequireDoc()));
                     }
                 }
+                else {
+                    taskAdapter.tryRemove(dataSnapshot.getKey());
+                }
+            }
 
-            } else if (dataSnapshot.getRef().getParent().getParent().getKey().equals("indicator")) {
+        } else if (dataSnapshot.getRef().getParent().getParent().getKey().equals("indicator")) {
 
-                IndicatorModel model = dataSnapshot.getValue(IndicatorModel.class);
+            IndicatorModel model = dataSnapshot.getValue(IndicatorModel.class);
 
-                assert model != null;
+            assert model != null;
+            boolean shouldAdd = model.getAssignee() != null && model.getAssignee().equals(user.getUserID()) && model.getDueDate() != null;
 
-                boolean shouldAdd = model.getAssignee() != null && model.getAssignee().equals(user.getUserID()) && model.getDueDate() != null;
-                System.out.println("shouldAdd = " + shouldAdd);
-                if (model.getAssignee() != null && model.getAssignee().equals(user.getUserID()) && model.getDueDate() != null) {
-                    Task task = new Task(dataSnapshot.getRef().getParent().getKey(), model.getTriggerSelected().intValue(), "indicator", model.getName(), model.getDueDate());
-                    task.setHazardId(hazardId);
-                    if (DateHelper.isDueInWeek(task.dueDate) || DateHelper.itWasDue(task.dueDate)) {
+            if (shouldAdd) {
+                Task task = new Task(dataSnapshot.getRef().getParent().getKey(), model.getTriggerSelected().intValue(), "indicator", model.getName(), model.getDueDate());
+                task.setParentId(dataSnapshot.getRef().getParent().getKey());
+                if (DateHelper.isDueInWeek(task.dueDate) || DateHelper.itWasDue(task.dueDate)) {
+                    if(dataSnapshot.getRef().getParent().getKey().equals(user.countryID)) {
                         addTask(dataSnapshot.getKey(), task);
                     }
                     else {
-                        taskAdapter.tryRemove(dataSnapshot.getKey());
-                    }
-                }
-            }
-        }
-
-        private void chsProcess(DataSnapshot dataSnapshot, String s) {
-            if (dataSnapshot.getRef().getParent().getParent().getKey().equals("action")) {
-                ActionModel model = AppUtils.getValueFromDataSnapshot(dataSnapshot, ActionModel.class);
-                String actionIDs = dataSnapshot.getKey();
-
-                if (model.getType() == 0) {
-                    dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-
-                            for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-
-                                if (actionIDs.contains(getChild.getKey())) {
-                                    // Task task;
-                                    String taskNameCHS = (String) getChild.child("task").getValue();
-                                    System.out.println("taskNameCHS = " + taskNameCHS);
-                                    addTask(dataSnapshot.getKey(), new Task(dataSnapshot.getRef().getParent().getKey(), 0, "action", taskNameCHS, model.getDueDate(), model.getType()));
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-                }
-            }
-        }
-
-
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            process(dataSnapshot, s);
-            //chsProcess(dataSnapshot, s);
-        }
-
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            process(dataSnapshot, s);
-        }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-        }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    }
-
-    private class AgencyListener implements ValueEventListener {
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-//            HashMap<String, Boolean> networks = (HashMap<String, Boolean>) dataSnapshot.child("networks").getValue();
-            agencyAdminId = dataSnapshot.child("adminId").getValue(String.class);
-
-            new NetworkFetcher(HomeFragment.this).fetch();
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    }
-
-    private class NetworkListener implements ValueEventListener {
-
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            onNetworkRetrieved(dataSnapshot);
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    }
-
-    private class NetworkTaskListener extends TaskListener {
-        @Override
-        protected void process(DataSnapshot dataSnapshot, String s) {
-            if (dataSnapshot.getRef().getParent().getParent().getKey().equals("action")) {
-                ActionModel model = AppUtils.getValueFromDataSnapshot(dataSnapshot, ActionModel.class);
-
-                assert model != null;
-                boolean shouldAdd = model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null;
-                if (shouldAdd) {
-                    if (DateHelper.isDueInWeek(model.getDueDate()) || DateHelper.itWasDue(model.getDueDate())) {
-                        addNetworkTask(dataSnapshot.getKey(), new Task(dataSnapshot.getRef().getParent().getKey(), 0, "action", model.getTask(), model.getDueDate()));
-                    }
-                    else {
-                        networkTaskAdapter.tryRemove(dataSnapshot.getKey());
-                    }
-                }
-
-            } else if (dataSnapshot.getRef().getParent().getParent().getKey().equals("indicator")) {
-
-                IndicatorModel model = dataSnapshot.getValue(IndicatorModel.class);
-                assert model != null;
-                boolean shouldAdd = model.getAssignee() != null && model.getAssignee().equals(user.getUserID()) && model.getDueDate() != null;
-                if (shouldAdd) {
-                    Task task = new Task(dataSnapshot.getRef().getParent().getKey(), model.getTriggerSelected().intValue(), "indicator", model.getName(), model.getDueDate());
-                    if (DateHelper.isDueInWeek(task.dueDate) || DateHelper.itWasDue(task.dueDate)) {
                         addNetworkTask(dataSnapshot.getKey(), task);
                     }
-                    else {
-                        networkTaskAdapter.tryRemove(dataSnapshot.getKey());
-                    }
+                }
+                else {
+                    taskAdapter.tryRemove(dataSnapshot.getKey());
                 }
             }
         }
-    }
-
-    private void onNetworkRetrieved(DataSnapshot snapshot) {
-        networkLeadId = snapshot.child("leadAgencyId").getValue(String.class);
-
-        agencyRef.addListenerForSingleValueEvent(agencyListener);
-        alertRef.addChildEventListener(alertListener);
     }
 }

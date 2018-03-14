@@ -100,6 +100,8 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
             isPasswordShowing= !isPasswordShowing;
         });
 
+        System.out.println("GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getContext()) = " + GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getContext()));
+
         if(GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getContext()) != ConnectionResult.SUCCESS) {
             GooglePlayServicesUtil.getErrorDialog(ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED, this, 1).show();
             validPlayServices = false;
@@ -166,7 +168,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onFailure(@NonNull Exception e) {
-
+        e.printStackTrace();
         progressDialog.dismiss();
         if(e instanceof FirebaseAuthInvalidUserException) { //no user found
             SnackbarHelper.show(this, "The email address you entered is not associated with an ALERT account. Please try again.");

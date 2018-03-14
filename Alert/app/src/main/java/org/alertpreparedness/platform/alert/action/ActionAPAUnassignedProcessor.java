@@ -2,8 +2,7 @@ package org.alertpreparedness.platform.alert.action;
 
 import com.google.firebase.database.DataSnapshot;
 
-import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
+import org.alertpreparedness.platform.alert.min_preparedness.model.ActionModel;
 
 import java.util.List;
 
@@ -16,7 +15,7 @@ public class ActionAPAUnassignedProcessor extends ActionUnassignedProcessor {
     private final List<Integer> alertHazardTypes;
     private final List<Integer> networkHazardTypes;
 
-    public ActionAPAUnassignedProcessor(int type, DataSnapshot snapshot, DataModel model, String id, String parentId, ActionProcessorListener listener, List<Integer> alertHazardTypes, List<Integer> networkHazardTypes) {
+    public ActionAPAUnassignedProcessor(int type, DataSnapshot snapshot, ActionModel model, String id, String parentId, ActionProcessorListener listener, List<Integer> alertHazardTypes, List<Integer> networkHazardTypes) {
         super(type, snapshot, model, id, parentId, listener);
         this.alertHazardTypes = alertHazardTypes;
         this.networkHazardTypes = networkHazardTypes;

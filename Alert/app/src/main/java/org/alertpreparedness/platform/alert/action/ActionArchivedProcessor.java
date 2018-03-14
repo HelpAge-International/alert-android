@@ -1,15 +1,11 @@
 package org.alertpreparedness.platform.alert.action;
 
-import android.view.View;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
-import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.min_preparedness.model.DataModel;
-import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.min_preparedness.model.ActionModel;
 
 /**
  * Created by Tj on 28/02/2018.
@@ -17,7 +13,7 @@ import org.alertpreparedness.platform.alert.utils.Constants;
 
 public class ActionArchivedProcessor extends BaseActionProcessor {
 
-    public ActionArchivedProcessor(int type, DataSnapshot snapshot, DataModel model, String id, String parentId, ActionProcessorListener listener) {
+    public ActionArchivedProcessor(int type, DataSnapshot snapshot, ActionModel model, String id, String parentId, ActionProcessorListener listener) {
         super(type, snapshot, model, id, parentId, listener);
     }
 

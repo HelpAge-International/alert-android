@@ -39,6 +39,15 @@ public class ActionItemWrapper {
         return new ActionItemWrapper(ActionType.CHS, dataSnapshot, actionSnapshot);
     }
 
+    @Override
+    public String toString() {
+        return "ActionItemWrapper{" +
+                "type=" + type +
+                ", typeSnapshot=" + typeSnapshot +
+                ", actionSnapshot=" + actionSnapshot +
+                '}';
+    }
+
     public static ActionItemWrapper createMandated(DataSnapshot dataSnapshot) {
         return new ActionItemWrapper(ActionType.MANDATED, dataSnapshot, null);
     }

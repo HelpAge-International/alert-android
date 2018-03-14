@@ -8,9 +8,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.AlertGroupObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionCHSRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
+import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
@@ -18,7 +21,9 @@ import org.alertpreparedness.platform.alert.utils.AppUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -53,6 +58,10 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
 
     @Inject
     Flowable<NetworkFetcher.NetworkFetcherResult> networkResultFlowable;
+
+    @Inject
+    @AlertGroupObservable
+    Flowable<Collection<DataSnapshot>> alertGroupFlowable;
 
     public TempActionFetcher() {
         DependencyInjector.applicationComponent().inject(this);
@@ -121,6 +130,45 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
         });
     }
 
+    public Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> rxActiveItems() {
+
+        return alertGroupFlowable.map(dataSnapshots -> {
+            Set<Integer> hazardTypes = new HashSet<>();
+
+            for(DataSnapshot snapshot : dataSnapshots) {
+                AlertModel alertModel = AppUtils.getFirebaseModelFromDataSnapshot(snapshot, AlertModel.class);
+                hazardTypes.add(alertModel.getHazardScenario());
+            }
+            return hazardTypes;
+        })
+        .distinct()
+        .flatMap(hazardTypes -> rxFetchGroup().map(actionItemWrapperFetcherResultItem -> {
+            ArrayList<ActionItemWrapper> result = new ArrayList<>();
+            for (ActionItemWrapper itemWrapper : actionItemWrapperFetcherResultItem) {
+                boolean res = false;
+                if (itemWrapper.getActionSnapshot() != null) {
+                    ActionModel model = AppUtils.getFirebaseModelFromDataSnapshot(itemWrapper.getActionSnapshot(), ActionModel.class);
+                    if (model.getAssignHazard() != null) {
+                        for (Integer hazardType : model.getAssignHazard()) {
+                            if (hazardTypes.contains(hazardType)) {
+                                res = true;
+                                break;
+                            }
+                        }
+                    } else if (model.getAssignHazard() == null || model.getAssignHazard().size() == 0) {
+                        res = true;
+                    }
+                }
+                if(res) {
+                    result.add(itemWrapper);
+//                    actionItemWrapperFetcherResultItem.remove(itemWrapper);
+                }
+            }
+            return new FetcherResultItem<>(result, RxFirebaseChildEvent.EventType.CHANGED);
+        }));
+
+    }
+
     @Override
     public Flowable<FetcherResultItem<ActionItemWrapper>> rxFetch() {
         return Flowable.merge(rxFetchActions(), rxFetchCHSActions(), rxFetchMandatedActions());
@@ -128,8 +176,6 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
 
     private Flowable<Collection<ActionItemWrapper>> rxFetchGroupActions(){
         return networkResultFlowable.flatMap(networkFetcherResult -> {
-
-            System.out.println(networkFetcherResult.toString());
 
             List<String> networkIds = networkFetcherResult.all();
 

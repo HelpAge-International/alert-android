@@ -17,6 +17,7 @@ import org.alertpreparedness.platform.alert.dashboard.activity.CreateAlertActivi
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.dashboard.adapter.TaskAdapter;
 import org.alertpreparedness.platform.alert.dashboard.fragment.HomeFragment;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.AgencyFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.HazardsFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.IndicatorsFetcher;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ResponsePlanResultItem;
@@ -156,4 +157,7 @@ public interface ApplicationComponent {
     void inject(ResponsePlanResultItem responsePlanResultItem);
 
     void inject(ApprovalNotesAdapter approvalNotesAdapter);
+
+    void inject(AgencyFetcher agencyFetcher);
+
 }

@@ -1,5 +1,7 @@
 package org.alertpreparedness.platform.alert.firebase;
 
+import java.util.ArrayList;
+
 public class ActionModel extends FirebaseModel {
 
     private String asignee;
@@ -15,8 +17,52 @@ public class ActionModel extends FirebaseModel {
     private Boolean requireDoc;
     private Integer frequencyBase;
     private Integer frequencyValue;
+    private ArrayList<Integer> assignHazard;
 
     public ActionModel() {
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ActionModel that = (ActionModel) o;
+
+        if (!asignee.equals(that.asignee)) return false;
+        if (!task.equals(that.task)) return false;
+        if (!isComplete.equals(that.isComplete)) return false;
+        if (!isCompleteAt.equals(that.isCompleteAt)) return false;
+        if (!createdAt.equals(that.createdAt)) return false;
+        if (!dueDate.equals(that.dueDate)) return false;
+        if (!updatedAt.equals(that.updatedAt)) return false;
+        if (!type.equals(that.type)) return false;
+        if (!level.equals(that.level)) return false;
+        if (!budget.equals(that.budget)) return false;
+        if (!requireDoc.equals(that.requireDoc)) return false;
+        if (!frequencyBase.equals(that.frequencyBase)) return false;
+        if (frequencyValue != null ? !frequencyValue.equals(that.frequencyValue) : that.frequencyValue != null)
+            return false;
+        return assignHazard != null ? assignHazard.equals(that.assignHazard) : that.assignHazard == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = asignee.hashCode();
+        result = 31 * result + task.hashCode();
+        result = 31 * result + isComplete.hashCode();
+        result = 31 * result + isCompleteAt.hashCode();
+        result = 31 * result + createdAt.hashCode();
+        result = 31 * result + dueDate.hashCode();
+        result = 31 * result + updatedAt.hashCode();
+        result = 31 * result + type.hashCode();
+        result = 31 * result + level.hashCode();
+        result = 31 * result + budget.hashCode();
+        result = 31 * result + requireDoc.hashCode();
+        result = 31 * result + frequencyBase.hashCode();
+        result = 31 * result + (frequencyValue != null ? frequencyValue.hashCode() : 0);
+        result = 31 * result + (assignHazard != null ? assignHazard.hashCode() : 0);
+        return result;
     }
 
     @Override
@@ -35,8 +81,8 @@ public class ActionModel extends FirebaseModel {
                 ", requireDoc=" + requireDoc +
                 ", frequencyBase=" + frequencyBase +
                 ", frequencyValue=" + frequencyValue +
-                '}' +
-                super.toString();
+                ", assignHazard=" + assignHazard +
+                '}';
     }
 
     public String getAsignee() {
@@ -141,5 +187,13 @@ public class ActionModel extends FirebaseModel {
 
     public void setLevel(Integer level) {
         this.level = level;
+    }
+
+    public ArrayList<Integer> getAssignHazard() {
+        return assignHazard;
+    }
+
+    public void setAssignHazard(ArrayList<Integer> assignHazard) {
+        this.assignHazard = assignHazard;
     }
 }
