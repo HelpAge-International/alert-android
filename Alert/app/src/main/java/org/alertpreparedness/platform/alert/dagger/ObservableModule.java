@@ -121,6 +121,13 @@ public class ObservableModule {
 
     @Provides
     @Singleton
+    @HazardGroupObservable
+    public Flowable<Collection<ResponsePlanResultItem>> provideResponsePlanGroupFlowable() {
+        return new ResponsePlanFetcher().rxFetchGroup();
+    }
+
+    @Provides
+    @Singleton
     @ResponsePlanObservable
     public Flowable<FetcherResultItem<ResponsePlanResultItem>> provideResponsePlans() {
         return new ResponsePlanFetcher().rxFetch();

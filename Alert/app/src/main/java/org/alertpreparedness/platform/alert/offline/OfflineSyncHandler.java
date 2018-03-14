@@ -46,6 +46,9 @@ public class OfflineSyncHandler {
     @HazardGroupObservable
     public Flowable<Collection<DataSnapshot>> hazardGroupObservable;
 
+    @Inject
+    @HazardGroupObservable
+    public Flowable<Collection<DataSnapshot>> responsePlanGroupObservable;
 
     @Inject
     @BaseLogRef
@@ -90,7 +93,7 @@ public class OfflineSyncHandler {
              return flowables.size() == 0 ? Flowable.just(new ArrayList<>()) : Flowable.combineLatest(flowables, AppUtils::combineDataSnapshotList);
          });
 
-         Flowable.combineLatest(alertGroupObservable, actionGroupObservable, indicatorGroupObservable, hazardGroupObservable, indicatorLogsFlow, (alertGroup, actionGroup, indicatorGroup, hazardGroup, indicatorLogs) -> true)
+         Flowable.combineLatest(alertGroupObservable, actionGroupObservable, indicatorGroupObservable, hazardGroupObservable, responsePlanGroupObservable, indicatorLogsFlow, (alertGroup, actionGroup, indicatorGroup, hazardGroup, responsePlanGroup, indicatorLogs) -> true)
                  .firstElement()
                  .subscribe(b -> {
                      Timber.d("Synchronised!");
