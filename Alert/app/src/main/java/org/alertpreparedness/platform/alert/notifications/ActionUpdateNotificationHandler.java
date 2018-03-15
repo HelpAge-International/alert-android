@@ -142,8 +142,8 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
         }
         Timber.d("Scheduled Notifications: " + actionFetcherResult.getModels().size());
     }
-    public void scheduleNotification(Context context, ActionModel actionModel, String groupId, String actionId) {
 
+    public void scheduleNotification(Context context, ActionModel actionModel, String groupId, String actionId) {
         new NetworkFetcher(networkFetcherResult -> {
             List<DatabaseReference> dbRefs = new ArrayList<>();
             if(networkFetcherResult.getLocalNetworks().contains(groupId)){
@@ -202,6 +202,7 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
                     int startTime = timeFromNow - WEEK_SECS;
 
                     dispatcher.schedule(
+
                             dispatcher
                                     .newJobBuilder()
                                     .setTrigger(Trigger.executionWindow(startTime, startTime + NOTIFICATION_ACCURACY))

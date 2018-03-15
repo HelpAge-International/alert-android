@@ -79,6 +79,9 @@
             android:resource="@array/preloaded_fonts" />
         <meta-data android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/alert_logo" />
+
+        <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
+
         <activity android:name=".MainDrawer" />
         <!-- <activity -->
         <!-- android:name=".risk_monitoring.vRiskFragmentvity" -->

@@ -16,6 +16,7 @@ import io.reactivex.Observable
 import kotlinx.android.synthetic.main.bottom_sheet_indicator.view.*
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.R
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.alert.risk_monitoring.view.ActiveRiskFragment
 import org.alertpreparedness.platform.alert.risk_monitoring.view.AddIndicatorActivity
@@ -60,6 +61,7 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
         val view = View.inflate(activity, R.layout.bottom_sheet_indicator, null)
+        DependencyInjector.applicationComponent().inject(this)
         initData()
         initView(view)
         initListeners(view)

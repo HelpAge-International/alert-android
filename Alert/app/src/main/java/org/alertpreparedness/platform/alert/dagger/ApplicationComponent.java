@@ -58,6 +58,7 @@ import org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivi
 import org.alertpreparedness.platform.alert.dashboard.activity.UpdateAlertActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.fragment.MinPreparednessFragment;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlanFragment;
+import org.alertpreparedness.platform.alert.risk_monitoring.dialog.BottomSheetDialog;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.RiskFragment;
 import org.alertpreparedness.platform.alert.settings.ChangeEmailActivity;
 import org.alertpreparedness.platform.alert.settings.ChangePasswordActivity;
@@ -160,4 +161,5 @@ public interface ApplicationComponent {
 
     void inject(AgencyFetcher agencyFetcher);
 
+    void inject(@NotNull BottomSheetDialog bottomSheetDialog);
 }
