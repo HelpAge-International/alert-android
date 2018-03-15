@@ -158,11 +158,16 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
 
         Flowable<FetcherResultItem<ArrayList<ActionItemWrapper>>> flowable =
         alertGroupFlowable.map(dataSnapshots -> {
-            Set<Integer> hazardTypes = new HashSet<>();
+            HashMap<String, Set<Integer>> hazardTypes = new HashMap<>();
 
             for (DataSnapshot snapshot : dataSnapshots) {
                 AlertModel alertModel = AppUtils.getFirebaseModelFromDataSnapshot(snapshot, AlertModel.class);
-                hazardTypes.add(alertModel.getHazardScenario());
+                Set<Integer> existingSet = hazardTypes.get(snapshot.getRef().getParent().getKey());
+                if(existingSet == null) {
+                    existingSet = new HashSet<>();
+                }
+                existingSet.add(alertModel.getHazardScenario());
+                hazardTypes.put(snapshot.getRef().getParent().getKey(), existingSet);
             }
             return hazardTypes;
         })
@@ -182,7 +187,7 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
                     ActionModel model = AppUtils.getFirebaseModelFromDataSnapshot(snapshot, ActionModel.class);
                     if (model.getAssignHazard() != null) {
                         for (Integer hazardType : model.getAssignHazard()) {
-                            if (hazardTypes.contains(hazardType)) {
+                            if (hazardTypes.get(model.getParentId()).contains(hazardType)) {
                                 res = true;
                                 break;
                             }

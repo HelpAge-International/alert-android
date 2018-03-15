@@ -182,7 +182,6 @@ public class ActionFetcher implements ActionProcessorListener {
                         processor.getCustom();
                     }
                     if(type != Constants.APA) {
-                        System.out.println("fetchingCHS");
                         processor.getCHS();
                     }
                     processor.getMandated();
