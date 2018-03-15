@@ -110,6 +110,7 @@ dependencies {
     compile 'com.android.support:multidex:1.0.3'
     compile 'com.google.guava:guava:24.0-android'
 
+    compile 'com.evernote:android-job:1.2.4'
 
 
 }

@@ -14,7 +14,12 @@ public class DependencyInjector {
         applicationComponent = DaggerApplicationComponent.builder()
                 .applicationModule(new ApplicationModule(diApplication))
                 .firebaseModule(new FirebaseModule())
+                .observableModule(new ObservableModule())
                 .build();
+    }
+
+    public static void deinit(){
+        applicationComponent = null;
     }
 
     public static ApplicationComponent applicationComponent() {
