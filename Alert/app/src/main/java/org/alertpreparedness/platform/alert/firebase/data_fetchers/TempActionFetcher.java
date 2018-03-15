@@ -131,7 +131,7 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
 
     private Flowable<FetcherResultItem<ActionItemWrapper>> rxFetchMandatedActions(){
         return networkResultFlowable.flatMap(networkFetcherResult -> {
-            Flowable<RxFirebaseChildEvent<DataSnapshot>> flow = RxFirebaseDatabase.observeChildEvent(dbBaseActionMandatedRef.child(user.countryID));
+            Flowable<RxFirebaseChildEvent<DataSnapshot>> flow = RxFirebaseDatabase.observeChildEvent(dbBaseActionMandatedRef.child(user.agencyAdminID));
 
             for (String networkId : networkFetcherResult.all()) {
                 flow = flow.mergeWith(RxFirebaseDatabase.observeChildEvent(dbBaseActionMandatedRef.child(networkId)));
@@ -139,12 +139,15 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
 
             return flow;
         }).flatMap(mandatedAction -> {
-            return RxFirebaseDatabase.observeChildEvent(dbActionBaseRef.child(mandatedAction.getValue().getRef().getParent().getKey()).child(mandatedAction.getValue().getKey()))
+            String mandatedActionParentId = mandatedAction.getValue().getRef().getParent().getKey();
+            if(mandatedActionParentId.equals(user.agencyAdminID)){
+                mandatedActionParentId = user.countryID;
+            }
+            return RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(mandatedActionParentId).child(mandatedAction.getValue().getKey()))
                     .map(action -> new Pair<>(mandatedAction, action));
         }).map(pair -> {
-            if (pair.second.getValue().exists()) {
-                FetcherResultItem.EventType eventType = pair.second.getEventType() == RxFirebaseChildEvent.EventType.REMOVED || pair.first.getEventType() == RxFirebaseChildEvent.EventType.REMOVED ? REMOVED : UPDATED;
-                return new FetcherResultItem<>(ActionItemWrapper.createMandated(pair.first.getValue(), pair.second.getValue()), eventType);
+            if (pair.second.exists()) {
+                return new FetcherResultItem<>(ActionItemWrapper.createMandated(pair.first.getValue(), pair.second), RxFirebaseChildEvent.EventType.CHANGED);
             } else {
                 return new FetcherResultItem<>(ActionItemWrapper.createMandated(pair.first.getValue()), pair.first.getEventType() == RxFirebaseChildEvent.EventType.REMOVED ? REMOVED : UPDATED);
             }
