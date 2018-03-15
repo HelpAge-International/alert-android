@@ -22,6 +22,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
@@ -31,33 +33,33 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.BaseAPAFragment;
+import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Flowable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAUnassignedFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener, ActionFetcher.ActionRetrievalListener, NetworkFetcher.NetworkFetcherListener {
-
-    private ArrayList<Integer> networkAlertHazardTypes = new ArrayList<>();
-    private ArrayList<Integer> alertHazardTypes = new ArrayList<>();
-    private List<String> networkIds = new ArrayList<>();
-    private AlertListener alertListener = new AlertListener();
+public class APAUnassignedFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener {
 
     public APAUnassignedFragment() {
         // Required empty public constructor
@@ -94,10 +96,13 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
     @Inject
     PermissionsHelper permissions;
 
+    @Inject
+    @ActiveActionObservable
+    Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> actionFlowable;
+
     private APActionAdapter mAPAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
     private String actionID;
-    private int freqValue = 0;
 
     @Nullable
     @Override
@@ -128,68 +133,29 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        new NetworkFetcher(this).fetch();
         handleAdvFab();
+
+        actionFlowable.subscribe(collectionFetcherResultItem -> {
+
+            ArrayList<String> result = new ArrayList<>();
+
+            for(ActionItemWrapper wrapper : collectionFetcherResultItem.getValue()) {
+                if(wrapper.getActionSnapshot() != null) {
+                    ActionModel actionModel = AppUtils.getFirebaseModelFromDataSnapshot(wrapper.getActionSnapshot(), ActionModel.class);
+                    if(actionModel.getAsignee() == null) {
+                        onActionRetrieved(actionModel);
+                        result.add(actionModel.getId());
+                    }
+                }
+            }
+            mAPAdapter.updateKeys(result);
+
+        });
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-    }
-
-    @Override
-    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
-        List<String> ids = networkFetcherResult.all();
-        this.networkIds = ids;
-        ids.add(user.countryID);
-        alertRef.addValueEventListener(alertListener);
-        for (String id : networkIds) {
-            baseAlertRef.child(id).addValueEventListener(alertListener);
-        }
-
-    }
-
-    private class AlertListener implements ValueEventListener {
-
-        private void process(DataSnapshot dataSnapshot) {
-
-            final GsonBuilder gsonBuilder = new GsonBuilder();
-            final Gson gson = gsonBuilder.create();
-
-            JsonReader reader = new JsonReader(new StringReader(gson.toJson(dataSnapshot.getValue()).trim()));
-            reader.setLenient(true);
-            AlertModel model = gson.fromJson(reader, AlertModel.class);
-
-            assert model != null;
-            model.setKey(dataSnapshot.getKey());
-            model.setParentKey(dataSnapshot.getRef().getParent().getKey());
-
-            if (model.getAlertLevel() == Constants.TRIGGER_RED && model.getHazardScenario() != null) {
-                update(!(dataSnapshot.getRef().getParent().getKey().equals(user.countryID)), model);
-            }
-
-        }
-
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            for(DataSnapshot child : dataSnapshot.getChildren()) {
-                process(child);
-            }
-            try {
-                dbActionRef.removeEventListener(this);
-            }
-            catch (Exception e) {}
-
-            new ActionFetcher(Constants.APA, ActionFetcher.ACTION_STATE.APA_UNASSIGNED, APAUnassignedFragment.this, alertHazardTypes, networkAlertHazardTypes).fetchWithIds(networkIds, (ids -> {
-
-            }));
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-
     }
 
     @Override
@@ -228,31 +194,16 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
         mAPAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-//        if(permissions.checkCanViewAPA(action)) {
-//            txtNoAction.setVisibility(View.GONE);
-//            mAPAdapter.addItems(snapshot.getKey(), action);
-//        }
+    public void onActionRetrieved(ActionModel action) {
+        if(permissions.checkCanViewAPA(action)) {
+            txtNoAction.setVisibility(View.GONE);
+            mAPAdapter.addItems(action.getId(), action);
+        }
     }
 
-    @Override
-    public void onActionRemoved(DataSnapshot snapshot) {
-        mAPAdapter.removeItem(snapshot.getKey());
-    }
 
     @Override
     protected RecyclerView getListView() {
         return mAdvActionRV;
     }
-
-    private void update(boolean isNetwork, AlertModel model) {
-        if(!isNetwork) {
-            alertHazardTypes.add(model.getHazardScenario());
-        }
-        else {
-            networkAlertHazardTypes.add(model.getHazardScenario());
-        }
-    }
-
 }

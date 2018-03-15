@@ -15,21 +15,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
 
 import org.alertpreparedness.platform.alert.R;
-import org.alertpreparedness.platform.alert.dagger.annotation.ActionGroupObservable;
-import org.alertpreparedness.platform.alert.dagger.annotation.ActionObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
-import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.ClockSetting;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
@@ -39,28 +30,22 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
-import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
-import org.alertpreparedness.platform.alert.adv_preparedness.fragment.BaseAPAFragment;
-import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ClockSettingsFetcher;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 import org.joda.time.DateTime;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -161,56 +146,29 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-//        new NetworkFetcher(this).fetch();
-
         handleAdvFab();
 
         actionFlowable
-            .filter(fetcherResultItem -> {
-                //filter by assignee
-                boolean res = false;
-                if(fetcherResultItem.getValue().getActionSnapshot() != null) {
-                    ActionModel actionModel = AppUtils.getFirebaseModelFromDataSnapshot(fetcherResultItem.getValue().getActionSnapshot(), ActionModel.class);
-                    res = user.getUserID().equals(actionModel.getAsignee());
-                }
-                return res;
-            })
-            .filter(fetcherResultItem -> {
-                //filter by expiry time
-                boolean res = false;
-                ActionModel actionModel = AppUtils.getFirebaseModelFromDataSnapshot(fetcherResultItem.getValue().getPrimarySnapshot(), ActionModel.class);
+        .subscribe(collectionFetcherResultItem -> {
 
-                if(actionModel.hasCustomClockSettings()) {
+            ArrayList<String> result = new ArrayList<>();
 
-                    if (actionModel.getCreatedAt() != null && actionModel.getFrequencyBase() == Constants.DUE_WEEK) {
-                        res = !DateHelper.isInProgressWeek(actionModel.getCreatedAt(), actionModel.getFrequencyValue());
-                    }
-                    else if (actionModel.getCreatedAt() != null && actionModel.getFrequencyBase() == Constants.DUE_MONTH) {
-                        res = !DateHelper.isInProgressMonth(actionModel.getCreatedAt(), actionModel.getFrequencyValue());
-                    }
-                    else if (actionModel.getCreatedAt() != null && actionModel.getFrequencyBase() == Constants.DUE_YEAR) {
-                        res = !DateHelper.isInProgressYear(actionModel.getCreatedAt(), actionModel.getFrequencyValue());
-                    }
-
-                }
-                else {
-                    ClockSetting clockSetting = fetcherResultItem.getValue().getClockSetting();
-                     if (actionModel.getCreatedAt() != null && clockSetting.getDurationType() == Constants.DUE_WEEK) {
-                        res = !DateHelper.isInProgressWeek(actionModel.getCreatedAt(), clockSetting.getValue());
-                    }
-                    else if (actionModel.getCreatedAt() != null && clockSetting.getDurationType() == Constants.DUE_MONTH) {
-                        res = !DateHelper.isInProgressMonth(actionModel.getCreatedAt(), clockSetting.getValue());
-                    }
-                    else if (actionModel.getCreatedAt() != null && clockSetting.getDurationType() == Constants.DUE_YEAR) {
-                        res = !DateHelper.isInProgressYear(actionModel.getCreatedAt(), clockSetting.getValue());
+            for(ActionItemWrapper wrapper : collectionFetcherResultItem.getValue()) {
+                if(wrapper.getActionSnapshot() != null) {
+                    ActionModel actionModel = AppUtils.getFirebaseModelFromDataSnapshot(wrapper.getActionSnapshot(), ActionModel.class);
+                    if(!user.getUserID().equals(actionModel.getAsignee())) {
+                        break;
                     }
                 }
+                if(!wrapper.checkActionInProgress()) {
+                    ActionModel actionModel = AppUtils.getFirebaseModelFromDataSnapshot(wrapper.getPrimarySnapshot(), ActionModel.class);
+                    onActionRetrieved(actionModel);
+                    result.add(actionModel.getId());
+                }
+            }
+            mAPAdapter.updateKeys(result);
 
-                return res;
-            })
-            .subscribe(fetcherResultItem -> {
-
-            });
+        });
 
     }
 

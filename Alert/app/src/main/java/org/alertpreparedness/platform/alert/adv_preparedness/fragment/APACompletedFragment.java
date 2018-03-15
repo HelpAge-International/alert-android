@@ -17,30 +17,41 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
+import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.BaseAPAFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
+import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Flowable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APACompletedFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener, ActionFetcher.ActionRetrievalListener {
+public class APACompletedFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener {
 
     private String actionID;
 
@@ -66,6 +77,13 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
     @Inject
     @ActionRef
     public DatabaseReference dbActionRef;
+
+    @Inject
+    @ClockSettingsActionObservable
+    Flowable<FetcherResultItem<ActionItemWrapper>> actionFlowable;
+
+    @Inject
+    User user;
 
     private APActionAdapter mAPAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
@@ -98,10 +116,30 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        new ActionFetcher(Constants.APA, ActionFetcher.ACTION_STATE.COMPLETED, this).fetch((ids) -> {
+        handleAdvFab();
+
+        actionFlowable.subscribe(collectionFetcherResultItem -> {
+
+            ArrayList<String> result = new ArrayList<>();
+
+            for(ActionItemWrapper wrapper : collectionFetcherResultItem.getValue()) {
+                if(wrapper.getActionSnapshot() != null) {
+                    ActionModel actionModel = AppUtils.getFirebaseModelFromDataSnapshot(wrapper.getActionSnapshot(), ActionModel.class);
+                    if(!user.getUserID().equals(actionModel.getAsignee())) {
+                        break;
+                    }
+                }
+                ActionModel actionModel = AppUtils.getFirebaseModelFromDataSnapshot(wrapper.getPrimarySnapshot(), ActionModel.class);
+                if(actionModel.getIsComplete()) {
+                    onActionRetrieved(actionModel);
+                    result.add(actionModel.getId());
+                }
+
+            }
+            mAPAdapter.updateKeys(result);
+
         });
 
-        handleAdvFab();
     }
 
     @Override
@@ -140,7 +178,8 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
                     break;
             }
             return false;
-        }).show();    }
+        }).show();
+    }
 
     @Override
     public void onAdapterItemRemoved(String key) {
@@ -149,17 +188,11 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
         }
     }
 
-    @Override
-    public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-//        if(permissions.checkCanViewAPA(action)) {
-//            txtNoAction.setVisibility(View.GONE);
-//            mAPAdapter.addItems(snapshot.getKey(), action);
-//        }
-    }
-
-    @Override
-    public void onActionRemoved(DataSnapshot snapshot) {
-        mAPAdapter.removeItem(snapshot.getKey());
+    public void onActionRetrieved(ActionModel action) {
+        if(permissions.checkCanViewAPA(action)) {
+            txtNoAction.setVisibility(View.GONE);
+            mAPAdapter.addItems(action.getId(), action);
+        }
     }
 
     //region UsersListDialogFragment.ActionAdapterListener

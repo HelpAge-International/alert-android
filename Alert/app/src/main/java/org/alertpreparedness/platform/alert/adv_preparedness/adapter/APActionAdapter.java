@@ -19,6 +19,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
+import org.alertpreparedness.platform.alert.dashboard.model.Task;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
@@ -130,6 +131,25 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
             listener.onAdapterItemRemoved(key);
         }
     }
+
+    public void updateKeys(ArrayList<String> newKeys) {
+        ArrayList<String> itemsToRemove = new ArrayList<>();
+        for(String oldKey : this.keys) {
+            if(!newKeys.contains(oldKey)) {
+                itemsToRemove.add(oldKey);
+            }
+        }
+
+        for (String key : itemsToRemove) {
+            int index = this.keys.indexOf(key);
+            String oldKey = this.keys.get(index);
+            this.items.remove(oldKey);
+            this.keys.remove(index);
+            notifyItemRemoved(index);
+
+        }
+    }
+
 
     @Override
     public APActionAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
