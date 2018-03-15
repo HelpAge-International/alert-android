@@ -22,12 +22,19 @@ import org.alertpreparedness.platform.alert.adv_preparedness.fragment.UsersListD
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
+import org.alertpreparedness.platform.alert.firebase.consumers.ItemConsumer;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
+import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
+import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 
@@ -35,12 +42,13 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Flowable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class InProgressFragment extends Fragment implements ActionAdapter.ActionAdapterListener, UsersListDialogFragment.ItemSelectedListener, ActionFetcher.ActionRetrievalListener {
+public class InProgressFragment extends Fragment implements ActionAdapter.ActionAdapterListener, UsersListDialogFragment.ItemSelectedListener {
 
     private String actionID;
 
@@ -63,6 +71,13 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
 
     private ActionAdapter mAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
+
+    @Inject
+    User user;
+
+    @Inject
+    @ClockSettingsActionObservable
+    Flowable<FetcherResultItem<ActionItemWrapper>> actionFlowable;
 
     @Nullable
     @Override
@@ -87,7 +102,14 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        new ActionFetcher(Constants.MPA, ActionFetcher.ACTION_STATE.IN_PROGRESS, this).fetch((ids)-> {});
+        actionFlowable.filter(fetcherResultItem -> {
+            //filter by expired time
+            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
+            return actionModel.getAsignee().equals(user.getUserID()) && fetcherResultItem.getValue().checkActionInProgress();
+        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
+            ActionModel actionModel = fetcherResultItem.makeModel();
+            onActionRetrieved(actionModel);
+        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
 
     }
 
@@ -98,18 +120,18 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
         SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress_mpa).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.complete_action:
-//                    if(permissions.checkCompleteMPAAction(mAdapter.getItem(pos), getActivity())) {
-//                        Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
-//                        intent.putExtra(CompleteActionActivity.REQUIRE_DOC, mAdapter.getItem(pos).getRequireDoc());
-//                        intent.putExtra(CompleteActionActivity.ACTION_KEY, key);
-//                        intent.putExtra(CompleteActionActivity.PARENT_KEY, parentId);
-//                        startActivity(intent);
-//                    }
+                    if(permissions.checkCompleteMPAAction(mAdapter.getItem(pos), getActivity())) {
+                        Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
+                        intent.putExtra(CompleteActionActivity.REQUIRE_DOC, mAdapter.getItem(pos).getRequireDoc());
+                        intent.putExtra(CompleteActionActivity.ACTION_KEY, key);
+                        intent.putExtra(CompleteActionActivity.PARENT_KEY, parentId);
+                        startActivity(intent);
+                    }
                     break;
                 case R.id.reassign_action:
-//                    if (permissions.checkMPAActionAssign(mAdapter.getItem(pos), getActivity())) {
-//                        dialog.show(getActivity().getFragmentManager(), "users_list");
-//                    }
+                    if (permissions.checkMPAActionAssign(mAdapter.getItem(pos), getActivity())) {
+                        dialog.show(getActivity().getFragmentManager(), "users_list");
+                    }
                     break;
                 case R.id.action_notes:
                     Intent intent3 = new Intent(getActivity(), AddNotesActivity.class);
@@ -146,15 +168,13 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
     }
     //endregion
 
-    @Override
-    public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-//        if(permissions.checkCanViewMPA(action)) {
-//            txtNoAction.setVisibility(View.GONE);
-//            mAdapter.addItems(snapshot.getKey(), action);
-//        }
+    public void onActionRetrieved(ActionModel action) {
+        if(permissions.checkCanViewMPA(action)) {
+            txtNoAction.setVisibility(View.GONE);
+            mAdapter.addItems(action.getId(), action);
+        }
     }
 
-    @Override
     public void onActionRemoved(DataSnapshot snapshot) {
         mAdapter.removeItem(snapshot.getKey());
     }

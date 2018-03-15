@@ -147,13 +147,13 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
 
             for(ActionItemWrapper wrapper : collectionFetcherResultItem.getValue()) {
                 if(wrapper.getActionSnapshot() != null) {
-                    ActionModel actionModel = AppUtils.getFirebaseModelFromDataSnapshot(wrapper.getActionSnapshot(), ActionModel.class);
+                    ActionModel actionModel = wrapper.makeModel();
                     if(!user.getUserID().equals(actionModel.getAsignee())) {
                         break;
                     }
                 }
                 if(wrapper.checkActionInProgress()) {
-                    ActionModel actionModel = AppUtils.getFirebaseModelFromDataSnapshot(wrapper.getPrimarySnapshot(), ActionModel.class);
+                    ActionModel actionModel = wrapper.makeModel();
                     keysToUpdate.add(actionModel.getId());
                     onActionRetrieved(actionModel);
                 }

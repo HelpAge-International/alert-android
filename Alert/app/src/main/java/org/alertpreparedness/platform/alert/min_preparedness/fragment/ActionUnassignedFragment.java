@@ -19,18 +19,24 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
+import org.alertpreparedness.platform.alert.firebase.consumers.ItemConsumer;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.UsersListDialogFragment;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
+import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ClockSettingsFetcher;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
@@ -42,13 +48,14 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Flowable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionUnassignedFragment extends Fragment implements UsersListDialogFragment.ItemSelectedListener, ActionAdapter.ActionAdapterListener, ActionFetcher.ActionRetrievalListener {
+public class ActionUnassignedFragment extends Fragment implements UsersListDialogFragment.ItemSelectedListener, ActionAdapter.ActionAdapterListener {
 
     @BindView(R.id.rvMinAction)
     RecyclerView mActionRV;
@@ -78,6 +85,10 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
 
     private String actionID;
 
+    @Inject
+    @ClockSettingsActionObservable
+    Flowable<FetcherResultItem<ActionItemWrapper>> actionFlowable;
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.content_minimum, container, false);
@@ -105,8 +116,15 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        new ActionFetcher(Constants.MPA, ActionFetcher.ACTION_STATE.UNASSIGNED, this).fetch((ids)-> {
-        });
+        actionFlowable.filter(fetcherResultItem -> {
+            //filter by unassigned time
+            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
+            return actionModel.getAsignee() == null;
+        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
+            ActionModel actionModel = fetcherResultItem.makeModel();
+            onActionRetrieved(actionModel);
+        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
+
 
     }
 
@@ -115,7 +133,7 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
         this.actionID = key;
 
         SheetMenu.with(getContext()).setMenu(R.menu.menu_unassigned_mpa).setClick(menuItem -> {
-            Action item = mUnassignedAdapter.getItem(pos);
+            ActionModel item = mUnassignedAdapter.getItem(pos);
 
             switch (menuItem.getItemId()) {
                 case R.id.update_date:
@@ -175,7 +193,7 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
                     if(mUnassignedAdapter.getItem(actionID).getFrequencyValue() != null) {
                         clocker = DateHelper.clockCalculation(
                                 mUnassignedAdapter.getItem(actionID).getFrequencyValue().longValue(),
-                                mUnassignedAdapter.getItem(actionID).getFrequencyBase()
+                                mUnassignedAdapter.getItem(actionID).getFrequencyBase().longValue()
                         );
                     }
                     else {
@@ -202,16 +220,13 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
     }
     //endregion
 
-
-    @Override
-    public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-//        if(permissions.checkCanViewMPA(action)) {
-//            txtNoAction.setVisibility(View.GONE);
-//            mUnassignedAdapter.addItems(snapshot.getKey(), action);
-//        }
+    public void onActionRetrieved(ActionModel action) {
+        if(permissions.checkCanViewMPA(action)) {
+            txtNoAction.setVisibility(View.GONE);
+            mUnassignedAdapter.addItems(action.getId(), action);
+        }
     }
 
-    @Override
     public void onActionRemoved(DataSnapshot snapshot) {
         mUnassignedAdapter.removeItem(snapshot.getKey());
     }

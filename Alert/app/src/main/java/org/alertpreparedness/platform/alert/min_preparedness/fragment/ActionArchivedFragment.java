@@ -17,12 +17,19 @@ import android.widget.TextView;
 import com.google.firebase.database.DataSnapshot;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
+import org.alertpreparedness.platform.alert.firebase.consumers.ItemConsumer;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
+import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
+import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 
@@ -30,13 +37,14 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Flowable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
  * Created by faizmohideen on 21/12/2017.
  */
 
-public class ActionArchivedFragment extends Fragment implements ActionAdapter.ActionAdapterListener, ActionFetcher.ActionRetrievalListener {
+public class ActionArchivedFragment extends Fragment implements ActionAdapter.ActionAdapterListener {
 
     @BindView(R.id.rvMinAction)
     RecyclerView mActionRV;
@@ -54,6 +62,13 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
 
     @Inject
     PermissionsHelper permissions;
+
+    @Inject
+    User user;
+
+    @Inject
+    @ClockSettingsActionObservable
+    Flowable<FetcherResultItem<ActionItemWrapper>> actionFlowable;
 
     @Nullable
     @Override
@@ -82,7 +97,14 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        new ActionFetcher(Constants.MPA, ActionFetcher.ACTION_STATE.ARCHIVED, this).fetch((ids)-> {});
+        actionFlowable.filter(fetcherResultItem -> {
+            //filter by archived
+            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
+            return actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsArchived();
+        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
+            ActionModel actionModel = fetcherResultItem.makeModel();
+            onActionRetrieved(actionModel);
+        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
 
     }
 
@@ -118,15 +140,13 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
         }
     }
 
-    @Override
-    public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-//        if(permissions.checkCanViewMPA(action)) {
-//            txtNoAction.setVisibility(View.GONE);
-//            mAdapter.addItems(snapshot.getKey(), action);
-//        }
+    public void onActionRetrieved(ActionModel action) {
+        if(permissions.checkCanViewMPA(action)) {
+            txtNoAction.setVisibility(View.GONE);
+            mAdapter.addItems(action.getId(), action);
+        }
     }
 
-    @Override
     public void onActionRemoved(DataSnapshot snapshot) {
         mAdapter.removeItem(snapshot.getKey());
     }

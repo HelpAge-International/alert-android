@@ -17,9 +17,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
+import org.alertpreparedness.platform.alert.firebase.ClockSetting;
+import org.alertpreparedness.platform.alert.firebase.consumers.ItemConsumer;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
@@ -28,6 +31,7 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
+import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.BaseAPAFragment;
@@ -79,7 +83,7 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
     public DatabaseReference dbActionRef;
 
     @Inject
-    @ClockSettingsActionObservable
+    @ActionObservable
     Flowable<FetcherResultItem<ActionItemWrapper>> actionFlowable;
 
     @Inject
@@ -118,27 +122,14 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
 
         handleAdvFab();
 
-        actionFlowable.subscribe(collectionFetcherResultItem -> {
-
-            ArrayList<String> result = new ArrayList<>();
-
-            for(ActionItemWrapper wrapper : collectionFetcherResultItem.getValue()) {
-                if(wrapper.getActionSnapshot() != null) {
-                    ActionModel actionModel = AppUtils.getFirebaseModelFromDataSnapshot(wrapper.getActionSnapshot(), ActionModel.class);
-                    if(!user.getUserID().equals(actionModel.getAsignee())) {
-                        break;
-                    }
-                }
-                ActionModel actionModel = AppUtils.getFirebaseModelFromDataSnapshot(wrapper.getPrimarySnapshot(), ActionModel.class);
-                if(actionModel.getIsComplete()) {
-                    onActionRetrieved(actionModel);
-                    result.add(actionModel.getId());
-                }
-
-            }
-            mAPAdapter.updateKeys(result);
-
-        });
+        actionFlowable.filter(fetcherResultItem -> {
+            //filter by completed time
+            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
+            return actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsComplete();
+        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
+            ActionModel actionModel = fetcherResultItem.makeModel();
+            onActionRetrieved(actionModel);
+        }, wrapperToRemove -> mAPAdapter.removeItem(wrapperToRemove.getPrimarySnapshot().getKey())));
 
     }
 

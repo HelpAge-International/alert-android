@@ -32,43 +32,47 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionCHSRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.InActiveActionObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
-import org.alertpreparedness.platform.alert.firebase.AlertModel;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
+import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.BaseAPAFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.min_preparedness.model.ActionModel;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Flowable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAInactiveFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener {
+public class APAInactiveFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener {
 
-    private ArrayList<Integer> alertHazardTypes = new ArrayList<>();
     private String actionID;
-    private List<String> networkIds;
-    private ArrayList<Integer> networkAlertHazardTypes = new ArrayList<>();
+
 
     public APAInactiveFragment() {
         // Required empty public constructor
@@ -83,7 +87,6 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
     @BindView(R.id.tvStatus)
     TextView tvActionInactive;
 
-    @Nullable
     @BindView(R.id.tvAPANoAction)
     TextView txtNoAction;
 
@@ -142,15 +145,11 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
     PermissionsHelper permissions;
 
     private APActionAdapter mAPAdapter;
-    private Boolean isCHS = false;
-    private Boolean isCHSAssigned = false;
-    private Boolean isMandated = false;
-    private Boolean isMandatedAssigned = false;
-    private Boolean isInProgress = false;
-    private int freqBase = 0;
-    private int freqValue = 0;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
 
+    @Inject
+    @InActiveActionObservable
+    Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> actionFlowable;
 
     @Nullable
     @Override
@@ -180,40 +179,33 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        new NetworkFetcher(this).fetch();
+        actionFlowable.subscribe(collectionFetcherResultItem -> {
 
-        handleFab();
+            ArrayList<String> keysToUpdate = new ArrayList<>();
+
+            for(ActionItemWrapper wrapper : collectionFetcherResultItem.getValue()) {
+                if(wrapper.getActionSnapshot() != null) {
+                    ActionModel actionModel = wrapper.makeModel();
+                    if(!user.getUserID().equals(actionModel.getAsignee())) {
+                        break;
+                    }
+                }
+                ActionModel actionModel = wrapper.makeModel();
+                keysToUpdate.add(actionModel.getId());
+                onActionRetrieved(actionModel);
+            }
+            mAPAdapter.updateKeys(keysToUpdate);
+
+        });
+
+        handleAdvFab();
 
     }
 
-    private void handleFab() {
-        AdvPreparednessFragment xFragment = null;
-        for(Fragment fragment : getFragmentManager().getFragments()){
-            if(fragment instanceof AdvPreparednessFragment){
-                xFragment = (AdvPreparednessFragment) fragment;
-                break;
-            }
-        }
-        if(xFragment != null) {
-            FloatingActionButton fab = xFragment.fabCreateAPA;
-            fab.show();
-
-            mAdvActionRV.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    if (dy > 0 && fab.isShown()) {
-                        fab.hide();
-                    }
-                }
-
-                @Override
-                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        fab.show();
-                    }
-                    super.onScrollStateChanged(recyclerView, newState);
-                }
-            });
+    public void onActionRetrieved(ActionModel action) {
+        if(permissions.checkCanViewAPA(action)) {
+            txtNoAction.setVisibility(View.GONE);
+            mAPAdapter.addItems(action.getId(), action);
         }
     }
 
@@ -257,181 +249,6 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
         }
     }
 
-    private void getCustom(ActionModel model, DataSnapshot getChild) {
-        dbAlertRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Long alertLevel = (Long) dataSnapshot.child("alertLevel").getValue();
-
-//                if (isInProgress) {
-                addObjects(model.getTask(),
-                        model.getCreatedAt(),
-                        model.getLevel(),
-                        model,
-                        alertLevel,
-                        getChild,
-                        isCHS,
-                        isMandated);
-//                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void getCHS(ActionModel model, String actionIDs) {
-        dbCHSRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    if (actionIDs.contains(getChild.getKey())) {
-                        String CHSTaskName = (String) getChild.child("task").getValue();
-                        Long CHSlevel = (Long) getChild.child("level").getValue();
-                        Long CHSCreatedAt = (Long) getChild.child("createdAt").getValue();
-                        isCHS = true;
-
-                        dbAlertRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                Long alertLevel = (Long) dataSnapshot.child("alertLevel").getValue();
-
-//                                if (isInProgress) {
-                                addObjects(CHSTaskName,
-                                        CHSCreatedAt,
-                                        CHSlevel,
-                                        model,
-                                        alertLevel,
-                                        getChild,
-                                        isCHS,
-                                        isMandated);
-
-//                                }
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
-                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void getMandated(ActionModel model, String actionIDs) {
-        dbMandatedRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot getChild : dataSnapshot.getChildren()) {
-                    if (actionIDs.contains(getChild.getKey())) {
-                        String taskNameMandated = (String) getChild.child("task").getValue();
-                        Long manCreatedAt = (Long) getChild.child("createdAt").getValue();
-                        Long manLevel = (Long) getChild.child("level").getValue();
-
-                        isMandated = true;
-                        isCHS = false;
-
-                        dbAlertRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                Long alertLevel = (Long) dataSnapshot.child("alertLevel").getValue();
-
-//                                if (isInProgress) {
-                                addObjects(taskNameMandated,
-                                        manCreatedAt,
-                                        manLevel,
-                                        model,
-                                        alertLevel,
-                                        getChild,
-                                        isCHS,
-                                        isMandated);
-
-//                                }
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void addObjects(String name, Long createdAt, Long level,
-                            ActionModel model, Long alertLevel, DataSnapshot getChild, Boolean isCHS, Boolean isMandated) {
-
-
-        if (model.getLevel() != null
-                && model.getLevel() == Constants.APA
-                || (isCHS //APA CHS inactive for logged in user.
-                && model.getLevel() != null
-                && model.getLevel() == Constants.APA)
-                || (isMandated
-                && model.getLevel() != null
-                && model.getLevel() == Constants.APA)) {
-
-            if(model.getAssignHazard() != null
-                    && ((networkAlertHazardTypes.indexOf(model.getAssignHazard().get(0)) == -1 && model.isNetworkLevel())
-                    || (alertHazardTypes.indexOf(model.getAssignHazard().get(0)) == -1 && !model.isNetworkLevel())) && !model.getIsArchived()
-            ) {
-                Action action = new Action(
-                        model.getId(),
-                        model.getTask(),
-                        model.getDepartment(),
-                        model.getAsignee(),
-                        model.getCreatedByAgencyId(),
-                        model.getCreatedByCountryId(),
-                        model.getNetworkId(),
-                        model.getIsArchived(),
-                        model.getIsComplete(),
-                        createdAt,
-                        model.getUpdatedAt(),
-                        model.getType(),
-                        model.getDueDate(),
-                        model.getBudget(),
-                        level,
-                        model.getFrequencyBase(),
-                        freqValue,
-                        user,
-                        dbAgencyRef.getRef(),
-                        dbUserPublicRef.getRef(),
-                        dbNetworkRef.getRef());
-
-//                if(permissions.checkCanViewAPA(action)) {
-//                    txtNoAction.setVisibility(View.GONE);
-//                    mAPAdapter.addItems(getChild.getKey(), action);
-//                }
-            }
-            else {
-                mAPAdapter.removeItem(getChild.getKey());
-            }
-        }
-        else {
-            mAPAdapter.removeItem(getChild.getKey());
-        }
-    }
-
     @Override
     public void onItemSelected(UserModel model) {
         dbActionRef.child(actionID).child("asignee").setValue(model.getUserID());
@@ -440,145 +257,8 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
     }
 
     @Override
-    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
-        this.networkIds = networkFetcherResult.all();
-        alertRef.addValueEventListener(new AlertListener(false));
-        for (String id : networkFetcherResult.all()) {
-            baseAlertRef.child(id).addValueEventListener(new AlertListener(true));
-        }
-    }
-
-    @Override
     protected RecyclerView getListView() {
         return mAdvActionRV;
-    }
-
-    private class InactiveAPAListener implements ChildEventListener {
-
-        private String id;
-
-        public InactiveAPAListener(String id) {
-            this.id = id;
-        }
-
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            process(dataSnapshot);
-        }
-
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            process(dataSnapshot);
-        }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-        }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-
-        private void process(DataSnapshot dataSnapshot) {
-            String actionIDs = dataSnapshot.getKey();
-            ActionModel model = dataSnapshot.getValue(ActionModel.class);
-
-            if(model != null) {
-
-                boolean isNetwork = !dataSnapshot.getRef().getParent().getKey().equals(user.countryID);
-
-                model.setIsNetworkLevel(isNetwork);
-
-                if (dataSnapshot.child("frequencyBase").getValue() != null) {
-                    model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
-                }
-                if (dataSnapshot.child("frequencyValue").getValue() != null) {
-                    model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
-                }
-
-                if (model.getType() != null && model.getType() == 0) {
-                    getCHS(model, actionIDs);
-                }
-                else if (model.getType() != null && model.getType() == 1) {
-                    getMandated(model, actionIDs);
-                }
-                else {
-                    System.out.println("model = " + model);
-                    getCustom(model, dataSnapshot);
-                }
-            }
-
-        }
-    }
-
-
-
-    private class AlertListener implements ValueEventListener {
-
-        private boolean isNetwork;
-
-        public AlertListener(boolean isNetwork) {
-
-            this.isNetwork = isNetwork;
-        }
-
-        private void process(DataSnapshot dataSnapshot) {
-
-            final GsonBuilder gsonBuilder = new GsonBuilder();
-            final Gson gson = gsonBuilder.create();
-
-            JsonReader reader = new JsonReader(new StringReader(gson.toJson(dataSnapshot.getValue()).trim()));
-            reader.setLenient(true);
-            AlertModel model = gson.fromJson(reader, AlertModel.class);
-
-            assert model != null;
-            model.setKey(dataSnapshot.getKey());
-            model.setParentKey(dataSnapshot.getRef().getParent().getKey());
-
-            if (model.getAlertLevel() == Constants.TRIGGER_RED && model.getHazardScenario() != null) {
-                update(isNetwork, model);
-            }
-
-        }
-
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            for(DataSnapshot child : dataSnapshot.getChildren()) {
-                process(child);
-            }
-            try {
-                dbActionRef.removeEventListener(this);
-            }
-            catch (Exception e) {}
-
-            for (String id : networkIds) {
-                if(id != null) {
-                    dbActionBaseRef.child(id).addChildEventListener(new InactiveAPAListener(id));
-                }
-            }
-            dbActionBaseRef.child(user.countryID).addChildEventListener(new InactiveAPAListener(user.countryID));
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    }
-
-    private void update(boolean isNetwork, AlertModel model) {
-        if(!isNetwork) {
-            alertHazardTypes.add(model.getHazardScenario());
-        }
-        else {
-            networkAlertHazardTypes.add(model.getHazardScenario());
-        }
     }
 
 }

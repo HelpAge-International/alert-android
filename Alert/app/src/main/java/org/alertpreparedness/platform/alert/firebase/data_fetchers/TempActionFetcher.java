@@ -109,7 +109,7 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
 
     private Flowable<FetcherResultItem<ActionItemWrapper>> rxFetchCHSActions(){
         return networkResultFlowable.flatMap(networkFetcherResult -> {
-            Flowable<RxFirebaseChildEvent<DataSnapshot>> flow = RxFirebaseDatabase.observeChildEvent(dbBaseActionCHSRef.child(user.countryID));
+            Flowable<RxFirebaseChildEvent<DataSnapshot>> flow = RxFirebaseDatabase.observeChildEvent(dbBaseActionCHSRef.child(user.getSystemAdminID()));
 
             for (String networkId : networkFetcherResult.all()) {
                 flow = flow.mergeWith(RxFirebaseDatabase.observeChildEvent(dbBaseActionCHSRef.child(networkId)));
@@ -117,13 +117,13 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
 
             return flow;
         }).flatMap(chsAction -> {
-            return RxFirebaseDatabase.observeChildEvent(dbActionBaseRef.child(chsAction.getValue().getRef().getParent().getKey()).child(chsAction.getValue().getKey()))
+            return RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(user.countryID).child(chsAction.getValue().getKey()))
                     .map(action -> new Pair<>(chsAction, action));
         }).map(pair -> {
-            if (pair.second.getValue().exists()) {
-                FetcherResultItem.EventType eventType = pair.second.getEventType() == RxFirebaseChildEvent.EventType.REMOVED || pair.first.getEventType() == RxFirebaseChildEvent.EventType.REMOVED ? REMOVED : UPDATED;
-                return new FetcherResultItem<>(ActionItemWrapper.createCHS(pair.first.getValue(), pair.second.getValue()), eventType);
-            } else {
+            if (pair.second.exists()) {
+                return new FetcherResultItem<>(ActionItemWrapper.createCHS(pair.first.getValue(), pair.second), RxFirebaseChildEvent.EventType.CHANGED);
+            }
+            else {
                 return new FetcherResultItem<>(ActionItemWrapper.createCHS(pair.first.getValue()), pair.first.getEventType() == RxFirebaseChildEvent.EventType.REMOVED ? REMOVED : UPDATED);
             }
         });

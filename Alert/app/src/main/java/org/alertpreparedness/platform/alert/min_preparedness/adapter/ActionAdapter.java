@@ -19,6 +19,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.min_preparedness.interfaces.OnItemsChangedListener;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.model.User;
@@ -43,7 +44,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     private final ArrayList<String> keys;
     private Context context;
-    private HashMap<String, Action> items;
+    private HashMap<String, ActionModel> items;
     private ActionAdapterListener listener;
     private String dateFormat = "MMM dd,yyyy";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
@@ -64,7 +65,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     public DatabaseReference dbRef;
 
 
-    public void addItems(String key, Action action) {
+    public void addItems(String key, ActionModel action) {
         if (keys.indexOf(key) == -1) {
             keys.add(key);
             items.put(key, action);
@@ -84,11 +85,11 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
         DependencyInjector.applicationComponent().inject(this);
     }
 
-    public Action getItem(int index) {
+    public ActionModel getItem(int index) {
         return items.get(keys.get(index));
     }
 
-    public Action getItem(String key) {
+    public ActionModel getItem(String key) {
         return items.get(key);
     }
 
@@ -111,10 +112,11 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(ActionAdapter.ViewHolder holder, int position) {
-        Action action = items.get(keys.get(position));
-        getDepartment(action.db, action.userRef, action.networkRef, action.user, action.getId(), action.getDepartment(), action.getNetworkId(), action.getAssignee(), holder);
-        holder.tvActionType.setText(getActionType((int) action.getActionType()));
-        holder.tvActionName.setText(action.getTaskName());
+        ActionModel action = items.get(keys.get(position));
+//        getDepartment(action.db, action.userRef, action.networkRef, action.user, action.getId(), action.getDepartment(), action.getNetworkId(), action.getAsignee(), holder);
+
+        holder.tvActionType.setText(getActionType(action.getType().intValue()));
+        holder.tvActionName.setText(action.getTask());
         holder.tvBudget.setText(getBudget(action.getBudget()));
         holder.tvDueDate.setText(getDate(action.getDueDate()));
         holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position, keys.get(position), action.getId()));

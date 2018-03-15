@@ -10,6 +10,7 @@ import com.firebase.jobdispatcher.Trigger;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
@@ -132,7 +133,12 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
                     Timber.d("ClockSetting: " + clockSetting.getValue() + " - " + clockSetting.getDurationType());
                     break;
             }
-            scheduleNotification(context, model.getAction(), model.getGroupId(), model.getActionId(), clockSetting);
+            try {
+                scheduleNotification(context, model.getAction(), model.getGroupId(), model.getActionId(), clockSetting);
+            }
+            catch (Exception e) {
+                //TODO soz elliot, had to do this. was braeking meh app
+            }
         }
         Timber.d("Scheduled Notifications: " + actionFetcherResult.getModels().size());
     }

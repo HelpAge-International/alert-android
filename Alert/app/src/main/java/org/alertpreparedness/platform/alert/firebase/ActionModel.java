@@ -228,7 +228,7 @@ public class ActionModel extends FirebaseModel {
     }
 
     public Boolean getIsArchived() {
-        return isArchived;
+        return (isArchived == null ? false : isArchived);
     }
 
     public void setIsArchived(Boolean archived) {

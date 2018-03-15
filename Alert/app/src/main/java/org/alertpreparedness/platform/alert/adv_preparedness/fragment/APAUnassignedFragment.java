@@ -140,12 +140,10 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
             ArrayList<String> result = new ArrayList<>();
 
             for(ActionItemWrapper wrapper : collectionFetcherResultItem.getValue()) {
-                if(wrapper.getActionSnapshot() != null) {
-                    ActionModel actionModel = AppUtils.getFirebaseModelFromDataSnapshot(wrapper.getActionSnapshot(), ActionModel.class);
-                    if(actionModel.getAsignee() == null) {
-                        onActionRetrieved(actionModel);
-                        result.add(actionModel.getId());
-                    }
+                ActionModel actionModel = wrapper.makeModel();
+                if(actionModel.getAsignee() == null) {
+                    onActionRetrieved(actionModel);
+                    result.add(actionModel.getId());
                 }
             }
             mAPAdapter.updateKeys(result);

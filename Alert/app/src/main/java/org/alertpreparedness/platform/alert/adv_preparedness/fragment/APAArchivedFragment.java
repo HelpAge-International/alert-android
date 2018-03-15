@@ -16,14 +16,20 @@ import android.widget.TextView;
 import com.google.firebase.database.DataSnapshot;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
+import org.alertpreparedness.platform.alert.firebase.consumers.ItemConsumer;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
+import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
-import org.alertpreparedness.platform.alert.adv_preparedness.fragment.BaseAPAFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
+import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 
@@ -31,13 +37,14 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Flowable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAArchivedFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, ActionFetcher.ActionRetrievalListener {
+public class APAArchivedFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener {
 
     public APAArchivedFragment() {
         // Required empty public constructor
@@ -62,6 +69,13 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
 
     @Inject
     PermissionsHelper permissions;
+
+    @Inject
+    @ClockSettingsActionObservable
+    Flowable<FetcherResultItem<ActionItemWrapper>> actionFlowable;
+
+    @Inject
+    User user;
 
     @Nullable
     @Override
@@ -90,8 +104,15 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        new ActionFetcher(Constants.APA, ActionFetcher.ACTION_STATE.ARCHIVED, this).fetch((ids) -> {
-        });
+        actionFlowable.filter(fetcherResultItem -> {
+            //filter by archived
+            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
+            return actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsArchived();
+        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
+            ActionModel actionModel = fetcherResultItem.makeModel();
+            onActionRetrieved(actionModel);
+        }, wrapperToRemove -> mAPAdapter.removeItem(wrapperToRemove.getPrimarySnapshot().getKey())));
+
 
         handleAdvFab();
     }
@@ -136,17 +157,11 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
         }
     }
 
-    @Override
-    public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-//        if(permissions.checkCanViewAPA(action)) {
-//            txtNoAction.setVisibility(View.GONE);
-//            mAPAdapter.addItems(snapshot.getKey(), action);
-//        }
-    }
-
-    @Override
-    public void onActionRemoved(DataSnapshot snapshot) {
-        mAPAdapter.removeItem(snapshot.getKey());
+    public void onActionRetrieved(ActionModel action) {
+        if(permissions.checkCanViewAPA(action)) {
+            txtNoAction.setVisibility(View.GONE);
+            mAPAdapter.addItems(action.getId(), action);
+        }
     }
 
     @Override
@@ -154,4 +169,3 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
         return mAdvActionRV;
     }
 }
-

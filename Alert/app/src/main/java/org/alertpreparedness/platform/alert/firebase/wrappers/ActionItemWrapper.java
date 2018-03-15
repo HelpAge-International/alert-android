@@ -38,7 +38,7 @@ public class ActionItemWrapper {
 
     public boolean checkActionInProgress() {
         boolean res = false;
-        ActionModel actionModel = AppUtils.getFirebaseModelFromDataSnapshot(getPrimarySnapshot(), ActionModel.class);
+        ActionModel actionModel = makeModel();
 
         if(actionModel.hasCustomClockSettings()) {
 
@@ -127,6 +127,25 @@ public class ActionItemWrapper {
         return (actionSnapshot == null ? typeSnapshot : actionSnapshot);
     }
 
+    public ActionModel makeModel() {
+        if((type == ActionType.MANDATED || type == ActionType.CHS) && actionSnapshot != null) {
+            ActionModel model = AppUtils.getFirebaseModelFromDataSnapshot(actionSnapshot, ActionModel.class);
+            model.setLevel(typeSnapshot.child("level").getValue(Integer.class));
+            model.setCreatedAt(typeSnapshot.child("createdAt").getValue(Long.class));
+            if(type == ActionType.MANDATED) {
+                model.setDepartment(typeSnapshot.child("department").getValue(String.class));
+            }
+            model.setTask(typeSnapshot.child("task").getValue(String.class));
+
+            return model;
+        }
+        else if(actionSnapshot != null) {
+            return AppUtils.getFirebaseModelFromDataSnapshot(actionSnapshot, ActionModel.class);
+        }
+        else {
+            return AppUtils.getFirebaseModelFromDataSnapshot(typeSnapshot, ActionModel.class);
+        }
+    }
 
     public void setActionSnapshot(DataSnapshot actionSnapshot) {
         this.actionSnapshot = actionSnapshot;
