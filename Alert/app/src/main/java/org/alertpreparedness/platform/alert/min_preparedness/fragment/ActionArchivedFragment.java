@@ -100,7 +100,7 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
         actionFlowable.filter(fetcherResultItem -> {
             //filter by archived
             ActionModel actionModel = fetcherResultItem.getValue().makeModel();
-            return actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsArchived();
+            return actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsArchived() && actionModel.getLevel() == Constants.MPA;
         }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
             ActionModel actionModel = fetcherResultItem.makeModel();
             onActionRetrieved(actionModel);

@@ -19,6 +19,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.min_preparedness.interfaces.OnItemsChangedListener;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
@@ -63,6 +64,12 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     @Inject
     @BaseActionRef
     public DatabaseReference dbRef;
+
+    @Inject
+    @UserPublicRef
+    DatabaseReference userPublicRef;
+
+
 
 
     public void addItems(String key, ActionModel action) {
@@ -113,6 +120,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
     @Override
     public void onBindViewHolder(ActionAdapter.ViewHolder holder, int position) {
         ActionModel action = items.get(keys.get(position));
+        getDepartment(action.getDepartment(), action.getParentId(), action.getAsignee(), holder);
 //        getDepartment(action.db, action.userRef, action.networkRef, action.user, action.getId(), action.getDepartment(), action.getNetworkId(), action.getAsignee(), holder);
 
         holder.tvActionType.setText(getActionType(action.getType().intValue()));
@@ -139,29 +147,26 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
 
     }
 
-    private void getDepartment(DatabaseReference db, DatabaseReference userRef, DatabaseReference networkRef, User user, String id, String departmentID, String networkID, String assignee, ActionAdapter.ViewHolder holder) {
+    private void getDepartment(String departmentID, String networkID, String assignee, ActionAdapter.ViewHolder holder) {
 
-        System.out.println("getdepartmentdb = " + db);
-
-        db.addListenerForSingleValueEvent(new ValueEventListener() {
+        dbAgencyRef.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (assignee!=null && departmentID != null && networkID == null) {
+                if (assignee != null) {
                     String department = (String) dataSnapshot.child("departments").child(departmentID).child("name").getValue();
-                    System.out.println("department = " + department);
                     if(department == null) {
-                        getCountryDepartment(holder, userRef, assignee, departmentID);
+                        getCountryDepartment(holder, userPublicRef, assignee, departmentID);
                     }
-                    setUser(holder, userRef, assignee, department);
-                } else if (assignee!=null && networkID != null && networkID.equals(user.getNetworkID())){
-                    setNetworkUser(holder, userRef, networkRef, assignee, networkID, user);
-                } else if (assignee!=null && id != null && id.equals(user.getLocalNetworkID())){
-                    setLocalNetworkUser(holder, userRef, networkRef, assignee, id, user);
-                } else if (assignee!=null && id != null && id.equals(user.getNetworkCountryID())){
-                    System.out.println("assignee in NetworkCountry= " + assignee);
-                    setLocalNetworkUser(holder, userRef, networkRef, assignee, id, user);
+                    setUser(holder, userPublicRef, assignee, department);
                 }
+//                else if (assignee!=null && networkID != null && networkID.equals(user.getNetworkID())){
+//                    setNetworkUser(holder, userPublicRef, networkRef, assignee, networkID, user);
+//                } else if (assignee!=null && id != null && id.equals(user.getLocalNetworkID())){
+//                    setLocalNetworkUser(holder, userPublicRef, networkRef, assignee, id, user);
+//                } else if (assignee!=null && id != null && id.equals(user.getNetworkCountryID())){
+//                    setLocalNetworkUser(holder, userPublicRef, networkRef, assignee, id, user);
+//                }
                 else {
                     holder.tvUserName.setText("Unassigned");
                    // setUser(holder, userRef, null, null);

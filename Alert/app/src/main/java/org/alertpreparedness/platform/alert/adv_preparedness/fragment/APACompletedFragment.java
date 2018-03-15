@@ -125,7 +125,7 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
         actionFlowable.filter(fetcherResultItem -> {
             //filter by completed time
             ActionModel actionModel = fetcherResultItem.getValue().makeModel();
-            return actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsComplete();
+            return actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsComplete() && actionModel.getLevel() == Constants.APA;
         }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
             ActionModel actionModel = fetcherResultItem.makeModel();
             onActionRetrieved(actionModel);

@@ -146,14 +146,11 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
             ArrayList<String> keysToUpdate = new ArrayList<>();
 
             for(ActionItemWrapper wrapper : collectionFetcherResultItem.getValue()) {
-                if(wrapper.getActionSnapshot() != null) {
-                    ActionModel actionModel = wrapper.makeModel();
-                    if(!user.getUserID().equals(actionModel.getAsignee())) {
-                        break;
-                    }
+                ActionModel actionModel = wrapper.makeModel();
+                if(actionModel.getAsignee() == null || !user.getUserID().equals(actionModel.getAsignee())) {
+                    break;
                 }
-                if(wrapper.checkActionInProgress()) {
-                    ActionModel actionModel = wrapper.makeModel();
+                if(wrapper.checkActionInProgress() && actionModel.getLevel() == Constants.APA) {
                     keysToUpdate.add(actionModel.getId());
                     onActionRetrieved(actionModel);
                 }

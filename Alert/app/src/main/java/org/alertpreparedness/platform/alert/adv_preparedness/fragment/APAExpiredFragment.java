@@ -156,12 +156,12 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
             for(ActionItemWrapper wrapper : collectionFetcherResultItem.getValue()) {
                 if(wrapper.getActionSnapshot() != null) {
                     ActionModel actionModel = wrapper.makeModel();
-                    if(!user.getUserID().equals(actionModel.getAsignee())) {
+                    if(actionModel.getAsignee() == null || !user.getUserID().equals(actionModel.getAsignee())) {
                         break;
                     }
                 }
-                if(!wrapper.checkActionInProgress()) {
-                    ActionModel actionModel = wrapper.makeModel();
+                ActionModel actionModel = wrapper.makeModel();
+                if(!wrapper.checkActionInProgress() && actionModel.getLevel() == Constants.APA) {
                     onActionRetrieved(actionModel);
                     result.add(actionModel.getId());
                 }

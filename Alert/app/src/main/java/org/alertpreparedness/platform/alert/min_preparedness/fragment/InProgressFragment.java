@@ -105,7 +105,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
         actionFlowable.filter(fetcherResultItem -> {
             //filter by expired time
             ActionModel actionModel = fetcherResultItem.getValue().makeModel();
-            return actionModel.getAsignee().equals(user.getUserID()) && fetcherResultItem.getValue().checkActionInProgress();
+            return actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && fetcherResultItem.getValue().checkActionInProgress() && actionModel.getLevel() == Constants.MPA;
         }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
             ActionModel actionModel = fetcherResultItem.makeModel();
             onActionRetrieved(actionModel);

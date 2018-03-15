@@ -141,7 +141,7 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
 
             for(ActionItemWrapper wrapper : collectionFetcherResultItem.getValue()) {
                 ActionModel actionModel = wrapper.makeModel();
-                if(actionModel.getAsignee() == null) {
+                if(actionModel.getAsignee() == null && actionModel.getLevel() == Constants.APA) {
                     onActionRetrieved(actionModel);
                     result.add(actionModel.getId());
                 }

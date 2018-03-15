@@ -184,13 +184,10 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
             ArrayList<String> keysToUpdate = new ArrayList<>();
 
             for(ActionItemWrapper wrapper : collectionFetcherResultItem.getValue()) {
-                if(wrapper.getActionSnapshot() != null) {
-                    ActionModel actionModel = wrapper.makeModel();
-                    if(!user.getUserID().equals(actionModel.getAsignee())) {
-                        break;
-                    }
-                }
                 ActionModel actionModel = wrapper.makeModel();
+                if(actionModel.getAsignee() == null || !user.getUserID().equals(actionModel.getAsignee()) || actionModel.getLevel() == Constants.APA) {
+                    break;
+                }
                 keysToUpdate.add(actionModel.getId());
                 onActionRetrieved(actionModel);
             }

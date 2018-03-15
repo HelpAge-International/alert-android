@@ -119,7 +119,7 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
         actionFlowable.filter(fetcherResultItem -> {
             //filter by unassigned time
             ActionModel actionModel = fetcherResultItem.getValue().makeModel();
-            return actionModel.getAsignee() == null;
+            return actionModel.getAsignee() == null && actionModel.getLevel() == Constants.MPA;
         }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
             ActionModel actionModel = fetcherResultItem.makeModel();
             onActionRetrieved(actionModel);
