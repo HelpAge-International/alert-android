@@ -203,6 +203,8 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
         FirebaseAuth.getInstance().addAuthStateListener(this);
 
+        System.out.println("user = " + user);
+
         return v;
     }
 
