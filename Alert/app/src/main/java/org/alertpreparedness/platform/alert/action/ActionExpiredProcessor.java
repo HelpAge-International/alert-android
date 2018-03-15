@@ -163,15 +163,20 @@ public class ActionExpiredProcessor extends BaseActionProcessor {
                 if (value != null) {
                     if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_WEEK) {
                         isInProgress = DateHelper.isInProgressWeek(model.getCreatedAt(), value.intValue());
-                    } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_WEEK) {
+                    }
+                    else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_WEEK) {
                         isInProgress = DateHelper.isInProgressWeek(model.getUpdatedAt(), value.intValue());
-                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_MONTH) {
+                    }
+                    else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_MONTH) {
                         isInProgress = DateHelper.isInProgressMonth(model.getCreatedAt(), value.intValue());
-                    } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_MONTH) {
+                    }
+                    else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_MONTH) {
                         isInProgress = DateHelper.isInProgressMonth(model.getUpdatedAt(), value.intValue());
-                    } else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_YEAR) {
+                    }
+                    else if (model.getCreatedAt() != null && model.getUpdatedAt() == null && durationType != null && durationType == Constants.DUE_YEAR) {
                         isInProgress = DateHelper.isInProgressYear(model.getCreatedAt(), value.intValue());
-                    } else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_YEAR) {
+                    }
+                    else if (model.getUpdatedAt() != null && durationType != null && durationType == Constants.DUE_YEAR) {
                         System.out.println("FAILED2");
                         isInProgress = DateHelper.isInProgressYear(model.getUpdatedAt(), value.intValue());
                         System.out.println("isInProgress = " + isInProgress);

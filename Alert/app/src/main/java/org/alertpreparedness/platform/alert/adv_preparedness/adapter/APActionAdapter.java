@@ -15,11 +15,12 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.PreparednessAdapter;
-import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
@@ -42,7 +43,7 @@ import butterknife.ButterKnife;
 public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHolder> implements ChildEventListener, PreparednessAdapter {
 
     private final ArrayList<String> keys;
-    private HashMap<String, Action> items;
+    private HashMap<String, ActionModel> items;
     private APAAdapterListener listener;
     private String dateFormat = "MMM dd,yyyy";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
@@ -58,6 +59,10 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
     @Inject
     @CountryOfficeRef
     DatabaseReference countryRef;
+
+    @Inject
+    @AgencyRef
+    public DatabaseReference dbAgencyRef;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -83,7 +88,7 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
         }
     }
 
-    public void addItems(String key, Action action) {
+    public void addItems(String key, ActionModel action) {
         if (keys.indexOf(key) == -1) {
             keys.add(key);
             items.put(key, action);
@@ -107,11 +112,11 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
         DependencyInjector.applicationComponent().inject(this);
     }
 
-    public Action getItem(int index) {
+    public ActionModel getItem(int index) {
         return items.get(keys.get(index));
     }
 
-    public Action getItem(String key) {
+    public ActionModel getItem(String key) {
         return items.get(key);
     }
 
@@ -135,13 +140,13 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(APActionAdapter.ViewHolder holder, int position) {
-        Action action = items.get(keys.get(position));
+        ActionModel action = items.get(keys.get(position));
 
         try {
-            getDepartment(action.db, action.getDepartment(), action.getAssignee(), holder);
+            getDepartment(action.getDepartment(), action.getAsignee(), holder);
 
-            holder.tvActionType.setText(getActionType((int) action.getActionType()));
-            holder.tvActionName.setText(action.getTaskName());
+            holder.tvActionType.setText(getActionType(action.getType()));
+            holder.tvActionName.setText(action.getTask());
             holder.tvBudget.setText(getBudget(action.getBudget()));
             holder.tvDueDate.setText(getDate(action.getDueDate()));
             holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position, keys.get(position), action.getId()));
@@ -168,8 +173,8 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
     }
 
-    private void getDepartment(DatabaseReference db, String departmentID, String assignee, APActionAdapter.ViewHolder holder) {
-        db.addListenerForSingleValueEvent(new ValueEventListener() {
+    private void getDepartment(String departmentID, String assignee, APActionAdapter.ViewHolder holder) {
+        dbAgencyRef.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -266,16 +271,12 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//        System.out.println("apaactiondataSnapshot = " + dataSnapshot.getRef());
-        Action action = AppUtils.getValueFromDataSnapshot(dataSnapshot, Action.class);
-        System.out.println("ActiondataSnapshot = " + dataSnapshot.getRef());
-//        Action action = dataSnapshot.getValue(Action.class);
+
+        ActionModel action = AppUtils.getFirebaseModelFromDataSnapshot(dataSnapshot, ActionModel.class);
+
         assert action != null;
-        if(dataSnapshot.child("frequencyValue").exists()) {
-            action.setFrequencyValue(Integer.valueOf(dataSnapshot.child("frequencyValue").getValue().toString()));
-        }
         if (keys.indexOf(dataSnapshot.getKey()) == -1) {
-            if (action.getComplete() != null && action.getComplete() && action.getDueDate() != null) {
+            if (action.getIsComplete() && action.getDueDate() != null) {
                 keys.add(dataSnapshot.getKey());
                 items.put(dataSnapshot.getKey(), action);
                 notifyItemInserted(keys.size() - 1);
@@ -288,13 +289,11 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
 
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-        Action action = dataSnapshot.getValue(Action.class);
+        ActionModel action = AppUtils.getFirebaseModelFromDataSnapshot(dataSnapshot, ActionModel.class);
         assert action != null;
-        if(dataSnapshot.child("frequencyValue").exists()) {
-            action.setFrequencyValue(Integer.valueOf(dataSnapshot.child("frequencyValue").getValue().toString()));
-        }
+
         if (keys.indexOf(dataSnapshot.getKey()) == -1) {
-            if (action.getComplete() != null && action.getComplete() && action.getDueDate() != null) {
+            if (action.getIsComplete() && action.getDueDate() != null) {
                 keys.add(dataSnapshot.getKey());
                 items.put(dataSnapshot.getKey(), action);
                 notifyItemInserted(keys.size() - 1);

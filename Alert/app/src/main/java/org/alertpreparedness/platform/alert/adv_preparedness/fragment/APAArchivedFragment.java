@@ -22,7 +22,7 @@ import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAda
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseAPAFragment;
+import org.alertpreparedness.platform.alert.adv_preparedness.fragment.BaseAPAFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
@@ -138,10 +138,10 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
 
     @Override
     public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-        if(permissions.checkCanViewAPA(action)) {
-            txtNoAction.setVisibility(View.GONE);
-            mAPAdapter.addItems(snapshot.getKey(), action);
-        }
+//        if(permissions.checkCanViewAPA(action)) {
+//            txtNoAction.setVisibility(View.GONE);
+//            mAPAdapter.addItems(snapshot.getKey(), action);
+//        }
     }
 
     @Override

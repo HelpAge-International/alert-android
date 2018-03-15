@@ -32,7 +32,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
-import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseAPAFragment;
+import org.alertpreparedness.platform.alert.adv_preparedness.fragment.BaseAPAFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -230,10 +230,10 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
 
     @Override
     public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-        if(permissions.checkCanViewAPA(action)) {
-            txtNoAction.setVisibility(View.GONE);
-            mAPAdapter.addItems(snapshot.getKey(), action);
-        }
+//        if(permissions.checkCanViewAPA(action)) {
+//            txtNoAction.setVisibility(View.GONE);
+//            mAPAdapter.addItems(snapshot.getKey(), action);
+//        }
     }
 
     @Override

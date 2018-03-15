@@ -46,7 +46,7 @@ public class ActionModel {
     public String toString() {
         return "ActionModel{" +
                 "isArchived=" + isArchived +
-                ", isComplete=" + isComplete +
+                ", getIsComplete=" + isComplete +
                 ", requireDoc=" + requireDoc +
                 ", task='" + task + '\'' +
                 ", department='" + department + '\'' +

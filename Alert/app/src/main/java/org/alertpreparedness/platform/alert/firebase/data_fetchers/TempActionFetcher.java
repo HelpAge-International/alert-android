@@ -14,15 +14,19 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionMandated
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
+import org.alertpreparedness.platform.alert.firebase.ClockSetting;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
+import org.intellij.lang.annotations.Flow;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -30,6 +34,7 @@ import javax.inject.Inject;
 import durdinapps.rxfirebase2.RxFirebaseChildEvent;
 import durdinapps.rxfirebase2.RxFirebaseDatabase;
 import io.reactivex.Flowable;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.rxkotlin.Flowables;
 
 import static org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem.EventType.REMOVED;
@@ -69,6 +74,7 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
 
 
     private Flowable<FetcherResultItem<ActionItemWrapper>> rxFetchActions(){
+
         return networkResultFlowable
                 .flatMap(networkFetcherResult -> {
                     Flowable<RxFirebaseChildEvent<DataSnapshot>> flow = RxFirebaseDatabase.observeChildEvent(dbActionBaseRef.child(user.countryID).orderByChild("type").equalTo(2));
@@ -84,6 +90,21 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
 
                     return new FetcherResultItem<>(ActionItemWrapper.createAction(dataSnapshotRxFirebaseChildEvent.getValue()), eventType);
                 });
+//
+    }
+
+    public Flowable<FetcherResultItem<ActionItemWrapper>> rxFetchWithClockSettings(Flowable<FetcherResultItem<ActionItemWrapper>> flowable) {
+        Flowable<ClockSettingsFetcher.ClockSettingsResult> clockSettingsResultFlowable = new ClockSettingsFetcher().rxFetch(ClockSettingsFetcher.TYPE_PREPAREDNESS);
+        return Flowable.combineLatest(clockSettingsResultFlowable, flowable,
+                (clockSettingsResult, actionItemWrapperFetcherResultItem) -> {
+                    DataSnapshot snapshot = actionItemWrapperFetcherResultItem.getValue().getActionSnapshot();
+                    if(snapshot == null) {
+                        snapshot = actionItemWrapperFetcherResultItem.getValue().getTypeSnapshot();
+                    }
+                    actionItemWrapperFetcherResultItem.getValue().setClockSetting(clockSettingsResult.all().get(snapshot.getRef().getParent().getKey()));
+                    return actionItemWrapperFetcherResultItem;
+                });
+
     }
 
     private Flowable<FetcherResultItem<ActionItemWrapper>> rxFetchCHSActions(){
@@ -132,10 +153,11 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
 
     public Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> rxActiveItems(boolean isActive) {
 
-        return alertGroupFlowable.map(dataSnapshots -> {
+        Flowable<FetcherResultItem<ArrayList<ActionItemWrapper>>> flowable =
+        alertGroupFlowable.map(dataSnapshots -> {
             Set<Integer> hazardTypes = new HashSet<>();
 
-            for(DataSnapshot snapshot : dataSnapshots) {
+            for (DataSnapshot snapshot : dataSnapshots) {
                 AlertModel alertModel = AppUtils.getFirebaseModelFromDataSnapshot(snapshot, AlertModel.class);
                 hazardTypes.add(alertModel.getHazardScenario());
             }
@@ -148,7 +170,7 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
                 boolean res = false;
 
                 DataSnapshot snapshot = itemWrapper.getActionSnapshot();
-                if(itemWrapper.getActionSnapshot() == null) {
+                if (itemWrapper.getActionSnapshot() == null) {
                     snapshot = itemWrapper.getTypeSnapshot();
                 }
 
@@ -165,13 +187,28 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
                     } else if (model.getAssignHazard() == null || model.getAssignHazard().size() == 0) {
                         res = true;
                     }
-                    if(res && isActive || !res && !isActive) {
+                    if (res && isActive || !res && !isActive) {
                         result.add(itemWrapper);
                     }
                 }
             }
             return new FetcherResultItem<>(result, RxFirebaseChildEvent.EventType.CHANGED);
         }));
+
+        Flowable<ClockSettingsFetcher.ClockSettingsResult> clockSettingsResultFlowable = new ClockSettingsFetcher().rxFetch(ClockSettingsFetcher.TYPE_PREPAREDNESS);
+
+        return Flowable.combineLatest(clockSettingsResultFlowable, flowable, (clockSettingsResult, actionItemWrapperFetcherResultItems) -> {
+            ArrayList<ActionItemWrapper> result = new ArrayList<>();
+            for(ActionItemWrapper itemWrapper : actionItemWrapperFetcherResultItems.getValue()) {
+                DataSnapshot snapshot = itemWrapper.getActionSnapshot();
+                if (snapshot == null) {
+                    snapshot = itemWrapper.getTypeSnapshot();
+                }
+                itemWrapper.setClockSetting(clockSettingsResult.all().get(snapshot.getRef().getParent().getKey()));
+                result.add(itemWrapper);
+            }
+            return new FetcherResultItem<Collection<ActionItemWrapper>>(result);
+        });
 
     }
 

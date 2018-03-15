@@ -23,6 +23,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionGroupObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
+import org.alertpreparedness.platform.alert.firebase.ClockSetting;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
@@ -34,13 +40,16 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
+import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.fragment.BaseAPAFragment;
+import org.alertpreparedness.platform.alert.adv_preparedness.fragment.BaseAPAFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ClockSettingsFetcher;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
@@ -50,22 +59,23 @@ import org.joda.time.DateTime;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Flowable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener, NetworkFetcher.NetworkFetcherListener, ActionFetcher.ActionRetrievalListener{
+public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener{
 
     private String actionID;
-    private List<String> networkIds;
 
     public APAExpiredFragment() {
         // Required empty public constructor
@@ -116,11 +126,11 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
     @Inject
     PermissionsHelper permissions;
 
+    @Inject
+    @ActiveActionObservable
+    Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> actionFlowable;
+
     private APActionAdapter mAPAdapter;
-    private int freqValue = 0;
-    private AlertListener alertListener = new AlertListener();
-    private ArrayList<Integer> networkAlertHazardTypes = new ArrayList<>();
-    private ArrayList<Integer> alertHazardTypes = new ArrayList<>();
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
 
     @Nullable
@@ -151,9 +161,57 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        new NetworkFetcher(this).fetch();
+//        new NetworkFetcher(this).fetch();
 
         handleAdvFab();
+
+        actionFlowable
+            .filter(fetcherResultItem -> {
+                //filter by assignee
+                boolean res = false;
+                if(fetcherResultItem.getValue().getActionSnapshot() != null) {
+                    ActionModel actionModel = AppUtils.getFirebaseModelFromDataSnapshot(fetcherResultItem.getValue().getActionSnapshot(), ActionModel.class);
+                    res = user.getUserID().equals(actionModel.getAsignee());
+                }
+                return res;
+            })
+            .filter(fetcherResultItem -> {
+                //filter by expiry time
+                boolean res = false;
+                ActionModel actionModel = AppUtils.getFirebaseModelFromDataSnapshot(fetcherResultItem.getValue().getPrimarySnapshot(), ActionModel.class);
+
+                if(actionModel.hasCustomClockSettings()) {
+
+                    if (actionModel.getCreatedAt() != null && actionModel.getFrequencyBase() == Constants.DUE_WEEK) {
+                        res = !DateHelper.isInProgressWeek(actionModel.getCreatedAt(), actionModel.getFrequencyValue());
+                    }
+                    else if (actionModel.getCreatedAt() != null && actionModel.getFrequencyBase() == Constants.DUE_MONTH) {
+                        res = !DateHelper.isInProgressMonth(actionModel.getCreatedAt(), actionModel.getFrequencyValue());
+                    }
+                    else if (actionModel.getCreatedAt() != null && actionModel.getFrequencyBase() == Constants.DUE_YEAR) {
+                        res = !DateHelper.isInProgressYear(actionModel.getCreatedAt(), actionModel.getFrequencyValue());
+                    }
+
+                }
+                else {
+                    ClockSetting clockSetting = fetcherResultItem.getValue().getClockSetting();
+                     if (actionModel.getCreatedAt() != null && clockSetting.getDurationType() == Constants.DUE_WEEK) {
+                        res = !DateHelper.isInProgressWeek(actionModel.getCreatedAt(), clockSetting.getValue());
+                    }
+                    else if (actionModel.getCreatedAt() != null && clockSetting.getDurationType() == Constants.DUE_MONTH) {
+                        res = !DateHelper.isInProgressMonth(actionModel.getCreatedAt(), clockSetting.getValue());
+                    }
+                    else if (actionModel.getCreatedAt() != null && clockSetting.getDurationType() == Constants.DUE_YEAR) {
+                        res = !DateHelper.isInProgressYear(actionModel.getCreatedAt(), clockSetting.getValue());
+                    }
+                }
+
+                return res;
+            })
+            .subscribe(fetcherResultItem -> {
+
+            });
+
     }
 
     @Override
@@ -226,7 +284,7 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
                     if(mAPAdapter.getItem(actionID).getFrequencyValue() != null) {
                         clocker = DateHelper.clockCalculation(
                                 mAPAdapter.getItem(actionID).getFrequencyValue().longValue(),
-                                mAPAdapter.getItem(actionID).getFrequencyBase()
+                                mAPAdapter.getItem(actionID).getFrequencyBase().longValue()
                         );
                     }
                     else {
@@ -253,86 +311,21 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
     //endregion
 
     @Override
-    public void onNetworkFetcherResult(NetworkFetcher.NetworkFetcherResult networkFetcherResult) {
-        List<String> ids = networkFetcherResult.all();
-        this.networkIds = ids;
-        ids.add(user.countryID);
-        alertRef.addValueEventListener(alertListener);
-        for (String id : networkIds) {
-            baseAlertRef.child(id).addValueEventListener(alertListener);
-        }
-
-    }
-
-    @Override
     protected RecyclerView getListView() {
         return mAdvActionRV;
     }
 
-    private class AlertListener implements ValueEventListener {
-
-        private void process(DataSnapshot dataSnapshot) {
-
-            final GsonBuilder gsonBuilder = new GsonBuilder();
-            final Gson gson = gsonBuilder.create();
-
-            JsonReader reader = new JsonReader(new StringReader(gson.toJson(dataSnapshot.getValue()).trim()));
-            reader.setLenient(true);
-            AlertModel model = gson.fromJson(reader, AlertModel.class);
-
-            assert model != null;
-            model.setKey(dataSnapshot.getKey());
-            model.setParentKey(dataSnapshot.getRef().getParent().getKey());
-
-            if (model.getAlertLevel() == Constants.TRIGGER_RED && model.getHazardScenario() != null) {
-                update(!(dataSnapshot.getRef().getParent().getKey().equals(user.countryID)), model);
-            }
-
-        }
-
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            for(DataSnapshot child : dataSnapshot.getChildren()) {
-                process(child);
-            }
-            try {
-                dbActionRef.removeEventListener(this);
-            }
-            catch (Exception e) {}
-
-            new ActionFetcher(Constants.APA, ActionFetcher.ACTION_STATE.APA_EXPIRED, APAExpiredFragment.this, alertHazardTypes, networkAlertHazardTypes).fetchWithIds(networkIds, (ids -> {
-
-            }));
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-
-    }
-
-    @Override
-    public void onActionRetrieved(DataSnapshot snapshot, Action action) {
+    public void onActionRetrieved(ActionModel action) {
         if(permissions.checkCanViewAPA(action)) {
             txtNoAction.setVisibility(View.GONE);
-            mAPAdapter.addItems(snapshot.getKey(), action);
+            mAPAdapter.addItems(action.getId(), action);
         }
     }
 
-    @Override
     public void onActionRemoved(DataSnapshot snapshot) {
         mAPAdapter.removeItem(snapshot.getKey());
     }
 
-    private void update(boolean isNetwork, AlertModel model) {
-        if(!isNetwork) {
-            alertHazardTypes.add(model.getHazardScenario());
-        }
-        else {
-            networkAlertHazardTypes.add(model.getHazardScenario());
-        }
-    }
 
 }
 

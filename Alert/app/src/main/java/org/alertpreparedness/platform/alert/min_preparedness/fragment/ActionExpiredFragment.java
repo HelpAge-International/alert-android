@@ -113,9 +113,9 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
                     showDatePicker(key);
                     break;
                 case R.id.reassign_action:
-                    if(permissions.checkMPAActionAssign(mExpiredAdapter.getItem(pos), getActivity())) {
-                        dialog.show(getActivity().getFragmentManager(), "users_list");
-                    }
+//                    if(permissions.checkMPAActionAssign(mExpiredAdapter.getItem(pos), getActivity())) {
+//                        dialog.show(getActivity().getFragmentManager(), "users_list");
+//                    }
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
@@ -191,10 +191,10 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
 
     @Override
     public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-        if(permissions.checkCanViewMPA(action)) {
-            txtNoAction.setVisibility(View.GONE);
-            mExpiredAdapter.addItems(snapshot.getKey(), action);
-        }
+//        if(permissions.checkCanViewMPA(action)) {
+//            txtNoAction.setVisibility(View.GONE);
+//            mExpiredAdapter.addItems(snapshot.getKey(), action);
+//        }
     }
 
     @Override

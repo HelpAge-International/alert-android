@@ -336,11 +336,11 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
             Note notes = new Note(texts, millis, userID);
 
             if(userTypeID.equals(user.getCountryID())) {
-                dbActionRef.child(key).child("isComplete").setValue(true);
+                dbActionRef.child(key).child("getIsComplete").setValue(true);
                 dbActionRef.child(key).child("isCompleteAt").setValue(millis);
             }
             else {
-                dbActionBaseRef.child(parentId).child(key).child("isComplete").setValue(true);
+                dbActionBaseRef.child(parentId).child(key).child("getIsComplete").setValue(true);
                 dbActionBaseRef.child(parentId).child(key).child("isCompleteAt").setValue(millis);
             }
             dbNoteRef.child(key).child(id).setValue(notes);

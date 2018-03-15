@@ -195,6 +195,7 @@ public class AppUtils {
 
         T mappedObject = gson.fromJson(reader, clazz);
         mappedObject.setId(dataSnapshot.getKey());
+        mappedObject.setParentId(dataSnapshot.getRef().getParent().getKey());
 
         return mappedObject;
     }

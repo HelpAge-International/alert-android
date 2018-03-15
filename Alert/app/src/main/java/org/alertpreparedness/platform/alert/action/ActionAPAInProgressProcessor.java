@@ -29,7 +29,7 @@ public class ActionAPAInProgressProcessor extends ActionInProgressProcessor {
                 && level != null
                 && level == getType()
                 && model.getDueDate() != null
-                && (model.getIsCompleteAt() == null && model.getIsComplete() == null || model.getIsCompleteAt() == null && !model.getIsComplete()) // isComplete can be set to false :D, and when it's false, isCreatedAt will disappear.
+                && (model.getIsCompleteAt() == null && model.getIsComplete() == null || model.getIsCompleteAt() == null && !model.getIsComplete()) // getIsComplete can be set to false :D, and when it's false, isCreatedAt will disappear.
                 && name != null
                 || (isCHS && isCHSAssigned //MPA CHS assigned and in-progress for logged in user.
                 && user.getUserID().equals(model.getAsignee())

@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.min_preparedness.adapter;
 
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 
 /**
@@ -7,7 +8,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
  */
 
 public interface PreparednessAdapter {
-    public void addItems(String key, Action action);
+    public void addItems(String key, ActionModel action);
     public void removeItem(String key);
-    Action getItem(int pos);
+    ActionModel getItem(int pos);
 }

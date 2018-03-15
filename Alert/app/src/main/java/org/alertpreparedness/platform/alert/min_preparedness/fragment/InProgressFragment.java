@@ -98,18 +98,18 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
         SheetMenu.with(getContext()).setMenu(R.menu.menu_in_progress_mpa).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.complete_action:
-                    if(permissions.checkCompleteMPAAction(mAdapter.getItem(pos), getActivity())) {
-                        Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
-                        intent.putExtra(CompleteActionActivity.REQUIRE_DOC, mAdapter.getItem(pos).getRequireDoc());
-                        intent.putExtra(CompleteActionActivity.ACTION_KEY, key);
-                        intent.putExtra(CompleteActionActivity.PARENT_KEY, parentId);
-                        startActivity(intent);
-                    }
+//                    if(permissions.checkCompleteMPAAction(mAdapter.getItem(pos), getActivity())) {
+//                        Intent intent = new Intent(getActivity(), CompleteActionActivity.class);
+//                        intent.putExtra(CompleteActionActivity.REQUIRE_DOC, mAdapter.getItem(pos).getRequireDoc());
+//                        intent.putExtra(CompleteActionActivity.ACTION_KEY, key);
+//                        intent.putExtra(CompleteActionActivity.PARENT_KEY, parentId);
+//                        startActivity(intent);
+//                    }
                     break;
                 case R.id.reassign_action:
-                    if (permissions.checkMPAActionAssign(mAdapter.getItem(pos), getActivity())) {
-                        dialog.show(getActivity().getFragmentManager(), "users_list");
-                    }
+//                    if (permissions.checkMPAActionAssign(mAdapter.getItem(pos), getActivity())) {
+//                        dialog.show(getActivity().getFragmentManager(), "users_list");
+//                    }
                     break;
                 case R.id.action_notes:
                     Intent intent3 = new Intent(getActivity(), AddNotesActivity.class);
@@ -148,10 +148,10 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
 
     @Override
     public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-        if(permissions.checkCanViewMPA(action)) {
-            txtNoAction.setVisibility(View.GONE);
-            mAdapter.addItems(snapshot.getKey(), action);
-        }
+//        if(permissions.checkCanViewMPA(action)) {
+//            txtNoAction.setVisibility(View.GONE);
+//            mAdapter.addItems(snapshot.getKey(), action);
+//        }
     }
 
     @Override

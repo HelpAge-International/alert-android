@@ -108,9 +108,9 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
         SheetMenu.with(getContext()).setMenu(R.menu.menu_completed_mpa).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.reassign_action:
-                    if(permissions.checkMPAActionAssign(mAdapter.getItem(pos), getActivity())) {
-                        dialog.show(getActivity().getFragmentManager(), "users_list");
-                    }
+//                    if(permissions.checkMPAActionAssign(mAdapter.getItem(pos), getActivity())) {
+//                        dialog.show(getActivity().getFragmentManager(), "users_list");
+//                    }
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
@@ -148,10 +148,10 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
 
     @Override
     public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-        if(permissions.checkCanViewMPA(action)) {
-            txtNoAction.setVisibility(View.GONE);
-            mAdapter.addItems(snapshot.getKey(), action);
-        }
+//        if(permissions.checkCanViewMPA(action)) {
+//            txtNoAction.setVisibility(View.GONE);
+//            mAdapter.addItems(snapshot.getKey(), action);
+//        }
     }
 
     @Override

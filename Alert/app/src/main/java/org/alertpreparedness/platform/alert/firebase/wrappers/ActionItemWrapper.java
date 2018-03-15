@@ -4,6 +4,8 @@ import android.service.autofill.Dataset;
 
 import com.google.firebase.database.DataSnapshot;
 
+import org.alertpreparedness.platform.alert.firebase.ClockSetting;
+
 import durdinapps.rxfirebase2.RxFirebaseChildEvent;
 
 /**
@@ -18,6 +20,16 @@ public class ActionItemWrapper {
 
     public void setType(ActionType type) {
         this.type = type;
+    }
+
+    private ClockSetting clockSetting;
+
+    public ClockSetting getClockSetting() {
+        return clockSetting;
+    }
+
+    public void setClockSetting(ClockSetting clockSetting) {
+        this.clockSetting = clockSetting;
     }
 
     public enum ActionType {
@@ -73,6 +85,11 @@ public class ActionItemWrapper {
     public DataSnapshot getActionSnapshot() {
         return actionSnapshot;
     }
+
+    public DataSnapshot getPrimarySnapshot() {
+        return (actionSnapshot == null ? typeSnapshot : actionSnapshot);
+    }
+
 
     public void setActionSnapshot(DataSnapshot actionSnapshot) {
         this.actionSnapshot = actionSnapshot;

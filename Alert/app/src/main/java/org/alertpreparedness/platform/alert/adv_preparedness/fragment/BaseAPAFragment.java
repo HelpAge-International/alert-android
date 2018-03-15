@@ -1,4 +1,4 @@
-package org.alertpreparedness.platform.alert.min_preparedness.fragment;
+package org.alertpreparedness.platform.alert.adv_preparedness.fragment;
 
 
 import android.support.design.widget.FloatingActionButton;

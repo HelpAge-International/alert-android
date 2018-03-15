@@ -39,13 +39,12 @@ import butterknife.ButterKnife;
  * Created by faizmohideen on 20/12/2017.
  */
 
-public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder> implements PreparednessAdapter {
+public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder> {
 
     private final ArrayList<String> keys;
     private Context context;
     private HashMap<String, Action> items;
     private ActionAdapterListener listener;
-    private OnItemsChangedListener changedListener;
     private String dateFormat = "MMM dd,yyyy";
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
 

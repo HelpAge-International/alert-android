@@ -8,6 +8,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObserv
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertGroupObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardGroupObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.HazardObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.InActiveActionObservable;
@@ -16,6 +17,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorObservabl
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlanObservable;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.AgencyFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.AlertFetcher;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.ClockSettingsFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.HazardsFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.IndicatorsFetcher;
@@ -92,6 +94,13 @@ public class ObservableModule {
 
     @Provides
     @Singleton
+    @ClockSettingsActionObservable
+    public Flowable<FetcherResultItem<ActionItemWrapper>> provideClockSettingsActionGroupFlowable(@ActionObservable Flowable<FetcherResultItem<ActionItemWrapper>> flowable) {
+        return new TempActionFetcher().rxFetchWithClockSettings(flowable);
+    }
+
+    @Provides
+    @Singleton
     @IndicatorObservable
     public Flowable<FetcherResultItem<DataSnapshot>> provideIndicatorFlowable() {
         return new IndicatorsFetcher().rxFetch();
@@ -137,6 +146,5 @@ public class ObservableModule {
     public Flowable<FetcherResultItem<AlertResultWrapper>> provideAlertsExtraFlowable() {
         return new AlertFetcher().fetchWithExtra();
     }
-
 
 }

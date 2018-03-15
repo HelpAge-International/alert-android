@@ -246,7 +246,7 @@ public class Action {
         return "Action{" +
                 "id='" + id + '\'' +
                 ", isArchived=" + isArchived +
-                ", isComplete=" + isComplete +
+                ", getIsComplete=" + isComplete +
                 ", isInProgress=" + isInProgress +
                 ", taskName='" + taskName + '\'' +
                 ", department='" + department + '\'' +

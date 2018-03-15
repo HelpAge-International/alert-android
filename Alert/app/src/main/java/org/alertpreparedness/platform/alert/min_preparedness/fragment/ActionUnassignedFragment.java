@@ -122,14 +122,14 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
                     showDatePicker(key);
                     break;
                 case R.id.assign_action:
-                    if(permissions.checkMPAActionAssign(item, getActivity())) {
-                        if (!item.hasCHSInfo() && item.isCHS()) {
-                            SnackbarHelper.show(getActivity(), "The action needs more information from the web portal");
-                        } else {
-                            dialog.show(getActivity().getFragmentManager(), "users_list");
-                        }
-                        break;
-                    }
+//                    if(permissions.checkMPAActionAssign(item, getActivity())) {
+//                        if (!item.hasCHSInfo() && item.isCHS()) {
+//                            SnackbarHelper.show(getActivity(), "The action needs more information from the web portal");
+//                        } else {
+//                            dialog.show(getActivity().getFragmentManager(), "users_list");
+//                        }
+//                        break;
+//                    }
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
                     intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, mUnassignedAdapter.getItem(pos).getId());
@@ -205,10 +205,10 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
 
     @Override
     public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-        if(permissions.checkCanViewMPA(action)) {
-            txtNoAction.setVisibility(View.GONE);
-            mUnassignedAdapter.addItems(snapshot.getKey(), action);
-        }
+//        if(permissions.checkCanViewMPA(action)) {
+//            txtNoAction.setVisibility(View.GONE);
+//            mUnassignedAdapter.addItems(snapshot.getKey(), action);
+//        }
     }
 
     @Override

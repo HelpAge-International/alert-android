@@ -1,9 +1,12 @@
 package org.alertpreparedness.platform.alert.firebase;
 
+import com.google.firebase.database.Exclude;
+
 import java.util.ArrayList;
 
 public class ActionModel extends FirebaseModel {
 
+    private Boolean isArchived;
     private String asignee;
     private String task;
     private Boolean isComplete;
@@ -17,7 +20,13 @@ public class ActionModel extends FirebaseModel {
     private Boolean requireDoc;
     private Integer frequencyBase;
     private Integer frequencyValue;
+    private String createdByAgencyId;
+    private String createdByCountryId;
     private ArrayList<Integer> assignHazard;
+    private String department;
+
+    @Exclude
+    private boolean isChs;
 
     public ActionModel() {
     }
@@ -46,6 +55,11 @@ public class ActionModel extends FirebaseModel {
         return assignHazard != null ? assignHazard.equals(that.assignHazard) : that.assignHazard == null;
     }
 
+    @Exclude
+    public boolean hasCustomClockSettings() {
+        return frequencyValue != null && frequencyBase != null;
+    }
+
     @Override
     public int hashCode() {
         int result = asignee.hashCode();
@@ -70,7 +84,7 @@ public class ActionModel extends FirebaseModel {
         return "ActionModel{" +
                 "asignee='" + asignee + '\'' +
                 ", task='" + task + '\'' +
-                ", isComplete=" + isComplete +
+                ", getIsComplete=" + isComplete +
                 ", isCompleteAt=" + isCompleteAt +
                 ", createdAt=" + createdAt +
                 ", dueDate=" + dueDate +
@@ -101,11 +115,11 @@ public class ActionModel extends FirebaseModel {
         this.task = task;
     }
 
-    public boolean isComplete() {
+    public boolean getIsComplete() {
         return (isComplete == null ? false : isComplete);
     }
 
-    public void setComplete(Boolean complete) {
+    public void setIsComplete(Boolean complete) {
         isComplete = complete;
     }
 
@@ -195,5 +209,45 @@ public class ActionModel extends FirebaseModel {
 
     public void setAssignHazard(ArrayList<Integer> assignHazard) {
         this.assignHazard = assignHazard;
+    }
+
+    public String getCreatedByCountryId() {
+        return createdByCountryId;
+    }
+
+    public void setCreatedByCountryId(String createdByCountryId) {
+        this.createdByCountryId = createdByCountryId;
+    }
+
+    public String getCreatedByAgencyId() {
+        return createdByAgencyId;
+    }
+
+    public void setCreatedByAgencyId(String createdByAgencyId) {
+        this.createdByAgencyId = createdByAgencyId;
+    }
+
+    public Boolean getIsArchived() {
+        return isArchived;
+    }
+
+    public void setIsArchived(Boolean archived) {
+        isArchived = archived;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public boolean isChs() {
+        return isChs;
+    }
+
+    public void setChs(boolean chs) {
+        isChs = chs;
     }
 }

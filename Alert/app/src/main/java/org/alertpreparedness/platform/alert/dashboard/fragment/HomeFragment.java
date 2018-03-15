@@ -1,7 +1,5 @@
 package org.alertpreparedness.platform.alert.dashboard.fragment;
 
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -21,22 +19,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionCHSRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.ActionGroupObservable;
-import org.alertpreparedness.platform.alert.dagger.annotation.ActionObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.AlertGroupObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
@@ -65,20 +58,14 @@ import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteAc
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.UpdateIndicatorActivity;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
-import org.alertpreparedness.platform.alert.utils.ObservableSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import durdinapps.rxfirebase2.RxFirebaseChildEvent;
-import durdinapps.rxfirebase2.RxFirebaseDatabase;
 import io.reactivex.Flowable;
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -456,20 +443,20 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
     protected void processTask(DataSnapshot dataSnapshot) {
         if(dataSnapshot == null) return;
-        if (dataSnapshot.getRef().getParent().getParent().getKey().equals("action")) {
+        if (dataSnapshot.getRef().getParent().getParent().getKey().equals(Task.TASK_ACTION)) {
 
             ActionModel model = AppUtils.getValueFromDataSnapshot(dataSnapshot, ActionModel.class);
 
             assert model != null;
-            boolean shouldAdd = model.getAsignee() != null && !model.isComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null;
+            boolean shouldAdd = model.getAsignee() != null && !model.getIsComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null;
 
             if (shouldAdd) {
                 if (DateHelper.isDueInWeek(model.getDueDate()) || DateHelper.itWasDue(model.getDueDate())) {
                     if(dataSnapshot.getRef().getParent().getKey().equals(user.countryID)) {
-                        addTask(dataSnapshot.getKey(), new Task(dataSnapshot.getRef().getParent().getKey(), 0, "action", model.getTask(), model.getDueDate(), model.getRequireDoc()));
+                        addTask(dataSnapshot.getKey(), new Task(dataSnapshot.getRef().getParent().getKey(), 0, Task.TASK_ACTION, model.getTask(), model.getDueDate(), model.getRequireDoc()));
                     }
                     else {
-                        addNetworkTask(dataSnapshot.getKey(), new Task(dataSnapshot.getRef().getParent().getKey(), 0, "action", model.getTask(), model.getDueDate(), model.getRequireDoc()));
+                        addNetworkTask(dataSnapshot.getKey(), new Task(dataSnapshot.getRef().getParent().getKey(), 0, Task.TASK_ACTION, model.getTask(), model.getDueDate(), model.getRequireDoc()));
                     }
                 }
                 else {
@@ -477,7 +464,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
                 }
             }
 
-        } else if (dataSnapshot.getRef().getParent().getParent().getKey().equals("indicator")) {
+        } else if (dataSnapshot.getRef().getParent().getParent().getKey().equals(Task.TASK_INDICATOR)) {
 
             IndicatorModel model = dataSnapshot.getValue(IndicatorModel.class);
 
@@ -485,7 +472,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
             boolean shouldAdd = model.getAssignee() != null && model.getAssignee().equals(user.getUserID()) && model.getDueDate() != null;
 
             if (shouldAdd) {
-                Task task = new Task(dataSnapshot.getRef().getParent().getKey(), model.getTriggerSelected().intValue(), "indicator", model.getName(), model.getDueDate());
+                Task task = new Task(dataSnapshot.getRef().getParent().getKey(), model.getTriggerSelected().intValue(), Task.TASK_INDICATOR, model.getName(), model.getDueDate());
                 task.setParentId(dataSnapshot.getRef().getParent().getKey());
                 if (DateHelper.isDueInWeek(task.dueDate) || DateHelper.itWasDue(task.dueDate)) {
                     if(dataSnapshot.getRef().getParent().getKey().equals(user.countryID)) {

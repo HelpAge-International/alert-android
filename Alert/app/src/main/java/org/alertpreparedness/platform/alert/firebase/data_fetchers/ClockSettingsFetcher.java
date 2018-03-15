@@ -63,8 +63,6 @@ public class ClockSettingsFetcher {
     @Inject
     User user;
 
-
-
     @Deprecated
     public ClockSettingsFetcher(ClockSettingsRetrievedListener listener) {
         this.listener = listener;
@@ -105,8 +103,6 @@ public class ClockSettingsFetcher {
     }
 
     public Flowable<ClockSetting> rxFetchNetworkCountry(String networkId, String networkCountryId, String key){
-        System.out.println("ClockSettingsFetcher.rxFetchNetworkCountry");
-        System.out.println("networkId = [" + networkId + "], networkCountryId = [" + networkCountryId + "], key = [" + key + "]");
         return rxFetch(baseNetworkCountryRef.child(networkId).child(networkCountryId), key);
     }
 
@@ -209,6 +205,15 @@ public class ClockSettingsFetcher {
 
         public Map<String, ClockSetting> getGlobalNetworkClockSettings() {
             return globalNetworkClockSettings;
+        }
+
+        public Map<String, ClockSetting> all() {
+            HashMap<String, ClockSetting> res = new HashMap<>();
+            res.putAll(networkCountryClockSettings);
+            res.putAll(localNetworkClockSettings);
+            res.put(user.countryID, countryClockSettings);
+            res.putAll(globalNetworkClockSettings);
+            return res;
         }
 
 

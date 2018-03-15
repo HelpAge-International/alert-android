@@ -120,10 +120,10 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
 
     @Override
     public void onActionRetrieved(DataSnapshot snapshot, Action action) {
-        if(permissions.checkCanViewMPA(action)) {
-            txtNoAction.setVisibility(View.GONE);
-            mAdapter.addItems(snapshot.getKey(), action);
-        }
+//        if(permissions.checkCanViewMPA(action)) {
+//            txtNoAction.setVisibility(View.GONE);
+//            mAdapter.addItems(snapshot.getKey(), action);
+//        }
     }
 
     @Override
