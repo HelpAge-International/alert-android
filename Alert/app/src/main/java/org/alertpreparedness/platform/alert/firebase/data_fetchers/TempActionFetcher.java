@@ -2,7 +2,9 @@ package org.alertpreparedness.platform.alert.firebase.data_fetchers;
 
 import android.util.Pair;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
@@ -18,6 +20,7 @@ import org.alertpreparedness.platform.alert.firebase.ClockSetting;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
+import org.alertpreparedness.platform.alert.utils.Constants;
 import org.intellij.lang.annotations.Flow;
 
 import java.util.ArrayList;
@@ -220,20 +223,23 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
         return Flowable.merge(rxFetchActions(), rxFetchCHSActions(), rxFetchMandatedActions());
     }
 
-    private Flowable<Collection<ActionItemWrapper>> rxFetchGroupActions(){
-        return networkResultFlowable.flatMap(networkFetcherResult -> {
+    private Flowable<Collection<ActionItemWrapper>> rxFetchGroupActions() {
+        return rxFetchGroupActions(Constants.CUSTOM);
+    }
 
+    private Flowable<Collection<ActionItemWrapper>> rxFetchGroupActions(int type){
+        return networkResultFlowable.flatMap(networkFetcherResult -> {
             List<String> networkIds = networkFetcherResult.all();
 
             List<Flowable<Collection<ActionItemWrapper>>> flowables = new ArrayList<>();
             flowables.add(
-                    RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(user.countryID).orderByChild("type").equalTo(2))
+                    RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(user.countryID).orderByChild("type").equalTo(type))
                             .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
                             .map(childrenDataSnapshotList -> Collections2.transform(childrenDataSnapshotList, ActionItemWrapper::createAction))
             );
 
             for (String networkId : networkIds) {
-                flowables.add(RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(networkId).orderByChild("type").equalTo(2))
+                flowables.add(RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(networkId).orderByChild("type").equalTo(type))
                         .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
                         .map(childrenDataSnapshotList -> Collections2.transform(childrenDataSnapshotList, ActionItemWrapper::createAction))
                 );
@@ -243,46 +249,29 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
     }
 
     private Flowable<Collection<ActionItemWrapper>> rxFetchGroupCHS(){
-        return networkResultFlowable.flatMap(networkFetcherResult -> {
-            List<String> networkIds = networkFetcherResult.all();
+        return Flowable.combineLatest(
+            rxFetchGroupActions(Constants.CHS).map(actionItemWrappers -> Collections2.transform(actionItemWrappers, ActionItemWrapper::getActionSnapshot)),
+            RxFirebaseDatabase.observeValueEvent(dbBaseActionCHSRef.child(user.getSystemAdminID()))
+                    .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren())),
+            (actionSnapshots, chsSnapshots) -> {
+                List<ActionItemWrapper> toReturn = new ArrayList<>();
+                for(DataSnapshot chsSnapshot : chsSnapshots){
+                    Optional<DataSnapshot> actionSnapshot = Iterables.tryFind(actionSnapshots, input -> input.getKey().equals(chsSnapshot.getKey()));
 
-            List<Flowable<Collection<DataSnapshot>>> flowables = new ArrayList<>();
-            flowables.add(
-                    RxFirebaseDatabase.observeValueEvent(dbBaseActionCHSRef.child(user.countryID))
-                            .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
-            );
-
-            for (String networkId : networkIds) {
-                flowables.add(RxFirebaseDatabase.observeValueEvent(dbBaseActionCHSRef.child(networkId))
-                        .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
-                );
+                     toReturn.add(ActionItemWrapper.createCHS(chsSnapshot, actionSnapshot.orNull()));
+                }
+                return toReturn;
             }
-            return Flowable.<Collection<DataSnapshot>, Collection<DataSnapshot>>combineLatest(flowables, AppUtils::combineDataSnapshotList);
-        })
-        .flatMap(actionItemWrapperLists -> {
-            List<Flowable<ActionItemWrapper>> flowables = new ArrayList<>();
-            for (DataSnapshot chsAction : actionItemWrapperLists) {
-                Flowable<ActionItemWrapper> chsActionFlow = RxFirebaseDatabase.observeValueEvent(dbBaseActionCHSRef.child(chsAction.getRef().getParent().getKey()))
-                        .map(action -> ActionItemWrapper.createCHS(chsAction, action));
-                flowables.add(chsActionFlow);
-            }
-
-            if(flowables.size() != 0) {
-                return Flowable.combineLatest(flowables, objects -> Arrays.asList((ActionItemWrapper[]) objects));
-            }
-            else{
-                return Flowable.just(new ArrayList<>());
-            }
-        });
+        );
     }
 
     private Flowable<Collection<ActionItemWrapper>> rxFetchGroupMandated(){
-        return networkResultFlowable.flatMap(networkFetcherResult -> {
+        Flowable<Collection<DataSnapshot>> mandatedFlow = networkResultFlowable.flatMap(networkFetcherResult -> {
             List<String> networkIds = networkFetcherResult.all();
 
             List<Flowable<Collection<DataSnapshot>>> flowables = new ArrayList<>();
             flowables.add(
-                    RxFirebaseDatabase.observeValueEvent(dbBaseActionMandatedRef.child(user.countryID))
+                    RxFirebaseDatabase.observeValueEvent(dbBaseActionMandatedRef.child(user.agencyAdminID))
                             .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
             );
 
@@ -292,22 +281,20 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
                 );
             }
             return Flowable.<Collection<DataSnapshot>, Collection<DataSnapshot>>combineLatest(flowables, AppUtils::combineDataSnapshotList);
-        })
-                .flatMap(actionItemWrapperLists -> {
-                    List<Flowable<ActionItemWrapper>> flowables = new ArrayList<>();
-                    for (DataSnapshot mandatedAction : actionItemWrapperLists) {
-                        Flowable<ActionItemWrapper> mandatedActionFlow = RxFirebaseDatabase.observeValueEvent(dbBaseActionMandatedRef.child(mandatedAction.getRef().getParent().getKey()))
-                                .map(action -> ActionItemWrapper.createMandated(mandatedAction, action));
-                        flowables.add(mandatedActionFlow);
-                    }
+        });
+        return Flowable.combineLatest(
+            rxFetchGroupActions(Constants.MANDATED).map(actionItemWrappers -> Collections2.transform(actionItemWrappers, ActionItemWrapper::getActionSnapshot)),
+            mandatedFlow,
+            (actionSnapshots, mandatedSnapshots) -> {
+                List<ActionItemWrapper> toReturn = new ArrayList<>();
+                for(DataSnapshot mandatedSnapshot : mandatedSnapshots){
+                    Optional<DataSnapshot> actionSnapshot = Iterables.tryFind(actionSnapshots, input -> input.getKey().equals(mandatedSnapshot.getKey()));
 
-                    if(flowables.size() != 0) {
-                        return Flowable.combineLatest(flowables, objects -> Arrays.asList((ActionItemWrapper[]) objects));
-                    }
-                    else{
-                        return Flowable.just(new ArrayList<>());
-                    }
-                });
+                    toReturn.add(ActionItemWrapper.createCHS(mandatedSnapshot, actionSnapshot.orNull()));
+                }
+                return toReturn;
+            }
+        );
     }
 
     @Override

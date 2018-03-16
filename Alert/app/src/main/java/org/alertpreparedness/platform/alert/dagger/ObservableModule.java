@@ -154,4 +154,12 @@ public class ObservableModule {
         return new AlertFetcher().fetchWithExtra();
     }
 
+    @Provides
+    @Singleton
+    @PreparednessClockSettingsFlowable
+    public Flowable<ClockSettingsFetcher.ClockSettingsResult> providePreparednessClockSettingsFlowable(){
+        return new ClockSettingsFetcher().rxFetch(ClockSettingsFetcher.TYPE_PREPAREDNESS);
+    }
+
+
 }
