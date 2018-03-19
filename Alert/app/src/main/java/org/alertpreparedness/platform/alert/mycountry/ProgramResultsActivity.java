@@ -38,6 +38,7 @@ import org.alertpreparedness.platform.alert.firebase.ProgrammeModel;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.CountryJsonData;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.SelectAreaViewModel;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -374,7 +375,7 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
 
         for (DataSnapshot child : dataSnapshot.getChildren()) {
             for(DataSnapshot programmSnapshot : child.child("4WMapping").getChildren()) {
-                ProgrammeModel model = programmSnapshot.getValue(ProgrammeModel.class);
+                ProgrammeModel model = AppUtils.getValueFromDataSnapshot(programmSnapshot, ProgrammeModel.class);
                 assert model != null;
                 model.setKey(programmSnapshot.getKey());
 
