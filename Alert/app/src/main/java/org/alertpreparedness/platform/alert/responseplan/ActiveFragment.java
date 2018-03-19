@@ -62,6 +62,8 @@ public class ActiveFragment extends Fragment implements ResponsePlansAdapter.Res
 
     private CompositeDisposable disposable = new CompositeDisposable();
 
+    protected boolean active = true;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -127,7 +129,7 @@ public class ActiveFragment extends Fragment implements ResponsePlansAdapter.Res
 
             boolean isActive = (boolean) item.getResponsePlan().child("isActive").getValue();
 
-            if (isActive) {
+            if (isActive == active) {
                 int regionalApproval = getApprovalStatus(item.getResponsePlan().child("approval").child("regionDirector"));
                 int countryApproval = getApprovalStatus(item.getResponsePlan().child("approval").child("countryDirector"));
                 int globalApproval = getApprovalStatus(item.getResponsePlan().child("approval").child("globalDirector"));

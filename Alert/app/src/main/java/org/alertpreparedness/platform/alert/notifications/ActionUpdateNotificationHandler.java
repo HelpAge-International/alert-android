@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.notifications;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Pair;
@@ -125,6 +126,7 @@ public class ActionUpdateNotificationHandler {
         actionIds.remove(actionId);
         PreferHelper.setScheduledActionNotifications(context, actionIds);
     }
+    @SuppressLint("CheckResult")
     public void scheduleAllNotifications(){
         Flowable.combineLatest(clockSettingsResultFlowable, actionGroupFlowable, Pair::new)
                 .firstElement()
@@ -135,34 +137,26 @@ public class ActionUpdateNotificationHandler {
                     cancelAllNotifications(context);
 
                     for(ActionItemWrapper actionItemWrapper : actionItemWrappers){
-                        ClockSetting clockSetting = null;
-                        switch (model.getActionType()) {
-                            case NETWORK_COUNTRY:
-                                clockSetting = actionFetcherResult.getNetworkCountryClockSettings(model.getGroupId());
-                                break;
-                            case LOCAL_NETWORK:
-                                clockSetting = actionFetcherResult.getLocalNetworkClockSettings(model.getGroupId());
-                                break;
-                            case COUNTRY:
-                                clockSetting = actionFetcherResult.getCountryClockSettings(model.getGroupId());
-                                Timber.d("ClockSetting: " + clockSetting.getValue() + " - " + clockSetting.getDurationType());
-                                break;
-                        }
-                        try {
-                            scheduleNotification(context, model.getAction(), model.getGroupId(), model.getActionId(), clockSetting);
-                        }
-                        catch (Exception e) {
-                            //TODO soz elliot, had to do this. was braeking meh app
+                        if(actionItemWrapper.getActionSnapshot() != null) {
+                            ClockSetting clockSetting = null;
+                            switch (actionItemWrapper.getGroup()) {
+                                case NETWORK_COUNTRY:
+                                    clockSetting = clockSettings.getNetworkCountryClockSettings().get(actionItemWrapper.getGroupId());
+                                    break;
+                                case LOCAL_NETWORK:
+                                    clockSetting = clockSettings.getLocalNetworkClockSettings().get(actionItemWrapper.getGroupId());
+                                    break;
+                                case COUNTRY:
+                                    clockSetting = clockSettings.getCountryClockSettings();
+                                    break;
+                            }
+                            try {
+                                scheduleNotification(context, actionItemWrapper.makeModel(), actionItemWrapper.getGroupId(), actionItemWrapper.getActionId(), clockSetting);
+                            } catch (Exception e) {
+                            }
                         }
                     }
-                    Timber.d("Scheduled Notifications: " + actionFetcherResult.getModels().size());
-
                 });
-    }
-
-    @Override
-    public void actionFetchSuccess(ActionFetcher.ActionFetcherResult actionFetcherResult) {
-        Timber.d("Success");
     }
 
     public void scheduleNotification(Context context, ActionModel actionModel, String groupId, String actionId) {
@@ -349,10 +343,5 @@ public class ActionUpdateNotificationHandler {
 
     private static String getTag(String actionId, int notificationType, int actionType) {
         return actionId + "-" + notificationType + "-" + actionType;
-    }
-
-    @Override
-    public void actionFetchFail() {
-        Timber.d("FAIL");
     }
 }

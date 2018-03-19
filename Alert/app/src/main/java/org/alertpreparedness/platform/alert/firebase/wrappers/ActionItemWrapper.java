@@ -8,8 +8,10 @@ import com.google.firebase.database.DataSnapshot;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.ClockSetting;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
+import org.alertpreparedness.platform.alert.notifications.ActionFetcher;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.jetbrains.annotations.NotNull;
 
 import butterknife.internal.ListenerClass;
 import durdinapps.rxfirebase2.RxFirebaseChildEvent;
@@ -37,7 +39,7 @@ public class ActionItemWrapper {
         return new ActionItemWrapper(ActionType.CHS, dataSnapshot, null, Group.NONE);
     }
 
-    public static ActionItemWrapper createCHS(DataSnapshot dataSnapshot, @Nullable DataSnapshot actionSnapshot, Group group) {
+    public static ActionItemWrapper createCHS(DataSnapshot dataSnapshot, @NotNull DataSnapshot actionSnapshot, Group group) {
         return new ActionItemWrapper(ActionType.CHS, dataSnapshot, actionSnapshot, group);
     }
 
@@ -161,6 +163,20 @@ public class ActionItemWrapper {
 
     public void setTypeSnapshot(DataSnapshot typeSnapshot) {
         this.typeSnapshot = typeSnapshot;
+    }
+
+    public String getGroupId() {
+        return actionSnapshot == null ? null : actionSnapshot.getRef().getParent().getKey();
+    }
+
+    public String getActionId(){
+        if(actionSnapshot != null){
+            return actionSnapshot.getKey();
+        }
+        else if(typeSnapshot != null){
+            return typeSnapshot.getKey();
+        }
+        return null;
     }
 
     public enum Group {

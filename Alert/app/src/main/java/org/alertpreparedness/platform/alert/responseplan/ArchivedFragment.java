@@ -22,6 +22,10 @@ import java.util.Date;
 
 public class ArchivedFragment extends ActiveFragment{
 
+    public ArchivedFragment() {
+        active = false;
+    }
+
     @Override
     protected ResponsePlansAdapter getmAdapter() {
         return new ResponsePlansAdapter(getContext(), responsePlans, false, this);
