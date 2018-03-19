@@ -26,6 +26,7 @@ import javax.inject.Inject;
 
 import timber.log.Timber;
 
+@Deprecated
 public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterListener {
 
     private ActionFetcherListener listener;

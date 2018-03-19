@@ -1,7 +1,9 @@
 package org.alertpreparedness.platform.alert.notifications;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Pair;
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
@@ -14,12 +16,19 @@ import com.google.firebase.database.Exclude;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.PreparednessClockSettingsFlowable;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionGroupObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseNetworkCountryRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseNetworkRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.ClockSetting;
+import org.alertpreparedness.platform.alert.firebase.ClockSettings;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.ClockSettingsFetcher;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.TempActionFetcher;
+import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -28,14 +37,16 @@ import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Flowable;
 import timber.log.Timber;
 
-public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetcherListener {
+public class ActionUpdateNotificationHandler {
 
     private final Context context;
     @Inject
@@ -57,6 +68,13 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
     @CountryOfficeRef
     public DatabaseReference countryOfficeRef;
 
+    @Inject
+    @ActionGroupObservable
+    public Flowable<Collection<ActionItemWrapper>> actionGroupFlowable;
+
+    @Inject
+    @PreparednessClockSettingsFlowable
+    public Flowable<ClockSettingsFetcher.ClockSettingsResult> clockSettingsResultFlowable;
 
     public static final String BUNDLE_ACTION_ID = "ActionId";
     public static final String BUNDLE_GROUP_ID = "GroupId";
@@ -108,39 +126,37 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
         actionIds.remove(actionId);
         PreferHelper.setScheduledActionNotifications(context, actionIds);
     }
-
+    @SuppressLint("CheckResult")
     public void scheduleAllNotifications(){
-        new ActionFetcher(this).fetchAll();
-    }
+        Flowable.combineLatest(clockSettingsResultFlowable, actionGroupFlowable, Pair::new)
+                .firstElement()
+                .subscribe(clockSettingsResultCollectionPair -> {
+                    ClockSettingsFetcher.ClockSettingsResult clockSettings = clockSettingsResultCollectionPair.first;
+                    Collection<ActionItemWrapper> actionItemWrappers = clockSettingsResultCollectionPair.second;
 
-    @Override
-    public void actionFetchSuccess(ActionFetcher.ActionFetcherResult actionFetcherResult) {
-        Timber.d("Success");
-        cancelAllNotifications(context);
+                    cancelAllNotifications(context);
 
-        for(ActionFetcher.ActionFetcherModel model : actionFetcherResult.getModels()){
-            Timber.d("Action Model: " + model.getAction());
-            ClockSetting clockSetting = null;
-            switch (model.getActionType()) {
-                case NETWORK_COUNTRY:
-                    clockSetting = actionFetcherResult.getNetworkCountryClockSettings(model.getGroupId());
-                    break;
-                case LOCAL_NETWORK:
-                    clockSetting = actionFetcherResult.getLocalNetworkClockSettings(model.getGroupId());
-                    break;
-                case COUNTRY:
-                    clockSetting = actionFetcherResult.getCountryClockSettings(model.getGroupId());
-                    Timber.d("ClockSetting: " + clockSetting.getValue() + " - " + clockSetting.getDurationType());
-                    break;
-            }
-            try {
-                scheduleNotification(context, model.getAction(), model.getGroupId(), model.getActionId(), clockSetting);
-            }
-            catch (Exception e) {
-                //TODO soz elliot, had to do this. was braeking meh app
-            }
-        }
-        Timber.d("Scheduled Notifications: " + actionFetcherResult.getModels().size());
+                    for(ActionItemWrapper actionItemWrapper : actionItemWrappers){
+                        if(actionItemWrapper.getActionSnapshot() != null) {
+                            ClockSetting clockSetting = null;
+                            switch (actionItemWrapper.getGroup()) {
+                                case NETWORK_COUNTRY:
+                                    clockSetting = clockSettings.getNetworkCountryClockSettings().get(actionItemWrapper.getGroupId());
+                                    break;
+                                case LOCAL_NETWORK:
+                                    clockSetting = clockSettings.getLocalNetworkClockSettings().get(actionItemWrapper.getGroupId());
+                                    break;
+                                case COUNTRY:
+                                    clockSetting = clockSettings.getCountryClockSettings();
+                                    break;
+                            }
+                            try {
+                                scheduleNotification(context, actionItemWrapper.makeModel(), actionItemWrapper.getGroupId(), actionItemWrapper.getActionId(), clockSetting);
+                            } catch (Exception e) {
+                            }
+                        }
+                    }
+                });
     }
 
     public void scheduleNotification(Context context, ActionModel actionModel, String groupId, String actionId) {
@@ -327,10 +343,5 @@ public class ActionUpdateNotificationHandler implements ActionFetcher.ActionFetc
 
     private static String getTag(String actionId, int notificationType, int actionType) {
         return actionId + "-" + notificationType + "-" + actionType;
-    }
-
-    @Override
-    public void actionFetchFail() {
-        Timber.d("FAIL");
     }
 }
