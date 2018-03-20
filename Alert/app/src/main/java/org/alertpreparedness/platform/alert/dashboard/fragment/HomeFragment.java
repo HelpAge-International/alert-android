@@ -58,7 +58,6 @@ import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteAc
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.UpdateIndicatorActivity;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
-import org.alertpreparedness.platform.alert.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -311,6 +310,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         networkTitle.setVisibility(View.VISIBLE);
         networkAlertList.setVisibility(View.VISIBLE);
         networkAlertAdapter.update(id, alert);
+
     }
 
     @Override
@@ -329,33 +329,29 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
         boolean redPresent = false;
         boolean amberPresent = false;
-        boolean noAlerts = false;
 
         updateTitle(R.string.green_alert_level, R.drawable.alert_green);
         for (String a : alertAdapter.getAlerts()) {
             AlertModel model = alertAdapter.getModel(a);
             switch (model.getAlertLevel()) {
                 case 2:
-                    if(!model.wasRedAlertRequested()) {//means is has approval
+                    if(model.getRedAlertApproved()) {//means is has approval
                         redPresent = true;
                     }
                     break;
                 case 1:
                     amberPresent = true;
                     break;
-                case 0:
-                    noAlerts = true;
-                    break;
             }
         }
 
-        if (!redPresent && !amberPresent && noAlerts) {
+        if (!redPresent && !amberPresent) {
             updateTitle(R.string.green_alert_level, R.drawable.alert_green);
         }
-
-        if (redPresent) {
+        else if (redPresent) {
             updateTitle(R.string.red_alert_level, R.drawable.alert_red_main);
-        } else {
+        }
+        else {
             updateTitle(R.string.amber_alert_level, R.drawable.alert_amber_main);
         }
     }

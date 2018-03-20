@@ -28,7 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.alertpreparedness.platform.alert.ExtensionHelperKt;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
-import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dashboard.adapter.AlertAdapter;
 import org.alertpreparedness.platform.alert.firebase.AffectedAreaModel;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
@@ -74,8 +74,8 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     SimpleDateFormat dateFormatter;
 
     @Inject
-    @AlertRef
-    DatabaseReference countryAlertRef;
+    @BaseAlertRef
+    DatabaseReference baseAlertRef;
 
     @Inject
     User user;
@@ -281,7 +281,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
     private void setUpRedAlertRequestView() {
         Window window = getWindow();
-        if (alert.isNetwork() && alert.getAgencyAdminId().equals(alert.getLeadAgencyId()) && alert.getAgencyAdminId().equals(user.getUserID())  && alert.wasRedAlertRequested() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
+        if (alert.isNetwork() && alert.getAgencyAdminId().equals(alert.getLeadAgencyId()) && alert.getAgencyAdminId().equals(user.getUserID())  && !alert.getRedAlertApproved() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setStatusBarColor(getResources().getColor(R.color.sBar_Gray));
             }
@@ -291,7 +291,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             llButtons.setVisibility(View.VISIBLE);
             setUserName();
         }
-        else if (!alert.isNetwork() && isCountryDirector && alert.wasRedAlertRequested() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
+        else if (!alert.isNetwork() && isCountryDirector && !alert.getRedAlertApproved() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setStatusBarColor(getResources().getColor(R.color.sBar_Gray));
             }
@@ -300,7 +300,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             clRequested.setVisibility(View.VISIBLE);
             llButtons.setVisibility(View.VISIBLE);
             setUserName();
-        } else if (!isCountryDirector && alert.wasRedAlertRequested() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
+        } else if (!isCountryDirector && !alert.getRedAlertApproved() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setStatusBarColor(getResources().getColor(R.color.sBar_Gray));
             }
@@ -312,10 +312,16 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
     private void setUserName() {
 
+        String userId = alert.getUpdatedBy();
+
+        if(userId == null) {
+            userId = alert.getCreatedBy();
+        }
+
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
         DatabaseReference db = ref.
                 child(PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS)).
-                child("userPublic").child(alert.getUpdatedBy());
+                child("userPublic").child(userId);
 
         System.out.println("REF: " + db.getRef());
         db.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -339,7 +345,10 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     }
 
     private String getRedDisplayText(String fn, String ln) {
-        return fn + " " + ln + " has requested the alert level to go from Amber to Red on the " + dateFormatter.format(new Date(alert.getTimeUpdated()));
+
+        Long date = alert.getTimeUpdated() == null ? alert.getTimeCreated() : alert.getTimeUpdated();
+
+        return fn + " " + ln + " has requested the alert level to go from Amber to Red on the " + dateFormatter.format(date);
     }
 
 
@@ -406,27 +415,19 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
     private void approveOrReject(boolean isApproved) {
 
-        mReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (isApproved) {
-                    DatabaseReference rf = countryAlertRef.child(alert.getKey());
-                    rf.setValue(alert);
-                    mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_APPROVED);
-                    mReference.child("alertLevel").setValue(Constants.TRIGGER_RED);
+        if (isApproved) {
+            DatabaseReference rf = baseAlertRef.child(alert.getParentKey()).child(alert.getId());
+            rf.setValue(alert);
+            mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_APPROVED);
+            mReference.child("redAlertApproved").setValue(true);
+            mReference.child("alertLevel").setValue(Constants.TRIGGER_RED);
 
-                } else {
-                    mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_REJECTED);
-                }
-                Intent intent = new Intent(AlertDetailActivity.this, HomeScreen.class);
-                startActivity(intent);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        }
+        else {
+            mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_REJECTED);
+        }
+        Intent intent = new Intent(AlertDetailActivity.this, HomeScreen.class);
+        startActivity(intent);
 
     }
 

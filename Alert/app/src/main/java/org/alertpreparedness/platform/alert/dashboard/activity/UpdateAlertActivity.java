@@ -245,8 +245,6 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
                @Override
                public void onDataChange(DataSnapshot dataSnapshot) {
 
-
-
                    for (int i = 0; i < areas.size(); i++) {
                        db.child("affectedAreas").child(String.valueOf(i))
                                .setValue(areas.get(i));
@@ -255,9 +253,6 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
                    if (reason != null) {
                        alert.setAlertLevel(2);
                        db.child("reasonForRedAlert").setValue(reason);
-                       db.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_PENDING);
-                   }else{
-                       db.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_REJECTED);
                    }
 
                    long time = System.currentTimeMillis();
@@ -279,23 +274,6 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
 
                }
            });
-    }
-
-
-    public void backToDetailView() {
-        Intent intent = new Intent(UpdateAlertActivity.this, AlertDetailActivity.class);
-        intent.putExtra(EXTRA_ALERT, alert);
-
-        if (mFieldsAdapter.isRedAlert()) {
-            if (mFieldsAdapter.getModel(2).resultTitle != null) {
-                intent.putExtra("IS_RED_REQUEST", "true");
-                startActivity(intent);
-            } else {
-                SnackbarHelper.show(this, getString(R.string.txt_reason_for_red));
-            }
-        } else {
-            startActivity(intent);
-        }
     }
 
     @Override

@@ -118,7 +118,7 @@ data class ModelIndicator(val id: String?, var hazardScenario: ModelHazard, val 
     }
 
     @Exclude
-    lateinit var hazardId: String
+    var hazardId: String = ""
 
 
 }

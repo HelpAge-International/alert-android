@@ -84,6 +84,7 @@ class RiskMonitoringService(private val context : Context) {
                 val reader = JsonReader(StringReader(toJson.trim()))
                 reader.isLenient = true
                 val fromJson = gson.fromJson<ModelIndicator>(reader, ModelIndicator::class.java)
+                fromJson.hazardId = hazardId
                 return@map fromJson.copy(id = it.key)
             }
         })
@@ -121,6 +122,7 @@ class RiskMonitoringService(private val context : Context) {
                 val reader = JsonReader(StringReader(toJson.trim()))
                 reader.isLenient = true
                 val fromJson = gson.fromJson<ModelIndicator>(reader, ModelIndicator::class.java)
+                fromJson.hazardId = hazardId
                 if (network != null) {
                     Timber.d("network id: %s, name: %s", network.id, network.name)
                     return@map fromJson.copy(id = it.key, networkId = network.id, networkName = network.name)
@@ -165,6 +167,7 @@ class RiskMonitoringService(private val context : Context) {
             val jsonReader = JsonReader(StringReader(toJson))
             jsonReader.isLenient = true
             val model = gson.fromJson<ModelIndicator>(jsonReader, ModelIndicator::class.java)
+            model.hazardId = hazardId
             return@observeValueEvent model.copy(id = indicatorId)
         })
     }

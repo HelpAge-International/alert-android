@@ -42,6 +42,8 @@ public class AlertModel extends FirebaseModel implements Serializable {
     private String name;
     private String key;
 
+    private boolean redAlertApproved;
+
     public AlertModel() {
     }
 
@@ -140,13 +142,6 @@ public class AlertModel extends FirebaseModel implements Serializable {
         this.reasonForRedAlert = reasonForRedAlert;
     }
 
-    public boolean wasRedAlertRequested() {
-        return approval == null ||
-                approval.getCountryDirector() == null ||
-                approval.getCountryDirector().size() == 0 ||
-                (alertLevel == 2 && approval.getCountryDirector().entrySet().iterator().next().getValue() == 0);
-    }
-
     public ApprovalModel getApproval() {
         return approval;
     }
@@ -226,11 +221,11 @@ public class AlertModel extends FirebaseModel implements Serializable {
         this.agencyAdminId = agencyAdminId;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public boolean getRedAlertApproved() {
+        return redAlertApproved;
     }
 
-    public String getKey() {
-        return key;
+    public void setRedAlertApproved(boolean redAlertApproved) {
+        this.redAlertApproved = redAlertApproved;
     }
 }

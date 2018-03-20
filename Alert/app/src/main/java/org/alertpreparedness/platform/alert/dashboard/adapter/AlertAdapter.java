@@ -1,7 +1,6 @@
 package org.alertpreparedness.platform.alert.dashboard.adapter;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,13 +12,11 @@ import org.alertpreparedness.platform.alert.ExtensionHelperKt;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
-import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.interfaces.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -184,17 +181,17 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
 
             tvPeopleCount.setText(getNumOfPeopleText(alert.getEstimatedPopulation(), alert.getAffectedAreas().size()));
 
-            if(isCountryDirector && alert.wasRedAlertRequested() && !alert.isNetwork() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
+            if(isCountryDirector && !alert.getRedAlertApproved() && !alert.isNetwork() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
                 txtRedRequested.setVisibility(View.VISIBLE);
                 imgAlertColour.setImageResource(R.drawable.gray_alert_left);
                 txtRedRequested.setText(R.string.txt_cd_red_request);
             }
-            else if(alert.isNetwork() && alert.wasRedAlertRequested() && alert.getAgencyAdminId().equals(alert.getLeadAgencyId()) && alert.getAgencyAdminId().equals(user.getUserID())  && alert.getAlertLevel() == Constants.TRIGGER_RED) {
+            else if(alert.isNetwork() && !alert.getRedAlertApproved() && alert.getAgencyAdminId().equals(alert.getLeadAgencyId()) && alert.getAgencyAdminId().equals(user.getUserID())  && alert.getAlertLevel() == Constants.TRIGGER_RED) {
                 txtRedRequested.setVisibility(View.VISIBLE);
                 imgAlertColour.setImageResource(R.drawable.gray_alert_left);
                 txtRedRequested.setText(R.string.txt_cd_red_request);
             }
-            else if(alert.wasRedAlertRequested() && !isCountryDirector && alert.getAlertLevel() == Constants.TRIGGER_RED) {
+            else if(!alert.getRedAlertApproved() && !isCountryDirector && alert.getAlertLevel() == Constants.TRIGGER_RED) {
                 txtRedRequested.setVisibility(View.VISIBLE);
                 imgAlertColour.setImageResource(R.drawable.gray_alert_left);
                 txtRedRequested.setText(R.string.txt_red_requested);
