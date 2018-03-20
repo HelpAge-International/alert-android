@@ -20,6 +20,7 @@ public class AlertFieldModel {
     public int drawable;
     @StringRes
     public int initialTitle;
+    public String currentTitle;
     public List<String> strings = new ArrayList<>();
     public String resultTitle;
     public int inputType = InputType.TYPE_CLASS_TEXT;

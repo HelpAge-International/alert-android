@@ -157,20 +157,14 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
             if (isRedAlert) {
                 put(user.getCountryID(), 0);
             }
-            else {
-//                put(user.getCountryID(), 2);
-            }
         }});
 
         m.setApproval(approval);
         if(isRedAlert) {
             m.setReasonForRedAlert(mFieldsAdapter.getRedAlertReason());
         }
-        System.out.println("m = " + m.toString());
 
         DatabaseReference ref = alertRef.push();
-
-        System.out.println("ref = " + ref);
 
         ref.setValue(m);
         finish();

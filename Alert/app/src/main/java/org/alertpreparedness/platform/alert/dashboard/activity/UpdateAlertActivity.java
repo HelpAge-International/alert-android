@@ -80,7 +80,14 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
                 mAlertLevelFragment.show(getSupportFragmentManager(), "alert_level");
                 break;
             case 3:
-                startActivityForResult(new Intent(this, SelectAreaActivity.class), EFFECTED_AREA_REQUEST);
+                if(alert.getAlertLevel() != Constants.TRIGGER_RED) {
+                    startActivityForResult(new Intent(this, SelectAreaActivity.class), EFFECTED_AREA_REQUEST);
+                }
+                break;
+            case 4:
+                if(alert.getAlertLevel() == Constants.TRIGGER_RED) {
+                    startActivityForResult(new Intent(this, SelectAreaActivity.class), EFFECTED_AREA_REQUEST);
+                }
                 break;
         }
     }
@@ -125,8 +132,7 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
                             level1, level2);
                     db.child("affectedAreas")
                             .child(String.valueOf(mFieldsAdapter.getSubListCapacity(3)))
-                            .setValue(affectedArea)
-                            .addOnCompleteListener(aVoid ->{});
+                            .setValue(affectedArea);
                 }
             }
 
@@ -140,7 +146,8 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
     private void fetchDetails() {
         if(alert.getOtherName() != null){
             mFieldsAdapter.setTextFieldValue(0, alert.getOtherName());
-        }else {
+        }
+        else {
             for (int i = 0; i < Constants.HAZARD_SCENARIO_NAME.length; i++) {
                 if (i == alert.getHazardScenario()) {
                     mFieldsAdapter.setTextFieldValue(0, Constants.HAZARD_SCENARIO_NAME[i]);
@@ -163,11 +170,17 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
                 String res = Constants.COUNTRIES[m.getCountry()];
                 if (m.getLevel1Name() != null) {
                     res += ", " + m.getLevel1Name();
+                    if(m.getLevel2Name() != null) {
+                        res += ", " + m.getLevel2Name();
+                    }
                 }
                 mFieldsAdapter.addSubListValue(3, res);
             }
         }
         mFieldsAdapter.setTextFieldValue(4, alert.getInfoNotes());
+        if(!alert.getRedAlertApproved() && alertLevel == Constants.TRIGGER_RED) {
+            mFieldsAdapter.addRedAlertReason(alert.getReasonForRedAlert());
+        }
     }
 
     private void setUpActionBarColour() {
@@ -179,7 +192,8 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
                 window.setStatusBarColor(getResources().getColor(R.color.sBar_Amber));
             }
 
-        } else if (alert.getAlertLevel() == 2) {
+        }
+        else if (alert.getAlertLevel() == 2) {
             mToolbar.setBackgroundResource(R.color.alertRed);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

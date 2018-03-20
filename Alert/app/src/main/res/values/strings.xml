@@ -53,7 +53,7 @@
     <string name="indicator_name">Indicator name</string>
     <string name="green_trigger_name">Green trigger name</string>
     <string name="amber_trigger_name">Amber trigger name</string>
-    <string name="red_trigger_name">Red trigger name</string>
+    <string name="red_trigger_name">Reasons for red alert request</string>
     <string name="update_every">Update every</string>
     <string name="_0">0</string>
     <string name="frequency">Frequency</string>

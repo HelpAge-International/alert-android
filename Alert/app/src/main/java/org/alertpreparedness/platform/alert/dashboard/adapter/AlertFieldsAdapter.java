@@ -39,6 +39,7 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     public final static int EDIT_TEXT = 1;
     public final static int RECYCLER = 2;
     private boolean isRedAlert;
+    private boolean isEditable;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -83,6 +84,13 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         this.listener = listener;
     }
 
+    public AlertFieldsAdapter(Context context, List<AlertFieldModel> models, ClickListener listener, boolean isEditable) {
+        this.context = context;
+        this.items = models;
+        this.listener = listener;
+        this.isEditable = isEditable;
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if(viewType == EDIT_TEXT) {
@@ -120,6 +128,9 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                 h.image.setImageDrawable(ContextCompat.getDrawable(context, m.drawable));
                 h.field.setOnClickListener(view -> listener.onItemClicked(m.originalPosition));
                 h.recylclerCon.setVisibility(View.GONE);
+                if(!isEditable) {
+                    h.field.setFocusable(false);
+                }
                 break;
             case EDIT_TEXT:
                 ViewHolder1 h1 = (ViewHolder1)holder;
@@ -153,8 +164,10 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                         m.resultTitle = editable.toString();
                     }
                 });
-                //no needed because edit_text
-//                holder.itemView.setOnClickListener(view -> listener.onItemClicked(position));
+
+                if(!isEditable) {
+                    h1.field.setFocusable(false);
+                }
                 break;
             case RECYCLER:
                 ViewHolder h2 = (ViewHolder)holder;
@@ -177,7 +190,9 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                 h2.image.setImageDrawable(
                         ContextCompat.getDrawable(context, m.drawable)
                 );
-                h2.textView.setOnClickListener(view -> listener.onItemClicked(m.originalPosition));
+                if(isEditable) {
+                    h2.textView.setOnClickListener(view -> listener.onItemClicked(m.originalPosition));
+                }
                 break;
         }
 
@@ -221,6 +236,16 @@ class AlertFieldsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             items.remove(2);
             isRedAlert = false;
             notifyItemRemoved(2);
+        }
+    }
+
+    public void addRedAlertReason(String reason) {
+        if(!isRedAlert) {
+            AlertFieldModel m = new AlertFieldModel(EDIT_TEXT, R.drawable.alert_red_reason, R.string.red_trigger_name);
+            m.resultTitle = reason;
+            items.add(2, m);
+            isRedAlert = true;
+            notifyItemInserted(2);
         }
     }
 

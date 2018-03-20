@@ -224,30 +224,34 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             if(countryJsonData != null) {
                 mCountryDataList = new ArrayList<>(countryJsonData);
 
-                if (mCountryDataList.size() == 248) {
+                if (mCountryDataList.size() >= 248) {
 
                     StringBuilder res = new StringBuilder();
                     for(AffectedAreaModel m : alert.getAffectedAreas()) {
-                        try {
-                            List<String> list = ExtensionHelperKt.getLevel1Values(m.getCountry(), mCountryDataList);
-                            List<String> level2List = ExtensionHelperKt.getLevel2Values(m.getCountry(), m.getLevel1(), mCountryDataList);
+                        if(m != null) {
                             res.append(Constants.COUNTRIES[m.getCountry()]);
-                            if (list != null) {
-                                if(m.getLevel1() != null && m.getLevel1() != -1  && list.get(m.getLevel1()) != null) {
-                                    m.setLevel1Name(list.get(m.getLevel1()));
-                                    res.append(", ").append(list.get(m.getLevel1()));
+                            try {
+                                List<String> list = ExtensionHelperKt.getLevel1Values(m.getCountry(), mCountryDataList);
+                                List<String> level2List = ExtensionHelperKt.getLevel2Values(m.getCountry(), m.getLevel1(), mCountryDataList);
+
+                                if (list != null) {
+                                    if (m.getLevel1() != null && m.getLevel1() != -1 && list.get(m.getLevel1()) != null) {
+                                        m.setLevel1Name(list.get(m.getLevel1()));
+                                        res.append(", ").append(list.get(m.getLevel1()));
+                                    }
+                                    if (m.getLevel2() != null && m.getLevel2() != -1 && level2List != null && level2List.get(m.getLevel2()) != null) {
+                                        m.setLevel2Name(level2List.get(m.getLevel2()));
+                                        res.append(", ").append(m.getLevel2Name());
+                                    }
                                 }
-                                if(m.getLevel2() != null && m.getLevel2() != -1 && level2List != null && level2List.get(m.getLevel2()) != null) {
-                                    m.setLevel2Name(level2List.get(m.getLevel2()));
-                                    res.append(", ").append(m.getLevel2Name());
-                                }
+                            } catch (Exception e) {
+                                //                            e.printStackTrace();
                             }
                             res.append("\n");
-                        }
-                        catch (Exception e){
-//                            e.printStackTrace();
+
                         }
                     }
+
                     txtAffectedArea.setText(res.toString());
                     imgUpdate.setOnClickListener(this);
 
