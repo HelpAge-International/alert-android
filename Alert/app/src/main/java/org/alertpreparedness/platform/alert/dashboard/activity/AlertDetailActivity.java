@@ -47,6 +47,8 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class AlertDetailActivity extends AppCompatActivity implements View.OnClickListener {
@@ -77,6 +79,15 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     @BaseAlertRef
     DatabaseReference baseAlertRef;
 
+    @BindView(R.id.redAlertReasonTxt)
+    TextView redAlertReasonText;
+
+    @BindView(R.id.redAlertReasonIcon)
+    ImageView redAlertReasonIcon;
+
+    @BindView(R.id.redAlertReason)
+    TextView redAlertTextView;
+
     @Inject
     User user;
 
@@ -99,6 +110,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alert_detail);
 
+        ButterKnife.bind(this);
         DependencyInjector.applicationComponent().inject(this);
 
         countryID = user.countryID;
@@ -162,6 +174,15 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                             .child(alert.getParentKey())
                             .child(alert.getId());
             mReference.addValueEventListener(mValueListener);
+        }
+
+        if(alert.getAlertLevel() != Constants.TRIGGER_RED) {
+            redAlertReasonIcon.setVisibility(View.GONE);
+            redAlertReasonText.setVisibility(View.GONE);
+            redAlertTextView.setVisibility(View.GONE);
+        }
+        else {
+            redAlertReasonText.setText(alert.getReasonForRedAlert());
         }
     }
 
