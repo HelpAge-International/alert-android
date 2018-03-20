@@ -201,6 +201,7 @@ public class SettingsFragment extends Fragment implements ValueEventListener {
 
         @Override
         public void onFailure(@NonNull Exception e) {
+            e.printStackTrace();
             SnackbarHelper.show(getActivity(), getString(R.string.couldnt_update_email_error));
         }
     }

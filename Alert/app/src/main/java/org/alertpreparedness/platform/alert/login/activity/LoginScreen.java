@@ -35,6 +35,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 
 import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.ApplicationComponent;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.alert.helper.RightDrawableOnTouchListener;
@@ -66,7 +67,7 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     private boolean isPasswordShowing = false;
     private boolean validPlayServices = true;
 
-    UserInfo userInfo = new UserInfo();
+    UserInfo userInfo;
     private ImageView img_eye;
 
     @SuppressLint("ClickableViewAccessibility")
@@ -74,6 +75,10 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_screen);
+
+        DependencyInjector.initialize((AlertApplication) getApplication());
+
+        userInfo = new UserInfo();
 
         userInfo.setActivity(this);
         progressDialog = new ProgressDialog(this);

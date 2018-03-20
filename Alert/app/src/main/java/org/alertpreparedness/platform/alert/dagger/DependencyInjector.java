@@ -11,11 +11,13 @@ public class DependencyInjector {
     private static ApplicationComponent applicationComponent;
 
     public static void initialize(AlertApplication diApplication) {
-        applicationComponent = DaggerApplicationComponent.builder()
-                .applicationModule(new ApplicationModule(diApplication))
-                .firebaseModule(new FirebaseModule())
-                .observableModule(new ObservableModule())
-                .build();
+        if(applicationComponent == null) {
+            applicationComponent = DaggerApplicationComponent.builder()
+                    .applicationModule(new ApplicationModule(diApplication))
+                    .firebaseModule(new FirebaseModule())
+                    .observableModule(new ObservableModule())
+                    .build();
+        }
     }
 
     public static void deinit(){
