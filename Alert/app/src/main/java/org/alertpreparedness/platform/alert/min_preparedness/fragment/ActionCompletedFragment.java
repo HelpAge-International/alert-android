@@ -18,6 +18,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionGroupObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionObservable;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.consumers.ItemConsumer;
@@ -36,6 +37,9 @@ import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.inject.Inject;
 
@@ -70,8 +74,8 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
     PermissionsHelper permissions;
 
     @Inject
-    @ActionObservable
-    Flowable<FetcherResultItem<ActionItemWrapper>> actionFlowable;
+    @ActionGroupObservable
+    Flowable<Collection<ActionItemWrapper>>  actionFlowable;
 
     @Inject
     User user;
@@ -112,15 +116,36 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        actionFlowable.filter(fetcherResultItem -> {
-            //filter by completed time
-            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
-            return actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsComplete() && actionModel.getLevel() == Constants.MPA;
-        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
-            ActionModel actionModel = fetcherResultItem.makeModel();
-            onActionRetrieved(actionModel);
-        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
+//        actionFlowable.filter(fetcherResultItem -> {
+//            //filter by completed time
+//            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
+//            return actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsComplete() && actionModel.getLevel() == Constants.MPA;
+//        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
+//            ActionModel actionModel = fetcherResultItem.makeModel();
+//            onActionRetrieved(actionModel);
+//        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
+//
+//
 
+        actionFlowable
+        .subscribe(collectionFetcherResultItem -> {
+
+            ArrayList<String> result = new ArrayList<>();
+
+            for(ActionItemWrapper wrapper : collectionFetcherResultItem) {
+                ActionModel actionModel = wrapper.makeModel();
+
+                if(actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsComplete() && actionModel.getLevel() == Constants.MPA) {
+                    if(!wrapper.checkActionInProgress() && actionModel.getLevel() == Constants.APA) {
+                        onActionRetrieved(actionModel);
+                        result.add(actionModel.getId());
+                    }
+                }
+
+            }
+            mAdapter.updateKeys(result);
+
+        });
 
     }
 

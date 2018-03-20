@@ -83,6 +83,24 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
         }
     }
 
+    public void updateKeys(ArrayList<String> newKeys) {
+        ArrayList<String> itemsToRemove = new ArrayList<>();
+        for(String oldKey : this.keys) {
+            if(!newKeys.contains(oldKey)) {
+                itemsToRemove.add(oldKey);
+            }
+        }
+
+        for (String key : itemsToRemove) {
+            int index = this.keys.indexOf(key);
+            String oldKey = this.keys.get(index);
+            this.items.remove(oldKey);
+            this.keys.remove(index);
+            notifyItemRemoved(index);
+
+        }
+    }
+
     public ActionAdapter(Context context, ActionAdapterListener listener) {
         this.context = context;
         this.items = new HashMap<>();

@@ -183,7 +183,6 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
                 }
 
                 if (snapshot != null) {
-//
                     ActionModel model = AppUtils.getFirebaseModelFromDataSnapshot(snapshot, ActionModel.class);
                     if (model.getAssignHazard() != null) {
                         for (Integer hazardType : model.getAssignHazard()) {

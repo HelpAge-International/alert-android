@@ -16,7 +16,10 @@ import android.widget.TextView;
 import com.google.firebase.database.DataSnapshot;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionGroupObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.InActiveActionObservable;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.consumers.ItemConsumer;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
@@ -32,6 +35,9 @@ import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.inject.Inject;
 
@@ -71,8 +77,8 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
     PermissionsHelper permissions;
 
     @Inject
-    @ClockSettingsActionObservable
-    Flowable<FetcherResultItem<ActionItemWrapper>> actionFlowable;
+    @ActionGroupObservable
+    Flowable<Collection<ActionItemWrapper>> actionFlowable;
 
     @Inject
     User user;
@@ -103,15 +109,32 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
         mAdvActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+//
+//        actionFlowable.filter(fetcherResultItem -> {
+//            //filter by archived
+//            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
+//            return actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsArchived() && actionModel.getLevel() == Constants.APA;
+//        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
+//            ActionModel actionModel = fetcherResultItem.makeModel();
+//            onActionRetrieved(actionModel);
+//        }, wrapperToRemove -> mAPAdapter.removeItem(wrapperToRemove.getPrimarySnapshot().getKey())));
 
-        actionFlowable.filter(fetcherResultItem -> {
-            //filter by archived
-            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
-            return actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsArchived() && actionModel.getLevel() == Constants.APA;
-        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
-            ActionModel actionModel = fetcherResultItem.makeModel();
-            onActionRetrieved(actionModel);
-        }, wrapperToRemove -> mAPAdapter.removeItem(wrapperToRemove.getPrimarySnapshot().getKey())));
+        actionFlowable.subscribe(collectionFetcherResultItem -> {
+
+            ArrayList<String> result = new ArrayList<>();
+
+            for(ActionItemWrapper wrapper : collectionFetcherResultItem) {
+                ActionModel actionModel = wrapper.makeModel();
+
+                if(actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsArchived() && actionModel.getLevel() == Constants.APA) {
+                    onActionRetrieved(actionModel);
+                    result.add(actionModel.getId());
+                }
+            }
+
+            mAPAdapter.updateKeys(result);
+
+        });
 
 
         handleAdvFab();

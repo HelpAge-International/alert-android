@@ -17,6 +17,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActionGroupObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
@@ -83,8 +84,8 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
     public DatabaseReference dbActionRef;
 
     @Inject
-    @ActionObservable
-    Flowable<FetcherResultItem<ActionItemWrapper>> actionFlowable;
+    @ActionGroupObservable
+    Flowable<Collection<ActionItemWrapper>>  actionFlowable;
 
     @Inject
     User user;
@@ -122,14 +123,31 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
 
         handleAdvFab();
 
-        actionFlowable.filter(fetcherResultItem -> {
-            //filter by completed time
-            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
-            return actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsComplete() && actionModel.getLevel() == Constants.APA;
-        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
-            ActionModel actionModel = fetcherResultItem.makeModel();
-            onActionRetrieved(actionModel);
-        }, wrapperToRemove -> mAPAdapter.removeItem(wrapperToRemove.getPrimarySnapshot().getKey())));
+//        actionFlowable.filter(fetcherResultItem -> {
+//            //filter by completed time
+//            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
+//            return actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsComplete() && actionModel.getLevel() == Constants.APA;
+//        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
+//            ActionModel actionModel = fetcherResultItem.makeModel();
+//            onActionRetrieved(actionModel);
+//        }, wrapperToRemove -> mAPAdapter.removeItem(wrapperToRemove.getPrimarySnapshot().getKey())));
+//
+
+        actionFlowable
+        .subscribe(collectionFetcherResultItem -> {
+
+            ArrayList<String> result = new ArrayList<>();
+
+            for(ActionItemWrapper wrapper : collectionFetcherResultItem) {
+                ActionModel actionModel = wrapper.makeModel();
+                if(actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsComplete() && actionModel.getLevel() == Constants.APA) {
+                    onActionRetrieved(actionModel);
+                    result.add(actionModel.getId());
+                }
+            }
+            mAPAdapter.updateKeys(result);
+
+        });
 
     }
 

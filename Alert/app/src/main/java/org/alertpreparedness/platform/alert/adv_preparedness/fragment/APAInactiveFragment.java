@@ -185,11 +185,13 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
 
             for(ActionItemWrapper wrapper : collectionFetcherResultItem.getValue()) {
                 ActionModel actionModel = wrapper.makeModel();
-                if(actionModel.getAsignee() == null || !user.getUserID().equals(actionModel.getAsignee()) || actionModel.getLevel() == Constants.APA) {
+                if(actionModel.getAsignee() == null || !user.getUserID().equals(actionModel.getAsignee()) || actionModel.getLevel() != Constants.APA) {
                     break;
                 }
-                keysToUpdate.add(actionModel.getId());
-                onActionRetrieved(actionModel);
+                else {
+                    keysToUpdate.add(actionModel.getId());
+                    onActionRetrieved(actionModel);
+                }
             }
             mAPAdapter.updateKeys(keysToUpdate);
 
