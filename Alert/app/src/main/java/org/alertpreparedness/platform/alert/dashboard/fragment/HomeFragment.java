@@ -58,6 +58,7 @@ import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteAc
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.UpdateIndicatorActivity;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
+import org.alertpreparedness.platform.alert.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -203,8 +204,6 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
         FirebaseAuth.getInstance().addAuthStateListener(this);
 
-        System.out.println("user = " + user);
-
         return v;
     }
 
@@ -254,19 +253,16 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
             ArrayList<String> countryRes = new ArrayList<>();
 
             for (ActionItemWrapper wrapper : actionItemWrappers) {
-                DataSnapshot snapshot = wrapper.getActionSnapshot();
-                if(snapshot == null) {
-                    snapshot = wrapper.getTypeSnapshot();
-                }
+                ActionModel model = wrapper.makeModel();
 
-                if(snapshot.getRef().getParent().getKey().equals(user.countryID)) {
-                    countryRes.add(snapshot.getKey());
+                if(model.getParentId().equals(user.countryID)) {
+                    countryRes.add(model.getId());
                 }
                 else {
-                    networkRes.add(snapshot.getKey());
+                    networkRes.add(model.getId());
                 }
 
-                processTask(snapshot);
+                processAction(model);
             }
 
             taskAdapter.updateKeys(countryRes);
@@ -443,30 +439,28 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         }
     }
 
-    protected void processTask(DataSnapshot dataSnapshot) {
-        if(dataSnapshot == null) return;
-        if (dataSnapshot.getRef().getParent().getParent().getKey().equals(Task.TASK_ACTION)) {
+    private void processAction(ActionModel model) {
+        assert model != null;
+        boolean shouldAdd = model.getAsignee() != null && !model.getIsComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null;
 
-            ActionModel model = AppUtils.getValueFromDataSnapshot(dataSnapshot, ActionModel.class);
-
-            assert model != null;
-            boolean shouldAdd = model.getAsignee() != null && !model.getIsComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null;
-
-            if (shouldAdd) {
-                if (DateHelper.isDueInWeek(model.getDueDate()) || DateHelper.itWasDue(model.getDueDate())) {
-                    if(dataSnapshot.getRef().getParent().getKey().equals(user.countryID)) {
-                        addTask(dataSnapshot.getKey(), new Task(dataSnapshot.getRef().getParent().getKey(), 0, Task.TASK_ACTION, model.getTask(), model.getDueDate(), model.getRequireDoc()));
-                    }
-                    else {
-                        addNetworkTask(dataSnapshot.getKey(), new Task(dataSnapshot.getRef().getParent().getKey(), 0, Task.TASK_ACTION, model.getTask(), model.getDueDate(), model.getRequireDoc()));
-                    }
+        if (shouldAdd) {
+            if (DateHelper.isDueInWeek(model.getDueDate()) || DateHelper.itWasDue(model.getDueDate())) {
+                if(model.getParentId().equals(user.countryID)) {
+                    addTask(model.getId(), new Task(model.getParentId(), 0, Task.TASK_ACTION, model.getTask(), model.getDueDate(), model.getRequireDoc(), model.getLevel()));
                 }
                 else {
-                    taskAdapter.tryRemove(dataSnapshot.getKey());
+                    addNetworkTask(model.getId(), new Task(model.getParentId(), 0, Task.TASK_ACTION, model.getTask(), model.getDueDate(), model.getRequireDoc(), model.getLevel()));
                 }
             }
+            else {
+                taskAdapter.tryRemove(model.getId());
+            }
+        }
+    }
 
-        } else if (dataSnapshot.getRef().getParent().getParent().getKey().equals(Task.TASK_INDICATOR)) {
+    protected void processTask(DataSnapshot dataSnapshot) {
+        if(dataSnapshot == null) return;
+        if (dataSnapshot.getRef().getParent().getParent().getKey().equals(Task.TASK_INDICATOR)) {
 
             IndicatorModel model = dataSnapshot.getValue(IndicatorModel.class);
 

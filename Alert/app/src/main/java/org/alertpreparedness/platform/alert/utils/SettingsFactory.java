@@ -68,42 +68,60 @@ public class SettingsFactory {
         if(snapshot.child("chsActions").child(String.valueOf(user.getUserType())).exists()) {
             settings.setCanAssignCHS(snapshot.child("chsActions").child(String.valueOf(user.getUserType())).getValue(boolean.class));
         }
-        else if(snapshot.child("countryContacts").child(String.valueOf(user.getUserType())).exists()) {
-            settings.setCanEditCountryContacts(snapshot.child("countryContacts").child(String.valueOf(user.getUserType())).child("edit").getValue(boolean.class));
-            settings.setCanCreateCountryContacts(snapshot.child("countryContacts").child(String.valueOf(user.getUserType())).child("new").getValue(boolean.class));
-            settings.setCanDeleteCountryContacts(snapshot.child("countryContacts").child(String.valueOf(user.getUserType())).child("new").getValue(boolean.class));
+
+        if(snapshot.child("countryContacts").child("edit").child(String.valueOf(user.getUserType())).exists()) {
+            settings.setCanEditCountryContacts(snapshot.child("countryContacts").child("edit").child(String.valueOf(user.getUserType())).getValue(boolean.class));
         }
-//        if(snapshot.child("crossCountry").child(String.valueOf(user.getUserType())).exists()) {
-//cant update
-//        }
-        if(snapshot.child("customApa").child(String.valueOf(user.getUserType())).exists()) {
-            settings.setCanEditCustomAPA(snapshot.child("customApa").child(String.valueOf(user.getUserType())).child("edit").getValue(boolean.class));
-            settings.setCanAssignCustomAPA(snapshot.child("customApa").child(String.valueOf(user.getUserType())).child("assign").getValue(boolean.class));
-            settings.setCanDeleteCustomAPA(snapshot.child("customApa").child(String.valueOf(user.getUserType())).child("delete").getValue(boolean.class));
-            settings.setCanCreateCustomAPA(snapshot.child("customApa").child(String.valueOf(user.getUserType())).child("new").getValue(boolean.class));
+        if(snapshot.child("countryContacts").child("new").child(String.valueOf(user.getUserType())).exists()) {
+            settings.setCanCreateCountryContacts(snapshot.child("countryContacts").child("new").child(String.valueOf(user.getUserType())).getValue(boolean.class));
         }
-        if(snapshot.child("customMpa").child(String.valueOf(user.getUserType())).exists()) {
-            settings.setCanEditCustomMPA(snapshot.child("customMpa").child(String.valueOf(user.getUserType())).child("edit").getValue(boolean.class));
-            settings.setCanAssignCustomMPA(snapshot.child("customMpa").child(String.valueOf(user.getUserType())).child("assign").getValue(boolean.class));
-            settings.setCanDeleteCustomMPA(snapshot.child("customMpa").child(String.valueOf(user.getUserType())).child("delete").getValue(boolean.class));
-            settings.setCanCreateCustomMPA(snapshot.child("customMpa").child(String.valueOf(user.getUserType())).child("new").getValue(boolean.class));
+        if(snapshot.child("countryContacts").child("delete").child(String.valueOf(user.getUserType())).exists()) {
+            settings.setCanDeleteCountryContacts(snapshot.child("countryContacts").child("delete").child(String.valueOf(user.getUserType())).getValue(boolean.class));
         }
-//        if(snapshot.child("interAgency").child(String.valueOf(user.getUserType())).exists()) {
-//cant update
-//        }
+
+        if(snapshot.child("customApa").child("edit").child(String.valueOf(user.getUserType())).exists()) {
+            settings.setCanEditCustomAPA(snapshot.child("customApa").child("edit").child(String.valueOf(user.getUserType())).getValue(boolean.class));
+        }
+        if(snapshot.child("customApa").child("assign").child(String.valueOf(user.getUserType())).exists()) {
+            settings.setCanAssignCustomAPA(snapshot.child("customApa").child("assign").child(String.valueOf(user.getUserType())).getValue(boolean.class));
+        }
+        if(snapshot.child("customApa").child("delete").child(String.valueOf(user.getUserType())).exists()) {
+            settings.setCanDeleteCustomAPA(snapshot.child("customApa").child("delete").child(String.valueOf(user.getUserType())).getValue(boolean.class));
+        }
+        if(snapshot.child("customApa").child("new").child(String.valueOf(user.getUserType())).exists()) {
+            settings.setCanCreateCustomAPA(snapshot.child("customApa").child("new").child(String.valueOf(user.getUserType())).getValue(boolean.class));
+        }
+
+        if(snapshot.child("customMpa").child("edit").child(String.valueOf(user.getUserType())).exists()) {
+            settings.setCanEditCustomMPA(snapshot.child("customMpa").child("edit").child(String.valueOf(user.getUserType())).getValue(boolean.class));
+        }
+        if(snapshot.child("customMpa").child("assign").child(String.valueOf(user.getUserType())).exists()) {
+            settings.setCanAssignCustomMPA(snapshot.child("customMpa").child("assign").child(String.valueOf(user.getUserType())).getValue(boolean.class));
+        }
+        if(snapshot.child("customMpa").child("delete").child(String.valueOf(user.getUserType())).exists()) {
+            settings.setCanDeleteCustomMPA(snapshot.child("customMpa").child("delete").child(String.valueOf(user.getUserType())).getValue(boolean.class));
+        }
+        if(snapshot.child("customMpa").child("new").child(String.valueOf(user.getUserType())).exists()) {
+            settings.setCanCreateCustomMPA(snapshot.child("customMpa").child("new").child(String.valueOf(user.getUserType())).getValue(boolean.class));
+        }
+
         if(snapshot.child("mandatedApaAssign").child(String.valueOf(user.getUserType())).exists()) {
             settings.setCanAssignMandatedAPA(snapshot.child("mandatedApaAssign").child(String.valueOf(user.getUserType())).getValue(boolean.class));
         }
         if(snapshot.child("mandatedMpaAssign").child(String.valueOf(user.getUserType())).exists()) {
             settings.setCanAssignMPA(snapshot.child("mandatedMpaAssign").child(String.valueOf(user.getUserType())).getValue(boolean.class));
         }
-        if(snapshot.child("notes").child(String.valueOf(user.getUserType())).exists()) {
-            settings.setCanEditNotes(snapshot.child("notes").child(String.valueOf(user.getUserType())).child("edit").getValue(boolean.class));
-            settings.setCanDeleteNotes(snapshot.child("notes").child(String.valueOf(user.getUserType())).child("delete").getValue(boolean.class));
-            settings.setCanCreateNotes(snapshot.child("notes").child(String.valueOf(user.getUserType())).child("new").getValue(boolean.class));
+        if(snapshot.child("notes").child("edit").child(String.valueOf(user.getUserType())).exists()) {
+            settings.setCanEditNotes(snapshot.child("notes").child("edit").child(String.valueOf(user.getUserType())).getValue(boolean.class));
         }
-        if(snapshot.child("other").child(String.valueOf(user.getUserType())).exists()) {
-            settings.setCanDownloadDocuments(snapshot.child("other").child(String.valueOf(user.getUserType())).child("downloadDoc").getValue(boolean.class));
+        if(snapshot.child("notes").child("delete").child(String.valueOf(user.getUserType())).exists()) {
+            settings.setCanDeleteNotes(snapshot.child("notes").child("delete").child(String.valueOf(user.getUserType())).getValue(boolean.class));
+        }
+        if(snapshot.child("notes").child("new").child(String.valueOf(user.getUserType())).exists()) {
+            settings.setCanCreateNotes(snapshot.child("notes").child("new").child(String.valueOf(user.getUserType())).getValue(boolean.class));
+        }
+        if(snapshot.child("other").child("downloadDoc").child(String.valueOf(user.getUserType())).exists()) {
+            settings.setCanDownloadDocuments(snapshot.child("other").child("downloadDoc").child(String.valueOf(user.getUserType())).getValue(boolean.class));
         }
         realm.commitTransaction();
         realm.close();
@@ -215,14 +233,14 @@ public class SettingsFactory {
             case Constants.CountryDirector:
             case Constants.ErtLeader:
             case Constants.CountryAdmin:
-                settings.setCanAssignCustomMPA(true);
-                settings.setCanEditCustomMPA(true);
-                settings.setCanCreateCustomMPA(true);
-                settings.setCanDeleteCustomMPA(true);
-                settings.setCanCompleteCustomMPA(true);
+                settings.setCanAssignCustomAPA(true);
+                settings.setCanEditCustomAPA(true);
+                settings.setCanCreateCustomAPA(true);
+                settings.setCanDeleteCustomAPA(true);
+                settings.setCanCompleteCustomAPA(true);
                 break;
             case Constants.PartnerUser:
-                settings.setCanCompleteCustomMPA(true);
+                settings.setCanCompleteCustomAPA(true);
                 break;
         }
         return settings;

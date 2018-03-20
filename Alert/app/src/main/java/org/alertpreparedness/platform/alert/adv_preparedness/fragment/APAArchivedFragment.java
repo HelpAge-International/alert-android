@@ -17,9 +17,6 @@ import com.google.firebase.database.DataSnapshot;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionGroupObservable;
-import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
-import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
-import org.alertpreparedness.platform.alert.dagger.annotation.InActiveActionObservable;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.consumers.ItemConsumer;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
@@ -152,7 +149,7 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
                 case R.id.edit:
                     if(permissions.checkEditAPA(mAPAdapter.getItem(pos), getActivity())) {
                         Intent i = new Intent(getContext(), EditAPAActivity.class);
-                        i.putExtra(EditAPAActivity.APA_ID, key);
+                        i.putExtra(EditAPAActivity.MODEL, mAPAdapter.getItem(pos));
                         startActivity(i);
                     }
                     break;

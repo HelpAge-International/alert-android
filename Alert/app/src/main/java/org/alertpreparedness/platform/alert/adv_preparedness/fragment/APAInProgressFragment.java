@@ -173,7 +173,7 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
                 case R.id.edit:
                     if(permissions.checkEditAPA(mAPAdapter.getItem(pos), getActivity())) {
                         Intent i = new Intent(getContext(), EditAPAActivity.class);
-                        i.putExtra(EditAPAActivity.APA_ID, key);
+                        i.putExtra(EditAPAActivity.MODEL, mAPAdapter.getItem(pos));
                         startActivity(i);
                     }
                     break;

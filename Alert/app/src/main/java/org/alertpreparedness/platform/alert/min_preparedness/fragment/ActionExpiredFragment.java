@@ -42,7 +42,9 @@ import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 import org.joda.time.DateTime;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 
 import javax.inject.Inject;
 
@@ -78,7 +80,7 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
 
     @Inject
     @ClockSettingsActionObservable
-    Flowable<FetcherResultItem<ActionItemWrapper>> actionFlowable;
+    Flowable<Collection<ActionItemWrapper>> actionFlowable;
 
     @Inject
     User user;
@@ -115,14 +117,33 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        actionFlowable.filter(fetcherResultItem -> {
-            //filter by expired time
-            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
-            return actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && !fetcherResultItem.getValue().checkActionInProgress() && actionModel.getLevel() == Constants.MPA;
-        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
-            ActionModel actionModel = fetcherResultItem.makeModel();
-            onActionRetrieved(actionModel);
-        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
+//        actionFlowable.filter(fetcherResultItem -> {
+//            //filter by expired time
+//            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
+//            return ;
+//        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
+//            ActionModel actionModel = fetcherResultItem.makeModel();
+//            onActionRetrieved(actionModel);
+//        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
+
+        actionFlowable.subscribe(collectionFetcherResultItem -> {
+
+            ArrayList<String> result = new ArrayList<>();
+
+            for(ActionItemWrapper wrapper : collectionFetcherResultItem) {
+                ActionModel actionModel = wrapper.makeModel();
+
+                if(actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && !wrapper.checkActionInProgress() && actionModel.getLevel() == Constants.MPA
+                        && !wrapper.checkActionInProgress()) {
+                    onActionRetrieved(actionModel);
+                    result.add(actionModel.getId());
+                }
+
+            }
+            mExpiredAdapter.updateKeys(result);
+
+        });
+
 
     }
 

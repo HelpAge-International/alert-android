@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.alert.dashboard.adapter;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
@@ -16,6 +17,7 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dashboard.model.Task;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
+import org.alertpreparedness.platform.alert.utils.Constants;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,6 +44,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
     @Inject
     User user;
     private TaskSelectListener listener;
+
+    @Inject
+    Context context;
 
     public TaskAdapter(TaskSelectListener listener) {
         this.listener = listener;
@@ -120,41 +125,40 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         }
 
         private void bind(Task task) {
-            //System.out.println("task.getActionType() = " + task.getActionType());
             itemView.setOnClickListener((v) -> listener.onTaskSelected(keys.get(getAdapterPosition()), items.get(keys.get(getAdapterPosition()))));
             if (task.getTaskType().equals("action") && DateHelper.isDueToday(task.dueDate)) {
                 txt_taskName.setText(task.getTaskName());
-                txt_taskStatus.setText(dueTodayString(task.getAlertLevel(), "action"));
+                txt_taskStatus.setText(dueTodayString(task.getAlertLevel(), task));
                 img_task.setImageResource(R.drawable.home_task_red);
             }
             else if (task.getTaskType().equals("indicator") && DateHelper.isDueToday(task.dueDate)) {
                 txt_taskName.setText(task.getTaskName());
-                txt_taskStatus.setText(dueTodayString(task.getAlertLevel(), "indicator"));
+                txt_taskStatus.setText(dueTodayString(task.getAlertLevel(), task));
                 img_task.setImageResource(R.drawable.home_task_red);
             }
             else if (task.getTaskType().equals("action") && DateHelper.isDueInWeek(task.dueDate)) {
                 txt_taskName.setText(task.getTaskName());
-                txt_taskStatus.setText(dueWeekString(task.getAlertLevel(), "action"));
+                txt_taskStatus.setText(dueWeekString(task.getAlertLevel(), task));
                 img_task.setImageResource(R.drawable.home_task_amber);
             }
             else if (task.getTaskType().equals("indicator") && DateHelper.isDueInWeek(task.dueDate)) {
                 txt_taskName.setText(task.getTaskName());
-                txt_taskStatus.setText(dueWeekString(task.getAlertLevel(), "indicator"));
+                txt_taskStatus.setText(dueWeekString(task.getAlertLevel(), task));
                 img_task.setImageResource(R.drawable.home_task_amber);
             }
             else if (task.getTaskType().equals("action") && DateHelper.itWasDue(task.dueDate)) {
                 txt_taskName.setText(task.getTaskName());
-                txt_taskStatus.setText(dueBeforeString(task.getAlertLevel(), "action", format.format(new Date(task.dueDate))));
+                txt_taskStatus.setText(dueBeforeString(task.getAlertLevel(), task, format.format(new Date(task.dueDate))));
                 img_task.setImageResource(R.drawable.home_task_red);
             }
             else if (task.getTaskType().equals("indicator") && DateHelper.itWasDue(task.dueDate)) {
                 txt_taskName.setText(task.getTaskName());
-                txt_taskStatus.setText(dueBeforeString(task.getAlertLevel(), "indicator", format.format(new Date(task.dueDate))));
+                txt_taskStatus.setText(dueBeforeString(task.getAlertLevel(), task, format.format(new Date(task.dueDate))));
                 img_task.setImageResource(R.drawable.home_task_red);
             }
             else {
                 txt_taskName.setText(task.getTaskName());
-                txt_taskStatus.setText(dueBeforeString(task.getAlertLevel(), "indicator", format.format(new Date(task.dueDate))));
+                txt_taskStatus.setText(dueBeforeString(task.getAlertLevel(), task, format.format(new Date(task.dueDate))));
                 img_task.setImageResource(R.drawable.home_task_blue);
 //                txt_taskName.setVisibility(View.GONE);
 //                txt_taskStatus.setVisibility(View.GONE);
@@ -190,27 +194,38 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
         return sb;
     }
 
-    private String dueTodayString(int level, String type) {
-        if (type.equals("action")) {
-            return "A minimum preparedness action needs to be completed today";
-        } else {
-            return "A " + getLevelAsString(level) + " " + type + " needs to be completed today";
+    private String dueTodayString(int level, Task task) {
+        if (task.getTaskType().equals(Task.TASK_ACTION)) {
+            return String.format(
+                    context.getString(R.string.an_actoin_needs_to_be_completed),
+                    (task.getActionType() == Constants.MPA ? context.getString(R.string.minimum) : context.getString(R.string.advanced))
+            );
+        }
+        else {
+            return "A " + getLevelAsString(level) + " " + task.getTaskType() + context.getString(R.string.needs_completing_today);
         }
     }
 
-    private String dueWeekString(int level, String type) {
-        if (type.equals("action")) {
-            return "A minimum preparedness action needs to be completed this week";
+    private String dueWeekString(int level, Task task) {
+        if (task.getTaskType().equals(Task.TASK_ACTION)) {
+            return String.format(
+                    context.getString(R.string.needs_completing_this_week),
+                    (task.getActionType() == Constants.MPA ? context.getString(R.string.minimum) : context.getString(R.string.advanced))
+            );
         } else {
-            return "A " + getLevelAsString(level)  + " " + type + " needs to be completed this week";
+            return "A " + getLevelAsString(level)  + " " + task.getTaskType() + " needs to be completed this week";
         }
     }
 
-    private String dueBeforeString(int level, String type, String date) {
-        if (type.equals("action")) {
-            return "A minimum preparedness action was due on" + setBoldText(date);
+    private String dueBeforeString(int level, Task task, String date) {
+        if (task.getTaskType().equals(Task.TASK_ACTION)) {
+            return String.format(
+                    context.getString(R.string.was_due_on),
+                    (task.getActionType() == Constants.MPA ? context.getString(R.string.minimum) : context.getString(R.string.advanced)),
+                    date
+            );
         } else {
-            return "A " + getLevelAsString(level)  + " " + type + " was due on" + setBoldText(date);
+            return "A " + getLevelAsString(level)  + " " + task.getTaskType() + " was due on" + setBoldText(date);
         }
     }
 

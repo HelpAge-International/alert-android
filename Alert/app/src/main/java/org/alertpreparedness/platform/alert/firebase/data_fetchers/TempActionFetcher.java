@@ -102,16 +102,25 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
 //
     }
 
-    public Flowable<FetcherResultItem<ActionItemWrapper>> rxFetchWithClockSettings(Flowable<FetcherResultItem<ActionItemWrapper>> flowable) {
+    public Flowable<Collection<ActionItemWrapper>> rxFetchWithClockSettings(Flowable<Collection<ActionItemWrapper>> flowable) {
+
         Flowable<ClockSettingsFetcher.ClockSettingsResult> clockSettingsResultFlowable = new ClockSettingsFetcher().rxFetch(ClockSettingsFetcher.TYPE_PREPAREDNESS);
+
         return Flowable.combineLatest(clockSettingsResultFlowable, flowable,
-                (clockSettingsResult, actionItemWrapperFetcherResultItem) -> {
-                    DataSnapshot snapshot = actionItemWrapperFetcherResultItem.getValue().getActionSnapshot();
-                    if(snapshot == null) {
-                        snapshot = actionItemWrapperFetcherResultItem.getValue().getTypeSnapshot();
+                (clockSettingsResult, actionItemWrapperFetcherResultItems) -> {
+
+                    ArrayList<ActionItemWrapper> res = new ArrayList<>();
+
+                    for (ActionItemWrapper itemWrapper : actionItemWrapperFetcherResultItems) {
+                        DataSnapshot snapshot = itemWrapper.getActionSnapshot();
+                        if(snapshot == null) {
+                            snapshot = itemWrapper.getTypeSnapshot();
+                        }
+                        itemWrapper.setClockSetting(clockSettingsResult.all().get(snapshot.getRef().getParent().getKey()));
+                        res.add(itemWrapper);
                     }
-                    actionItemWrapperFetcherResultItem.getValue().setClockSetting(clockSettingsResult.all().get(snapshot.getRef().getParent().getKey()));
-                    return actionItemWrapperFetcherResultItem;
+
+                    return res;
                 });
 
     }
@@ -177,7 +186,9 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
                 if(existingSet == null) {
                     existingSet = new HashSet<>();
                 }
-                existingSet.add(alertModel.getHazardScenario());
+                if(alertModel.getAlertLevel() == Constants.TRIGGER_RED) {
+                    existingSet.add(alertModel.getHazardScenario());
+                }
                 hazardTypes.put(snapshot.getRef().getParent().getKey(), existingSet);
             }
             return hazardTypes;
@@ -197,14 +208,15 @@ public class TempActionFetcher implements RxFirebaseDataFetcher<ActionItemWrappe
                     ActionModel model = AppUtils.getFirebaseModelFromDataSnapshot(snapshot, ActionModel.class);
                     if (model.getAssignHazard() != null) {
                         for (Integer hazardType : model.getAssignHazard()) {
-                            if (hazardTypes.get(model.getParentId()).contains(hazardType)) {
+                            if (hazardTypes.get(model.getParentId()) != null && hazardTypes.get(model.getParentId()).contains(hazardType)) {
                                 res = true;
                                 break;
                             }
                         }
-                    } else if (model.getAssignHazard() == null || model.getAssignHazard().size() == 0) {
-                        res = true;
                     }
+//                    else if (model.getAssignHazard() == null || model.getAssignHazard().size() == 0) {
+//                        res = true;
+//                    }
                     if (res && isActive || !res && !isActive) {
                         result.add(itemWrapper);
                     }

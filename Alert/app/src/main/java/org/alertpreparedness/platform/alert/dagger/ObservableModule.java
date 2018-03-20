@@ -95,7 +95,7 @@ public class ObservableModule {
     @Provides
     @Singleton
     @ClockSettingsActionObservable
-    public Flowable<FetcherResultItem<ActionItemWrapper>> provideClockSettingsActionGroupFlowable(@ActionObservable Flowable<FetcherResultItem<ActionItemWrapper>> flowable) {
+    public Flowable<Collection<ActionItemWrapper>> provideClockSettingsActionGroupFlowable(@ActionGroupObservable Flowable<Collection<ActionItemWrapper>> flowable) {
         return new TempActionFetcher().rxFetchWithClockSettings(flowable);
     }
 

@@ -288,7 +288,7 @@ public class FirebaseModule {
             case Constants.CountryAdmin:
             case Constants.CountryDirector:
             case Constants.Ert:
-                return db.child("countryOffice").child(user.countryID).child("permissionSettings");
+                return db.child("countryOffice").child(user.agencyAdminID).child(user.countryID).child("permissionSettings");
             default: //Constants.PartnerUser:
                 return db.child("partner").child(user.getUserID()).child("permissions");
         }

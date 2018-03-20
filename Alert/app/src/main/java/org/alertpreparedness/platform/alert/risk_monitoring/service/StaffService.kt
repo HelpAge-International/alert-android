@@ -31,7 +31,7 @@ class StaffService(private val context: Context) {
                 }
     }
 
-    fun getCountryAdmin(): Flowable<ModelUserPublic> {
+    fun getCountryAdmin(countryId : String): Flowable<ModelUserPublic> {
         val userDetail = FirebaseHelper.getUserDetail(PreferHelper.getString(context, Constants.APP_STATUS), PreferHelper.getString(context, Constants.COUNTRY_ID))
 
         return RxFirebaseDatabase.observeValueEvent(userDetail, { snap ->
@@ -39,7 +39,7 @@ class StaffService(private val context: Context) {
             val reader = JsonReader(StringReader(toJson.trim()))
             reader.isLenient = true
             val fromJson = RiskMonitoringService(context).gson.fromJson<ModelUserPublic>(reader, ModelUserPublic::class.java)
-            fromJson.id = Constants.COUNTRY_ID
+            fromJson.id = countryId
             return@observeValueEvent fromJson
         })
 

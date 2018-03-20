@@ -38,6 +38,9 @@ import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -77,7 +80,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
 
     @Inject
     @ClockSettingsActionObservable
-    Flowable<FetcherResultItem<ActionItemWrapper>> actionFlowable;
+    Flowable<Collection<ActionItemWrapper>> actionFlowable;
 
     @Nullable
     @Override
@@ -102,14 +105,32 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-        actionFlowable.filter(fetcherResultItem -> {
-            //filter by expired time
-            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
-            return actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && fetcherResultItem.getValue().checkActionInProgress() && actionModel.getLevel() == Constants.MPA;
-        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
-            ActionModel actionModel = fetcherResultItem.makeModel();
-            onActionRetrieved(actionModel);
-        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
+//        actionFlowable.filter(fetcherResultItem -> {
+//            //filter by expired time
+//            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
+//            return actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && fetcherResultItem.getValue().checkActionInProgress() && actionModel.getLevel() == Constants.MPA;
+//        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
+//            ActionModel actionModel = fetcherResultItem.makeModel();
+//            onActionRetrieved(actionModel);
+//        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
+
+        actionFlowable.subscribe(collectionFetcherResultItem -> {
+
+            ArrayList<String> result = new ArrayList<>();
+
+            for(ActionItemWrapper wrapper : collectionFetcherResultItem) {
+                ActionModel actionModel = wrapper.makeModel();
+
+                if(actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsComplete() && actionModel.getLevel() == Constants.MPA
+                        && wrapper.checkActionInProgress()) {
+                    onActionRetrieved(actionModel);
+                    result.add(actionModel.getId());
+                }
+
+            }
+            mAdapter.updateKeys(result);
+
+        });
 
     }
 

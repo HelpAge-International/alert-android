@@ -110,8 +110,7 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
 //            onActionRetrieved(actionModel);
 //        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
 
-        actionFlowable
-        .subscribe(collectionFetcherResultItem -> {
+        actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
 

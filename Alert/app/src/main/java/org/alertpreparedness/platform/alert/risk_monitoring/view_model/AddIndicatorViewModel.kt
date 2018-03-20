@@ -124,7 +124,7 @@ class AddIndicatorViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
         println("getStaff")
         val users = mutableListOf<ModelUserPublic>()
 
-        StaffService(getApplication()).getCountryAdmin().doOnSubscribe { }
+        StaffService(getApplication()).getCountryAdmin(countryId).doOnSubscribe { }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ user ->

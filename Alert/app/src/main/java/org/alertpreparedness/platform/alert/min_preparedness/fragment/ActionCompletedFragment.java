@@ -127,8 +127,7 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
 //
 //
 
-        actionFlowable
-        .subscribe(collectionFetcherResultItem -> {
+        actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
 
@@ -136,10 +135,8 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
                 ActionModel actionModel = wrapper.makeModel();
 
                 if(actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsComplete() && actionModel.getLevel() == Constants.MPA) {
-                    if(!wrapper.checkActionInProgress() && actionModel.getLevel() == Constants.APA) {
-                        onActionRetrieved(actionModel);
-                        result.add(actionModel.getId());
-                    }
+                    onActionRetrieved(actionModel);
+                    result.add(actionModel.getId());
                 }
 
             }

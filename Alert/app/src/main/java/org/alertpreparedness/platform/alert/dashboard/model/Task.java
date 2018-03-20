@@ -22,6 +22,16 @@ public class Task {
         this.isCompleteTask = isCompleteTask;
     }
 
+    public Task(String parentId, int alertLevel, String taskType, String taskName, long dueDate, boolean requireDoc, Integer level) {
+        this.parentId = parentId;
+        this.alertLevel = alertLevel;
+        this.taskType = taskType;
+        this.taskName = taskName;
+        this.dueDate = dueDate;
+        this.requireDoc = requireDoc;
+        this.actionType = level;
+    }
+
     public boolean isCompleteTask() {
         return isCompleteTask;
     }

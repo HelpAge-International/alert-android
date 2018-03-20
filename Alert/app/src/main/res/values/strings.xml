@@ -250,4 +250,10 @@
     <string name="note_cannot_be_empty">Note cannot be empty</string>
     <string name="play_service_error">You must update Google Play Services before logging in</string>
     <string name="requires_submission">Requires Submission</string>
+    <string name="an_actoin_needs_to_be_completed">A %s preparedness action needs to be completed today</string>
+    <string name="advanced">advanced</string>
+    <string name="minimum">minimum</string>
+    <string name="needs_completing_this_week">A %s preparedness action needs to be completed this week</string>
+    <string name="needs_completing_today">needs to be completed today</string>
+    <string name="was_due_on">An %s preparedness action was due on <strong> %s </strong></string>
 </resources>

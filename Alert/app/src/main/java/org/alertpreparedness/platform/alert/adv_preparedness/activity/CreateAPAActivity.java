@@ -21,10 +21,15 @@ import com.google.firebase.database.ValueEventListener;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.AgencyObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.HazardSelectionActivity;
 import org.alertpreparedness.platform.alert.firebase.APAAction;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
+import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.AssignToDialogFragment;
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.AssignToListener;
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.DepartmentDialogFragment;
@@ -44,6 +49,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Flowable;
 import shortbread.Shortcut;
 
 @Shortcut(id = "createAPA", icon = R.drawable.fab_add, shortLabel = "Create APA")
@@ -71,8 +77,8 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
     RadioGroup needsDocumentView;
 
     @Inject
-    @ActionRef
-    DatabaseReference actionRef;
+    @BaseActionRef
+    DatabaseReference baseActionRef;
 
     @Inject
     @AgencyRef
@@ -94,6 +100,13 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
     protected int mCurrentHazardType;
     protected ArrayList<DepartmentModel> departments = new ArrayList<>();
     protected String selectedDepartment;
+
+    @Inject
+    User user;
+
+    @Inject
+    @AgencyObservable
+    public Flowable<FetcherResultItem<DataSnapshot>> agencyObservable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -271,11 +284,12 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
             return;
         }
 
-        APAAction apaAction = new APAAction();
+        ActionModel apaAction = new ActionModel();
+        apaAction.setLevel(Constants.APA);
         apaAction.setAsignee(assignee);
         apaAction.setDueDate(new DateTime().plusWeeks(1).getMillis());
         apaAction.setTask(task.getText().toString());
-        apaAction.setBudget(Integer.valueOf(budget.getText().toString()));
+        apaAction.setBudget(Long.valueOf(budget.getText().toString()));
         apaAction.setAssignHazard(new ArrayList<Integer>() {{
             add(mCurrentHazardType);
         }});
@@ -284,7 +298,7 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
         apaAction.setDepartment(selectedDepartment);
         apaAction.setLevel(Constants.APA);
         apaAction.setType(Constants.CUSTOM);
-        DatabaseReference ref = actionRef.push();
+        DatabaseReference ref = baseActionRef.child(user.countryID).push();
         ref.setValue(apaAction);
         finish();
     }
