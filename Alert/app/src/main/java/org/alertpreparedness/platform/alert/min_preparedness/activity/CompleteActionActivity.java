@@ -122,7 +122,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         ButterKnife.bind(this);
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
 
         setSupportActionBar(mToolbar);
 

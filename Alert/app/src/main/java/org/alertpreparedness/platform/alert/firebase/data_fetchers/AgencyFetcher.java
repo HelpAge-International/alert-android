@@ -24,7 +24,7 @@ public class AgencyFetcher implements RxFirebaseDataFetcher<DataSnapshot> {
     DatabaseReference agencyRef;
 
     public AgencyFetcher() {
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
     }
 
     @Override

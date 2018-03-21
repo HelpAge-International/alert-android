@@ -12,18 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonReader;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
@@ -33,21 +26,15 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
-import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
-import org.alertpreparedness.platform.alert.adv_preparedness.fragment.BaseAPAFragment;
-import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -57,6 +44,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
@@ -107,6 +95,8 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
     @Inject
     User user;
 
+    CompositeDisposable disposable = new CompositeDisposable();
+
     @Inject
     PermissionsHelper permissions;
 
@@ -122,7 +112,7 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
         View v = inflater.inflate(R.layout.content_advanced, container, false);
 
         ButterKnife.bind(this, v);
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
 
         initViews();
 
@@ -141,7 +131,7 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
 
         handleAdvFab();
 
-        actionFlowable.subscribe(collectionFetcherResultItem -> {
+        disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> keysToUpdate = new ArrayList<>();
 
@@ -157,7 +147,7 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
             }
             mAPAdapter.updateKeys(keysToUpdate);
 
-        });
+        }));
     }
 
     @Override
@@ -212,6 +202,12 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
         if (mAPAdapter.getItemCount() == 0) {
             txtNoAction.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        disposable.dispose();
     }
 
     //region UsersListDialogFragment.ActionAdapterListener

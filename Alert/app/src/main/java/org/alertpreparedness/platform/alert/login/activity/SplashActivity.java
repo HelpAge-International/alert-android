@@ -55,7 +55,7 @@ public class SplashActivity extends BaseActivity {
         AppUtils.getDatabase();
 
         if (FirebaseAuth.getInstance().getCurrentUser() != null && new UserInfo().getUser() != null && !PreferHelper.getString(this, Constants.UID).equals("")) {
-            DependencyInjector.applicationComponent().inject(this);
+            DependencyInjector.userScopeComponent().inject(this);
             if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("type")) {
                 int notificationType = Integer.parseInt(getIntent().getExtras().getString("type"));
                 if(notificationType == NOTIFICATION_ALERT){

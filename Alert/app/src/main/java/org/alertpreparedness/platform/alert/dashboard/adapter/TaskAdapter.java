@@ -23,13 +23,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
-
-import butterknife.OnClick;
 
 /**
  * Created by faizmohideen on 13/11/2017.
@@ -50,7 +47,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
 
     public TaskAdapter(TaskSelectListener listener) {
         this.listener = listener;
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
     }
 
     @Override

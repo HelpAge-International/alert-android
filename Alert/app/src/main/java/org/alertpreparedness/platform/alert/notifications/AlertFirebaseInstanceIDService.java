@@ -4,7 +4,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
@@ -24,7 +23,7 @@ public class AlertFirebaseInstanceIDService extends FirebaseInstanceIdService {
         super.onTokenRefresh();
 
         if(FirebaseAuth.getInstance().getCurrentUser() != null) {
-            DependencyInjector.applicationComponent().inject(this);
+            DependencyInjector.userScopeComponent().inject(this);
             User user = new UserInfo().getUser();
             String deviceNotificationId = FirebaseInstanceId.getInstance().getToken();
 

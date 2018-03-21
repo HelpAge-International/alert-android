@@ -1,29 +1,17 @@
 package org.alertpreparedness.platform.alert.helper;
 
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.util.Log;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 
-import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
-import org.alertpreparedness.platform.alert.dagger.annotation.AgencyBaseRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseCountryOfficeRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserId;
@@ -35,19 +23,11 @@ import org.alertpreparedness.platform.alert.notifications.NotificationIdHandler;
 import org.alertpreparedness.platform.alert.realm.UserRealm;
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.SelectAreaViewModel;
 import org.alertpreparedness.platform.alert.utils.Constants;
-import org.alertpreparedness.platform.alert.utils.DBListener;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.inject.Inject;
-
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.realm.Realm;
-import timber.log.Timber;
 
 /**
  * Created by faizmohideen on 08/11/2017.
@@ -77,9 +57,6 @@ public class UserInfo implements ValueEventListener {
     DatabaseReference userPublic;
 
     @Inject
-    public NotificationIdHandler notificationIdHandler;
-
-    @Inject
     Context context;
 
     private UserAuthenticationListener listener = new UserAuthenticationListener();
@@ -89,7 +66,7 @@ public class UserInfo implements ValueEventListener {
     private LoginScreen activity;
 
     public UserInfo() {
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.applicationcomponent().inject(this);
     }
 
     public void authUser(final AuthCallback authCallback, String userId) {
@@ -272,7 +249,6 @@ public class UserInfo implements ValueEventListener {
             if (dataSnapshot.child(userId).exists()) {
                 DataSnapshot userNode = dataSnapshot.child(userId);
                 populateUser(dataSnapshot.getKey(), userNode);
-                notificationIdHandler.registerDeviceId(userId, FirebaseInstanceId.getInstance().getToken());
             }
         }
 

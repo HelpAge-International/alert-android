@@ -44,7 +44,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
     User user;
 
     public AlertAdapter(Context context, OnAlertItemClickedListener listener) {
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
         this.isCountryDirector = user.isCountryDirector();
 
         this.context = context;

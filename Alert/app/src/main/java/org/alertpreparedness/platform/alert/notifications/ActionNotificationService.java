@@ -56,7 +56,7 @@ public class ActionNotificationService extends JobService {
 
         Timber.d("ACTION JOB START");
 
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
 
         if(job.getExtras() != null) {
             Timber.d("JOB EXTRAS NOT NULL");

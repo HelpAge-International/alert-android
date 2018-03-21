@@ -15,6 +15,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.InActiveActionObse
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorGroupObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.IndicatorObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlanObservable;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.AgencyFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.AlertFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ClockSettingsFetcher;
@@ -25,12 +26,9 @@ import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetche
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ResponsePlanFetcher;
 import org.alertpreparedness.platform.alert.firebase.wrappers.AlertResultWrapper;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ResponsePlanResultItem;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.TempActionFetcher;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 
 import java.util.Collection;
-
-import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
@@ -44,119 +42,121 @@ import io.reactivex.Flowable;
 public class ObservableModule {
 
     @Provides
-    @Singleton
+    @UserScope
     public Flowable<NetworkFetcher.NetworkFetcherResult> provideNetworkResultFlowable() {
         return new NetworkFetcher().rxFetch();
     }
 
     @Provides
-    @Singleton
     @AlertObservable
+    @UserScope
     public Flowable<FetcherResultItem<DataSnapshot>> provideAlertFlowable() {
         return new AlertFetcher().rxFetch();
     }
 
     @Provides
-    @Singleton
     @AlertGroupObservable
+    @UserScope
     public Flowable<Collection<DataSnapshot>> provideAlertGroupFlowable() {
         return new AlertFetcher().rxFetchGroup();
     }
 
     @Provides
-    @Singleton
     @ActionObservable
+    @UserScope
     public Flowable<FetcherResultItem<ActionItemWrapper>> provideActionFlowable() {
-        return new TempActionFetcher().rxFetch();
+        return new ActionFetcher().rxFetch();
     }
 
     @Provides
-    @Singleton
     @ActiveActionObservable
+    @UserScope
     public Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> provideActiveActionFlowable() {
-        return new TempActionFetcher().rxActiveItems(true);
+        return new ActionFetcher().rxActiveItems(true);
     }
 
     @Provides
-    @Singleton
     @InActiveActionObservable
+    @UserScope
     public Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> provideInActiveActionFlowable() {
-        return new TempActionFetcher().rxActiveItems(false);
+        return new ActionFetcher().rxActiveItems(false);
     }
 
 
     @Provides
-    @Singleton
     @ActionGroupObservable
+    @UserScope
     public Flowable<Collection<ActionItemWrapper>> provideActionGroupFlowable() {
-        return new TempActionFetcher().rxFetchGroup();
+        return new ActionFetcher().rxFetchGroup();
     }
 
     @Provides
-    @Singleton
+
     @ClockSettingsActionObservable
+    @UserScope
     public Flowable<Collection<ActionItemWrapper>> provideClockSettingsActionGroupFlowable(@ActionGroupObservable Flowable<Collection<ActionItemWrapper>> flowable) {
-        return new TempActionFetcher().rxFetchWithClockSettings(flowable);
+        return new ActionFetcher().rxFetchWithClockSettings(flowable);
     }
 
     @Provides
-    @Singleton
     @IndicatorObservable
+    @UserScope
     public Flowable<FetcherResultItem<DataSnapshot>> provideIndicatorFlowable() {
         return new IndicatorsFetcher().rxFetch();
     }
 
 
     @Provides
-    @Singleton
     @IndicatorGroupObservable
+    @UserScope
     public Flowable<Collection<DataSnapshot>> provideIndicatorGroupFlowable() {
         return new IndicatorsFetcher().rxFetchGroup();
     }
 
     @Provides
-    @Singleton
     @HazardObservable
+    @UserScope
     public Flowable<FetcherResultItem<DataSnapshot>> provideHazardFlowable() {
         return new HazardsFetcher().rxFetch();
     }
 
     @Provides
-    @Singleton
     @HazardGroupObservable
+    @UserScope
     public Flowable<Collection<DataSnapshot>> provideHazardGroupFlowable() {
         return new HazardsFetcher().rxFetchGroup();
     }
 
     @Provides
-    @Singleton
     @HazardGroupObservable
+    @UserScope
     public Flowable<Collection<ResponsePlanResultItem>> provideResponsePlanGroupFlowable() {
         return new ResponsePlanFetcher().rxFetchGroup();
     }
 
     @Provides
-    @Singleton
     @ResponsePlanObservable
+    @UserScope
     public Flowable<FetcherResultItem<ResponsePlanResultItem>> provideResponsePlans() {
         return new ResponsePlanFetcher().rxFetch();
     }
 
     @Provides
-    @Singleton
     @AgencyObservable
+    @UserScope
     public Flowable<FetcherResultItem<DataSnapshot>> provideAgency() {
         return new AgencyFetcher().rxFetch();
     }
 
     @Provides
+    @UserScope
     public Flowable<FetcherResultItem<AlertResultWrapper>> provideAlertsExtraFlowable() {
         return new AlertFetcher().fetchWithExtra();
     }
 
     @Provides
-    @Singleton
     @PreparednessClockSettingsFlowable
+    @UserScope
     public Flowable<ClockSettingsFetcher.ClockSettingsResult> providePreparednessClockSettingsFlowable(){
         return new ClockSettingsFetcher().rxFetch(ClockSettingsFetcher.TYPE_PREPAREDNESS);
     }

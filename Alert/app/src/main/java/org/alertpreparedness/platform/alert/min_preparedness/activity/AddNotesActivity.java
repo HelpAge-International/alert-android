@@ -24,9 +24,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.AddNotesAdapter;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Note;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
-import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import javax.inject.Inject;
@@ -83,7 +81,7 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
         setContentView(R.layout.activity_add_notes);
 
         ButterKnife.bind(this);
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
         submitNote.setOnClickListener(this);
 
         setSupportActionBar(mToolbar);

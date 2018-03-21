@@ -49,7 +49,7 @@ public class ResponsePlanFetcher implements SynchronizedCounter.SynchronizedCoun
 
     public ResponsePlanFetcher(ResponsePlanFetcherListener listener) {
         this.listener = listener;
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
     }
 
     public void fetch(){

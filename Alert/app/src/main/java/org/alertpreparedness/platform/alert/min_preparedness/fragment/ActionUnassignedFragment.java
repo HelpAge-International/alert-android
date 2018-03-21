@@ -20,25 +20,19 @@ import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionGroupObservable;
-import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
-import org.alertpreparedness.platform.alert.firebase.consumers.ItemConsumer;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.UsersListDialogFragment;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
-import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ClockSettingsFetcher;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
@@ -53,6 +47,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
@@ -96,12 +91,14 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
     @Inject
     User user;
 
+    CompositeDisposable disposable = new CompositeDisposable();
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.content_minimum, container, false);
 
         ButterKnife.bind(this, v);
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
 
         initViews();
 
@@ -133,7 +130,7 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
 //        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
 
 
-        actionFlowable.subscribe(collectionFetcherResultItem -> {
+        disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
 
@@ -148,7 +145,7 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
             }
             mUnassignedAdapter.updateKeys(result);
 
-        });
+        }));
 
 
     }
@@ -252,7 +249,10 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
         }
     }
 
-    public void onActionRemoved(DataSnapshot snapshot) {
-        mUnassignedAdapter.removeItem(snapshot.getKey());
+    @Override
+    public void onStop() {
+        super.onStop();
+        disposable.dispose();
     }
+
 }

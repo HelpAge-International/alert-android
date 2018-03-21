@@ -66,11 +66,11 @@ public class ClockSettingsFetcher {
     @Deprecated
     public ClockSettingsFetcher(ClockSettingsRetrievedListener listener) {
         this.listener = listener;
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
     }
 
     public ClockSettingsFetcher() {
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
     }
 
     @Deprecated

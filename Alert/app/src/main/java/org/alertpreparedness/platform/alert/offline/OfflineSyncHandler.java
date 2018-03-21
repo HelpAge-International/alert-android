@@ -70,10 +70,10 @@ public class OfflineSyncHandler {
 
     public void sync(AlertApplication alertApplication, SyncCallback syncCallback) {
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            if(DependencyInjector.applicationComponent() == null){
-                DependencyInjector.initialize(alertApplication);
-            }
-            DependencyInjector.applicationComponent().inject(this);
+//            if(DependencyInjector.userScopeComponent() == null){
+//                DependencyInjector.initialize(alertApplication);
+//            }
+            DependencyInjector.userScopeComponent().inject(this);
         } else {
             syncCallback.syncSuccess();
             return;

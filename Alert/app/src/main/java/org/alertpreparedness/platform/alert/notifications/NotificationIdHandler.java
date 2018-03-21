@@ -4,20 +4,15 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.MutableData;
-import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
-import org.alertpreparedness.platform.alert.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-
-import dagger.Lazy;
 
 public class NotificationIdHandler {
 
@@ -28,7 +23,7 @@ public class NotificationIdHandler {
     public static final String DEVICE_IDS_KEY = "deviceNotificationIds";
 
     public NotificationIdHandler(){
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
     }
 
 
@@ -62,7 +57,6 @@ public class NotificationIdHandler {
         deviceNotificationIdsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                System.out.println("dataSnapshot.getRef() = " + dataSnapshot.getRef());
                 List<String> ids = dataSnapshot.getValue(new GenericTypeIndicator<List<String>>() {});
                 if(ids == null){
                     ids = new ArrayList<>();

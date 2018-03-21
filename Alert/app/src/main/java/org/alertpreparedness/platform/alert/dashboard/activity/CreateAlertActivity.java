@@ -2,7 +2,6 @@ package org.alertpreparedness.platform.alert.dashboard.activity;
 
 import android.content.Intent;
 import android.os.Parcelable;
-import android.support.annotation.CallSuper;
 import android.support.annotation.DrawableRes;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -78,7 +77,7 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
         setContentView(R.layout.activity_create_alert);
 
         ButterKnife.bind(this);
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
 
         setSupportActionBar(mToolbar);
 

@@ -50,11 +50,11 @@ public class IndicatorsFetcher implements FirebaseDataFetcher, RxFirebaseDataFet
     @Deprecated
     public IndicatorsFetcher(IndicatorsFetcherListener indicatorsFetcherListener) {
         this.indicatorsFetcherListener = indicatorsFetcherListener;
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
     }
 
     public IndicatorsFetcher() {
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
     }
 
 

@@ -20,8 +20,6 @@ import javax.inject.Inject;
 
 import durdinapps.rxfirebase2.RxFirebaseDatabase;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
-import io.realm.internal.Util;
 
 public class NetworkFetcher implements ValueEventListener {
 
@@ -33,11 +31,11 @@ public class NetworkFetcher implements ValueEventListener {
 
     public NetworkFetcher(NetworkFetcherListener networkFetcherListener){
         this.networkFetcherListener = networkFetcherListener;
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
     }
 
     public NetworkFetcher() {
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
     }
 
     @Deprecated

@@ -42,11 +42,11 @@ public class HazardsFetcher implements FirebaseDataFetcher, RxFirebaseDataFetche
     @Deprecated
     public HazardsFetcher(HazardsFetcherListener hazardsFetcherListener) {
         this.hazardsFetcherListener = hazardsFetcherListener;
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
     }
 
     public HazardsFetcher() {
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
     }
 
     //region FirebaseDataFetcher

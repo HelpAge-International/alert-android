@@ -2,7 +2,6 @@ package org.alertpreparedness.platform.alert.adv_preparedness.fragment;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,10 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,7 +25,6 @@ import org.alertpreparedness.platform.alert.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.alert.model.User;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import javax.inject.Inject;
 
@@ -72,7 +67,7 @@ public class UsersListDialogFragment extends DialogFragment implements UserListA
 
         View v = getActivity().getLayoutInflater().inflate(R.layout.dialog_users_list, null);
         unbinder = ButterKnife.bind(this, v);
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
 
         mAdapter = new UserListAdapter(getContext(), dbUserPublicRef, this);
         mList.setAdapter(mAdapter);

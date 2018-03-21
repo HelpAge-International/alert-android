@@ -21,22 +21,17 @@ import com.google.firebase.database.DatabaseReference;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
-import org.alertpreparedness.platform.alert.firebase.consumers.ItemConsumer;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.UsersListDialogFragment;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
-import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ClockSettingsFetcher;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
@@ -51,6 +46,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
@@ -85,6 +81,8 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
     @Inject
     User user;
 
+    CompositeDisposable disposable = new CompositeDisposable();
+
     protected ActionAdapter mExpiredAdapter;
     private String actionID;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
@@ -94,7 +92,7 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
         View v = inflater.inflate(R.layout.content_minimum, container, false);
 
         ButterKnife.bind(this, v);
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
 
         initViews();
 
@@ -126,7 +124,7 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
 //            onActionRetrieved(actionModel);
 //        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
 
-        actionFlowable.subscribe(collectionFetcherResultItem -> {
+        disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
 
@@ -142,7 +140,7 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
             }
             mExpiredAdapter.updateKeys(result);
 
-        });
+        }));
 
 
     }
@@ -239,7 +237,10 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
         }
     }
 
-    public void onActionRemoved(DataSnapshot snapshot) {
-        mExpiredAdapter.removeItem(snapshot.getKey());
+    @Override
+    public void onStop() {
+        super.onStop();
+        disposable.dispose();
     }
+
 }

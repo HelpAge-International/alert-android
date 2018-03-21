@@ -64,7 +64,7 @@ public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterLis
 
     public ActionFetcher(ActionFetcherListener listener) {
         this.listener = listener;
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
     }
 
     public void fetchAll(){

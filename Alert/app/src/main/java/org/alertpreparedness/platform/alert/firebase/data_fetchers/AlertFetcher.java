@@ -43,7 +43,7 @@ public class AlertFetcher implements RxFirebaseDataFetcher<DataSnapshot> {
 
 
     public AlertFetcher(){
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
     }
 
     @Override

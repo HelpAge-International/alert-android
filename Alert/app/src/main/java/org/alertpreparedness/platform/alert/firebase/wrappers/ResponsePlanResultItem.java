@@ -15,9 +15,6 @@ import javax.inject.Inject;
 import durdinapps.rxfirebase2.RxFirebaseChildEvent;
 import durdinapps.rxfirebase2.RxFirebaseDatabase;
 import io.reactivex.Flowable;
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.Single;
 
 /**
  * Created by Tj on 13/03/2018.
@@ -37,7 +34,7 @@ public class ResponsePlanResultItem {
 
     public ResponsePlanResultItem(DataSnapshot responsePlan) {
         this.responsePlan = responsePlan;
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
     }
 
     public Flowable<FetcherResultItem<NoteItemWrapper>> getNotes() {

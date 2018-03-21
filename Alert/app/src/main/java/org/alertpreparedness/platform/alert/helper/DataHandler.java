@@ -51,6 +51,6 @@ public class DataHandler {
 
 
     public DataHandler() {
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
     }
 }

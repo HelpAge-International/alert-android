@@ -11,7 +11,6 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ResponsePlanResultItem;
 
 import java.util.Collection;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -34,7 +33,7 @@ import io.reactivex.Flowable;
         DatabaseReference noteRef;
 
         public ResponsePlanFetcher() {
-            DependencyInjector.applicationComponent().inject(this);
+            DependencyInjector.userScopeComponent().inject(this);
         }
 
         @Override

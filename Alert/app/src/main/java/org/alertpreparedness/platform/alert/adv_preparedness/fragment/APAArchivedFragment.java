@@ -13,23 +13,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.firebase.database.DataSnapshot;
-
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionGroupObservable;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
-import org.alertpreparedness.platform.alert.firebase.consumers.ItemConsumer;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
-import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 
@@ -41,6 +34,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
@@ -77,6 +71,8 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
     @ActionGroupObservable
     Flowable<Collection<ActionItemWrapper>> actionFlowable;
 
+    CompositeDisposable disposable = new CompositeDisposable();
+
     @Inject
     User user;
 
@@ -86,7 +82,7 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
         View v = inflater.inflate(R.layout.content_advanced, container, false);
 
         ButterKnife.bind(this, v);
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
 
         initViews();
 
@@ -116,7 +112,7 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
 //            onActionRetrieved(actionModel);
 //        }, wrapperToRemove -> mAPAdapter.removeItem(wrapperToRemove.getPrimarySnapshot().getKey())));
 
-        actionFlowable.subscribe(collectionFetcherResultItem -> {
+        disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
 
@@ -131,7 +127,7 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
 
             mAPAdapter.updateKeys(result);
 
-        });
+        }));
 
 
         handleAdvFab();
@@ -188,4 +184,11 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
     protected RecyclerView getListView() {
         return mAdvActionRV;
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        disposable.dispose();
+    }
+
 }

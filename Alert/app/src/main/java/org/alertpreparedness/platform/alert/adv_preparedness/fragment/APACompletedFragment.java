@@ -13,32 +13,20 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionGroupObservable;
-import org.alertpreparedness.platform.alert.dagger.annotation.ActionObservable;
-import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
-import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
-import org.alertpreparedness.platform.alert.firebase.ClockSetting;
-import org.alertpreparedness.platform.alert.firebase.consumers.ItemConsumer;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
 import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
-import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
-import org.alertpreparedness.platform.alert.adv_preparedness.fragment.BaseAPAFragment;
-import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 
@@ -50,6 +38,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
@@ -90,6 +79,8 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
     @Inject
     User user;
 
+    CompositeDisposable disposable = new CompositeDisposable();
+
     private APActionAdapter mAPAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
 
@@ -99,7 +90,7 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
         View v = inflater.inflate(R.layout.content_advanced, container, false);
 
         ButterKnife.bind(this, v);
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
 
         initViews();
         dialog.setListener(this);
@@ -133,8 +124,7 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
 //        }, wrapperToRemove -> mAPAdapter.removeItem(wrapperToRemove.getPrimarySnapshot().getKey())));
 //
 
-        actionFlowable
-        .subscribe(collectionFetcherResultItem -> {
+        disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
 
@@ -147,7 +137,7 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
             }
             mAPAdapter.updateKeys(result);
 
-        });
+        }));
 
     }
 
@@ -219,6 +209,12 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
         return mAdvActionRV;
     }
     //endregion
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        disposable.dispose();
+    }
 
 
 }

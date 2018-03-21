@@ -48,7 +48,7 @@ public class ViewAttachmentAdapter extends RecyclerView.Adapter<ViewAttachmentAd
 
     public ViewAttachmentAdapter(Context context, AttachementSelectListener listener) {
         this.listener = listener;
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
         this.context = context;
     }
 

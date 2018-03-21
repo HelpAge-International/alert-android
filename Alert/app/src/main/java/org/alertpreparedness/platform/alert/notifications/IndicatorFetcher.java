@@ -43,7 +43,7 @@ public class IndicatorFetcher implements SynchronizedCounter.SynchronizedCounter
 
     public IndicatorFetcher(IndicatorFetcherListener listener) {
         this.listener = listener;
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
     }
 
     public void fetchAll(){

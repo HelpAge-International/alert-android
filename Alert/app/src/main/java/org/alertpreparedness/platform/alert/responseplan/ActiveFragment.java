@@ -70,7 +70,7 @@ public class ActiveFragment extends Fragment implements ResponsePlansAdapter.Res
         View v = inflater.inflate(R.layout.fragment_response_plans_subfrag, container, false);
 
         ButterKnife.bind(this, v);
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
 
         initViews();
 

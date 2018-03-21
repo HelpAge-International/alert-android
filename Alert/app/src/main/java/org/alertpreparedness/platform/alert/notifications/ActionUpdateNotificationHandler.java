@@ -12,7 +12,6 @@ import com.firebase.jobdispatcher.Trigger;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.Exclude;
 import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
@@ -21,13 +20,10 @@ import org.alertpreparedness.platform.alert.dagger.annotation.ActionGroupObserva
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseNetworkCountryRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseNetworkRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.ClockSetting;
-import org.alertpreparedness.platform.alert.firebase.ClockSettings;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ClockSettingsFetcher;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.TempActionFetcher;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
@@ -90,7 +86,7 @@ public class ActionUpdateNotificationHandler {
 
 
     public ActionUpdateNotificationHandler(Context context) {
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
         this.context = context;
     }
 

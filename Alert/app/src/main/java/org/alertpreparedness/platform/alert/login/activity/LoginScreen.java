@@ -32,6 +32,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.alertpreparedness.platform.alert.AlertApplication;
 import org.alertpreparedness.platform.alert.R;
@@ -42,6 +43,7 @@ import org.alertpreparedness.platform.alert.helper.RightDrawableOnTouchListener;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
 import org.alertpreparedness.platform.alert.interfaces.AuthCallback;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.notifications.NotificationIdHandler;
 import org.alertpreparedness.platform.alert.settings.SettingsFragment;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -124,7 +126,15 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
         }
 
         if (view == txt_forgotPasword) {
-            startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://platform.alertpreparedness.org/forgot-password")));
+            switch (AlertApplication.CURRENT_STATUS) {
+
+                case LIVE:
+                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://platform.alertpreparedness.org/forgot-password")));
+                    break;
+                default:
+                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://uat.portal.alertpreparedness.org/forgot-password")));
+                    break;
+            }
         }
     }
 
@@ -146,10 +156,6 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
         progressDialog.setMessage("Logging you in...");
         progressDialog.show();
 
-
-        System.out.println("firebaseAuth = " + firebaseAuth);
-        System.out.println("email = " + email);
-        System.out.println("password = " + password);
         Task<AuthResult> a = FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password);
         Task<AuthResult> b = a.addOnCompleteListener(this, this);
         Task<AuthResult> c = b.addOnFailureListener(this);
@@ -157,7 +163,6 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onUserAuthorized(User user) {
-        DependencyInjector.initialize((AlertApplication) getApplication());
         progressDialog.dismiss();
         SettingsFactory.tryMakeBaseSettings(user);
         startActivity(new Intent(this, HomeScreen.class));
@@ -193,8 +198,11 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
     public void onComplete(@NonNull Task<AuthResult> task) {
         if (task.isSuccessful()) {
             if (firebaseAuth.getCurrentUser()!=null) {
+                DependencyInjector.initialize((AlertApplication) getApplication());
+                DependencyInjector.initializeUserScope();
                 PreferHelper.putString(this, Constants.UID, firebaseAuth.getCurrentUser().getUid());
                 userInfo.authUser(this, PreferHelper.getString(this, Constants.UID));
+                new NotificationIdHandler().registerDeviceId(firebaseAuth.getCurrentUser().getUid(), FirebaseInstanceId.getInstance().getToken());
             }
         }
         else {

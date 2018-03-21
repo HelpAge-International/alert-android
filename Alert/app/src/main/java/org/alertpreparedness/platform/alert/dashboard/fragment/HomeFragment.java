@@ -186,7 +186,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     public AlertAdapter alertAdapter;
     public AlertAdapter networkAlertAdapter;
     private TaskAdapter networkTaskAdapter;
-    private CompositeDisposable disposable;
+    private CompositeDisposable disposable = new CompositeDisposable();
 
     @Nullable
     @Override
@@ -195,7 +195,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
         ButterKnife.bind(this, v);
 
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
 
         ((MainDrawer) getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.ALERT, R.string.green_alert_level, R.drawable.alert_green);
 
@@ -237,17 +237,17 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         ViewCompat.setNestedScrollingEnabled(myTaskRecyclerView, false);
         scroller.setOnScrollChangeListener(this);
 
-        alertFlowable.subscribe(new ItemConsumer<>(
+        disposable.add(alertFlowable.subscribe(new ItemConsumer<>(
                 this::processAlert,
                 alertResultWrapper -> removeAlert(alertResultWrapper.getAlertSnapshot().getKey())
             )
-        );
+        ));
 
-        indicatorFlowable.subscribe(new ItemConsumer<>(this::processTask, dataSnapshot -> {
+        disposable.add(indicatorFlowable.subscribe(new ItemConsumer<>(this::processTask, dataSnapshot -> {
             //handled by the processTask method
-        }));
+        })));
 
-        actionFlowable.subscribe(new ItemConsumer<>(actionItemWrappers -> {
+        disposable.add(actionFlowable.subscribe(new ItemConsumer<>(actionItemWrappers -> {
             ArrayList<String> networkRes = new ArrayList<>();
             ArrayList<String> countryRes = new ArrayList<>();
 
@@ -269,7 +269,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
         }, actionItemWrappers -> {
             //not used
-        }));
+        })));
 
     }
 
@@ -316,6 +316,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     @Override
     public void onStop() {
         super.onStop();
+        disposable.dispose();
     }
 
     @Override

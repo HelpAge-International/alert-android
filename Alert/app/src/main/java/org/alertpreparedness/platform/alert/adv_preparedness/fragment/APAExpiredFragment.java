@@ -20,7 +20,6 @@ import com.google.firebase.database.DatabaseReference;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
-import org.alertpreparedness.platform.alert.firebase.ClockSetting;
 import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
@@ -37,7 +36,6 @@ import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesAc
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.ClockSettingsFetcher;
-import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
@@ -52,6 +50,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
@@ -115,6 +114,8 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
     @ActiveActionObservable
     Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> actionFlowable;
 
+    CompositeDisposable disposable = new CompositeDisposable();
+
     private APActionAdapter mAPAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
 
@@ -124,7 +125,7 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
         View v = inflater.inflate(R.layout.content_advanced, container, false);
 
         ButterKnife.bind(this, v);
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
 
         initViews();
         dialog.setListener(this);
@@ -148,8 +149,7 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
 
         handleAdvFab();
 
-        actionFlowable
-        .subscribe(collectionFetcherResultItem -> {
+        disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
 
@@ -169,7 +169,7 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
             }
             mAPAdapter.updateKeys(result);
 
-        });
+        }));
 
     }
 

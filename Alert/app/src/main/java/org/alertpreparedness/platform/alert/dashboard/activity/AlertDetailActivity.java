@@ -111,7 +111,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         setContentView(R.layout.activity_alert_detail);
 
         ButterKnife.bind(this);
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
 
         countryID = user.countryID;
         isCountryDirector = user.isCountryDirector();

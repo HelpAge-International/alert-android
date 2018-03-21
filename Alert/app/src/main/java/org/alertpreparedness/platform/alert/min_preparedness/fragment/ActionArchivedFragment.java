@@ -18,19 +18,13 @@ import com.google.firebase.database.DataSnapshot;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionGroupObservable;
-import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
-import org.alertpreparedness.platform.alert.firebase.consumers.ItemConsumer;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
-import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.adapter.ActionAdapter;
-import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.model.User;
-import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 
@@ -42,6 +36,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
@@ -74,13 +69,15 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
     @ActionGroupObservable
     Flowable<Collection<ActionItemWrapper>>  actionFlowable;
 
+    CompositeDisposable disposable = new CompositeDisposable();
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.content_minimum, container, false);
 
         ButterKnife.bind(this, v);
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
 
         initViews();
 
@@ -110,7 +107,7 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
 //            onActionRetrieved(actionModel);
 //        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
 
-        actionFlowable.subscribe(collectionFetcherResultItem -> {
+        disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
 
@@ -127,7 +124,7 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
             }
             mAdapter.updateKeys(result);
 
-        });
+        }));
 
     }
 
@@ -170,7 +167,9 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
         }
     }
 
-    public void onActionRemoved(DataSnapshot snapshot) {
-        mAdapter.removeItem(snapshot.getKey());
+    @Override
+    public void onStop() {
+        super.onStop();
+        disposable.dispose();
     }
 }

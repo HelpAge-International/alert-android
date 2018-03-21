@@ -1,237 +1,341 @@
 package org.alertpreparedness.platform.alert.firebase.data_fetchers;
 
-import com.google.firebase.database.ChildEventListener;
+import android.util.Pair;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 
-import org.alertpreparedness.platform.alert.action.ActionAPAExpiredProcessor;
-import org.alertpreparedness.platform.alert.action.ActionAPAInProgressProcessor;
-import org.alertpreparedness.platform.alert.action.ActionAPAUnassignedProcessor;
-import org.alertpreparedness.platform.alert.action.ActionArchivedProcessor;
-import org.alertpreparedness.platform.alert.action.ActionCompletedProcessor;
-import org.alertpreparedness.platform.alert.action.ActionExpiredProcessor;
-import org.alertpreparedness.platform.alert.action.ActionInProgressProcessor;
-import org.alertpreparedness.platform.alert.action.ActionProcessor;
-import org.alertpreparedness.platform.alert.action.ActionProcessorListener;
-import org.alertpreparedness.platform.alert.action.ActionUnassignedProcessor;
-import org.alertpreparedness.platform.alert.action.IdFetcherListener;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.dagger.annotation.AlertGroupObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionCHSRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionMandatedRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
-import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
-import org.alertpreparedness.platform.alert.min_preparedness.model.ActionModel;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
+import org.alertpreparedness.platform.alert.firebase.AlertModel;
+import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
+import durdinapps.rxfirebase2.RxFirebaseChildEvent;
+import durdinapps.rxfirebase2.RxFirebaseDatabase;
 import io.reactivex.Flowable;
 
+import static org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem.EventType.REMOVED;
+import static org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem.EventType.UPDATED;
+
 /**
- * Created by Tj on 28/02/2018.
+ * Created by Tj on 08/03/2018.
  */
 
-public class ActionFetcher implements ActionProcessorListener {
-
-    private int type;
-    private ACTION_STATE state;
-    private ActionRetrievalListener listener;
-    private List<Integer> alertHazardTypes;
-    private List<Integer> networkHazardTypes;
+public class ActionFetcher implements RxFirebaseDataFetcher<ActionItemWrapper> {
 
     @Inject
     User user;
 
     @Inject
     @BaseActionRef
-    public DatabaseReference dbActionBaseRef;
+    DatabaseReference dbActionBaseRef;
+
+    @Inject
+    @BaseActionCHSRef
+    DatabaseReference dbBaseActionCHSRef;
+
+    @Inject
+    @BaseActionMandatedRef
+    DatabaseReference dbBaseActionMandatedRef;
 
     @Inject
     Flowable<NetworkFetcher.NetworkFetcherResult> networkResultFlowable;
 
-
-    public enum ACTION_STATE {
-        IN_PROGRESS,
-        UNASSIGNED,
-        COMPLETED,
-        INACTIVE,
-        EXPIRED,
-        APA_EXPIRED,
-        APA_IN_PROGRESS,
-        ARCHIVED,
-        APA_UNASSIGNED
-    }
+    @Inject
+    @AlertGroupObservable
+    Flowable<Collection<DataSnapshot>> alertGroupFlowable;
 
     public ActionFetcher() {
-    }
-
-    /**
-     *
-     * @param type MPA or APA
-     * @param listener
-     */
-    @Deprecated
-    public ActionFetcher(int type, ACTION_STATE state, ActionRetrievalListener listener) {
-        this.type = type;
-        this.state = state;
-        this.listener = listener;
-        DependencyInjector.applicationComponent().inject(this);
-    }
-
-    @Deprecated
-    public ActionFetcher(int type, ACTION_STATE state, ActionRetrievalListener listener, List<Integer> alertHazardTypes, List<Integer> networkHazardTypes) {
-        this.type = type;
-        this.state = state;
-        this.listener = listener;
-        this.alertHazardTypes = alertHazardTypes;
-        this.networkHazardTypes = networkHazardTypes;
-        DependencyInjector.applicationComponent().inject(this);
-    }
-
-    @Deprecated
-    public void fetchWithIds(List<String> ids, IdFetcherListener idFetcherListener) {
-        ids.add(user.countryID);
-        idFetcherListener.onIdResult(ids);
-        for (String id : ids) {
-            dbActionBaseRef.child(id).addChildEventListener(new ActionListener(id));
-        }
-    }
-
-    @Deprecated
-    public void fetch(IdFetcherListener idFetcherListener) {
-        new NetworkFetcher((n) -> {
-            List<String> ids = n.all();
-            ids.add(user.countryID);
-            idFetcherListener.onIdResult(ids);
-            for (String id : ids) {
-                dbActionBaseRef.child(id).addChildEventListener(new ActionListener(id));
-            }
-        }).fetch();
+        DependencyInjector.userScopeComponent().inject(this);
     }
 
 
-    private ActionProcessor makeProcessor(DataSnapshot snapshot, ActionModel model, String actionId, String parentId) {
-        switch (state) {
-            case IN_PROGRESS:
-                return new ActionInProgressProcessor(type, snapshot, model, actionId, parentId, this);
-            case EXPIRED:
-                return new ActionExpiredProcessor(type, snapshot, model, actionId, parentId, this);
-            case APA_EXPIRED:
-                return new ActionAPAExpiredProcessor(type, snapshot, model, actionId, parentId, this, alertHazardTypes, networkHazardTypes);
-            case APA_IN_PROGRESS:
-                return new ActionAPAInProgressProcessor(type, snapshot, model, actionId, parentId, this, alertHazardTypes, networkHazardTypes);
-            case ARCHIVED:
-                return new ActionArchivedProcessor(type, snapshot, model, actionId, parentId, this);
-            case COMPLETED:
-                return new ActionCompletedProcessor(type, snapshot, model, actionId, parentId, this);
-            case UNASSIGNED:
-                return new ActionUnassignedProcessor(type, snapshot, model, actionId, parentId, this);
-            case APA_UNASSIGNED:
-                return new ActionAPAUnassignedProcessor(type, snapshot, model, actionId, parentId, this, alertHazardTypes, networkHazardTypes);
-            default:
-                return new ActionInProgressProcessor(type, snapshot, model, actionId, parentId, this);
-        }
+    private Flowable<FetcherResultItem<ActionItemWrapper>> rxFetchActions(){
+
+        return networkResultFlowable
+                .flatMap(networkFetcherResult -> {
+                    Flowable<Pair<ActionItemWrapper.Group, RxFirebaseChildEvent<DataSnapshot>>> flow = RxFirebaseDatabase.observeChildEvent(dbActionBaseRef.child(user.countryID).orderByChild("type").equalTo(2))
+                            .map(dataSnapshotRxFirebaseChildEvent -> new Pair<>(ActionItemWrapper.Group.COUNTRY, dataSnapshotRxFirebaseChildEvent));
+
+                    for (String localNetworkId : networkFetcherResult.getLocalNetworks()) {
+                        flow = flow.mergeWith(RxFirebaseDatabase.observeChildEvent(dbActionBaseRef.child(localNetworkId).orderByChild("type").equalTo(2))
+                                .map(dataSnapshotRxFirebaseChildEvent -> new Pair<>(ActionItemWrapper.Group.LOCAL_NETWORK, dataSnapshotRxFirebaseChildEvent)));
+                    }
+                    for (String networkCountryId : networkFetcherResult.getLocalNetworks()) {
+                        flow = flow.mergeWith(RxFirebaseDatabase.observeChildEvent(dbActionBaseRef.child(networkCountryId).orderByChild("type").equalTo(2))
+                                .map(dataSnapshotRxFirebaseChildEvent -> new Pair<>(ActionItemWrapper.Group.NETWORK_COUNTRY, dataSnapshotRxFirebaseChildEvent)));
+                    }
+
+                    return flow;
+                })
+                .map(pair -> {
+                    FetcherResultItem.EventType eventType = pair.second.getEventType() == RxFirebaseChildEvent.EventType.REMOVED ? REMOVED : UPDATED;
+
+                    return new FetcherResultItem<>(ActionItemWrapper.createAction(pair.second.getValue(), pair.first), eventType);
+                });
+//
     }
 
-    protected class ActionListener implements ChildEventListener {
-        private String parentId;
+    public Flowable<Collection<ActionItemWrapper>> rxFetchWithClockSettings(Flowable<Collection<ActionItemWrapper>> flowable) {
 
-        public ActionListener(String id) {
-            this.parentId = id;
-        }
+        Flowable<ClockSettingsFetcher.ClockSettingsResult> clockSettingsResultFlowable = new ClockSettingsFetcher().rxFetch(ClockSettingsFetcher.TYPE_PREPAREDNESS);
 
+        return Flowable.combineLatest(clockSettingsResultFlowable, flowable,
+                (clockSettingsResult, actionItemWrapperFetcherResultItems) -> {
 
-        protected void process(DataSnapshot dataSnapshot) {
+                    ArrayList<ActionItemWrapper> res = new ArrayList<>();
 
-
-            String actionID = dataSnapshot.getKey();
-
-            ActionModel model = dataSnapshot.getValue(ActionModel.class);
-
-            if(model != null) {
-                boolean isNetwork = !dataSnapshot.getRef().getParent().getKey().equals(user.countryID);
-                model.setIsNetworkLevel(isNetwork);
-                if (dataSnapshot.child("frequencyBase").getValue() != null) {
-                    model.setFrequencyBase(dataSnapshot.child("frequencyBase").getValue().toString());
-                }
-                if (dataSnapshot.child("frequencyValue").getValue() != null) {
-                    model.setFrequencyValue(dataSnapshot.child("frequencyValue").getValue().toString());
-                }
-
-                ActionProcessor processor = makeProcessor(dataSnapshot, model, actionID, parentId);
-
-                if (model.getType() != null && model.getType() == 0 && type == Constants.MPA && state != ACTION_STATE.UNASSIGNED) {
-                    processor.getCHS();
-                }
-                else if (model.getType() != null && model.getType() == 1 && state != ACTION_STATE.UNASSIGNED) {
-                    processor.getMandated();
-                }
-                else if (model.getType() != null && model.getType() == 2 && state != ACTION_STATE.UNASSIGNED) {
-                    processor.getCustom();
-                }
-                else if (state == ACTION_STATE.UNASSIGNED){
-                    if (dataSnapshot.getValue() == null) {
-                        if (type != Constants.APA) {
-                            ((ActionUnassignedProcessor) processor).getCHSForNewUser();
+                    for (ActionItemWrapper itemWrapper : actionItemWrapperFetcherResultItems) {
+                        DataSnapshot snapshot = itemWrapper.getActionSnapshot();
+                        if(snapshot == null) {
+                            snapshot = itemWrapper.getTypeSnapshot();
                         }
-                        ((ActionUnassignedProcessor)processor).getMandatedForNewUser();
+                        itemWrapper.setClockSetting(clockSettingsResult.all().get(snapshot.getRef().getParent().getKey()));
+                        res.add(itemWrapper);
                     }
-                    if (model.getType() != null && model.getType() == 2) {
-                        processor.getCustom();
+
+                    return res;
+                });
+
+    }
+
+    private Flowable<FetcherResultItem<ActionItemWrapper>> rxFetchCHSActions(){
+        return networkResultFlowable.flatMap(networkFetcherResult -> {
+            Flowable<RxFirebaseChildEvent<DataSnapshot>> flow = RxFirebaseDatabase.observeChildEvent(dbBaseActionCHSRef.child(user.getSystemAdminID()));
+
+            for (String networkId : networkFetcherResult.all()) {
+                flow = flow.mergeWith(RxFirebaseDatabase.observeChildEvent(dbBaseActionCHSRef.child(networkId)));
+            }
+
+            return flow;
+        }).flatMap(chsAction -> {
+            return RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(user.countryID).child(chsAction.getValue().getKey()))
+                    .map(action -> new Pair<>(chsAction, action));
+        }).map(pair -> {
+            if (pair.second.exists()) {
+                //TODO: The group here shouldn't be none, should correspond to the actual action group (See rxFetchActions)
+                return new FetcherResultItem<>(ActionItemWrapper.createCHS(pair.first.getValue(), pair.second, ActionItemWrapper.Group.NONE), RxFirebaseChildEvent.EventType.CHANGED);
+            }
+            else {
+                return new FetcherResultItem<>(ActionItemWrapper.createCHS(pair.first.getValue()), pair.first.getEventType() == RxFirebaseChildEvent.EventType.REMOVED ? REMOVED : UPDATED);
+            }
+        });
+    }
+
+    private Flowable<FetcherResultItem<ActionItemWrapper>> rxFetchMandatedActions(){
+        return networkResultFlowable.flatMap(networkFetcherResult -> {
+            Flowable<RxFirebaseChildEvent<DataSnapshot>> flow = RxFirebaseDatabase.observeChildEvent(dbBaseActionMandatedRef.child(user.agencyAdminID));
+
+            for (String networkId : networkFetcherResult.all()) {
+                flow = flow.mergeWith(RxFirebaseDatabase.observeChildEvent(dbBaseActionMandatedRef.child(networkId)));
+            }
+
+            return flow;
+        }).flatMap(mandatedAction -> {
+            String mandatedActionParentId = mandatedAction.getValue().getRef().getParent().getKey();
+            if(mandatedActionParentId.equals(user.agencyAdminID)){
+                mandatedActionParentId = user.countryID;
+            }
+            return RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(mandatedActionParentId).child(mandatedAction.getValue().getKey()))
+                    .map(action -> new Pair<>(mandatedAction, action));
+        }).map(pair -> {
+            if (pair.second.exists()) {
+                //TODO: The group here shouldn't be none, should correspond to the actual action group (See rxFetchActions)
+                return new FetcherResultItem<>(ActionItemWrapper.createMandated(pair.first.getValue(), pair.second, ActionItemWrapper.Group.NONE), RxFirebaseChildEvent.EventType.CHANGED);
+            } else {
+                return new FetcherResultItem<>(ActionItemWrapper.createMandated(pair.first.getValue()), pair.first.getEventType() == RxFirebaseChildEvent.EventType.REMOVED ? REMOVED : UPDATED);
+            }
+        });
+    }
+
+    public Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> rxActiveItems(boolean isActive) {
+
+        Flowable<FetcherResultItem<ArrayList<ActionItemWrapper>>> flowable =
+        alertGroupFlowable.map(dataSnapshots -> {
+            HashMap<String, Set<Integer>> hazardTypes = new HashMap<>();
+
+            for (DataSnapshot snapshot : dataSnapshots) {
+                AlertModel alertModel = AppUtils.getFirebaseModelFromDataSnapshot(snapshot, AlertModel.class);
+                Set<Integer> existingSet = hazardTypes.get(snapshot.getRef().getParent().getKey());
+                if(existingSet == null) {
+                    existingSet = new HashSet<>();
+                }
+                if(alertModel.getAlertLevel() == Constants.TRIGGER_RED) {
+                    existingSet.add(alertModel.getHazardScenario());
+                }
+                hazardTypes.put(snapshot.getRef().getParent().getKey(), existingSet);
+            }
+            return hazardTypes;
+        })
+        .distinct()
+        .flatMap(hazardTypes -> rxFetchGroup().map(actionItemWrapperFetcherResultItem -> {
+            ArrayList<ActionItemWrapper> result = new ArrayList<>();
+            for (ActionItemWrapper itemWrapper : actionItemWrapperFetcherResultItem) {
+                boolean res = false;
+
+                DataSnapshot snapshot = itemWrapper.getActionSnapshot();
+                if (itemWrapper.getActionSnapshot() == null) {
+                    snapshot = itemWrapper.getTypeSnapshot();
+                }
+
+                if (snapshot != null) {
+                    ActionModel model = AppUtils.getFirebaseModelFromDataSnapshot(snapshot, ActionModel.class);
+                    if (model.getAssignHazard() != null) {
+                        for (Integer hazardType : model.getAssignHazard()) {
+                            if (hazardTypes.get(model.getParentId()) != null && hazardTypes.get(model.getParentId()).contains(hazardType)) {
+                                res = true;
+                                break;
+                            }
+                        }
                     }
-                    if(type != Constants.APA) {
-                        processor.getCHS();
+//                    else if (model.getAssignHazard() == null || model.getAssignHazard().size() == 0) {
+//                        res = true;
+//                    }
+                    if (res && isActive || !res && !isActive) {
+                        result.add(itemWrapper);
                     }
-                    processor.getMandated();
                 }
             }
-        }
+            return new FetcherResultItem<>(result, RxFirebaseChildEvent.EventType.CHANGED);
+        }));
 
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            process(dataSnapshot);
+        Flowable<ClockSettingsFetcher.ClockSettingsResult> clockSettingsResultFlowable = new ClockSettingsFetcher().rxFetch(ClockSettingsFetcher.TYPE_PREPAREDNESS);
 
-        }
+        return Flowable.combineLatest(clockSettingsResultFlowable, flowable, (clockSettingsResult, actionItemWrapperFetcherResultItems) -> {
+            ArrayList<ActionItemWrapper> result = new ArrayList<>();
+            for(ActionItemWrapper itemWrapper : actionItemWrapperFetcherResultItems.getValue()) {
+                DataSnapshot snapshot = itemWrapper.getActionSnapshot();
+                if (snapshot == null) {
+                    snapshot = itemWrapper.getTypeSnapshot();
+                }
+                itemWrapper.setClockSetting(clockSettingsResult.all().get(snapshot.getRef().getParent().getKey()));
+                result.add(itemWrapper);
+            }
+            return new FetcherResultItem<Collection<ActionItemWrapper>>(result);
+        });
 
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            process(dataSnapshot);
-
-        }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-        }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
     }
 
     @Override
-    public void onAddAction(DataSnapshot snapshot, Action action) {
-        if(!(type == Constants.APA && action.getActionType() == 0)) {//quick fix to remove CHS from APA fragments
-            listener.onActionRetrieved(snapshot, action);
-        }
+    public Flowable<FetcherResultItem<ActionItemWrapper>> rxFetch() {
+        return Flowable.merge(rxFetchActions(), rxFetchCHSActions(), rxFetchMandatedActions());
+    }
+
+    private Flowable<Collection<ActionItemWrapper>> rxFetchGroupActions() {
+        return rxFetchGroupActions(Constants.CUSTOM);
+    }
+
+    private Flowable<Collection<ActionItemWrapper>> rxFetchGroupActions(int type){
+        return networkResultFlowable.flatMap(networkFetcherResult -> {
+
+            List<Flowable<Collection<ActionItemWrapper>>> flowables = new ArrayList<>();
+            flowables.add(
+                    RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(user.countryID).orderByChild("type").equalTo(type))
+                            .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
+                            .map(childrenDataSnapshotList -> Collections2.transform(childrenDataSnapshotList, item -> ActionItemWrapper.createAction(item, ActionItemWrapper.Group.COUNTRY)))
+            );
+
+            for (String localNetworkId : networkFetcherResult.getLocalNetworks()) {
+                flowables.add(RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(localNetworkId).orderByChild("type").equalTo(type))
+                        .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
+                        .map(childrenDataSnapshotList -> Collections2.transform(childrenDataSnapshotList, item -> ActionItemWrapper.createAction(item, ActionItemWrapper.Group.LOCAL_NETWORK)))
+                );
+            }
+            for (String networkCountryId : networkFetcherResult.getNetworksCountries()) {
+                flowables.add(RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(networkCountryId).orderByChild("type").equalTo(type))
+                        .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
+                        .map(childrenDataSnapshotList -> Collections2.transform(childrenDataSnapshotList, item -> ActionItemWrapper.createAction(item, ActionItemWrapper.Group.LOCAL_NETWORK)))
+                );
+            }
+            return Flowable.combineLatest(flowables, AppUtils::combineDataSnapshotList);
+        });
+    }
+
+    private Flowable<Collection<ActionItemWrapper>> rxFetchGroupCHS(){
+        return Flowable.combineLatest(
+            rxFetchGroupActions(Constants.CHS),
+            RxFirebaseDatabase.observeValueEvent(dbBaseActionCHSRef.child(user.getSystemAdminID()))
+                    .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren())),
+            (actionItemWrappers, chsSnapshots) -> {
+                List<ActionItemWrapper> toReturn = new ArrayList<>();
+                for(DataSnapshot chsSnapshot : chsSnapshots){
+                    Optional<ActionItemWrapper> actionItemWrapperOptional = Iterables.tryFind(actionItemWrappers, input -> input.getActionSnapshot().getKey().equals(chsSnapshot.getKey()));
+
+                    if(actionItemWrapperOptional.isPresent()) {
+                        toReturn.add(ActionItemWrapper.createCHS(chsSnapshot, actionItemWrapperOptional.get().getActionSnapshot(), actionItemWrapperOptional.get().getGroup()));
+                    }
+                    else{
+                        toReturn.add(ActionItemWrapper.createCHS(chsSnapshot));
+                    }
+                }
+                return toReturn;
+            }
+        );
+    }
+
+    private Flowable<Collection<ActionItemWrapper>> rxFetchGroupMandated(){
+        Flowable<Collection<DataSnapshot>> mandatedFlow = networkResultFlowable.flatMap(networkFetcherResult -> {
+            List<String> networkIds = networkFetcherResult.all();
+
+            List<Flowable<Collection<DataSnapshot>>> flowables = new ArrayList<>();
+            flowables.add(
+                    RxFirebaseDatabase.observeValueEvent(dbBaseActionMandatedRef.child(user.agencyAdminID))
+                            .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
+            );
+
+            for (String networkId : networkIds) {
+                flowables.add(RxFirebaseDatabase.observeValueEvent(dbBaseActionMandatedRef.child(networkId))
+                        .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
+                );
+            }
+            return Flowable.<Collection<DataSnapshot>, Collection<DataSnapshot>>combineLatest(flowables, AppUtils::combineDataSnapshotList);
+        });
+        return Flowable.combineLatest(
+            rxFetchGroupActions(Constants.MANDATED),
+            mandatedFlow,
+            (actionSnapshots, mandatedSnapshots) -> {
+                List<ActionItemWrapper> toReturn = new ArrayList<>();
+                for(DataSnapshot mandatedSnapshot : mandatedSnapshots){
+                    Optional<ActionItemWrapper> actionItemWrapperOptional = Iterables.tryFind(actionSnapshots, input -> input.getActionSnapshot().getKey().equals(mandatedSnapshot.getKey()));
+
+                    if(actionItemWrapperOptional.isPresent()) {
+                        toReturn.add(ActionItemWrapper.createMandated(mandatedSnapshot, actionItemWrapperOptional.get().getActionSnapshot(), actionItemWrapperOptional.get().getGroup()));
+                    }
+                    else{
+                        toReturn.add(ActionItemWrapper.createMandated(mandatedSnapshot));
+                    }
+                }
+                return toReturn;
+            }
+        );
     }
 
     @Override
-    public void tryRemoveAction(DataSnapshot snapshot) {
-        listener.onActionRemoved(snapshot);
+    public Flowable<Collection<ActionItemWrapper>> rxFetchGroup() {
+        List<Flowable<Collection<ActionItemWrapper>>> flowables = new ArrayList<>();
+        flowables.add(rxFetchGroupActions());
+        flowables.add(rxFetchGroupCHS());
+        flowables.add(rxFetchGroupMandated());
+        return Flowable.combineLatest(flowables, AppUtils::combineDataSnapshotList);
     }
-
-    public interface ActionRetrievalListener {
-        void onActionRetrieved(DataSnapshot snapshot, Action action);
-        void onActionRemoved(DataSnapshot snapshot);
-    }
-
 }

@@ -37,7 +37,7 @@ public class IndicatorNotificationService extends JobService {
     @Override
     public boolean onStartJob(JobParameters job) {
         if(FirebaseAuth.getInstance().getCurrentUser() != null && job.getExtras() != null) {
-            DependencyInjector.applicationComponent().inject(this);
+            DependencyInjector.userScopeComponent().inject(this);
 
             String hazardId = job.getExtras().getString(IndicatorUpdateNotificationHandler.BUNDLE_HAZARD_ID, null);
             String indicatorId = job.getExtras().getString(IndicatorUpdateNotificationHandler.BUNDLE_INDICATOR_ID, null);

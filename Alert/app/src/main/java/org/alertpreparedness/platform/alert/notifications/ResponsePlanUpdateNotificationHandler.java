@@ -14,7 +14,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
-import org.alertpreparedness.platform.alert.dagger.annotation.DocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ResponsePlansRef;
 import org.alertpreparedness.platform.alert.firebase.ResponsePlanModel;
 import org.alertpreparedness.platform.alert.firebase.ClockSetting;
@@ -55,7 +54,7 @@ public class ResponsePlanUpdateNotificationHandler implements ResponsePlanFetche
 
 
     public ResponsePlanUpdateNotificationHandler(Context context) {
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
         this.context = context;
     }
 

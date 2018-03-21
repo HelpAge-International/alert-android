@@ -18,12 +18,9 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.FirebaseDatabase;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
-import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import butterknife.BindView;
@@ -59,7 +56,7 @@ public class ChangePasswordActivity extends AppCompatActivity implements OnCompl
         setContentView(R.layout.activity_change_password);
 
         ButterKnife.bind(this);
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
 
         setSupportActionBar(mToolbar);
 
@@ -85,6 +82,10 @@ public class ChangePasswordActivity extends AppCompatActivity implements OnCompl
     void onSaveClick(View v) {
         String password = mPassword.getText().toString();
 
+        System.out.println("mReenterPAssword.getText() = " + mReenterPAssword.getText().toString());
+        System.out.println("mNewPassword.getText() = " + mNewPassword.getText().toString());
+        System.out.println("passwordequals = " + mNewPassword.getText().toString().equals(mReenterPAssword.getText().toString()));
+
         if(password.length() == 0) {
             SnackbarHelper.show(this, getString(R.string.enter_password_error));
         }
@@ -94,7 +95,7 @@ public class ChangePasswordActivity extends AppCompatActivity implements OnCompl
         else if(mReenterPAssword.getText().length() == 0) {
             SnackbarHelper.show(this, getString(R.string.reenter_new_password_error));
         }
-        else if(!mReenterPAssword.getText().equals(mNewPassword.getText())) {
+        else if(!mReenterPAssword.getText().toString().equals(mNewPassword.getText().toString())) {
             SnackbarHelper.show(this, getString(R.string.passwords_dont_match_error));
         }
         else {
@@ -120,7 +121,7 @@ public class ChangePasswordActivity extends AppCompatActivity implements OnCompl
     @Override
     public void onComplete(@NonNull Task<Void> task) {
         Intent i = new Intent();
-        i.putExtra(PASSWORD_KEY, mNewPassword.getText());
+        i.putExtra(PASSWORD_KEY, mNewPassword.getText().toString());
         setResult(RESULT_OK, i);
         finish();
         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
@@ -140,6 +141,9 @@ public class ChangePasswordActivity extends AppCompatActivity implements OnCompl
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
         if(mNewPassword.getText() != null && !mNewPassword.getText().toString().equals(mReenterPAssword.getText().toString())) {
             reenterBase.setError(getString(R.string.passwords_dont_match_temp_error));
+        }
+        else {
+            reenterBase.setError("");
         }
     }
 

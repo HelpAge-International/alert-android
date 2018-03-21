@@ -110,7 +110,7 @@ public class MyCountryFragment extends Fragment implements OnCountrySelectedList
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_my_country, container, false);
 
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
         ButterKnife.bind(MyCountryFragment.this, v);
 
         initViews(v);

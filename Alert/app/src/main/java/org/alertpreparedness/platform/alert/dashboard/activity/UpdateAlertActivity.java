@@ -59,7 +59,7 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
             mAlertLevel = alert.getAlertLevel();
         }
 
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
 
         mToolbar.setTitle(R.string.update_alert);
         countryID = user.countryID;

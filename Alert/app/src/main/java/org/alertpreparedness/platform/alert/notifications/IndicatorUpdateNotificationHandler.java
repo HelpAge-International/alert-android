@@ -45,7 +45,7 @@ public class IndicatorUpdateNotificationHandler implements IndicatorFetcher.Indi
 
 
     public IndicatorUpdateNotificationHandler(Context context) {
-        DependencyInjector.applicationComponent().inject(this);
+        DependencyInjector.userScopeComponent().inject(this);
         this.context = context;
     }
 
@@ -78,7 +78,6 @@ public class IndicatorUpdateNotificationHandler implements IndicatorFetcher.Indi
 
     @Override
     public void indicatorFetchSuccess(List<IndicatorFetcher.IndicatorFetcherResult> models) {
-        Timber.d("Success");
         cancelAllNotifications(context);
 
         for(IndicatorFetcher.IndicatorFetcherResult model : models){

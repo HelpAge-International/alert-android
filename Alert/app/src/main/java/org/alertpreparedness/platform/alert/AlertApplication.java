@@ -138,20 +138,9 @@ public class AlertApplication extends MultiDexApplication implements ValueEventL
         }
 
         if(loggedIn) {
-//            FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(this));
-//            Job myJob = dispatcher.newJobBuilder()
-//                    .setService(SyncJobService.class) // the JobService that will be called
-//                    .setTag("sync")        // uniquely identifies the job
-//                    .setRecurring(true)
-//                    .setConstraints(Constraint.ON_ANY_NETWORK)
-//                    .setReplaceCurrent(true)
-//                    .setLifetime(Lifetime.FOREVER)
-//                    .setTrigger(Trigger.executionWindow(/*(int) TimeUnit.MINUTES.toSeconds(60), (int) TimeUnit.MINUTES.toSeconds(90)*/10, 11))
-//                    .build();
-//
-//            dispatcher.schedule(myJob);
 
             DependencyInjector.initialize(this);
+            DependencyInjector.initializeUserScope();
 
             JobManager.create(this).addJobCreator(new OfflineSyncJobCreator());
 

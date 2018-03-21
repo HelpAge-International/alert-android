@@ -26,7 +26,7 @@ class RiskFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        DependencyInjector.applicationComponent().inject(this)
+        DependencyInjector.userScopeComponent().inject(this)
 
         val v = inflater?.inflate(R.layout.fragment_risk_monitoring, container, false)
 
