@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -202,7 +203,12 @@ public class SettingsFragment extends Fragment implements ValueEventListener {
         @Override
         public void onFailure(@NonNull Exception e) {
             e.printStackTrace();
-            SnackbarHelper.show(getActivity(), getString(R.string.couldnt_update_email_error));
+            if(e instanceof FirebaseAuthRecentLoginRequiredException) {
+                //TODO this should be handled, but doesnt actually seem to effect operations. i.e. the users email gets updated regardless. weird.
+            }
+            else {
+                SnackbarHelper.show(getActivity(), getString(R.string.couldnt_update_email_error));
+            }
         }
     }
 

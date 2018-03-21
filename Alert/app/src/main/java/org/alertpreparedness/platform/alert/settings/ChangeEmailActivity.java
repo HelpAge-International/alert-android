@@ -66,6 +66,7 @@ public class ChangeEmailActivity extends AppCompatActivity {
     @OnClick(R.id.btnSave)
     void onSaveClick(View v) {
         String email = mEmail.getText().toString();
+        System.out.println("email = " + email);
         if(!AppUtils.isEmailValid(email)) {
             SnackbarHelper.show(this, getString(R.string.enter_valid_emial_error));
         }
