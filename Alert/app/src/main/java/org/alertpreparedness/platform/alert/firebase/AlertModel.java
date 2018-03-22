@@ -42,7 +42,7 @@ public class AlertModel extends FirebaseModel implements Serializable {
     private String name;
     private String key;
 
-    private boolean redAlertApproved;
+    private Boolean redAlertApproved;
 
     public AlertModel() {
     }
@@ -222,7 +222,18 @@ public class AlertModel extends FirebaseModel implements Serializable {
     }
 
     public boolean getRedAlertApproved() {
-        return redAlertApproved;
+        if (redAlertApproved != null) {
+            return redAlertApproved;
+        }
+        else {
+            boolean res = false;
+            for(Integer value : approval.getCountryDirector().values()) {
+                if(value >= 1) {
+                    res = true;
+                }
+            }
+            return res;
+        }
     }
 
     public void setRedAlertApproved(boolean redAlertApproved) {

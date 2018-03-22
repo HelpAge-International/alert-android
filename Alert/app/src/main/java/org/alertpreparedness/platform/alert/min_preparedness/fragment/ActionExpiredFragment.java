@@ -115,14 +115,6 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-//        actionFlowable.filter(fetcherResultItem -> {
-//            //filter by expired time
-//            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
-//            return ;
-//        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
-//            ActionModel actionModel = fetcherResultItem.makeModel();
-//            onActionRetrieved(actionModel);
-//        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
 
         disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
@@ -131,8 +123,13 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
             for(ActionItemWrapper wrapper : collectionFetcherResultItem) {
                 ActionModel actionModel = wrapper.makeModel();
 
-                if(actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && !wrapper.checkActionInProgress() && actionModel.getLevel() == Constants.MPA
-                        && !wrapper.checkActionInProgress()) {
+                if(actionModel.getAsignee() != null &&
+                        actionModel.getAsignee().equals(user.getUserID()) &&
+                        !wrapper.checkActionInProgress() &&
+                        !actionModel.getIsComplete() &&
+                        !actionModel.getIsArchived() &&
+                        actionModel.getLevel() == Constants.MPA) {
+
                     onActionRetrieved(actionModel);
                     result.add(actionModel.getId());
                 }

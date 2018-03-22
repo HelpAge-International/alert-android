@@ -295,8 +295,9 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
                                                 hazards?.forEach {
                                                     //get network indicators for hazard
                                                     if (it.id != null) {
-                                                        if (it.id != networkCountryId) {
+                                                        if (it.id != networkCountryId && it.hazardScenario > -2) {
                                                             when (it.hazardScenario) {
+
                                                                 -1 -> {
                                                                     if (!mHazardNameMapNetwork.containsKey(it.id!!)) {
                                                                         mHazardNameMapNetwork.put(it.id!!, "")

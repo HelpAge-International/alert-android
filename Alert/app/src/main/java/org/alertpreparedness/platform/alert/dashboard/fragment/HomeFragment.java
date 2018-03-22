@@ -417,10 +417,15 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     private void processAlert(AlertResultWrapper alertResult) {
         AlertModel model = AppUtils.getValueFromDataSnapshot(alertResult.getAlertSnapshot(), AlertModel.class);
 
+
         assert model != null;
 
         model.setId(alertResult.getAlertSnapshot().getKey());
         model.setParentKey(alertResult.getAlertSnapshot().getRef().getParent().getKey());
+        model.setLeadAgencyId(alertResult.getNetworkLeadId());
+        model.setNetwork(alertResult.isNetwork());
+
+        System.out.println("alertResult = " + alertResult.getAlertSnapshot().getRef());
 
         if (!alertResult.isNetwork()) {
             if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
@@ -430,7 +435,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         else {
             model.setLeadAgencyId(alertResult.getNetworkLeadId());
             model.setAgencyAdminId(user.agencyAdminID);
-            if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {
+            if (model.getAlertLevel() != 0 && model.getHazardScenario() != null && !model.hasNetworkApproval()) {
                 updateNetworkAlert(model.getId(), model);
             }
         }

@@ -281,10 +281,11 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
         }
     }
 
-    public void onActionRemoved(DataSnapshot snapshot) {
-        mAPAdapter.removeItem(snapshot.getKey());
+    @Override
+    public void onStop() {
+        super.onStop();
+        disposable.dispose();
     }
-
 
 }
 

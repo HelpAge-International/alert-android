@@ -98,15 +98,6 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-//        actionFlowable.filter(fetcherResultItem -> {
-//            //filter by archived
-//            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
-//            return actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsArchived() && actionModel.getLevel() == Constants.MPA;
-//        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
-//            ActionModel actionModel = fetcherResultItem.makeModel();
-//            onActionRetrieved(actionModel);
-//        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
-
         disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
@@ -114,11 +105,14 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
             for(ActionItemWrapper wrapper : collectionFetcherResultItem) {
                 ActionModel actionModel = wrapper.makeModel();
 
-                if(actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsArchived() && actionModel.getLevel() == Constants.MPA) {
-                    if(!wrapper.checkActionInProgress() && actionModel.getLevel() == Constants.APA) {
-                        onActionRetrieved(actionModel);
-                        result.add(actionModel.getId());
-                    }
+                if(actionModel.getAsignee() != null &&
+                        actionModel.getAsignee().equals(user.getUserID()) &&
+                        !actionModel.getIsComplete() &&
+                        actionModel.getIsArchived() &&
+                        actionModel.getLevel() == Constants.MPA) {
+                    onActionRetrieved(actionModel);
+                    result.add(actionModel.getId());
+
                 }
 
             }

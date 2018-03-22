@@ -157,7 +157,7 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
         assert imgActionInactive != null;
         imgActionInactive.setImageResource(R.drawable.ic_in_progress_gray);
         assert tvActionInactive != null;
-        tvActionInactive.setText("Inactive");
+        tvActionInactive.setText(R.string.inactive_title);
         tvActionInactive.setTextColor(getResources().getColor(R.color.alertGray));
         mAPAdapter = new APActionAdapter(getContext(), this);
         assert mAdvActionRV != null;
@@ -172,10 +172,9 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
 
             for(ActionItemWrapper wrapper : collectionFetcherResultItem.getValue()) {
                 ActionModel actionModel = wrapper.makeModel();
-                if(actionModel.getAsignee() == null || !user.getUserID().equals(actionModel.getAsignee()) || actionModel.getLevel() != Constants.APA) {
-                    break;
-                }
-                else {
+                boolean assigned = actionModel.getAsignee() != null && user.getUserID().equals(actionModel.getAsignee());
+                boolean unassigned = actionModel.getAsignee() == null;
+                if(assigned && actionModel.getLevel() == Constants.APA || unassigned && actionModel.getLevel() == Constants.APA) {
                     keysToUpdate.add(actionModel.getId());
                     onActionRetrieved(actionModel);
                 }

@@ -151,25 +151,25 @@ public class ActiveFragment extends Fragment implements ResponsePlansAdapter.Res
                         globalApproval)
                 );
 
-                item.getNotes().subscribe(new ItemConsumer<>(
+                disposable.add(item.getNotes().subscribe(new ItemConsumer<>(
                     (m) -> {
                         System.out.println("m.getUser() = " + m.getUser());
                         addNote(item.getResponsePlan().getKey(), m.getValue(), m.getUser());
                     },
                     (m) -> removeNote(item.getResponsePlan().getKey(), m.getValue()))
-                );
+                ));
 
             }
         }
     }
 
     private void addNote(String planKey, DataSnapshot dataSnapshot, Single<DataSnapshot> userSignle) {
-        userSignle.subscribe((userSnapshot) -> {
+        disposable.add(userSignle.subscribe((userSnapshot) -> {
             Note n = AppUtils.getFirebaseModelFromDataSnapshot(dataSnapshot, Note.class);
             UserProfileModel user =  AppUtils.getFirebaseModelFromDataSnapshot(userSnapshot, UserProfileModel.class);
             n.setFullName(user.getFirstName() + " " + user.getLastName());
             mAdapter.addNote(planKey, n);
-        });
+        }));
     }
 
     private void removeNote(String planKey, DataSnapshot dataSnapshot) {

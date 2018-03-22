@@ -120,16 +120,6 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-//        actionFlowable.filter(fetcherResultItem -> {
-//            //filter by unassigned time
-//            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
-//            return actionModel.getAsignee() == null && actionModel.getLevel() == Constants.MPA;
-//        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
-//            ActionModel actionModel = fetcherResultItem.makeModel();
-//            onActionRetrieved(actionModel);
-//        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
-
-
         disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
@@ -251,6 +241,7 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
 
     @Override
     public void onStop() {
+        System.out.println("STOPPED");
         super.onStop();
         disposable.dispose();
     }

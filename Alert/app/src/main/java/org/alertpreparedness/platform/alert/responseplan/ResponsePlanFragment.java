@@ -48,6 +48,7 @@ public class ResponsePlanFragment extends Fragment {
 
     @BindView(R.id.pager)
     ViewPager mPager;
+    private PagerAdapter mAdapter;
 
     @Nullable
     @Override
@@ -68,11 +69,15 @@ public class ResponsePlanFragment extends Fragment {
         mTabs.addTab(mTabs.newTab());
         mTabs.addTab(mTabs.newTab());
         mTabs.setupWithViewPager(mPager);
-        mPager.setAdapter(new ResponsePlanFragment.PagerAdapter(getFragmentManager()));
+        mAdapter = new ResponsePlanFragment.PagerAdapter(getFragmentManager());
+        mPager.setAdapter(mAdapter);
 
     }
 
     private class PagerAdapter extends FragmentStatePagerAdapter {
+
+        private Fragment one = new ArchivedFragment();
+        private Fragment two = new ActiveFragment();
 
         public PagerAdapter(FragmentManager fm) {
             super(fm);
@@ -82,10 +87,15 @@ public class ResponsePlanFragment extends Fragment {
         public Fragment getItem(int position) {
             switch (position) {
                 case 1:
-                    return new ArchivedFragment();
+                    return one;
                 default:
-                    return new ActiveFragment();
+                    return two;
             }
+        }
+
+        public void stopAll() {
+            one.onStop();
+            two.onStop();
         }
 
         @Override
@@ -101,5 +111,11 @@ public class ResponsePlanFragment extends Fragment {
                 default: return "Active";
             }
         }
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        mAdapter.stopAll();
     }
 }

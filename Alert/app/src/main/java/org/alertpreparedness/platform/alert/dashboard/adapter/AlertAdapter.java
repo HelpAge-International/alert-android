@@ -90,7 +90,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
             items.put(id, alert);
             notifyDataSetChanged();
         }
-        if(alert.isNetwork() && alert.hasNetworkApproval() || alert.getAlertLevel() == Constants.TRIGGER_GREEN) {
+        if((alert.isNetwork() && alert.hasNetworkApproval() || alert.getAlertLevel() == Constants.TRIGGER_GREEN) && index != -1) {
             keys.remove(index);
             items.remove(id);
             notifyItemRemoved(index);

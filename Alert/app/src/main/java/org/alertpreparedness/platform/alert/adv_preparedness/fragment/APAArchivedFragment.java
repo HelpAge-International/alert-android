@@ -102,15 +102,6 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
         mAdvActionRV.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
-//
-//        actionFlowable.filter(fetcherResultItem -> {
-//            //filter by archived
-//            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
-//            return actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsArchived() && actionModel.getLevel() == Constants.APA;
-//        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
-//            ActionModel actionModel = fetcherResultItem.makeModel();
-//            onActionRetrieved(actionModel);
-//        }, wrapperToRemove -> mAPAdapter.removeItem(wrapperToRemove.getPrimarySnapshot().getKey())));
 
         disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 

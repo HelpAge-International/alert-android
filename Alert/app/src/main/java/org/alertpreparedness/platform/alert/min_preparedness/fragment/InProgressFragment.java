@@ -24,6 +24,7 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.ActionFetcher;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
@@ -103,15 +104,6 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-//        actionFlowable.filter(fetcherResultItem -> {
-//            //filter by expired time
-//            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
-//            return actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && fetcherResultItem.getValue().checkActionInProgress() && actionModel.getLevel() == Constants.MPA;
-//        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
-//            ActionModel actionModel = fetcherResultItem.makeModel();
-//            onActionRetrieved(actionModel);
-//        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
-
         disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
@@ -119,7 +111,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
             for(ActionItemWrapper wrapper : collectionFetcherResultItem) {
                 ActionModel actionModel = wrapper.makeModel();
 
-                if(actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsComplete() && actionModel.getLevel() == Constants.MPA
+                if(actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && !actionModel.getIsComplete() && !actionModel.getIsArchived() && actionModel.getLevel() == Constants.MPA
                         && wrapper.checkActionInProgress()) {
                     onActionRetrieved(actionModel);
                     result.add(actionModel.getId());

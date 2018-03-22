@@ -99,7 +99,7 @@ public class OfflineSyncHandler {
                      Timber.d("Synchronised!");
                      DatabaseReference.goOffline();
                      syncCallback.syncSuccess();
-                 });
+                 }, e-> {});
 
     }
 

@@ -1,5 +1,7 @@
 package org.alertpreparedness.platform.alert.firebase;
 
+import com.google.firebase.database.Exclude;
+
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
 
 import java.io.Serializable;
@@ -13,9 +15,11 @@ public class AffectedAreaModel extends FirebaseModel implements Serializable {
     private Integer level2;
 
     //not set through firebase
+    @Exclude
     private String level1Name;
 
     //not set through firebase
+    @Exclude
     private String level2Name;
 
     public AffectedAreaModel() {
@@ -69,18 +73,22 @@ public class AffectedAreaModel extends FirebaseModel implements Serializable {
         this.level2 = level2;
     }
 
+    @Exclude
     public String getLevel2Name() {
         return level2Name;
     }
 
+    @Exclude
     public void setLevel2Name(String level2Name) {
         this.level2Name = level2Name;
     }
 
+    @Exclude
     public String getLevel1Name() {
         return level1Name;
     }
 
+    @Exclude
     public void setLevel1Name(String level1Name) {
         this.level1Name = level1Name;
     }

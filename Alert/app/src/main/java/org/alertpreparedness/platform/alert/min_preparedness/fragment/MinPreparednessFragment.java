@@ -47,6 +47,7 @@ public class MinPreparednessFragment extends Fragment {
 
     @BindView(R.id.action_pager)
     ViewPager mPager;
+    private PagerAdapter mAdapter;
 
     @Nullable
     @Override
@@ -65,12 +66,19 @@ public class MinPreparednessFragment extends Fragment {
 
     private void initViews() {
 //        fabCreateAPA.setVisibility(View.GONE);
+        mAdapter = new MinPreparednessFragment.PagerAdapter(getFragmentManager());
         mPager.setOffscreenPageLimit(5);
-        mPager.setAdapter(new MinPreparednessFragment.PagerAdapter(getFragmentManager()));
+        mPager.setAdapter(mAdapter);
     }
 
 
     private class PagerAdapter extends FragmentStatePagerAdapter {
+
+        private Fragment one = new ActionExpiredFragment();
+        private Fragment two = new ActionUnassignedFragment();
+        private Fragment three = new ActionCompletedFragment();
+        private Fragment four = new ActionArchivedFragment();
+        private Fragment five = new InProgressFragment();
 
         public PagerAdapter(FragmentManager fm) {
             super(fm);
@@ -81,16 +89,24 @@ public class MinPreparednessFragment extends Fragment {
 
             switch (position) {
                 case 1:
-                    return new ActionExpiredFragment();
+                    return one;
                 case 2:
-                    return new ActionUnassignedFragment();
+                    return two;
                 case 3:
-                    return new ActionCompletedFragment();
+                    return three;
                 case 4:
-                    return new ActionArchivedFragment();
+                    return four;
                 default:
-                    return new InProgressFragment();
+                    return five;
             }
+        }
+
+        public void stopAll() {
+            one.onStop();
+            three.onStop();
+            two.onStop();
+            five.onStop();
+            four.onStop();
         }
 
         @Override
@@ -99,4 +115,11 @@ public class MinPreparednessFragment extends Fragment {
         }
 
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mAdapter.stopAll();
+    }
+
 }

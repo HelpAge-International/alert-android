@@ -122,6 +122,7 @@ public class ActionUpdateNotificationHandler {
         actionIds.remove(actionId);
         PreferHelper.setScheduledActionNotifications(context, actionIds);
     }
+
     @SuppressLint("CheckResult")
     public void scheduleAllNotifications(){
         Flowable.combineLatest(clockSettingsResultFlowable, actionGroupFlowable, Pair::new)
@@ -152,7 +153,7 @@ public class ActionUpdateNotificationHandler {
                             }
                         }
                     }
-                });
+                }, e-> {});
     }
 
     public void scheduleNotification(Context context, ActionModel actionModel, String groupId, String actionId) {

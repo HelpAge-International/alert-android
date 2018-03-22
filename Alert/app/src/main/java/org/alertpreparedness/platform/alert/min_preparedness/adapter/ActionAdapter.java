@@ -167,7 +167,10 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (assignee != null) {
-                    String department = (String) dataSnapshot.child("departments").child(departmentID).child("name").getValue();
+                    String department = null;
+                    if(departmentID != null) {
+                        department = (String) dataSnapshot.child("departments").child(departmentID).child("name").getValue();
+                    }
                     if(department == null) {
                         getCountryDepartment(holder, userPublicRef, assignee, departmentID);
                     }

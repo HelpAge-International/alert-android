@@ -245,28 +245,33 @@ public class ActionFetcher implements RxFirebaseDataFetcher<ActionItemWrapper> {
         return rxFetchGroupActions(Constants.CUSTOM);
     }
 
-    private Flowable<Collection<ActionItemWrapper>> rxFetchGroupActions(int type){
+    public Flowable<Collection<ActionItemWrapper>> rxFetchGroupActions(int type){
         return networkResultFlowable.flatMap(networkFetcherResult -> {
 
             List<Flowable<Collection<ActionItemWrapper>>> flowables = new ArrayList<>();
+
             flowables.add(
-                    RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(user.countryID).orderByChild("type").equalTo(type))
+                    RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(user.countryID))
                             .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
+                            .map(dataSnapshots -> Collections2.filter(dataSnapshots, input -> input.child("type").getValue() != null && input.child("type").getValue(Integer.class) == 2))
                             .map(childrenDataSnapshotList -> Collections2.transform(childrenDataSnapshotList, item -> ActionItemWrapper.createAction(item, ActionItemWrapper.Group.COUNTRY)))
             );
 
             for (String localNetworkId : networkFetcherResult.getLocalNetworks()) {
-                flowables.add(RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(localNetworkId).orderByChild("type").equalTo(type))
+                flowables.add(RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(localNetworkId))
                         .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
+                        .map(dataSnapshots -> Collections2.filter(dataSnapshots, input -> input.child("type") != null && input.child("type").getValue(Integer.class) == 2))
                         .map(childrenDataSnapshotList -> Collections2.transform(childrenDataSnapshotList, item -> ActionItemWrapper.createAction(item, ActionItemWrapper.Group.LOCAL_NETWORK)))
                 );
             }
             for (String networkCountryId : networkFetcherResult.getNetworksCountries()) {
-                flowables.add(RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(networkCountryId).orderByChild("type").equalTo(type))
+                flowables.add(RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(networkCountryId))
                         .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
+                        .map(dataSnapshots -> Collections2.filter(dataSnapshots, input -> input.child("type").getValue() != null && input.child("type").getValue(Integer.class) == 2))
                         .map(childrenDataSnapshotList -> Collections2.transform(childrenDataSnapshotList, item -> ActionItemWrapper.createAction(item, ActionItemWrapper.Group.LOCAL_NETWORK)))
                 );
             }
+
             return Flowable.combineLatest(flowables, AppUtils::combineDataSnapshotList);
         });
     }

@@ -67,7 +67,7 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
 
     private fun initData() {
         mCountryId = PreferHelper.getString(context, Constants.COUNTRY_ID)
-        Timber.d("country id: %s", mCountryId)
+
         if (arguments.containsKey(ActiveRiskFragment.HAZARD_ID)) {
             mHazardId = arguments.get(ActiveRiskFragment.HAZARD_ID) as String
         }
@@ -80,7 +80,7 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
         if (arguments.containsKey(ActiveRiskFragment.NETWORK_COUNTRY_ID)) {
             mNetworkCountryId = arguments.get(ActiveRiskFragment.NETWORK_COUNTRY_ID) as String
         }
-        Timber.d("hazardId: %s, indicatorId: %s", mHazardId, mIndicatorId)
+
         mViewModel = ViewModelProviders.of(this).get(ActiveRiskViewModel::class.java)
         mHazardId = if (mHazardId == "countryContext") mCountryId else mHazardId
         mViewModel.getLiveIndicatorModel(mHazardId, mIndicatorId).observe(this, Observer { indicator ->

@@ -40,4 +40,14 @@ public class AlertResultWrapper {
     public void setAlertSnapshot(DataSnapshot alertSnapshot) {
         this.alertSnapshot = alertSnapshot;
     }
+
+    @Override
+    public String toString() {
+        return "AlertResultWrapper{" +
+                "parentId='" + parentId + '\'' +
+                ", isNetwork=" + isNetwork +
+                ", networkLeadId='" + networkLeadId + '\'' +
+                ", alertSnapshot=" + alertSnapshot +
+                '}';
+    }
 }

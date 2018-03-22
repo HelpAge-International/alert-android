@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.alert.risk_monitoring.service
 
 import android.content.Context
+import com.google.firebase.database.DataSnapshot
 import com.google.gson.Gson
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.stream.JsonReader
@@ -47,9 +48,14 @@ class StaffService(private val context: Context) {
 
     fun getUserDetail(userId: String): Flowable<ModelUserPublic> {
         val userDetail = FirebaseHelper.getUserDetail(PreferHelper.getString(context, Constants.APP_STATUS), userId)
-        return RxFirebaseDatabase.observeValueEvent(userDetail, ModelUserPublic::class.java)
-                .map({ model: ModelUserPublic ->
-                    println("model = ${model}")
+        return RxFirebaseDatabase.observeValueEvent(userDetail)
+                .map({ snapshot: DataSnapshot ->
+
+                    val toJson = RiskMonitoringService(context).gson.toJson(snapshot.value)
+                    val reader = JsonReader(StringReader(toJson.trim()))
+                    reader.isLenient = true
+                    val model = RiskMonitoringService(context).gson.fromJson<ModelUserPublic>(reader, ModelUserPublic::class.java)
+
                     model.id = userId
                     return@map model
                 })

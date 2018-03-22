@@ -30,12 +30,15 @@ import java.util.Date;
 import javax.inject.Inject;
 
 import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
 
 
 public class EditAPAActivity extends CreateAPAActivity implements RadioGroup.OnCheckedChangeListener, AssignToListener, DepartmentListener {
 
     public static final String MODEL = "model";
     private ActionModel model;
+
+    CompositeDisposable disposable = new CompositeDisposable();
 
     @Override
     protected void initData() {
@@ -57,9 +60,9 @@ public class EditAPAActivity extends CreateAPAActivity implements RadioGroup.OnC
         task.setText(model.getTask());
         hazard.setText(ExtensionHelperKt.getHazardTypes().get(model.getAssignHazard().get(0)));
 
-        agencyObservable.subscribe(new ItemConsumer<DataSnapshot>(this::processAgency, item -> {
+        disposable.add(agencyObservable.subscribe(new ItemConsumer<DataSnapshot>(this::processAgency, item -> {
             //not used
-        }));
+        })));
 
         mViewModel = ViewModelProviders.of(EditAPAActivity.this).get(AddIndicatorViewModel.class);
         mViewModel.getStaffLive().observe(EditAPAActivity.this, modelUserPublics -> {
@@ -166,54 +169,10 @@ public class EditAPAActivity extends CreateAPAActivity implements RadioGroup.OnC
         }
     }
 
-    private class AgencyListener implements ValueEventListener {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            if(dataSnapshot.child("departments").exists()) {
-                for(DataSnapshot department : dataSnapshot.child("departments").getChildren()) {
-                    DepartmentModel model = department.getValue(DepartmentModel.class);
-                    if(model != null) {
-                        model.setKey(department.getKey());
-                        EditAPAActivity.this.departments.add(model);
-                    }
-                }
-            }
-            department.setFocusable(true);
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-            department.setFocusable(true);
-        }
+    @Override
+    public void onStop() {
+        super.onStop();
+        disposable.dispose();
     }
 
-    private class CountryListener implements ValueEventListener {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            if(dataSnapshot.child("departments").exists()) {
-                int i = 0;
-                for(DataSnapshot department : dataSnapshot.child("departments").getChildren()) {
-                    DepartmentModel model = department.getValue(DepartmentModel.class);
-                    if(model != null) {
-                        if(department.getKey().equals(EditAPAActivity.this.model.getDepartment())) {
-                            selectedDepartment = department.getKey();
-                            EditAPAActivity.this.department.setText(model.getName());
-                            mDepartmentPosition = i;
-                        }
-                        model.setKey(department.getKey());
-                        EditAPAActivity.this.departments.add(model);
-                    }
-                    i++;
-                }
-            }
-
-            agencyRef.addListenerForSingleValueEvent(new AgencyListener());
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-
-    }
 }

@@ -35,6 +35,7 @@ public class AdvPreparednessFragment extends Fragment implements View.OnClickLis
 
     @Inject
     PermissionsHelper permissions;
+    private PagerAdapter mAdapter;
 
     @Nullable
     @Override
@@ -59,7 +60,10 @@ public class AdvPreparednessFragment extends Fragment implements View.OnClickLis
         else {
             fabCreateAPA.setOnClickListener(this);
         }
-        mPager.setAdapter(new AdvPreparednessFragment.PagerAdapter(getFragmentManager()));
+
+        mAdapter = new AdvPreparednessFragment.PagerAdapter(getFragmentManager());
+
+        mPager.setAdapter(mAdapter);
         mPager.setOffscreenPageLimit(6);
 
     }
@@ -74,6 +78,13 @@ public class AdvPreparednessFragment extends Fragment implements View.OnClickLis
 
     private class PagerAdapter extends FragmentStatePagerAdapter {
 
+        private Fragment one = new APAExpiredFragment();
+        private Fragment two = new APAUnassignedFragment();
+        private Fragment three = new APACompletedFragment();
+        private Fragment four = new APAInactiveFragment();
+        private Fragment five = new APAArchivedFragment();
+        private Fragment six = new APAInProgressFragment();
+
         public PagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -83,18 +94,27 @@ public class AdvPreparednessFragment extends Fragment implements View.OnClickLis
 
             switch (position) {
                 case 1:
-                    return new APAExpiredFragment();
+                    return one;
                 case 2:
-                    return new APAUnassignedFragment();
+                    return two;
                 case 3:
-                    return new APACompletedFragment();
+                    return three;
                 case 4:
-                    return new APAInactiveFragment();
+                    return four;
                 case 5:
-                    return new APAArchivedFragment();
+                    return five;
                 default:
-                    return new APAInProgressFragment();
+                    return six;
             }
+        }
+
+        public void stopAll() {
+            one.onStop();
+            three.onStop();
+            two.onStop();
+            five.onStop();
+            four.onStop();
+            six.onStop();
         }
 
         @Override
@@ -103,4 +123,12 @@ public class AdvPreparednessFragment extends Fragment implements View.OnClickLis
         }
 
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mAdapter.stopAll();
+        System.out.println("STOPPED stop");
+    }
+
 }
