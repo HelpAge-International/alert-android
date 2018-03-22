@@ -156,9 +156,9 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
         progressDialog.setMessage("Logging you in...");
         progressDialog.show();
 
-        Task<AuthResult> a = FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password);
-        Task<AuthResult> b = a.addOnCompleteListener(this, this);
-        Task<AuthResult> c = b.addOnFailureListener(this);
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, this)
+                .addOnFailureListener(this);
     }
 
     @Override
