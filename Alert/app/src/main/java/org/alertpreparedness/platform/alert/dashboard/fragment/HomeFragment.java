@@ -271,6 +271,8 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
             //not used
         })));
 
+        System.out.println("user = " + user);
+
     }
 
     @Override
@@ -424,8 +426,6 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         model.setParentKey(alertResult.getAlertSnapshot().getRef().getParent().getKey());
         model.setLeadAgencyId(alertResult.getNetworkLeadId());
         model.setNetwork(alertResult.isNetwork());
-
-        System.out.println("alertResult = " + alertResult.getAlertSnapshot().getRef());
 
         if (!alertResult.isNetwork()) {
             if (model.getAlertLevel() != 0 && model.getHazardScenario() != null) {

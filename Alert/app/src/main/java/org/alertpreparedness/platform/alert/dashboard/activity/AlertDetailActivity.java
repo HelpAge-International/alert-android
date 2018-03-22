@@ -61,7 +61,6 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     private SimpleDateFormat format = new SimpleDateFormat(dateFormat, Locale.getDefault());
     private AlertModel alert;
     private String isRequestSent;
-    private ConstraintLayout clRequested;
     private LinearLayout llButtons;
     private String countryID;
     private boolean isCountryDirector;
@@ -130,7 +129,6 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
     private void initView() {
 
-        clRequested = findViewById(R.id.clRedRequested);
         llButtons = findViewById(R.id.llButtons);
         txtHazardName = (TextView) findViewById(R.id.txtHazardName);
         txtPopulation = (TextView) findViewById(R.id.txtPopulationAffected);
@@ -152,7 +150,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         btnApprove.setOnClickListener(this);
         btnReject.setOnClickListener(this);
         imgClose.setVisibility(View.GONE);
-        clRequested.setVisibility(View.GONE);
+        txtRedRequested.setVisibility(View.GONE);
         llButtons.setVisibility(View.GONE);
 
         if (alert == null) {
@@ -295,11 +293,15 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                 }
                 txtInfo.setText((CharSequence) alert.getInfoNotes());
             } else if (alert.getOtherName() != null) {
+                Long date = alert.getTimeUpdated();
+                if(date == null) {
+                    date = alert.getTimeCreated();
+                }
                 imgHazard.setImageResource(R.drawable.other);
                 txtHazardName.setText(alert.getOtherName());
                 txtPopulation.setText(getPeopleAsString(alert.getEstimatedPopulation()));
                 txtInfo.setText((CharSequence) alert.getInfoNotes());
-                txtLastUpdated.setText(getUpdatedAsString(new Date(alert.getTimeUpdated())));
+                txtLastUpdated.setText(getUpdatedAsString(new Date(date)));
             }
         }
     }
@@ -312,7 +314,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             }
             toolbar.setBackgroundResource(R.color.alertGray);
             txtActionBarTitle.setText(R.string.amber_alert_text);
-            clRequested.setVisibility(View.VISIBLE);
+            txtRedRequested.setVisibility(View.VISIBLE);
             llButtons.setVisibility(View.VISIBLE);
             setUserName();
         }
@@ -322,7 +324,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             }
             toolbar.setBackgroundResource(R.color.alertGray);
             txtActionBarTitle.setText(R.string.amber_alert_text);
-            clRequested.setVisibility(View.VISIBLE);
+            txtRedRequested.setVisibility(View.VISIBLE);
             llButtons.setVisibility(View.VISIBLE);
             setUserName();
         } else if (!isCountryDirector && !alert.getRedAlertApproved() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
@@ -331,7 +333,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             }
             toolbar.setBackgroundResource(R.color.alertGray);
             txtActionBarTitle.setText(R.string.amber_alert_text);
-            clRequested.setVisibility(View.VISIBLE);
+            txtRedRequested.setVisibility(View.VISIBLE);
         }
     }
 
