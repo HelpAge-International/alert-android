@@ -3,6 +3,8 @@ import android.content.SharedPreferences;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import org.alertpreparedness.platform.alert.utils.Constants;
+
 import java.io.Serializable;
 import java.util.List;
 

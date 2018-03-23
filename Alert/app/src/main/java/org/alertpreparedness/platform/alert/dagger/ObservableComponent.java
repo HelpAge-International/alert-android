@@ -59,6 +59,7 @@ import org.alertpreparedness.platform.alert.responseplan.ApprovalNotesAdapter;
 import org.alertpreparedness.platform.alert.responseplan.ArchivedFragment;
 import org.alertpreparedness.platform.alert.responseplan.ResponsePlanFragment;
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.BottomSheetDialog;
+import org.alertpreparedness.platform.alert.risk_monitoring.view.IndicatorLogActivityFragment;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.RiskFragment;
 import org.alertpreparedness.platform.alert.settings.ChangeEmailActivity;
 import org.alertpreparedness.platform.alert.settings.ChangePasswordActivity;
@@ -154,6 +155,8 @@ public interface ObservableComponent {
     void inject(AgencyFetcher agencyFetcher);
 
     void inject(@NotNull BottomSheetDialog bottomSheetDialog);
+
+    void inject(@NotNull IndicatorLogActivityFragment indicatorLogActivityFragment);
 
     @Subcomponent.Builder
     interface Builder {

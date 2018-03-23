@@ -185,6 +185,7 @@ public class ActionFetcher implements RxFirebaseDataFetcher<ActionItemWrapper> {
                 }
                 hazardTypes.put(snapshot.getRef().getParent().getKey(), existingSet);
             }
+            System.out.println("hazardTypes = " + hazardTypes);
             return hazardTypes;
         })
         .distinct()
@@ -200,7 +201,9 @@ public class ActionFetcher implements RxFirebaseDataFetcher<ActionItemWrapper> {
 
                 if (snapshot != null) {
                     ActionModel model = AppUtils.getFirebaseModelFromDataSnapshot(snapshot, ActionModel.class);
+
                     if (model.getAssignHazard() != null) {
+
                         for (Integer hazardType : model.getAssignHazard()) {
                             if (hazardTypes.get(model.getParentId()) != null && hazardTypes.get(model.getParentId()).contains(hazardType)) {
                                 res = true;
@@ -208,9 +211,15 @@ public class ActionFetcher implements RxFirebaseDataFetcher<ActionItemWrapper> {
                             }
                         }
                     }
-//                    else if (model.getAssignHazard() == null || model.getAssignHazard().size() == 0) {
-//                        res = true;
-//                    }
+                    else if(model.getLevel() == Constants.MPA) {
+                        res = true;
+                    }
+                    else {
+//                        System.out.println("model.getTask() = " + model.getTask());
+                        res = true;
+                        //this could be an issue. But atm it getd round the "all hazards" flag for APA's
+                    }
+
                     if (res && isActive || !res && !isActive) {
                         result.add(itemWrapper);
                     }

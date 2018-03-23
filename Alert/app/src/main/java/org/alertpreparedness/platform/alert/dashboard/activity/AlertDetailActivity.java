@@ -13,10 +13,12 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -178,6 +180,12 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             redAlertReasonIcon.setVisibility(View.GONE);
             redAlertReasonText.setVisibility(View.GONE);
             redAlertTextView.setVisibility(View.GONE);
+
+
+            RelativeLayout.LayoutParams params= (RelativeLayout.LayoutParams) imgAffectedArea.getLayoutParams();
+            params.addRule(RelativeLayout.BELOW, R.id.txtInfo);
+
+            imgAffectedArea.setLayoutParams(params);
         }
         else {
             redAlertReasonText.setText(alert.getReasonForRedAlert());

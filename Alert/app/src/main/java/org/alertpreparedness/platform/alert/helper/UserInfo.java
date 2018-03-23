@@ -119,9 +119,6 @@ public class UserInfo implements ValueEventListener {
             PreferHelper.putString(context, Constants.SYSTEM_ID, systemAdmin);
         }
 
-        System.out.println("userNode.getRef() = " + userNode.getRef());
-        System.out.println("userNode = " + userNode);
-
         String countryId = userNode.child("countryId").getValue(String.class);
 
         PreferHelper.putInt(context, Constants.USER_TYPE, userType);

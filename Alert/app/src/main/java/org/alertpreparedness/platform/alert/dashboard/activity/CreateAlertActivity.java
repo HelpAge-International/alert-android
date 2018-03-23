@@ -145,7 +145,7 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
         AlertModel m = new AlertModel(
                 mAlertLevel,
                 mCurrentHazardType,
-                Integer.valueOf(mFieldsAdapter.getModel(getIndex(isRedAlert, 2)).resultTitle),
+                Long.valueOf(mFieldsAdapter.getModel(getIndex(isRedAlert, 2)).resultTitle),
                 mFieldsAdapter.getModel(getIndex(isRedAlert, 4)).resultTitle,
                 user.getUserID(),
                 mCurrentAffectedAreas

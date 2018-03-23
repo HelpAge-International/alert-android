@@ -14,6 +14,7 @@ import es.dmoral.toasty.Toasty
 import kotlinx.android.synthetic.main.fragment_indicator_log.view.*
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.R
+import org.alertpreparedness.platform.alert.dagger.DependencyInjector
 import org.alertpreparedness.platform.alert.risk_monitoring.adapter.IndicatorLogRVAdapter
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelLog
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.ActiveRiskViewModel
@@ -34,8 +35,17 @@ class IndicatorLogActivityFragment : Fragment() {
     @Inject
     lateinit var permissions : PermissionsHelper
 
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        DependencyInjector.userScopeComponent().inject(this)
+
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+
         val view = inflater.inflate(R.layout.fragment_indicator_log, container, false)
         initViews(view)
         initData(view)

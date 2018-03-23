@@ -68,7 +68,7 @@ public class AlertApplication extends MultiDexApplication implements ValueEventL
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.SAND;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.UAT;
 
     @Override
     public void onCreate() {
@@ -95,10 +95,6 @@ public class AlertApplication extends MultiDexApplication implements ValueEventL
         JodaTimeAndroid.init(this);
 
         boolean loggedIn = FirebaseAuth.getInstance().getCurrentUser() != null;
-
-        System.out.println("FirebaseAuth.getInstance().getCurrentUser() = " + FirebaseAuth.getInstance().getCurrentUser());
-
-//        ACRA.init(this);
 
         if(!PreferHelper.getBoolean(this, Constants.HAS_RUN_BEFORE)) {
             System.out.println("PreferHelper.getString(this, Constants.HAS_RUN_BEFORE) = " + PreferHelper.getString(this, Constants.HAS_RUN_BEFORE));

@@ -302,9 +302,11 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
     @Override
     public void updateAlert(String id, AlertModel alert) {
-        countryTitle.setVisibility(View.VISIBLE);
         alertRecyclerView.setVisibility(View.VISIBLE);
         alertAdapter.update(id, alert);
+        if (alertAdapter.getItemCount() > 0) {
+            countryTitle.setVisibility(View.VISIBLE);
+        }
         updateTitle();
     }
 
@@ -419,7 +421,6 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     private void processAlert(AlertResultWrapper alertResult) {
         AlertModel model = AppUtils.getValueFromDataSnapshot(alertResult.getAlertSnapshot(), AlertModel.class);
 
-
         assert model != null;
 
         model.setId(alertResult.getAlertSnapshot().getKey());
@@ -443,7 +444,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
     private void processAction(ActionModel model) {
         assert model != null;
-        boolean shouldAdd = model.getAsignee() != null && !model.getIsComplete() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null;
+        boolean shouldAdd = model.getAsignee() != null && !model.getIsComplete() && !model.getIsArchived() && model.getAsignee().equals(user.getUserID()) && model.getDueDate() != null;
 
         if (shouldAdd) {
             if (DateHelper.isDueInWeek(model.getDueDate()) || DateHelper.itWasDue(model.getDueDate())) {
@@ -457,6 +458,9 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
             else {
                 taskAdapter.tryRemove(model.getId());
             }
+        }
+        else {
+            taskAdapter.tryRemove(model.getId());
         }
     }
 

@@ -45,13 +45,25 @@
     <include
         android:id="@+id/detail_view"
         layout="@layout/content_alert_detail"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/llButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/clRedRequested" />
+
+    <TextView
+        android:id="@+id/txtLastUpdated"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:gravity="center"
+        android:text="@string/last_updated"
+        android:textColor="@android:color/black"
+        app:layout_constraintBottom_toTopOf="@+id/llButtons"/>
 
     <LinearLayout
         android:id="@+id/llButtons"

@@ -257,4 +257,5 @@
     <string name="needs_completing_today">needs to be completed today</string>
     <string name="was_due_on">An %s preparedness action was due on <strong> %s </strong></string>
     <string name="inactive_title">Inactive</string>
+    <string name="all_hazards">All Hazards</string>
 </resources>

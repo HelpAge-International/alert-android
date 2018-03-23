@@ -58,7 +58,12 @@ public class EditAPAActivity extends CreateAPAActivity implements RadioGroup.OnC
         needsDocument = model.getRequireDoc();
         budget.setText(model.getBudget().toString());
         task.setText(model.getTask());
-        hazard.setText(ExtensionHelperKt.getHazardTypes().get(model.getAssignHazard().get(0)));
+        if(model.getAssignHazard() != null && model.getAssignHazard().size() > 0) {
+            hazard.setText(ExtensionHelperKt.getHazardTypes().get(model.getAssignHazard().get(0)));
+        }
+        else {
+            hazard.setText(R.string.all_hazards);
+        }
 
         disposable.add(agencyObservable.subscribe(new ItemConsumer<DataSnapshot>(this::processAgency, item -> {
             //not used

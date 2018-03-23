@@ -27,7 +27,7 @@ public class AlertModel extends FirebaseModel implements Serializable {
 
     private String createdBy;
 
-    private Integer estimatedPopulation;
+    private Long estimatedPopulation;
 
     private String reasonForRedAlert;
 
@@ -47,7 +47,7 @@ public class AlertModel extends FirebaseModel implements Serializable {
     public AlertModel() {
     }
 
-    public AlertModel(int alertLevel, int hazardScenario, int estimatedPopulation, String infoNotes, String
+    public AlertModel(int alertLevel, int hazardScenario, Long estimatedPopulation, String infoNotes, String
             createdBy, ArrayList<AffectedAreaModel> affectedAreas) {
 
         this.alertLevel = alertLevel;
@@ -126,11 +126,11 @@ public class AlertModel extends FirebaseModel implements Serializable {
         this.createdBy = createdBy;
     }
 
-    public Integer getEstimatedPopulation() {
+    public Long getEstimatedPopulation() {
         return estimatedPopulation;
     }
 
-    public void setEstimatedPopulation(Integer estimatedPopulation) {
+    public void setEstimatedPopulation(Long estimatedPopulation) {
         this.estimatedPopulation = estimatedPopulation;
     }
 
