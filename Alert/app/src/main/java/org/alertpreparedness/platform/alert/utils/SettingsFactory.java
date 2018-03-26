@@ -118,6 +118,8 @@ public class SettingsFactory {
             settings.setCanDeleteNotes(snapshot.child("notes").child("delete").child(String.valueOf(user.getUserType())).getValue(boolean.class));
         }
         if(snapshot.child("notes").child("new").child(String.valueOf(user.getUserType())).exists()) {
+            System.out.println("snapshot.child(\"notes\") = " + snapshot.child("notes").child("new").child(String.valueOf(user.getUserType())).getRef());
+
             settings.setCanCreateNotes(snapshot.child("notes").child("new").child(String.valueOf(user.getUserType())).getValue(boolean.class));
         }
         if(snapshot.child("other").child("downloadDoc").child(String.valueOf(user.getUserType())).exists()) {
@@ -159,6 +161,7 @@ public class SettingsFactory {
             settings.setCanDeleteCustomMPA(snapshot.child("customMpa").child("delete").getValue(boolean.class));
         }
         if(snapshot.child("notes").exists()) {
+            System.out.println("snapshot.child(\"notes\") = " + snapshot.child("notes").getRef());
             settings.setCanEditNotes(snapshot.child("notes").child("edit").getValue(boolean.class));
             settings.setCanCreateNotes(snapshot.child("notes").child("new").getValue(boolean.class));
             settings.setCanDeleteCustomMPA(snapshot.child("notes").child("delete").getValue(boolean.class));

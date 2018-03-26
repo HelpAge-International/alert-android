@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,11 +31,14 @@ import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.alert.helper.UserInfo;
+import org.alertpreparedness.platform.alert.interfaces.DisposableFragment;
 import org.alertpreparedness.platform.alert.login.activity.LoginScreen;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.notifications.NotificationIdHandler;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -90,6 +95,7 @@ public class SettingsFragment extends Fragment implements ValueEventListener {
 
     @OnClick(R.id.btnLogout)
     void onLogoutClick(View v) {
+
         AlertDialog.Builder builder;
         builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Logout")

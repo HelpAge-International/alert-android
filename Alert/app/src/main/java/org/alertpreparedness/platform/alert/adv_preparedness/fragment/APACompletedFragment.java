@@ -24,6 +24,7 @@ import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
+import org.alertpreparedness.platform.alert.interfaces.DisposableFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.model.User;
@@ -45,7 +46,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APACompletedFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener {
+public class APACompletedFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener, DisposableFragment {
 
     private String actionID;
 
@@ -79,7 +80,7 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
     @Inject
     User user;
 
-    CompositeDisposable disposable = new CompositeDisposable();
+    CompositeDisposable disposable;
 
     private APActionAdapter mAPAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
@@ -114,16 +115,11 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
 
         handleAdvFab();
 
-//        actionFlowable.filter(fetcherResultItem -> {
-//            //filter by completed time
-//            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
-//            return actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsComplete() && actionModel.getLevel() == Constants.APA;
-//        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
-//            ActionModel actionModel = fetcherResultItem.makeModel();
-//            onActionRetrieved(actionModel);
-//        }, wrapperToRemove -> mAPAdapter.removeItem(wrapperToRemove.getPrimarySnapshot().getKey())));
-//
+        initData();
+    }
 
+    private void initData() {
+        disposable = new CompositeDisposable();
         disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
@@ -165,13 +161,13 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
-                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, mAPAdapter.getItem(pos).getId());
+                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, parentId);
                     intent.putExtra(AddNotesActivity.ACTION_ID, key);
                     startActivity(intent);
                     break;
                 case R.id.attachments:
                     Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
-                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, mAPAdapter.getItem(pos).getId());
+                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, parentId);
                     intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
                     startActivity(intent2);
                     break;
@@ -211,11 +207,23 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
     //endregion
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void dispose() {
         disposable.dispose();
     }
 
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        disposable.dispose();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(disposable.isDisposed()) {
+            initData();
+        }
+    }
 }
 

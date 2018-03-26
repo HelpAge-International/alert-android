@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionGroupObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.UsersListDialogFragment;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
@@ -69,14 +70,14 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
     PermissionsHelper permissions;
 
     @Inject
-    @ActionGroupObservable
+    @ClockSettingsActionObservable
     Flowable<Collection<ActionItemWrapper>>  actionFlowable;
 
     @Inject
     User user;
 
     private ActionAdapter mAdapter;
-    CompositeDisposable disposable = new CompositeDisposable();
+    CompositeDisposable disposable;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
     private String actionID;
 
@@ -111,6 +112,12 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
+       initData();
+
+    }
+
+    private void initData() {
+        disposable = new CompositeDisposable();
         disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
@@ -118,9 +125,16 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
             for(ActionItemWrapper wrapper : collectionFetcherResultItem) {
                 ActionModel actionModel = wrapper.makeModel();
 
-                if(actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID())
-                        && actionModel.getIsComplete() && !actionModel.getIsArchived()
+                System.out.println("actionModel = " + actionModel);
+
+                if(actionModel.getAsignee() != null
+                        && actionModel.getAsignee().equals(user.getUserID())
+                        && actionModel.getIsComplete()
+                        && !actionModel.getIsArchived()
+                        && wrapper.checkActionInProgress()
                         && actionModel.getLevel() == Constants.MPA) {
+                    System.out.println("actionModel.hasCustomClockSettings() = " + actionModel.hasCustomClockSettings());
+                    System.out.println("wrapper.getClockSetting() = " + wrapper.getClockSetting());
                     onActionRetrieved(actionModel);
                     result.add(actionModel.getId());
                 }
@@ -129,7 +143,6 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
             mAdapter.updateKeys(result);
 
         }));
-
     }
 
     @Override
@@ -144,13 +157,13 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
-                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, mAdapter.getItem(pos).getId());
+                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, parentId);
                     intent.putExtra(AddNotesActivity.ACTION_ID, key);
                     startActivity(intent);
                     break;
                 case R.id.attachments:
                     Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
-                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, mAdapter.getItem(pos).getId());
+                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID,parentId);
                     intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
                     startActivity(intent2);
                     break;
@@ -189,4 +202,18 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
         disposable.dispose();
     }
 
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        disposable.dispose();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(disposable.isDisposed()) {
+            initData();
+        }
+    }
 }

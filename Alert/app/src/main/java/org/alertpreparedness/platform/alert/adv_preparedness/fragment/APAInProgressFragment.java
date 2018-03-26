@@ -28,6 +28,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
+import org.alertpreparedness.platform.alert.interfaces.DisposableFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
@@ -45,18 +46,16 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Flowable;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
  * Created by faizmohideen on 05/01/2018.
  */
 
-public class APAInProgressFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener {
+public class APAInProgressFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener, DisposableFragment {
 
-    private ArrayList<Integer> alertHazardTypes = new ArrayList<>();
     private String actionID;
-    private List<String> networkIds;
-    private ArrayList<Integer> networkAlertHazardTypes = new ArrayList<>();
 
     public APAInProgressFragment() {
         // Required empty public constructor
@@ -95,7 +94,7 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
     @Inject
     User user;
 
-    CompositeDisposable disposable = new CompositeDisposable();
+    CompositeDisposable disposable;
 
     @Inject
     PermissionsHelper permissions;
@@ -131,13 +130,19 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
 
         handleAdvFab();
 
+        initData();
+    }
+
+    private void initData() {
+        disposable = new CompositeDisposable();
+
         disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> keysToUpdate = new ArrayList<>();
 
-            for(ActionItemWrapper wrapper : collectionFetcherResultItem.getValue()) {
+            for (ActionItemWrapper wrapper : collectionFetcherResultItem.getValue()) {
                 ActionModel actionModel = wrapper.makeModel();
-                if(actionModel.getAsignee() != null
+                if (actionModel.getAsignee() != null
                         && user.getUserID().equals(actionModel.getAsignee())
                         && wrapper.checkActionInProgress()
                         && !actionModel.getIsArchived()
@@ -186,13 +191,13 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
                     break;
                 case R.id.action_notes:
                     Intent intent3 = new Intent(getActivity(), AddNotesActivity.class);
-                    intent3.putExtra(AddNotesActivity.PARENT_ACTION_ID, mAPAdapter.getItem(pos).getId());
+                    intent3.putExtra(AddNotesActivity.PARENT_ACTION_ID, parentId);
                     intent3.putExtra(AddNotesActivity.ACTION_ID, key);
                     startActivity(intent3);
                     break;
                 case R.id.attachments:
                     Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
-                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, mAPAdapter.getItem(pos).getId());
+                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, parentId);
                     intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
                     startActivity(intent2);
             }
@@ -208,8 +213,21 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
+        disposable.dispose();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(disposable.isDisposed()) {
+            initData();
+        }
+    }
+
+    @Override
+    public void dispose() {
         disposable.dispose();
     }
 

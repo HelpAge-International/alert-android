@@ -20,6 +20,7 @@ import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAAct
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
+import org.alertpreparedness.platform.alert.interfaces.DisposableFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.model.User;
@@ -41,7 +42,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAArchivedFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener {
+public class APAArchivedFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, DisposableFragment {
 
     public APAArchivedFragment() {
         // Required empty public constructor
@@ -71,7 +72,7 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
     @ActionGroupObservable
     Flowable<Collection<ActionItemWrapper>> actionFlowable;
 
-    CompositeDisposable disposable = new CompositeDisposable();
+    CompositeDisposable disposable;
 
     @Inject
     User user;
@@ -103,6 +104,13 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
         mAdvActionRV.setItemAnimator(new DefaultItemAnimator());
         mAdvActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
+        initData();
+
+        handleAdvFab();
+    }
+
+    private void initData() {
+        disposable = new CompositeDisposable();
         disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
@@ -119,9 +127,6 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
             mAPAdapter.updateKeys(result);
 
         }));
-
-
-        handleAdvFab();
     }
 
     @Override
@@ -142,13 +147,13 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
                     break;
                 case R.id.action_notes:
                     Intent intent2 = new Intent(getActivity(), AddNotesActivity.class);
-                    intent2.putExtra(AddNotesActivity.PARENT_ACTION_ID, mAPAdapter.getItem(pos).getId());
+                    intent2.putExtra(AddNotesActivity.PARENT_ACTION_ID, parentId);
                     intent2.putExtra(AddNotesActivity.ACTION_ID, key);
                     startActivity(intent2);
                     break;
                 case R.id.attachments:
                     Intent intent3 = new Intent(getActivity(), ViewAttachmentsActivity.class);
-                    intent3.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, mAPAdapter.getItem(pos).getId());
+                    intent3.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, parentId);
                     intent3.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
                     startActivity(intent3);
                     break;
@@ -177,9 +182,22 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void dispose() {
         disposable.dispose();
     }
 
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        disposable.dispose();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(disposable.isDisposed()) {
+            initData();
+        }
+    }
 }

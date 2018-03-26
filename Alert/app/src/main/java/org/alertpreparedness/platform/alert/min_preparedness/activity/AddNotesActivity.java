@@ -156,7 +156,7 @@ public class AddNotesActivity extends AppCompatActivity implements AddNotesAdapt
 
     public void saveNote(String texts) {
 
-        if(permissions.checkCreateNote()) {
+        if(!permissions.checkCreateNote()) {
             SnackbarHelper.show(this, getString(R.string.permission_note_create_error));
         }
         else if(!TextUtils.isEmpty(texts)) {

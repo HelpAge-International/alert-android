@@ -24,6 +24,7 @@ public class ActionModel extends FirebaseModel {
     private String createdByCountryId;
     private ArrayList<Integer> assignHazard;
     private String department;
+    private TimeTrackingModel timeTracking;
 
     @Exclude
     private boolean isChs;
@@ -249,5 +250,13 @@ public class ActionModel extends FirebaseModel {
 
     public void setChs(boolean chs) {
         isChs = chs;
+    }
+
+    public TimeTrackingModel getTimeTracking() {
+        return timeTracking;
+    }
+
+    public void setTimeTracking(TimeTrackingModel timeTracking) {
+        this.timeTracking = timeTracking;
     }
 }

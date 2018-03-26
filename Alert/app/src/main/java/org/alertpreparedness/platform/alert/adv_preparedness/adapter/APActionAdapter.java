@@ -168,7 +168,7 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
             holder.tvActionName.setText(action.getTask());
             holder.tvBudget.setText(getBudget(action.getBudget()));
             holder.tvDueDate.setText(getDate(action.getDueDate()));
-            holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position, keys.get(position), action.getId()));
+            holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position, action.getId(), action.getParentId()));
 
             if (action.getDueDate() == null) {
                 holder.tvDueDate.setVisibility(View.GONE);

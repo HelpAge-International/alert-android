@@ -140,7 +140,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
         holder.tvActionName.setText(action.getTask());
         holder.tvBudget.setText(getBudget(action.getBudget()));
         holder.tvDueDate.setText(getDate(action.getDueDate()));
-        holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position, keys.get(position), action.getId()));
+        holder.itemView.setOnClickListener((v) -> listener.onActionItemSelected(position, action.getId(), action.getParentId()));
 
         if (action.getDueDate() == null) {
             holder.tvDueDate.setVisibility(View.GONE);

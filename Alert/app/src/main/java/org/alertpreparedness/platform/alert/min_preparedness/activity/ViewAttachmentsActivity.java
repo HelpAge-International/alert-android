@@ -104,8 +104,6 @@ public class ViewAttachmentsActivity extends AppCompatActivity implements ViewAt
 
     @Override
     public void onAttachmentSelected(DocumentModel document) {
-        System.out.println("document.getUploadedBy() = " + document.getUploadedBy());
-        System.out.println("user.getUserID() = " + user.getUserID());
         if(user.getUserID().equals(document.getUploadedBy())) {
             SheetMenu.with(this).setMenu(R.menu.menu_attachment).setClick(menuItem -> {
                 if (AppUtils.isDeviceOnline(this)) {

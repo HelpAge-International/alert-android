@@ -27,6 +27,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
+import org.alertpreparedness.platform.alert.interfaces.DisposableFragment;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
@@ -46,7 +47,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAUnassignedFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener {
+public class APAUnassignedFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener, DisposableFragment {
 
     public APAUnassignedFragment() {
         // Required empty public constructor
@@ -87,7 +88,7 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
     @ActiveActionObservable
     Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> actionFlowable;
 
-    CompositeDisposable disposable = new CompositeDisposable();
+    CompositeDisposable disposable;
 
     private APActionAdapter mAPAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
@@ -124,6 +125,11 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
 
         handleAdvFab();
 
+        initData();
+    }
+
+    private void initData() {
+        disposable = new CompositeDisposable();
         disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
@@ -138,12 +144,6 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
             mAPAdapter.updateKeys(result);
 
         }));
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        disposable.dispose();
     }
 
     @Override
@@ -198,5 +198,25 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
     @Override
     protected RecyclerView getListView() {
         return mAdvActionRV;
+    }
+
+    @Override
+    public void dispose() {
+        disposable.dispose();
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        disposable.dispose();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(disposable.isDisposed()) {
+            initData();
+        }
     }
 }

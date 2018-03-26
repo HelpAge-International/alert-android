@@ -15,6 +15,7 @@ import org.alertpreparedness.platform.alert.MainDrawer;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.adv_preparedness.activity.CreateAPAActivity;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
+import org.alertpreparedness.platform.alert.interfaces.DisposableFragment;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
 
 import javax.inject.Inject;
@@ -26,7 +27,7 @@ import butterknife.ButterKnife;
  * Created by faizmohideen on 05/01/2018.
  */
 
-public class AdvPreparednessFragment extends Fragment implements View.OnClickListener{
+public class AdvPreparednessFragment extends Fragment implements View.OnClickListener {
     @BindView(R.id.action_pager)
     ViewPager mPager;
 
@@ -76,14 +77,20 @@ public class AdvPreparednessFragment extends Fragment implements View.OnClickLis
         }
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        mAdapter.stopAll();
+    }
+
     private class PagerAdapter extends FragmentStatePagerAdapter {
 
-        private Fragment one = new APAExpiredFragment();
-        private Fragment two = new APAUnassignedFragment();
-        private Fragment three = new APACompletedFragment();
-        private Fragment four = new APAInactiveFragment();
-        private Fragment five = new APAArchivedFragment();
-        private Fragment six = new APAInProgressFragment();
+        private DisposableFragment one = new APAExpiredFragment();
+        private DisposableFragment two = new APAUnassignedFragment();
+        private DisposableFragment three = new APACompletedFragment();
+        private DisposableFragment four = new APAInactiveFragment();
+        private DisposableFragment five = new APAArchivedFragment();
+        private DisposableFragment six = new APAInProgressFragment();
 
         public PagerAdapter(FragmentManager fm) {
             super(fm);
@@ -94,27 +101,27 @@ public class AdvPreparednessFragment extends Fragment implements View.OnClickLis
 
             switch (position) {
                 case 1:
-                    return one;
+                    return (Fragment) one;
                 case 2:
-                    return two;
+                    return (Fragment) two;
                 case 3:
-                    return three;
+                    return (Fragment) three;
                 case 4:
-                    return four;
+                    return (Fragment) four;
                 case 5:
-                    return five;
+                    return (Fragment) five;
                 default:
-                    return six;
+                    return (Fragment) six;
             }
         }
 
         public void stopAll() {
-            one.onStop();
-            three.onStop();
-            two.onStop();
-            five.onStop();
-            four.onStop();
-            six.onStop();
+            one.dispose();
+            three.dispose();
+            two.dispose();
+            five.dispose();
+            four.dispose();
+            six.dispose();
         }
 
         @Override
@@ -124,11 +131,5 @@ public class AdvPreparednessFragment extends Fragment implements View.OnClickLis
 
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        mAdapter.stopAll();
-        System.out.println("STOPPED stop");
-    }
 
 }

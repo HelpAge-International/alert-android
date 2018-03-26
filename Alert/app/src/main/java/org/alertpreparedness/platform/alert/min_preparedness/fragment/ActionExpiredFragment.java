@@ -81,7 +81,7 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
     @Inject
     User user;
 
-    CompositeDisposable disposable = new CompositeDisposable();
+    CompositeDisposable disposable;
 
     protected ActionAdapter mExpiredAdapter;
     private String actionID;
@@ -115,7 +115,12 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
+        initData();
 
+    }
+
+    private void initData() {
+        disposable = new CompositeDisposable();
         disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
@@ -126,7 +131,6 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
                 if(actionModel.getAsignee() != null &&
                         actionModel.getAsignee().equals(user.getUserID()) &&
                         !wrapper.checkActionInProgress() &&
-                        !actionModel.getIsComplete() &&
                         !actionModel.getIsArchived() &&
                         actionModel.getLevel() == Constants.MPA) {
 
@@ -138,8 +142,6 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
             mExpiredAdapter.updateKeys(result);
 
         }));
-
-
     }
 
     @Override
@@ -157,13 +159,13 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
-                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, mExpiredAdapter.getItem(pos).getId());
+                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, parentId);
                     intent.putExtra(AddNotesActivity.ACTION_ID, key);
                     startActivity(intent);
                     break;
                 case R.id.attachments:
                     Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
-                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, mExpiredAdapter.getItem(pos).getId());
+                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, parentId);
                     intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
                     startActivity(intent2);
                     break;
@@ -238,6 +240,21 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
     public void onStop() {
         super.onStop();
         disposable.dispose();
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        disposable.dispose();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(disposable.isDisposed()) {
+            initData();
+        }
     }
 
 }

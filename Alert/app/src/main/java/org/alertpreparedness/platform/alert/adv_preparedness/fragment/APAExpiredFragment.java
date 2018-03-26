@@ -32,6 +32,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
+import org.alertpreparedness.platform.alert.interfaces.DisposableFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.alert.model.User;
@@ -57,7 +58,7 @@ import ru.whalemare.sheetmenu.SheetMenu;
  * Created by faizmohideen on 06/01/2018.
  */
 
-public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener{
+public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener, DisposableFragment{
 
     private String actionID;
 
@@ -114,7 +115,7 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
     @ActiveActionObservable
     Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> actionFlowable;
 
-    CompositeDisposable disposable = new CompositeDisposable();
+    CompositeDisposable disposable;
 
     private APActionAdapter mAPAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
@@ -149,6 +150,12 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
 
         handleAdvFab();
 
+        initData();
+
+    }
+
+    private void initData() {
+        disposable = new CompositeDisposable();
         disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
@@ -170,7 +177,6 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
             mAPAdapter.updateKeys(result);
 
         }));
-
     }
 
     @Override
@@ -200,13 +206,13 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
                     break;
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
-                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, mAPAdapter.getItem(pos).getId());
+                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, parentId);
                     intent.putExtra(AddNotesActivity.ACTION_ID, key);
                     startActivity(intent);
                     break;
                 case R.id.attachments:
                     Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
-                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, mAPAdapter.getItem(pos).getId());
+                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, parentId);
                     intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
                     startActivity(intent2);
                     break;
@@ -281,11 +287,25 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
         }
     }
 
+
     @Override
-    public void onStop() {
-        super.onStop();
+    public void dispose() {
         disposable.dispose();
     }
 
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        disposable.dispose();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(disposable.isDisposed()) {
+            initData();
+        }
+    }
 }
 

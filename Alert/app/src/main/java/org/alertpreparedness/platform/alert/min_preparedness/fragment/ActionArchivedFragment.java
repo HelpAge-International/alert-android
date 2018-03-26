@@ -69,7 +69,7 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
     @ActionGroupObservable
     Flowable<Collection<ActionItemWrapper>>  actionFlowable;
 
-    CompositeDisposable disposable = new CompositeDisposable();
+    CompositeDisposable disposable;
 
     @Nullable
     @Override
@@ -98,6 +98,11 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
+        initData();
+    }
+
+    private void initData() {
+        disposable = new CompositeDisposable();
         disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
@@ -132,13 +137,13 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
 //                    break;
                 case R.id.action_notes:
                     Intent intent2 = new Intent(getActivity(), AddNotesActivity.class);
-                    intent2.putExtra(AddNotesActivity.PARENT_ACTION_ID, mAdapter.getItem(pos).getId());
+                    intent2.putExtra(AddNotesActivity.PARENT_ACTION_ID, parentId);
                     intent2.putExtra(AddNotesActivity.ACTION_ID, key);
                     startActivity(intent2);
                     break;
                 case R.id.attachments:
                     Intent intent3 = new Intent(getActivity(), ViewAttachmentsActivity.class);
-                    intent3.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, mAdapter.getItem(pos).getId());
+                    intent3.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, key);
                     intent3.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
                     startActivity(intent3);
                     break;
@@ -165,5 +170,19 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
     public void onStop() {
         super.onStop();
         disposable.dispose();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        disposable.dispose();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(disposable.isDisposed()) {
+            initData();
+        }
     }
 }

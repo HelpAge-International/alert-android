@@ -68,7 +68,7 @@ public class AlertApplication extends MultiDexApplication implements ValueEventL
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.UAT;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING;
 
     @Override
     public void onCreate() {
@@ -97,7 +97,6 @@ public class AlertApplication extends MultiDexApplication implements ValueEventL
         boolean loggedIn = FirebaseAuth.getInstance().getCurrentUser() != null;
 
         if(!PreferHelper.getBoolean(this, Constants.HAS_RUN_BEFORE)) {
-            System.out.println("PreferHelper.getString(this, Constants.HAS_RUN_BEFORE) = " + PreferHelper.getString(this, Constants.HAS_RUN_BEFORE));
             FirebaseAuth.getInstance().signOut();
             PreferHelper.deleteString(this, Constants.UID);
             PreferHelper.putBoolean(this, Constants.HAS_RUN_BEFORE, true);

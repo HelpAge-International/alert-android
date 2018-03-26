@@ -79,7 +79,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
     @ClockSettingsActionObservable
     Flowable<Collection<ActionItemWrapper>> actionFlowable;
 
-    CompositeDisposable disposable = new CompositeDisposable();
+    CompositeDisposable disposable;
 
     @Nullable
     @Override
@@ -104,6 +104,12 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
+        initData();
+
+    }
+
+    private void initData() {
+        disposable = new CompositeDisposable();
         disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
@@ -121,7 +127,6 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
             mAdapter.updateKeys(result);
 
         }));
-
     }
 
 
@@ -146,13 +151,13 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
                     break;
                 case R.id.action_notes:
                     Intent intent3 = new Intent(getActivity(), AddNotesActivity.class);
-                    intent3.putExtra(AddNotesActivity.PARENT_ACTION_ID, mAdapter.getItem(pos).getId());
+                    intent3.putExtra(AddNotesActivity.PARENT_ACTION_ID, parentId);
                     intent3.putExtra(AddNotesActivity.ACTION_ID, key);
                     startActivity(intent3);
                     break;
                 case R.id.attachments:
                     Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
-                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, mAdapter.getItem(pos).getId());
+                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, parentId);
                     intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
                     startActivity(intent2);
                     break;
@@ -190,5 +195,20 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
     public void onStop() {
         super.onStop();
         disposable.dispose();
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        disposable.dispose();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(disposable.isDisposed()) {
+            initData();
+        }
     }
 }

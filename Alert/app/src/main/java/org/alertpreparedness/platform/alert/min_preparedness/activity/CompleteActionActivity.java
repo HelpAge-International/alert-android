@@ -34,6 +34,8 @@ import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseDocumentRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseNoteRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseStorageRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.DocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
@@ -79,7 +81,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     StorageReference mStorageRef;
 
     @Inject
-    @NoteRef
+    @BaseNoteRef
     DatabaseReference dbNoteRef;
 
     @Inject
@@ -91,7 +93,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     DatabaseReference dbActionBaseRef;
 
     @Inject
-    @DocumentRef
+    @BaseDocumentRef
     DatabaseReference dbDocRef;
 
     @Inject
@@ -255,12 +257,11 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
                     "File Selected: " + path, Toast.LENGTH_LONG).show();
 
             String filename = path.substring(path.lastIndexOf("/") + 1);
-            System.out.println("filename = " + filename);
             pathList.add(path);
             imgList.add(filename);
             simpleAdapter.notifyDataSetChanged();
-        } catch (Exception e) {
-            System.out.println("exceptional = " + e);
+        }
+        catch (Exception e) {
         }
     }
 
@@ -278,75 +279,51 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     }
 
     private void saveData(String texts) {
-        Intent intent = getIntent();
 
-        new NetworkFetcher((networkFetcherResult -> {
+        saveNote(texts, key);
 
-            List<String> networkIds = networkFetcherResult.all();
+        System.out.println("dbActionBaseRef.child(parentId).child(key) = " + dbActionBaseRef.child(parentId).child(key));
+//        return;
+        for (int i = 0; i < imgList.size(); i++) {
 
-            saveNote(texts, key, parentId, networkIds);
+            DatabaseReference newDocRef = dbActionBaseRef.child(parentId).child(key).child("documents").push();
+            newDocRef.setValue(true);
 
-            for (int i = 0; i < imgList.size(); i++) {
+            riversRef = mStorageRef.child("documents/" + parentId + "/" + key + "/" + imgList.get(i));
 
-                if(parentId.equals(user.getCountryID())) {
-                    ref = dbActionRef.child(key).child("documents").push();
-                    ref.setValue(true);
-                    riversRef = mStorageRef.child("documents/" + user.getCountryID() + "/" + ref.getKey() + "/" + imgList.get(i));
-                }
-                else {
-                    ref = dbActionBaseRef.child(parentId).child(key).child("documents").push();
-                    ref.setValue(true);
-                    riversRef = mStorageRef.child("documents/" + parentId + "/" + ref.getKey() + "/" + imgList.get(i));
-                }
+            riversRef.putFile(Uri.parse("file://" + pathList.get(i)))
+                    .addOnSuccessListener(taskSnapshot -> {
 
-                riversRef.putFile(Uri.parse("file://" + pathList.get(i)))
-                        .addOnSuccessListener(taskSnapshot -> {
+                        String title = taskSnapshot.getMetadata().getName();
+                        String downloadUri = taskSnapshot.getMetadata().getDownloadUrl().toString();
+                        Long size = taskSnapshot.getMetadata().getSizeBytes();
+                        double sizeInKb = size / KB;
+                        Long time = System.currentTimeMillis();
+                        FileInfo info = new FileInfo(title, downloadUri, 0L, sizeInKb, 0L, time, title, user.getUserID());
+                        dbDocRef.child(parentId).child(newDocRef.getKey()).setValue(info);
+                    })
+                    .addOnFailureListener(Throwable::printStackTrace);
+        }
 
-                            String title = taskSnapshot.getMetadata().getName();
-                            String downloadUri = taskSnapshot.getMetadata().getDownloadUrl().toString();
-                            System.out.println("downloadUri = " + downloadUri);
-                            Long size = taskSnapshot.getMetadata().getSizeBytes();
-                            double sizeInKb = size / KB;
-                            Long time = System.currentTimeMillis();
-                            //TODO Bug fix: Documents must be saved to the right node under document/[parentId]/actionID/.setValue(info);
-                            FileInfo info = new FileInfo(title, downloadUri, Long.valueOf(0), sizeInKb, Long.valueOf(0), time, title, user.getUserID());
-                            dbDocRef.child(ref.getKey()).setValue(info);
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                exception.printStackTrace();
-                            }
-                        });
-            }
+        imgList.clear();
+        editTextNote.setText("");
+        simpleAdapter.notifyDataSetChanged();
 
-            imgList.clear();
-            editTextNote.setText("");
-            simpleAdapter.notifyDataSetChanged();
 
-        })).fetch();
     }
 
-    public void saveNote(String texts, String key, String userTypeID, List<String> networkIds) {
+    public void saveNote(String texts, String key) {
         if (!TextUtils.isEmpty(texts)) {
-            String id = dbNoteRef.child(key).push().getKey();
             String userID = PreferHelper.getString(getApplicationContext(), Constants.AGENCY_ID);
             Long millis = System.currentTimeMillis();
 
             Note notes = new Note(texts, millis, userID);
 
-            if(userTypeID.equals(user.getCountryID())) {
-                dbActionRef.child(key).child("getIsComplete").setValue(true);
-                dbActionRef.child(key).child("isCompleteAt").setValue(millis);
-            }
-            else {
-                dbActionBaseRef.child(parentId).child(key).child("getIsComplete").setValue(true);
-                dbActionBaseRef.child(parentId).child(key).child("isCompleteAt").setValue(millis);
-            }
-            dbNoteRef.child(key).child(id).setValue(notes);
+            dbActionBaseRef.child(parentId).child(key).child("isComplete").setValue(true);
+            dbActionBaseRef.child(parentId).child(key).child("isCompleteAt").setValue(millis);
 
-//            Intent intent = new Intent(CompleteActionActivity.this, HomeScreen.class);
-//            startActivity(intent);
+            dbNoteRef.child(parentId).child(key).push().setValue(notes);
+
         } else {
             SnackbarHelper.show(this, getString(R.string.txt_note_not_empty));
         }
@@ -382,7 +359,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     }
 
     private void confirmActionComplete() {
-        String notes = editTextNote.getText().toString().trim();
+        String notes = editTextNote.getText().toString();
 
         if (TextUtils.isEmpty(notes)) {
             SnackbarHelper.show(this, getString(R.string.txt_err_complete_action_note));

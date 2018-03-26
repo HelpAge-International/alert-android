@@ -91,7 +91,7 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
     @Inject
     User user;
 
-    CompositeDisposable disposable = new CompositeDisposable();
+    CompositeDisposable disposable;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -120,6 +120,13 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
+        initData();
+
+
+    }
+
+    private void initData() {
+        disposable = new CompositeDisposable();
         disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
@@ -141,8 +148,6 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
             mUnassignedAdapter.updateKeys(result);
 
         }));
-
-
     }
 
     @Override
@@ -150,7 +155,6 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
         this.actionID = key;
 
         SheetMenu.with(getContext()).setMenu(R.menu.menu_unassigned_mpa).setClick(menuItem -> {
-            ActionModel item = mUnassignedAdapter.getItem(pos);
 
             switch (menuItem.getItemId()) {
                 case R.id.update_date:
@@ -167,13 +171,13 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
 //                    }
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
-                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, mUnassignedAdapter.getItem(pos).getId());
+                    intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, parentId);
                     intent.putExtra(AddNotesActivity.ACTION_ID, key);
                     startActivity(intent);
                     break;
                 case R.id.attachments:
                     Intent intent2 = new Intent(getActivity(), ViewAttachmentsActivity.class);
-                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, mUnassignedAdapter.getItem(pos).getId());
+                    intent2.putExtra(ViewAttachmentsActivity.PARENT_ACTION_ID, parentId);
                     intent2.putExtra(ViewAttachmentsActivity.ACTION_ID, key);
                     startActivity(intent2);
                     break;
@@ -249,6 +253,21 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
         System.out.println("STOPPED");
         super.onStop();
         disposable.dispose();
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        disposable.dispose();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(disposable.isDisposed()) {
+            initData();
+        }
     }
 
 }
