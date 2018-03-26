@@ -177,6 +177,10 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
                         && user.getUserID().equals(actionModel.getAsignee());
                 boolean unassigned = actionModel.getAsignee() == null;
 
+//                if(actionModel.getTask().equals("Custom APA 180318 1451")) {
+//                    System.out.println("model = " + wrapper.getPrimarySnapshot().getRef());
+//                }
+
                 if((unassigned || assignedToUser)
                         && actionModel.getLevel() == Constants.APA
                         && !actionModel.getIsArchived()

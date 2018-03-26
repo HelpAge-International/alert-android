@@ -36,7 +36,7 @@ public abstract class BaseAPAFragment extends Fragment {
 //                    else if (!fab.isShown() && dy <= 0) {
 //                        fab.show();
 //                    }
-                    System.out.println("dy = " + dy);
+//                    System.out.println("dy = " + dy);
 
                 }
 

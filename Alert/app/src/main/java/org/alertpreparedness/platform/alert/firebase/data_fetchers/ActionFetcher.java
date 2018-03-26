@@ -180,12 +180,11 @@ public class ActionFetcher implements RxFirebaseDataFetcher<ActionItemWrapper> {
                 if(existingSet == null) {
                     existingSet = new HashSet<>();
                 }
-                if(alertModel.getAlertLevel() == Constants.TRIGGER_RED) {
+                if(alertModel.getAlertLevel() == Constants.TRIGGER_RED && alertModel.getRedAlertApproved()) {
                     existingSet.add(alertModel.getHazardScenario());
                 }
                 hazardTypes.put(snapshot.getRef().getParent().getKey(), existingSet);
             }
-            System.out.println("hazardTypes = " + hazardTypes);
             return hazardTypes;
         })
         .distinct()
@@ -194,13 +193,10 @@ public class ActionFetcher implements RxFirebaseDataFetcher<ActionItemWrapper> {
             for (ActionItemWrapper itemWrapper : actionItemWrapperFetcherResultItem) {
                 boolean res = false;
 
-                DataSnapshot snapshot = itemWrapper.getActionSnapshot();
-                if (itemWrapper.getActionSnapshot() == null) {
-                    snapshot = itemWrapper.getTypeSnapshot();
-                }
+                DataSnapshot snapshot = itemWrapper.getPrimarySnapshot();
 
                 if (snapshot != null) {
-                    ActionModel model = AppUtils.getFirebaseModelFromDataSnapshot(snapshot, ActionModel.class);
+                    ActionModel model = itemWrapper.makeModel();
 
                     if (model.getAssignHazard() != null) {
 
@@ -211,11 +207,10 @@ public class ActionFetcher implements RxFirebaseDataFetcher<ActionItemWrapper> {
                             }
                         }
                     }
-                    else if(model.getLevel() == Constants.MPA) {
+                    else if(model.getLevel() != null && model.getLevel() == Constants.MPA) {
                         res = true;
                     }
-                    else {
-//                        System.out.println("model.getTask() = " + model.getTask());
+                    else if(hazardTypes.get(model.getParentId()).size() > 0 && model.getLevel() != null && model.getLevel() == Constants.APA){
                         res = true;
                         //this could be an issue. But atm it getd round the "all hazards" flag for APA's
                     }
@@ -262,21 +257,21 @@ public class ActionFetcher implements RxFirebaseDataFetcher<ActionItemWrapper> {
             flowables.add(
                     RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(user.countryID))
                             .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
-                            .map(dataSnapshots -> Collections2.filter(dataSnapshots, input -> input.child("type").getValue() != null && input.child("type").getValue(Integer.class) == 2))
+                            .map(dataSnapshots -> Collections2.filter(dataSnapshots, input -> input.child("type").getValue() != null && input.child("type").getValue(Integer.class) == type))
                             .map(childrenDataSnapshotList -> Collections2.transform(childrenDataSnapshotList, item -> ActionItemWrapper.createAction(item, ActionItemWrapper.Group.COUNTRY)))
             );
 
             for (String localNetworkId : networkFetcherResult.getLocalNetworks()) {
                 flowables.add(RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(localNetworkId))
                         .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
-                        .map(dataSnapshots -> Collections2.filter(dataSnapshots, input -> input.child("type") != null && input.child("type").getValue(Integer.class) == 2))
+                        .map(dataSnapshots -> Collections2.filter(dataSnapshots, input -> input.child("type") != null && input.child("type").getValue(Integer.class) == type))
                         .map(childrenDataSnapshotList -> Collections2.transform(childrenDataSnapshotList, item -> ActionItemWrapper.createAction(item, ActionItemWrapper.Group.LOCAL_NETWORK)))
                 );
             }
             for (String networkCountryId : networkFetcherResult.getNetworksCountries()) {
                 flowables.add(RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(networkCountryId))
                         .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
-                        .map(dataSnapshots -> Collections2.filter(dataSnapshots, input -> input.child("type").getValue() != null && input.child("type").getValue(Integer.class) == 2))
+                        .map(dataSnapshots -> Collections2.filter(dataSnapshots, input -> input.child("type").getValue() != null && input.child("type").getValue(Integer.class) == type))
                         .map(childrenDataSnapshotList -> Collections2.transform(childrenDataSnapshotList, item -> ActionItemWrapper.createAction(item, ActionItemWrapper.Group.LOCAL_NETWORK)))
                 );
             }
@@ -305,6 +300,7 @@ public class ActionFetcher implements RxFirebaseDataFetcher<ActionItemWrapper> {
                 return toReturn;
             }
         );
+
     }
 
     private Flowable<Collection<ActionItemWrapper>> rxFetchGroupMandated(){

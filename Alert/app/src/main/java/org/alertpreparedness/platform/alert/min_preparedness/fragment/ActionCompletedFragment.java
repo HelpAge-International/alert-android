@@ -111,17 +111,6 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
         mActionRV.setItemAnimator(new DefaultItemAnimator());
         mActionRV.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
-//        actionFlowable.filter(fetcherResultItem -> {
-//            //filter by completed time
-//            ActionModel actionModel = fetcherResultItem.getValue().makeModel();
-//            return actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsComplete() && actionModel.getLevel() == Constants.MPA;
-//        }).subscribe(new ItemConsumer<>(fetcherResultItem -> {
-//            ActionModel actionModel = fetcherResultItem.makeModel();
-//            onActionRetrieved(actionModel);
-//        }, wrapperToRemove -> onActionRemoved(wrapperToRemove.getPrimarySnapshot())));
-//
-//
-
         disposable.add(actionFlowable.subscribe(collectionFetcherResultItem -> {
 
             ArrayList<String> result = new ArrayList<>();
@@ -129,7 +118,9 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
             for(ActionItemWrapper wrapper : collectionFetcherResultItem) {
                 ActionModel actionModel = wrapper.makeModel();
 
-                if(actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsComplete() && actionModel.getLevel() == Constants.MPA) {
+                if(actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID())
+                        && actionModel.getIsComplete() && !actionModel.getIsArchived()
+                        && actionModel.getLevel() == Constants.MPA) {
                     onActionRetrieved(actionModel);
                     result.add(actionModel.getId());
                 }

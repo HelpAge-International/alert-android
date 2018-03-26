@@ -127,6 +127,11 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
             for(ActionItemWrapper wrapper : collectionFetcherResultItem) {
                 ActionModel actionModel = wrapper.makeModel();
 
+                if(actionModel.getId().equals("-L5YnpbZO0tFnK2-IOHG")) {
+                    System.out.println("wrapper.getActionSnapshot() = " + wrapper.getActionSnapshot());
+                    System.out.println("wrapper.getTypeSnapshot() = " + wrapper.getTypeSnapshot());
+                }
+
                 if(actionModel.getAsignee() == null && actionModel.getLevel() == Constants.MPA) {
                     onActionRetrieved(actionModel);
                     result.add(actionModel.getId());

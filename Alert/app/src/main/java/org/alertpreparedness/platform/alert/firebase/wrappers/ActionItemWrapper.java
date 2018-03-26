@@ -101,19 +101,19 @@ public class ActionItemWrapper {
 
         }
         else {
-            System.out.println("notcustomclocksetting actionModel = " + actionModel);
+//            System.out.println("notcustomclocksetting actionModel = " + actionModel);
             ClockSetting clockSetting = getClockSetting();
             if (clockSetting != null && actionModel.getCreatedAt() != null && clockSetting.getDurationType() == Constants.DUE_WEEK) {
                 res = DateHelper.isInProgressWeek(actionModel.getCreatedAt(), clockSetting.getValue());
-                System.out.println("notcustomclocksetting dueweek = " + DateHelper.isInProgressWeek(actionModel.getCreatedAt(), clockSetting.getValue()));
+//                System.out.println("notcustomclocksetting dueweek = " + DateHelper.isInProgressWeek(actionModel.getCreatedAt(), clockSetting.getValue()));
             }
             else if (clockSetting != null && actionModel.getCreatedAt() != null && clockSetting.getDurationType() == Constants.DUE_MONTH) {
                 res = DateHelper.isInProgressMonth(actionModel.getCreatedAt(), clockSetting.getValue());
-                System.out.println("notcustomclocksetting doemonth = " + DateHelper.isInProgressMonth(actionModel.getCreatedAt(), clockSetting.getValue()));
+//                System.out.println("notcustomclocksetting doemonth = " + DateHelper.isInProgressMonth(actionModel.getCreatedAt(), clockSetting.getValue()));
             }
             else if (clockSetting != null && actionModel.getCreatedAt() != null && clockSetting.getDurationType() == Constants.DUE_YEAR) {
                 res = DateHelper.isInProgressYear(actionModel.getCreatedAt(), clockSetting.getValue());
-                System.out.println("notcustomclocksetting dueyear = " + DateHelper.isInProgressYear(actionModel.getCreatedAt(), clockSetting.getValue()));
+//                System.out.println("notcustomclocksetting dueyear = " + DateHelper.isInProgressYear(actionModel.getCreatedAt(), clockSetting.getValue()));
 
             }
         }
@@ -156,6 +156,7 @@ public class ActionItemWrapper {
                 model.setDepartment(typeSnapshot.child("department").getValue(String.class));
             }
             model.setTask(typeSnapshot.child("task").getValue(String.class));
+            model.setAsignee(actionSnapshot.child("asignee").getValue(String.class));
 
             return model;
         }
