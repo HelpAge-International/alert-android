@@ -157,8 +157,6 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
 
         });
 
-
-
         initViews();
     }
 
@@ -208,6 +206,7 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
     }
 
     private void createAdapter() {
+        System.out.println("mProgrammes = " + mProgrammes);
         mProgrammesAdapter = new ProgrammesAdapter(this, mProgrammes);
         mResultsList.setAdapter(mProgrammesAdapter);
     }
@@ -369,41 +368,49 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-
         for (DataSnapshot child : dataSnapshot.getChildren()) {
             for(DataSnapshot programmSnapshot : child.child("4WMapping").getChildren()) {
                 ProgrammeModel model = AppUtils.getValueFromDataSnapshot(programmSnapshot, ProgrammeModel.class);
                 assert model != null;
+
                 model.setKey(programmSnapshot.getKey());
-
                 model.setCountryName(mTitle1);
-
                 model.setLevel1Name(
                         ExtensionHelperKt.getLevel1Values(filter.getCountry(),
                                 mCountryDataList
                         ).get(model.getLevel1()));
-                if(model.getLevel2() != null) {
-                    model.setLevel2Name(
-                            ExtensionHelperKt.getLevel2Values(
-                                    filter.getCountry(),
-                                    model.getLevel1(),
-                                    mCountryDataList
-                            ).get(Integer.parseInt(model.getLevel2()))
-                    );
+
+                List<String> level2Values = ExtensionHelperKt.getLevel2Values(filter.getCountry(), model.getLevel1(), mCountryDataList);
+
+                if(model.getLevel2() != null && level2Values != null && level2Values.size() > Integer.parseInt(model.getLevel2())) {
+                    model.setLevel2Name(level2Values.get(Integer.parseInt(model.getLevel2())));
                 }
 
                 boolean hasLevel1 = filter.getLevel1() != null && filter.getLevel1() != -1;
                 boolean hasLevel2 = filter.getLevel2() != null && filter.getLevel2() != -1;
 
-                if((!hasLevel1 || filter.getLevel1() == model.getLevel1()) && (!hasLevel2 || filter.getLevel2().toString().equals(model.getLevel2()))) {
-                    ArrayList<ProgrammeModel> models = programmes.get(model.getAgencyId());
-
-                    if (programmes.get(model.getAgencyId()) == null) {
-                        models = new ArrayList<>();
+                if(filter.getLevel1() == -1) {
+                    if(model.getAgencyId() != null) {
+                        ArrayList<ProgrammeModel> models = programmes.get(model.getAgencyId());
+                        if (models == null) {
+                            models = new ArrayList<>();
+                        }
+                        models.add(model);
+                        programmes.put(model.getAgencyId(), models);
+                        agencyRequests.put(model.getAgencyId(), false);
                     }
-                    models.add(model);
-                    programmes.put(model.getAgencyId(), models);
-                    agencyRequests.put(model.getAgencyId(), false);
+                }
+                else if((!hasLevel1 || filter.getLevel1() == model.getLevel1()) && (!hasLevel2 || filter.getLevel2().toString().equals(model.getLevel2()))) {
+                    if(model.getAgencyId() != null) {
+                        ArrayList<ProgrammeModel> models = programmes.get(model.getAgencyId());
+
+                        if (programmes.get(model.getAgencyId()) == null) {
+                            models = new ArrayList<>();
+                        }
+                        models.add(model);
+                        programmes.put(model.getAgencyId(), models);
+                        agencyRequests.put(model.getAgencyId(), false);
+                    }
                 }
             }
         }
@@ -411,6 +418,7 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
         if(agencyRequests.size() > 0) {
             for (String id : agencyRequests.keySet()) {
                 if(id != null) {
+                    System.out.println(agencyRequests.keySet());
                     agencyRef.child(id).addValueEventListener(new AgencyListener());
                 }
             }
@@ -450,6 +458,7 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
             }
 
             if(allAgencyRequestsComplete()) {
+                System.out.println("agencyComplete");
                 createAdapter();
             }
         }

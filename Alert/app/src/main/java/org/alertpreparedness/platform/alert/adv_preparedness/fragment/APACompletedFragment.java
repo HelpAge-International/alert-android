@@ -17,12 +17,14 @@ import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionGroupObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.interfaces.DisposableFragment;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
@@ -74,8 +76,8 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
     public DatabaseReference dbActionRef;
 
     @Inject
-    @ActionGroupObservable
-    Flowable<Collection<ActionItemWrapper>>  actionFlowable;
+    @ActiveActionObservable
+    Flowable<FetcherResultItem<Collection<ActionItemWrapper>>>   actionFlowable;
 
     @Inject
     User user;
@@ -124,9 +126,9 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
 
             ArrayList<String> result = new ArrayList<>();
 
-            for(ActionItemWrapper wrapper : collectionFetcherResultItem) {
+            for(ActionItemWrapper wrapper : collectionFetcherResultItem.getValue()) {
                 ActionModel actionModel = wrapper.makeModel();
-                if(actionModel.getAsignee() != null && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsComplete() && actionModel.getLevel() == Constants.APA) {
+                if(actionModel.getAsignee() != null && wrapper.checkActionInProgress() && actionModel.getAsignee().equals(user.getUserID()) && actionModel.getIsComplete() && actionModel.getLevel() == Constants.APA) {
                     onActionRetrieved(actionModel);
                     result.add(actionModel.getId());
                 }
