@@ -8,6 +8,7 @@ import com.google.firebase.database.DataSnapshot;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.ClockSetting;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
+import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.notifications.ActionFetcher;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
@@ -84,46 +85,7 @@ public class ActionItemWrapper {
     }
 
     public boolean checkActionInProgress() {
-        boolean res = false;
-        ActionModel actionModel = makeModel();
-
-        if(actionModel.hasCustomClockSettings()) {
-
-            if (actionModel.getCreatedAt() != null && actionModel.getFrequencyBase() == Constants.DUE_WEEK) {
-                res = DateHelper.isInProgressWeek(actionModel.getCreatedAt(), actionModel.getFrequencyValue());
-            }
-            else if (actionModel.getCreatedAt() != null && actionModel.getFrequencyBase() == Constants.DUE_MONTH) {
-                res = DateHelper.isInProgressMonth(actionModel.getCreatedAt(), actionModel.getFrequencyValue());
-            }
-            else if (actionModel.getCreatedAt() != null && actionModel.getFrequencyBase() == Constants.DUE_YEAR) {
-                res = DateHelper.isInProgressYear(actionModel.getCreatedAt(), actionModel.getFrequencyValue());
-            }
-
-        }
-        else {
-//            System.out.println("notcustomclocksetting actionModel = " + actionModel);
-            ClockSetting clockSetting = getClockSetting();
-            if (clockSetting != null && actionModel.getCreatedAt() != null && clockSetting.getDurationType() == Constants.DUE_WEEK) {
-                res = DateHelper.isInProgressWeek(actionModel.getCreatedAt(), clockSetting.getValue());
-//                System.out.println("notcustomclocksetting dueweek = " + DateHelper.isInProgressWeek(actionModel.getCreatedAt(), clockSetting.getValue()));
-            }
-            else if (clockSetting != null && actionModel.getCreatedAt() != null && clockSetting.getDurationType() == Constants.DUE_MONTH) {
-                res = DateHelper.isInProgressMonth(actionModel.getCreatedAt(), clockSetting.getValue());
-//                System.out.println("notcustomclocksetting doemonth = " + DateHelper.isInProgressMonth(actionModel.getCreatedAt(), clockSetting.getValue()));
-            }
-            else if (clockSetting != null && actionModel.getCreatedAt() != null && clockSetting.getDurationType() == Constants.DUE_YEAR) {
-                res = DateHelper.isInProgressYear(actionModel.getCreatedAt(), clockSetting.getValue());
-//                System.out.println("notcustomclocksetting dueyear = " + DateHelper.isInProgressYear(actionModel.getCreatedAt(), clockSetting.getValue()));
-
-            }
-        }
-//
-//        System.out.println("actionitemwrapper actionModel = " + actionModel);
-//        System.out.println("actionitemwrapper clockSetting = " + clockSetting);
-//        System.out.println("actionitemwrapper res = " + res);
-
-
-        return res;
+        return AppUtils.isActionInProgress(makeModel(), getClockSetting());
     }
 
     @Override
@@ -164,7 +126,14 @@ public class ActionItemWrapper {
             return AppUtils.getFirebaseModelFromDataSnapshot(actionSnapshot, ActionModel.class);
         }
         else {
-            return AppUtils.getFirebaseModelFromDataSnapshot(typeSnapshot, ActionModel.class);
+            if(type == ActionType.MANDATED) {
+                return AppUtils.getFirebaseModelFromDataSnapshot(typeSnapshot, ActionModel.class);
+            }
+            else {
+                ActionModel model = AppUtils.getFirebaseModelFromDataSnapshot(typeSnapshot, ActionModel.class);
+                model.setHasEnoughChsInfo(false);
+                return model;
+            }
         }
     }
 

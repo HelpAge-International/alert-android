@@ -17,6 +17,7 @@ import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
@@ -25,15 +26,18 @@ import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
+import org.alertpreparedness.platform.alert.firebase.TimeTrackingModel;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.interfaces.DisposableFragment;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.PermissionsHelper;
+import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 import javax.inject.Inject;
 
@@ -42,10 +46,6 @@ import butterknife.ButterKnife;
 import io.reactivex.Flowable;
 import io.reactivex.disposables.CompositeDisposable;
 import ru.whalemare.sheetmenu.SheetMenu;
-
-/**
- * Created by faizmohideen on 06/01/2018.
- */
 
 public class APAUnassignedFragment extends BaseAPAFragment implements APActionAdapter.APAAdapterListener, UsersListDialogFragment.ItemSelectedListener, DisposableFragment {
 
@@ -75,7 +75,7 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
     TextView txtNoAction;
 
     @Inject
-    @ActionRef
+    @BaseActionRef
     DatabaseReference dbActionRef;
 
     @Inject
@@ -93,6 +93,7 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
     private APActionAdapter mAPAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
     private String actionID;
+    private HashMap<String, ActionItemWrapper> actionWrappers = new HashMap<>();
 
     @Nullable
     @Override
@@ -136,6 +137,7 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
 
             for(ActionItemWrapper wrapper : collectionFetcherResultItem.getValue()) {
                 ActionModel actionModel = wrapper.makeModel();
+                actionWrappers.put(actionModel.getId(), wrapper);
                 if(actionModel.getAsignee() == null && actionModel.getLevel() == Constants.APA) {
                     onActionRetrieved(actionModel);
                     result.add(actionModel.getId());
@@ -154,10 +156,14 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
     @Override
     public void onActionItemSelected(int pos, String key, String parentId) {
         this.actionID = key;
+        ActionModel item = mAPAdapter.getItem(pos);
         SheetMenu.with(getContext()).setMenu(R.menu.menu_unassigned_apa).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.assign_action:
-                    if(permissions.checkAssignAPA(mAPAdapter.getItem(pos), getActivity())) {
+                    if (!item.hasEnoughChsInfo() && item.isChs()) {
+                        SnackbarHelper.show(getActivity(), getString(R.string.more_info_chs));
+                    }
+                    else {
                         dialog.show(getActivity().getFragmentManager(), "users_list");
                     }
                     break;
@@ -175,14 +181,26 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
 
     @Override
     public void onAdapterItemRemoved(String key) {
-
+        if(mAPAdapter.getItemCount() == 0) {
+            txtNoAction.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public void onItemSelected(UserModel userModel) {
-        long millis = System.currentTimeMillis();
-        dbActionRef.child(actionID).child("asignee").setValue(userModel.getUserID());
-        dbActionRef.child(actionID).child("updatedAt").setValue(millis);
+        ActionModel model = mAPAdapter.getItem(actionID);
+        model.setAsignee(userModel.getUserID());
+        model.setUpdatedAt(System.currentTimeMillis());
+        mAPAdapter.getItem(actionID)
+                .getTimeTracking()
+                .updateActionTimeTracking(
+                        TimeTrackingModel.LEVEL.RED,
+                        model.getIsComplete(),
+                        model.getIsArchived(),
+                        true,
+                        actionWrappers.get(model.getId()).checkActionInProgress()
+                );
+        dbActionRef.child(model.getParentId()).child(model.getId()).setValue(model);
         mAPAdapter.removeItem(actionID);
         mAPAdapter.notifyDataSetChanged();
     }

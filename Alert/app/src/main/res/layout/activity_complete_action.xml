@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context="org.alertpreparedness.platform.alert.min_preparedness.activity.CompleteActionActivity">
 
-
     <LinearLayout
         android:id="@+id/llCompleteAction"
         android:layout_width="match_parent"

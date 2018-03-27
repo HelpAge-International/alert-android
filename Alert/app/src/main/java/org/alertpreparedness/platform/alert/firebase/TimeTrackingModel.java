@@ -22,7 +22,8 @@ public class TimeTrackingModel implements Serializable {
         RED,
         GREY,
         GREEN,
-        AMBER
+        AMBER,
+        NEW//only used when creating new items
     }
 
     public TimeTrackingModel() {
@@ -64,6 +65,36 @@ public class TimeTrackingModel implements Serializable {
         LEVEL oldState = establishLevel(oldLevel, approval);
         LEVEL newState = establishLevel(newLevel, approval);
         updateTimeTracking(oldState, newState);
+    }
+
+    public void updateActionTimeTracking(LEVEL currentState, boolean isComplete, boolean isArchived, boolean isAssigned, boolean isInProgress) {
+
+        LEVEL newState;
+        if(!isAssigned) {
+            newState = LEVEL.RED;
+        }
+        else {
+            if (isComplete) {
+                newState = LEVEL.GREEN;
+            }
+            else if (isArchived) {
+                newState = LEVEL.GREY;
+            }
+            else if(isInProgress) {
+                newState = LEVEL.AMBER;
+            }
+            else {//!isInProgress
+                newState = LEVEL.GREY;
+            }
+        }
+
+        System.out.println("newState = " + newState);
+        System.out.println("currentState = " + currentState);
+        updateTimeTracking(currentState, newState);
+        System.out.println("timeSpentInGrey = " + timeSpentInGrey);
+        System.out.println("timeSpentInAmber = " + timeSpentInAmber);
+        System.out.println("timeSpentInGreen = " + timeSpentInGreen);
+        System.out.println("timeSpentInRed = " + timeSpentInRed);
     }
 
     public void updateTimeTracking(LEVEL oldState, LEVEL newState) {

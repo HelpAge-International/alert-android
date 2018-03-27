@@ -188,7 +188,7 @@ public class ResponsePlanFetcher implements SynchronizedCounter.SynchronizedCoun
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             dbRef.removeEventListener(this);
-            ClockSetting clockSetting = dataSnapshot.getValue(ClockSetting.class);
+            ClockSetting clockSetting = AppUtils.getValueFromDataSnapshot(dataSnapshot, ClockSetting.class);
 
             switch (responsePlanType) {
                 case COUNTRY:

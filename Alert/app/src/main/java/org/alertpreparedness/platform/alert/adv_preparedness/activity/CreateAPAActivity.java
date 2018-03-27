@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,10 +23,15 @@ import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
+import org.alertpreparedness.platform.alert.dagger.annotation.AlertGroupObservable;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.HazardSelectionActivity;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
+import org.alertpreparedness.platform.alert.firebase.AlertModel;
+import org.alertpreparedness.platform.alert.firebase.ClockSettings;
+import org.alertpreparedness.platform.alert.firebase.TimeTrackingModel;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.ClockSettingsFetcher;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.AssignToDialogFragment;
@@ -34,13 +40,18 @@ import org.alertpreparedness.platform.alert.risk_monitoring.dialog.DepartmentDia
 import org.alertpreparedness.platform.alert.risk_monitoring.dialog.DepartmentListener;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelUserPublic;
 import org.alertpreparedness.platform.alert.risk_monitoring.view_model.AddIndicatorViewModel;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
+import org.intellij.lang.annotations.Flow;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -48,6 +59,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
 import shortbread.Shortcut;
 
 @Shortcut(id = "createAPA", icon = R.drawable.fab_add, shortLabel = "Create APA")
@@ -86,6 +98,10 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
     @CountryOfficeRef
     DatabaseReference countryRef;
 
+    @Inject
+    @AlertGroupObservable
+    Flowable<Collection<DataSnapshot>> alertFlowable;
+
     protected int mSelectedAssignPosition = 0;
     protected int mDepartmentPosition = 0;
     protected boolean needsDocument;
@@ -101,6 +117,8 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
 
     @Inject
     User user;
+
+    CompositeDisposable disposable = new CompositeDisposable();
 
     @Inject
     @AgencyObservable
@@ -296,9 +314,55 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
         apaAction.setDepartment(selectedDepartment);
         apaAction.setLevel(Constants.APA);
         apaAction.setType(Constants.CUSTOM);
-        DatabaseReference ref = baseActionRef.child(user.countryID).push();
-        ref.setValue(apaAction);
-        finish();
+
+        Flowable<ClockSettingsFetcher.ClockSettingsResult> clockSettingsFlowable = new ClockSettingsFetcher()
+                .rxFetch(ClockSettingsFetcher.TYPE_PREPAREDNESS);
+
+//        alertFlowable.subscribe(res -> {
+//            System.out.println("HEHEHEHHE res = " + res);
+//        });
+//
+//        clockSettingsFlowable.subscribe(res -> {
+//            System.out.println("HEHEHEHHE clock = " + res);
+//        });
+
+        Flowable<Pair<Set<Integer>, ClockSettingsFetcher.ClockSettingsResult>> pairs = Flowable.combineLatest(clockSettingsFlowable, alertFlowable, (clockSettingsResult, snapshots) -> {
+            System.out.println("HEHEHEHHE");
+            Set<Integer> hazards = new HashSet<>();
+            for(DataSnapshot snapshot : snapshots) {
+                AlertModel model = AppUtils.getFirebaseModelFromDataSnapshot(snapshot, AlertModel.class);
+                hazards.add(model.getHazardScenario());
+            }
+            return new Pair<>(hazards, clockSettingsResult);
+        });
+
+        pairs.subscribe(pair -> {
+            ClockSettingsFetcher.ClockSettingsResult clockSettingsResult = pair.second;
+            Set<Integer> hazards = pair.first;
+            boolean isInProgress = AppUtils.isActionInProgress(apaAction, clockSettingsResult.all().get(user.countryID));
+            boolean isActive = false;
+
+            for(Integer h : apaAction.getAssignHazard()) {
+                if(hazards.contains(h)) {
+                    isActive = true;
+                    break;
+                }
+            }
+            
+            isInProgress = isInProgress && isActive;
+            TimeTrackingModel timeTrackingModel = new TimeTrackingModel();
+            timeTrackingModel.updateActionTimeTracking(
+                    TimeTrackingModel.LEVEL.NEW,
+                    apaAction.getIsComplete(),
+                    apaAction.getIsArchived(),
+                    apaAction.getAsignee() != null,
+                    isInProgress
+            );
+            apaAction.setTimeTracking(timeTrackingModel);
+            DatabaseReference ref = baseActionRef.child(user.countryID).push();
+            ref.setValue(apaAction);
+            finish();
+        }).dispose();
     }
 
     @Override
@@ -330,4 +394,12 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
             department.setText(model.getName());
         }
     }
+
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        disposable.dispose();
+    }
+
 }

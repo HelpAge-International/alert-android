@@ -28,6 +28,8 @@ public class ActionModel extends FirebaseModel {
 
     @Exclude
     private boolean isChs;
+    @Exclude
+    private boolean hasEnoughChsInfo;
 
     public ActionModel() {
     }
@@ -253,10 +255,20 @@ public class ActionModel extends FirebaseModel {
     }
 
     public TimeTrackingModel getTimeTracking() {
-        return timeTracking;
+        return timeTracking == null ? new TimeTrackingModel() : timeTracking;
     }
 
     public void setTimeTracking(TimeTrackingModel timeTracking) {
         this.timeTracking = timeTracking;
+    }
+
+    @Exclude
+    public void setHasEnoughChsInfo(boolean hasEnoughChsInfo) {
+        this.hasEnoughChsInfo = hasEnoughChsInfo;
+    }
+
+    @Exclude
+    public boolean hasEnoughChsInfo() {
+        return hasEnoughChsInfo;
     }
 }

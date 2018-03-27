@@ -144,6 +144,7 @@ public class APActionAdapter extends RecyclerView.Adapter<APActionAdapter.ViewHo
             String oldKey = this.keys.get(index);
             this.items.remove(oldKey);
             this.keys.remove(index);
+            listener.onAdapterItemRemoved(key);
             notifyItemRemoved(index);
 
         }

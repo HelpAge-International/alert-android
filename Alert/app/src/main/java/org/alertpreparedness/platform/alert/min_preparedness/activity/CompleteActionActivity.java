@@ -26,7 +26,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 
 
@@ -39,11 +42,15 @@ import org.alertpreparedness.platform.alert.dagger.annotation.BaseNoteRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseStorageRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.DocumentRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NoteRef;
+import org.alertpreparedness.platform.alert.firebase.ActionModel;
+import org.alertpreparedness.platform.alert.firebase.TimeTrackingModel;
+import org.alertpreparedness.platform.alert.firebase.data_fetchers.ClockSettingsFetcher;
 import org.alertpreparedness.platform.alert.min_preparedness.helper.FileUtils;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Action;
 import org.alertpreparedness.platform.alert.min_preparedness.model.FileInfo;
 import org.alertpreparedness.platform.alert.min_preparedness.model.Note;
 import org.alertpreparedness.platform.alert.model.User;
+import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.NetworkFetcher;
 import org.alertpreparedness.platform.alert.utils.PreferHelper;
@@ -53,6 +60,7 @@ import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -107,6 +115,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     private static final int VIDEO_REQUEST_CODE = 104;
     public static final String PARENT_KEY = "PARENT_KEY";
     public static final String ACTION_KEY = "ACTION_KEY";
+    public static final String WRAPPER = "WRAPPER";
     private static final int IMG_REQUEST_CODE = 0;
     private DatabaseReference ref;
     private StorageReference riversRef;
@@ -280,10 +289,8 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
 
     private void saveData(String texts) {
 
-        saveNote(texts, key);
 
-        System.out.println("dbActionBaseRef.child(parentId).child(key) = " + dbActionBaseRef.child(parentId).child(key));
-//        return;
+
         for (int i = 0; i < imgList.size(); i++) {
 
             DatabaseReference newDocRef = dbActionBaseRef.child(parentId).child(key).child("documents").push();
@@ -305,6 +312,8 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
                     .addOnFailureListener(Throwable::printStackTrace);
         }
 
+        saveNote(texts, key);
+
         imgList.clear();
         editTextNote.setText("");
         simpleAdapter.notifyDataSetChanged();
@@ -318,13 +327,36 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
             Long millis = System.currentTimeMillis();
 
             Note notes = new Note(texts, millis, userID);
-
-            dbActionBaseRef.child(parentId).child(key).child("isComplete").setValue(true);
-            dbActionBaseRef.child(parentId).child(key).child("isCompleteAt").setValue(millis);
-
             dbNoteRef.child(parentId).child(key).push().setValue(notes);
 
-        } else {
+            dbActionBaseRef.child(parentId).child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    ActionModel model = AppUtils.getFirebaseModelFromDataSnapshot(dataSnapshot, ActionModel.class);
+                    model.setIsComplete(true);
+                    model.setIsCompleteAt(new Date().getTime());
+                    new ClockSettingsFetcher().rxFetch(ClockSettingsFetcher.TYPE_PREPAREDNESS).subscribe(clockSettingsResult -> {
+                        boolean isInProgress = AppUtils.isActionInProgress(model, clockSettingsResult.all().get(model.getParentId()));
+                        model.getTimeTracking().updateActionTimeTracking(
+                                TimeTrackingModel.LEVEL.AMBER,
+                                true,
+                                model.getIsArchived(),
+                                model.getAsignee() != null,
+                                isInProgress
+                        );
+                        dbActionBaseRef.child(parentId).child(key).setValue(model);
+                        finish();
+                    });
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+        }
+        else {
             SnackbarHelper.show(this, getString(R.string.txt_note_not_empty));
         }
     }
@@ -370,7 +402,6 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
             return;
         }
         saveData(notes);
-        finish();
     }
 
     @Override

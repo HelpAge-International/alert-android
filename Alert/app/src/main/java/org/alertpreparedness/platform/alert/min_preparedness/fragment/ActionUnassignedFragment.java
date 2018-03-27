@@ -155,20 +155,21 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
         this.actionID = key;
 
         SheetMenu.with(getContext()).setMenu(R.menu.menu_unassigned_mpa).setClick(menuItem -> {
-
+            ActionModel item = mUnassignedAdapter.getItem(pos);
             switch (menuItem.getItemId()) {
                 case R.id.update_date:
                     showDatePicker(key);
                     break;
                 case R.id.assign_action:
-//                    if(permissions.checkMPAActionAssign(item, getActivity())) {
-//                        if (!item.hasCHSInfo() && item.isCHS()) {
-//                            SnackbarHelper.show(getActivity(), "The action needs more information from the web portal");
-//                        } else {
-//                            dialog.show(getActivity().getFragmentManager(), "users_list");
-//                        }
-//                        break;
-//                    }
+                    if(permissions.checkMPAActionAssign(item, getActivity())) {
+                        if (!item.hasEnoughChsInfo() && item.isChs()) {
+                            SnackbarHelper.show(getActivity(), getString(R.string.more_info_chs));
+                        }
+                        else {
+                            dialog.show(getActivity().getFragmentManager(), "users_list");
+                        }
+                        break;
+                    }
                 case R.id.action_notes:
                     Intent intent = new Intent(getActivity(), AddNotesActivity.class);
                     intent.putExtra(AddNotesActivity.PARENT_ACTION_ID, parentId);
