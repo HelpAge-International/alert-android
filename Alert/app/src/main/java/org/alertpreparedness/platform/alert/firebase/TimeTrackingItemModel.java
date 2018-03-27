@@ -10,7 +10,14 @@ import java.util.ArrayList;
 public class TimeTrackingItemModel implements Serializable {
     private Long finish;
 
+    private Long level;
+
     public TimeTrackingItemModel() {
+    }
+
+    public TimeTrackingItemModel(Long finish, Long start) {
+        this.finish = finish;
+        this.start = start;
     }
 
     private Long start;
@@ -29,5 +36,13 @@ public class TimeTrackingItemModel implements Serializable {
 
     public void setStart(Long start) {
         this.start = start;
+    }
+
+    public Long getLevel() {
+        return level;
+    }
+
+    public void setLevel(Long level) {
+        this.level = level;
     }
 }

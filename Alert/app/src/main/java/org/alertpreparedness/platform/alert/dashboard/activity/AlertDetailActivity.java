@@ -6,14 +6,12 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -69,7 +67,6 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     private String mAppStatus;
     private Button btnApprove, btnReject;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
-    private UpdateAlertActivity updateAlertActivity = new UpdateAlertActivity();
 
     public static final String EXTRA_ALERT = "extra_alert";
 
@@ -96,7 +93,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
     ValueEventListener mValueListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            parseAlert(dataSnapshot);
+            parseAlert();
         }
 
         @Override
@@ -192,29 +189,30 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    private void parseAlert(DataSnapshot dataSnapshot) {
-        System.out.println("dataSnapshot = " + dataSnapshot);
-        if (dataSnapshot.child("alertLevel").getValue() != null) {
-            long alertLevel = (long) dataSnapshot.child("alertLevel").getValue();
-            String id = dataSnapshot.getKey();
+    private void parseAlert() {
+
+        if (alert.getAlertLevel() != null) {
+            long alertLevel = alert.getAlertLevel();
 
             if (alertLevel != 0) {
-                long hazardScenario = (long) dataSnapshot.child("hazardScenario").getValue();
+                long hazardScenario = alert.getHazardScenario();
 
-                if (dataSnapshot.child("timeUpdated").exists()) {
+                if (alert.getTimeUpdated() != null) {
                     if (hazardScenario != -1) {
                         fetchDetails();
-                    } else if (dataSnapshot.child("otherName").exists()) {
-                        String nameId = (String) dataSnapshot.child("otherName").getValue();
+                    }
+                    else if (alert.getOtherName() != null) {
+                        String nameId = alert.getOtherName();
 
                         setOtherName(nameId);
                     }
 
-                } else if (dataSnapshot.child("timeCreated").exists()) {
+                } else if (alert.getTimeCreated() != null) {
                     if (hazardScenario != -1) {
                         fetchDetails();
-                    } else if (dataSnapshot.child("otherName").exists()) {
-                        String nameId = (String) dataSnapshot.child("otherName").getValue();
+                    }
+                    else if (alert.getOtherName() != null) {
+                        String nameId = alert.getOtherName();
                         setOtherName(nameId);
                     }
                 }
@@ -452,6 +450,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
         if (isApproved) {
             DatabaseReference rf = baseAlertRef.child(alert.getParentKey()).child(alert.getId());
+            alert.getTimeTracking().updateAlertTimeTracking(Constants.TRIGGER_RED, Constants.TRIGGER_RED, isApproved);
             rf.setValue(alert);
             mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_APPROVED);
             mReference.child("redAlertApproved").setValue(true);

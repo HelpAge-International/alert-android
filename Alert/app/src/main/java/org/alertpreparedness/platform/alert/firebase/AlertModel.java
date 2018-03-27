@@ -1,5 +1,7 @@
 package org.alertpreparedness.platform.alert.firebase;
 
+import com.google.firebase.database.Exclude;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,7 +42,10 @@ public class AlertModel extends FirebaseModel implements Serializable {
     private String otherName;
 
     private String name;
+
     private String key;
+
+    private TimeTrackingModel timeTracking;
 
     private Boolean redAlertApproved;
 
@@ -238,5 +243,13 @@ public class AlertModel extends FirebaseModel implements Serializable {
 
     public void setRedAlertApproved(boolean redAlertApproved) {
         this.redAlertApproved = redAlertApproved;
+    }
+
+    public TimeTrackingModel getTimeTracking() {
+        return timeTracking;
+    }
+
+    public void setTimeTracking(TimeTrackingModel timeTracking) {
+        this.timeTracking = timeTracking;
     }
 }

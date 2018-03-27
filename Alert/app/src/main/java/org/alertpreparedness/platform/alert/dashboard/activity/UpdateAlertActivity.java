@@ -24,6 +24,7 @@ import org.alertpreparedness.platform.alert.utils.DBListener;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -48,6 +49,7 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
 
     @Inject
     User user;
+    private int mOrigionalLevel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +59,8 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
         if (intent.hasExtra(EXTRA_ALERT)){
             alert = (AlertModel) intent.getSerializableExtra(EXTRA_ALERT);
             mAlertLevel = alert.getAlertLevel();
+            mOrigionalLevel = mAlertLevel;
+            affectedAreas = alert.getAffectedAreas();
         }
 
         DependencyInjector.userScopeComponent().inject(this);
@@ -64,7 +68,6 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
         mToolbar.setTitle(R.string.update_alert);
         countryID = user.countryID;
 
-        System.out.println("alert = " + alert);
 
         fetchDetails();
         setUpActionBarColour();
@@ -120,27 +123,12 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
     protected void addArea(ModelIndicatorLocation location){
         if (alert == null || location == null) return;
 
-        DatabaseReference db = alertRef.child(alert.getId());
+        int level1 = location.getLevel1() == null ? -1 : location.getLevel1();
+        int level2 =location.getLevel2() == null ? -1 : location.getLevel2();
+        AffectedAreaModel affectedArea = new AffectedAreaModel(location.getCountry(),
+                level1, level2);
+        affectedAreas.add(affectedArea);
 
-        db.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()){
-                    int level1 = location.getLevel1() == null ? -1 : location.getLevel1();
-                    int level2 =location.getLevel2() == null ? -1 : location.getLevel2();
-                    AffectedAreaModel affectedArea = new AffectedAreaModel(location.getCountry(),
-                            level1, level2);
-                    db.child("affectedAreas")
-                            .child(String.valueOf(mFieldsAdapter.getSubListCapacity(3)))
-                            .setValue(affectedArea);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 
     private void fetchDetails() {
@@ -209,10 +197,10 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
 
         if(isRedAlert) {
             String reason = mFieldsAdapter.getModel(2).resultTitle;
-            update(mAlertLevel, reason, population, affectedAreas, info);
+            update(mAlertLevel, reason, population, info);
         }
         else {
-            update(mAlertLevel, null, population, affectedAreas, info);
+            update(mAlertLevel, null, population, info);
         }
     }
 
@@ -250,44 +238,22 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
         }
     }
 
-    private void update(int alertLevel, String reason, long population, List<AffectedAreaModel> areas, String info) {
+    private void update(int alertLevel, String reason, long population, String info) {
 
-        DatabaseReference db = baseAlertRef.child(alert.getParentKey()).child(alert.getId());
+        DatabaseReference alertRef = baseAlertRef.child(alert.getParentKey()).child(alert.getId());
 
-
-           db.addListenerForSingleValueEvent(new ValueEventListener() {
-               @Override
-               public void onDataChange(DataSnapshot dataSnapshot) {
-
-                   for (int i = 0; i < areas.size(); i++) {
-                       db.child("affectedAreas").child(String.valueOf(i))
-                               .setValue(areas.get(i));
-                   }
-
-                   if (reason != null) {
-                       alert.setAlertLevel(2);
-                       db.child("reasonForRedAlert").setValue(reason);
-                   }
-
-                   long time = System.currentTimeMillis();
-                   db.child("timeUpdated").setValue(time);
-
-                   db.child("infoNotes").setValue(info);
-                   db.child("estimatedPopulation").setValue(population);
-                   db.child("alertLevel").setValue(alertLevel);
-                   finishAffinity();
-                   startActivity(new Intent(UpdateAlertActivity.this, HomeScreen.class));
-                  if (dataSnapshot.child("otherName").exists()) {
-                        //TODO Fix other alert update
-                  }
-
-               }
-
-               @Override
-               public void onCancelled(DatabaseError databaseError) {
-
-               }
-           });
+        alert.setAffectedAreas(affectedAreas);
+        if(reason != null) {
+            alert.setReasonForRedAlert(reason);
+        }
+        alert.setTimeUpdated(new Date().getTime());
+        alert.setInfoNotes(info);
+        alert.setEstimatedPopulation(population);
+        alert.getTimeTracking().updateAlertTimeTracking(mOrigionalLevel, alertLevel, alert.getRedAlertApproved());
+        alert.setAlertLevel(alertLevel);
+        alertRef.setValue(alert);
+        finishAffinity();
+        startActivity(new Intent(UpdateAlertActivity.this, HomeScreen.class));
     }
 
     @Override

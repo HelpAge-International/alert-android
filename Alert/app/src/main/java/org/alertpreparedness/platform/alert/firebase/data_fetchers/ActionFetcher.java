@@ -210,9 +210,8 @@ public class ActionFetcher implements RxFirebaseDataFetcher<ActionItemWrapper> {
                     else if(model.getLevel() != null && model.getLevel() == Constants.MPA) {
                         res = true;
                     }
-                    else if(hazardTypes.get(model.getParentId()).size() > 0 && model.getLevel() != null && model.getLevel() == Constants.APA){
+                    else if(hazardTypes.get(model.getParentId()) != null && hazardTypes.get(model.getParentId()).size() > 0 && model.getLevel() != null && model.getLevel() == Constants.APA){
                         res = true;
-                        //this could be an issue. But atm it getd round the "all hazards" flag for APA's
                     }
 
                     if (res && isActive || !res && !isActive) {

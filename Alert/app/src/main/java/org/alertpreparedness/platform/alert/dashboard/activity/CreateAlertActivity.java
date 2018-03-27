@@ -23,13 +23,17 @@ import org.alertpreparedness.platform.alert.dashboard.model.AlertFieldModel;
 import org.alertpreparedness.platform.alert.firebase.AffectedAreaModel;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.firebase.ApprovalModel;
+import org.alertpreparedness.platform.alert.firebase.TimeTrackingItemModel;
+import org.alertpreparedness.platform.alert.firebase.TimeTrackingModel;
 import org.alertpreparedness.platform.alert.helper.AlertLevelDialog;
 import org.alertpreparedness.platform.alert.model.User;
 import org.alertpreparedness.platform.alert.risk_monitoring.model.ModelIndicatorLocation;
 import org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity;
+import org.alertpreparedness.platform.alert.utils.Constants;
 import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import javax.inject.Inject;
@@ -161,6 +165,30 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
         m.setApproval(approval);
         if(isRedAlert) {
             m.setReasonForRedAlert(mFieldsAdapter.getRedAlertReason());
+        }
+
+        TimeTrackingModel timeTracking = new TimeTrackingModel();
+
+        TimeTrackingItemModel timeTrackingItemModel = new TimeTrackingItemModel();
+        timeTrackingItemModel.setFinish(-1L);
+        timeTrackingItemModel.setStart(new Date().getTime());
+
+        switch (mAlertLevel) {
+            case Constants.TRIGGER_RED://grey, cant be approved yet
+                timeTracking.setTimeSpentInGrey(new ArrayList<TimeTrackingItemModel>() {{
+                    add(timeTrackingItemModel);
+                }});
+                break;
+            case Constants.TRIGGER_GREEN:
+                timeTracking.setTimeSpentInGreen(new ArrayList<TimeTrackingItemModel>() {{
+                    add(timeTrackingItemModel);
+                }});
+                break;
+            case Constants.TRIGGER_AMBER:
+                timeTracking.setTimeSpentInAmber(new ArrayList<TimeTrackingItemModel>() {{
+                    add(timeTrackingItemModel);
+                }});
+                break;
         }
 
         DatabaseReference ref = alertRef.push();

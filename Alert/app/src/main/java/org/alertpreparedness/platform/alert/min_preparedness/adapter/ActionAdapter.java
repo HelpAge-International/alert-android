@@ -171,9 +171,9 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
                     if(departmentID != null) {
                         department = (String) dataSnapshot.child("departments").child(departmentID).child("name").getValue();
                     }
-                    if(department == null) {
-                        getCountryDepartment(holder, userPublicRef, assignee, departmentID);
-                    }
+//                    if(department == null) {
+//                        getCountryDepartment(holder, userPublicRef, assignee, departmentID);
+//                    }
                     setUser(holder, userPublicRef, assignee, department);
                 }
 //                else if (assignee!=null && networkID != null && networkID.equals(user.getNetworkID())){
@@ -285,7 +285,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
                     String firstname = (String) dataSnapshot.child("firstName").getValue();
                     String lastname = (String) dataSnapshot.child("lastName").getValue();
                     String fullname = String.format("%s %s", firstname, lastname);
-                    holder.tvUserName.setText(fullname + ", " + department);
+                    holder.tvUserName.setText(department == null ? fullname : fullname + ", " + department);
                 }
 
                 @Override
