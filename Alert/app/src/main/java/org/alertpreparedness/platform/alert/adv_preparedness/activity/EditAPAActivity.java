@@ -2,8 +2,11 @@ package org.alertpreparedness.platform.alert.adv_preparedness.activity;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.RadioGroup;
 
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -25,6 +28,7 @@ import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 import javax.inject.Inject;
@@ -53,19 +57,16 @@ public class EditAPAActivity extends CreateAPAActivity implements RadioGroup.OnC
         assignTo.setFocusable(false);
         department.setFocusable(false);
         if(model.getAssignHazard() != null && model.getAssignHazard().size() > 0) {
-            mCurrentHazardType = model.getAssignHazard().get(0);
+            mCurrentHazards.addAll(Collections2.transform(model.getAssignHazard(), Constants.Hazard::getById));
+        }
+        else{
+            mCurrentHazards.addAll(Arrays.asList(Constants.Hazard.values()));
         }
         needsDocument = model.getRequireDoc();
         budget.setText(model.getBudget().toString());
         task.setText(model.getTask());
-        if(model.getAssignHazard() != null && model.getAssignHazard().size() > 0) {
-            hazard.setText(ExtensionHelperKt.getHazardTypes().get(model.getAssignHazard().get(0)));
-        }
-        else {
-            hazard.setText(R.string.all_hazards);
-        }
 
-        disposable.add(agencyObservable.subscribe(new ItemConsumer<DataSnapshot>(this::processAgency, item -> {
+        disposable.add(agencyObservable.subscribe(new ItemConsumer<>(this::processAgency, item -> {
             //not used
         })));
 
@@ -82,6 +83,9 @@ public class EditAPAActivity extends CreateAPAActivity implements RadioGroup.OnC
             }
 
         });
+        updateHazardsTextView();
+        
+
     }
 
     private void processAgency(DataSnapshot item) {
@@ -131,9 +135,12 @@ public class EditAPAActivity extends CreateAPAActivity implements RadioGroup.OnC
         model.setAsignee(assignee);
         model.setTask(task.getText().toString());
         model.setBudget(Long.valueOf(budget.getText().toString()));
-        model.setAssignHazard(new ArrayList<Integer>() {{
-            add(mCurrentHazardType);
-        }});
+
+        ArrayList<Integer> hazardIds = Lists.newArrayList(
+                Collections2.transform(mCurrentHazards, Constants.Hazard::getId)
+        );
+
+        model.setAssignHazard(mCurrentHazards.size() == Constants.Hazard.values().length ? null : hazardIds);
         model.setUpdatedAt(new Date().getTime());
         model.setRequireDoc(needsDocument);
         model.setDepartment(selectedDepartment);
