@@ -91,6 +91,7 @@ public class ActionAdapter extends RecyclerView.Adapter<ActionAdapter.ViewHolder
             String oldKey = this.keys.get(index);
             this.items.remove(oldKey);
             this.keys.remove(index);
+            listener.itemRemoved(key);
             notifyItemRemoved(index);
 
         }
