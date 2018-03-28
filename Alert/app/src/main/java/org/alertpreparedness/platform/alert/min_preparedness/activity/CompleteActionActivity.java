@@ -288,9 +288,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     }
 
     private void saveData(String texts) {
-
-
-
+        
         for (int i = 0; i < imgList.size(); i++) {
 
             DatabaseReference newDocRef = dbActionBaseRef.child(parentId).child(key).child("documents").push();
