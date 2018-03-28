@@ -109,6 +109,10 @@
             android:label="@string/select_hazard_title"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".dashboard.activity.MultiHazardSelectionActivity"
+            android:label="@string/select_hazard_title"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".dashboard.activity.AlertDetailActivity"
             android:parentActivityName=".dashboard.activity.HomeScreen"
             android:screenOrientation="portrait"

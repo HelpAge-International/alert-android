@@ -34,14 +34,14 @@
             android:padding="0dp"
             android:singleLine="false" />
 
-        <EditText
-            android:id="@+id/etHazardAssociation"
+        <TextView
+            android:id="@+id/tvHazardAssociation"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:layout_margin="@dimen/space_16"
+            style="@style/Widget.AppCompat.EditText"
             android:backgroundTint="@android:color/transparent"
             android:ems="10"
-            android:inputType="none"
             android:gravity="center_vertical"
             android:hint="@string/txt_hazard_association"
             android:padding="0dp"

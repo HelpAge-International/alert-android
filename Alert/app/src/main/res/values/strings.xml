@@ -259,4 +259,36 @@
     <string name="inactive_title">Inactive</string>
     <string name="all_hazards">All Hazards</string>
     <string name="more_info_chs">The action needs more information from the web portal</string>
+
+    <string name="hazard_cold_wave">Cold Wave</string>
+    <string name="hazard_conflict">Conflict</string>
+    <string name="hazard_cyclone">Cyclone</string>
+    <string name="hazard_drought">Drought</string>
+    <string name="hazard_earthquake">Earthquake</string>
+    <string name="hazard_epidemic">Epidemic</string>
+    <string name="hazard_fire">Fire</string>
+    <string name="hazard_flash_flood">Flash Flood</string>
+    <string name="hazard_flood">Flood</string>
+    <string name="hazard_heat_wave">Heat Wave</string>
+    <string name="hazard_heavy_rain">Heavy Rain</string>
+    <string name="hazard_humanitarian_access">Humanitarian Access</string>
+    <string name="hazard_insect_infestation">Insect Infestation</string>
+    <string name="hazard_landslide">Landslide</string>
+    <string name="hazard_locust_infestation">Locust Infestation</string>
+    <string name="hazard_mudslide">Mudslide</string>
+    <string name="hazard_population_displacement">Population Displacement</string>
+    <string name="hazard_population_return">Population Return</string>
+    <string name="hazard_snow_avalanche">Snow Avalanche</string>
+    <string name="hazard_snowfall">Snowfall</string>
+    <string name="hazard_storm">Storm</string>
+    <string name="hazard_storm_surge">Storm Surge</string>
+    <string name="hazard_technological_disaster">Technological Disaster</string>
+    <string name="hazard_tornado">Tornado</string>
+    <string name="hazard_tsunami">Tsunami</string>
+    <string name="hazard_violent_wind">Violent Wind</string>
+    <string name="hazard_volcano">Volcano</string>
+    <string name="select_all">Select All</string>
+    <string name="deselect_all">Deselect All</string>
+
+
 </resources>

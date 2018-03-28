@@ -48,7 +48,6 @@ public class HazardSelectionActivity extends AppCompatActivity implements Hazard
         return true;
     }
 
-
     @Override
     public void onHazardSelected(int position, String hazardTitle) {
         Intent data = new Intent();

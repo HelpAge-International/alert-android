@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Pair;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -13,7 +14,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,6 +31,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AlertGroupObservab
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.CountryOfficeRef;
 import org.alertpreparedness.platform.alert.dashboard.activity.HazardSelectionActivity;
+import org.alertpreparedness.platform.alert.dashboard.activity.MultiHazardSelectionActivity;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.AlertModel;
 import org.alertpreparedness.platform.alert.firebase.ClockSettings;
@@ -52,6 +57,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -71,8 +77,8 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
     @BindView(R.id.etNotes)
     EditText task;
 
-    @BindView(R.id.etHazardAssociation)
-    EditText hazard;
+    @BindView(R.id.tvHazardAssociation)
+    TextView hazard;
 
     @BindView(R.id.etDepartment)
     EditText department;
@@ -111,7 +117,7 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
     protected DepartmentDialogFragment mDepartmentFragment = new DepartmentDialogFragment();
     protected String assignee;
     public static final int HAZARD_RESULT = 9003;
-    protected int mCurrentHazardType;
+    protected List<Constants.Hazard> mCurrentHazards = new ArrayList<>();
     protected ArrayList<DepartmentModel> departments = new ArrayList<>();
     protected String selectedDepartment;
 
@@ -150,11 +156,28 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
         switch (requestCode) {
             case HAZARD_RESULT:
                 if (resultCode == RESULT_OK) {
-                    String hazardType = data.getStringExtra(HazardSelectionActivity.HAZARD_TITLE);
-                    mCurrentHazardType = data.getIntExtra(HazardSelectionActivity.HAZARD_TYPE, 0);
-                    hazard.setText(hazardType);
+                    mCurrentHazards.clear();
+                    mCurrentHazards.addAll(Collections2.transform(
+                            data.getIntegerArrayListExtra(MultiHazardSelectionActivity.HAZARDS),
+                            input -> Constants.Hazard.values()[input]
+                    ));
+
+                    updateHazardsTextView();
                 }
                 break;
+        }
+    }
+
+    protected void updateHazardsTextView() {
+        if(mCurrentHazards.size() == 0){
+            hazard.setText(null);
+        }
+        else if(mCurrentHazards.size() == Constants.Hazard.values().length){
+            hazard.setText(R.string.all_hazards);
+        }
+        else{
+            Collection<String> hazardNames = Collections2.transform(mCurrentHazards, input -> getString(input.getStringRes()));
+            hazard.setText(TextUtils.join(", ", hazardNames));
         }
     }
 
@@ -214,11 +237,15 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
         needsDocumentView.setOnCheckedChangeListener(this);
         assignTo.setFocusable(false);
         department.setFocusable(false);
+
+        updateHazardsTextView();
     }
 
-    @OnClick(R.id.etHazardAssociation)
+    @OnClick(R.id.tvHazardAssociation)
     void onHazardClick(View v) {
-        startActivityForResult(new Intent(this, HazardSelectionActivity.class), HAZARD_RESULT);
+        Intent intent = new Intent(this, MultiHazardSelectionActivity.class);
+        intent.putIntegerArrayListExtra(MultiHazardSelectionActivity.HAZARDS, Lists.newArrayList(Collections2.transform(mCurrentHazards, Constants.Hazard::getId)));
+        startActivityForResult(intent, HAZARD_RESULT);
     }
 
     @OnClick(R.id.etDepartment)
@@ -304,9 +331,11 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
         apaAction.setDueDate(new DateTime().plusWeeks(1).getMillis());
         apaAction.setTask(task.getText().toString());
         apaAction.setBudget(Long.valueOf(budget.getText().toString()));
-        apaAction.setAssignHazard(new ArrayList<Integer>() {{
-            add(mCurrentHazardType);
-        }});
+        ArrayList<Integer> hazardIds = Lists.newArrayList(
+                Collections2.transform(mCurrentHazards, Constants.Hazard::getId)
+        );
+
+        apaAction.setAssignHazard(mCurrentHazards.size() == Constants.Hazard.values().length ? null : hazardIds);
         apaAction.setCreatedAt(new Date().getTime());
         apaAction.setRequireDoc(needsDocument);
         apaAction.setDepartment(selectedDepartment);
