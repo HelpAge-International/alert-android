@@ -118,8 +118,6 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
     @Inject
     User user;
 
-    CompositeDisposable disposable = new CompositeDisposable();
-
     @Inject
     @AgencyObservable
     public Flowable<FetcherResultItem<DataSnapshot>> agencyObservable;
@@ -336,7 +334,7 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
             return new Pair<>(hazards, clockSettingsResult);
         });
 
-        pairs.subscribe(pair -> {
+        pairs.firstElement().subscribe(pair -> {
             ClockSettingsFetcher.ClockSettingsResult clockSettingsResult = pair.second;
             Set<Integer> hazards = pair.first;
             boolean isInProgress = AppUtils.isActionInProgress(apaAction, clockSettingsResult.all().get(user.countryID));
@@ -348,7 +346,7 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
                     break;
                 }
             }
-            
+
             isInProgress = isInProgress && isActive;
             TimeTrackingModel timeTrackingModel = new TimeTrackingModel();
             timeTrackingModel.updateActionTimeTracking(
@@ -362,7 +360,7 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
             DatabaseReference ref = baseActionRef.child(user.countryID).push();
             ref.setValue(apaAction);
             finish();
-        }).dispose();
+        });
     }
 
     @Override
@@ -399,7 +397,6 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
     @Override
     public void onStop() {
         super.onStop();
-        disposable.dispose();
     }
 
 }
