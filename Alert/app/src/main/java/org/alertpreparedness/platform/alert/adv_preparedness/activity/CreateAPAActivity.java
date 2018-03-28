@@ -345,20 +345,14 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
         Flowable<ClockSettingsFetcher.ClockSettingsResult> clockSettingsFlowable = new ClockSettingsFetcher()
                 .rxFetch(ClockSettingsFetcher.TYPE_PREPAREDNESS);
 
-//        alertFlowable.subscribe(res -> {
-//            System.out.println("HEHEHEHHE res = " + res);
-//        });
-//
-//        clockSettingsFlowable.subscribe(res -> {
-//            System.out.println("HEHEHEHHE clock = " + res);
-//        });
 
         Flowable<Pair<Set<Integer>, ClockSettingsFetcher.ClockSettingsResult>> pairs = Flowable.combineLatest(clockSettingsFlowable, alertFlowable, (clockSettingsResult, snapshots) -> {
-            System.out.println("HEHEHEHHE");
             Set<Integer> hazards = new HashSet<>();
             for(DataSnapshot snapshot : snapshots) {
                 AlertModel model = AppUtils.getFirebaseModelFromDataSnapshot(snapshot, AlertModel.class);
-                hazards.add(model.getHazardScenario());
+                if(model.getParentId().equals(user.countryID) && model.getAlertLevel() == Constants.TRIGGER_RED && model.getRedAlertApproved()) {
+                    hazards.add(model.getHazardScenario());
+                }
             }
             return new Pair<>(hazards, clockSettingsResult);
         });
@@ -369,14 +363,20 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
             boolean isInProgress = AppUtils.isActionInProgress(apaAction, clockSettingsResult.all().get(user.countryID));
             boolean isActive = false;
 
-            for(Integer h : apaAction.getAssignHazard()) {
-                if(hazards.contains(h)) {
-                    isActive = true;
-                    break;
+            if(apaAction.getAssignHazard() == null && hazards.size() > 0) {
+                isActive = true;
+            }
+            else {
+                for (Integer h : apaAction.getAssignHazard()) {
+                    if (hazards.contains(h)) {
+                        isActive = true;
+                        break;
+                    }
                 }
             }
 
             isInProgress = isInProgress && isActive;
+
             TimeTrackingModel timeTrackingModel = new TimeTrackingModel();
             timeTrackingModel.updateActionTimeTracking(
                     TimeTrackingModel.LEVEL.NEW,
