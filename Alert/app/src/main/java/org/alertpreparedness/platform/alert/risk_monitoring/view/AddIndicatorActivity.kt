@@ -620,10 +620,6 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         }
         mIndicatorModel.updatedAt = DateTime.now().millis
 
-        val timeTracking = TimeTrackingModel()
-        timeTracking.updateIndicatorTracking(TimeTrackingModel.LEVEL.NEW, mIndicatorModel.triggerSelected)
-        mIndicatorModel.timeTracking = timeTracking
-
         if (mIndicatorModel.validateModel().isNotEmpty()) {
             Toasty.error(this, mIndicatorModel.validateModel()).show()
             return
@@ -655,6 +651,9 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         //actual add or edit indicator
         when (mIndicatorModel.id) {
             null -> {
+                val timeTracking = TimeTrackingModel()
+                timeTracking.updateIndicatorTracking(TimeTrackingModel.LEVEL.NEW, mIndicatorModel.triggerSelected)
+                mIndicatorModel.timeTracking = timeTracking
                 pushToDatabase(mIndicatorModel)
             }
             else -> {
