@@ -41,7 +41,6 @@ class SelectAreaViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
         getSelectedCountry()
         return mSelectedCountryLive
     }
-
     fun getCountryJsonDataLive(): MutableLiveData<List<CountryJsonData>> {
         getCountryJsonData()
         return mCountryJsonDataLive
@@ -84,13 +83,15 @@ class SelectAreaViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
 
     override fun onCleared() {
         super.onCleared()
-        mDisposables.clear()
+        println("mDisposables = ${mDisposables}")
+        mDisposables.dispose()
         FirebaseAuth.getInstance().removeAuthStateListener(this)
     }
 
     override fun onAuthStateChanged(auth: FirebaseAuth) {
         if (auth.currentUser == null) {
-            mDisposables.clear()
+            mDisposables.dispose()
+
         }
     }
 

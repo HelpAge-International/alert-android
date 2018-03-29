@@ -207,27 +207,13 @@ public class UserInfo implements ValueEventListener {
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-
-        SelectAreaViewModel mViewModel = ViewModelProviders.of(activity).get(SelectAreaViewModel.class);
-
-        mViewModel.getCountryJsonDataLive().observe(() -> activity.getLifecycle(), countryJsonData -> {
-
-            if (countryJsonData != null) {
-                mCountryDataList = new ArrayList<>(countryJsonData);
-
-                if (mCountryDataList.size() == 248) {
-                    String country = Constants.COUNTRIES[((int) (long) dataSnapshot.child("location").getValue())];
-                    userObj.setCountryName(country);
-                    userObj.setCountryListId(((int) (long) dataSnapshot.child("location").getValue()));
-                    saveUser(userObj);
-                    if(authCallback != null) {
-                        authCallback.onUserAuthorized(userObj);
-                    }
-                }
-            }
-
-        });
-
+        String country = Constants.COUNTRIES[((int) (long) dataSnapshot.child("location").getValue())];
+        userObj.setCountryName(country);
+        userObj.setCountryListId(((int) (long) dataSnapshot.child("location").getValue()));
+        saveUser(userObj);
+        if(authCallback != null) {
+            authCallback.onUserAuthorized(userObj);
+        }
     }
 
     @Override
