@@ -67,6 +67,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import durdinapps.rxfirebase2.RxFirebaseStorage;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 public class CompleteActionActivity extends AppCompatActivity implements SimpleAdapter.RemoveListener, View.OnClickListener {
@@ -288,35 +289,31 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     }
 
     private void saveData(String texts) {
-
         for (int i = 0; i < imgList.size(); i++) {
-
-            DatabaseReference newDocRef = dbActionBaseRef.child(parentId).child(key).child("documents").push();
-            newDocRef.setValue(true);
 
             riversRef = mStorageRef.child("documents/" + parentId + "/" + key + "/" + imgList.get(i));
 
             riversRef.putFile(Uri.parse("file://" + pathList.get(i)))
                     .addOnSuccessListener(taskSnapshot -> {
-
                         String title = taskSnapshot.getMetadata().getName();
                         String downloadUri = taskSnapshot.getMetadata().getDownloadUrl().toString();
                         Long size = taskSnapshot.getMetadata().getSizeBytes();
                         double sizeInKb = size / KB;
                         Long time = System.currentTimeMillis();
                         FileInfo info = new FileInfo(title, downloadUri, 0L, sizeInKb, 0L, time, title, user.getUserID());
+
+                        DatabaseReference newDocRef = dbActionBaseRef.child(parentId).child(key).child("documents").push();
+                        newDocRef.setValue(true);
+
                         dbDocRef.child(parentId).child(newDocRef.getKey()).setValue(info);
                     })
                     .addOnFailureListener(Throwable::printStackTrace);
         }
-
         saveNote(texts, key);
 
         imgList.clear();
         editTextNote.setText("");
         simpleAdapter.notifyDataSetChanged();
-
-
     }
 
     public void saveNote(String texts, String key) {
