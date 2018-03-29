@@ -93,6 +93,7 @@ class RiskMonitoringService(private val context : Context) {
     fun addIndicatorToHazard(indicator: ModelIndicator, countryContext: Boolean) {
         val indicatorRef = FirebaseHelper.getIndicatorsRef(mAppStatus, if (countryContext) PreferHelper.getString(context, Constants.COUNTRY_ID) else indicator.hazardScenario.id)
         val ref = indicatorRef.push()
+        println("mIndicatorModeltriggerSelected = ${ref}")
         if (countryContext) {
             ref.setValue(indicator).continueWith {
                 ref.child("hazardScenario").setValue(ModelHazardCountryContext())

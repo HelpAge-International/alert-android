@@ -136,7 +136,11 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
                 throw IllegalArgumentException("Duration type is not valid!")
             }
         }
-        val updateMap = mutableMapOf("dueDate" to dueTime, "triggerSelected" to selection, "updatedAt" to DateTime().millis)
+
+        val timeTracking = indicator.timeTracking
+        timeTracking.updateIndicatorTracking(indicator.triggerSelected, selection)
+
+        val updateMap = mutableMapOf("dueDate" to dueTime, "triggerSelected" to selection, "updatedAt" to DateTime().millis, "timeTracking" to timeTracking)
         mDisposables.add(RiskMonitoringService(getApplication()).updateIndicator(hazardId, indicatorId, updateMap).subscribe())
     }
 

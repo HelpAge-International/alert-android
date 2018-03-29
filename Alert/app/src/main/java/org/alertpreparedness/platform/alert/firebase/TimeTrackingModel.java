@@ -3,6 +3,7 @@ package org.alertpreparedness.platform.alert.firebase;
 import com.google.firebase.database.Exclude;
 
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -149,6 +150,21 @@ public class TimeTrackingModel implements Serializable {
 
     private void updateTimeList(ArrayList<TimeTrackingItemModel> list) {
         list.add(new TimeTrackingItemModel(-1L, new Date().getTime()));
+    }
+
+    public void updateIndicatorTracking(@NotNull LEVEL level, int triggerSelected) {
+        LEVEL state = establishLevel(triggerSelected, true);
+        if(state != level) {
+            updateTimeTracking(level, state);
+        }
+    }
+
+    public void updateIndicatorTracking(int oldSelection, int triggerSelected) {
+        LEVEL state = establishLevel(triggerSelected, true);
+        LEVEL oldState = establishLevel(oldSelection, true);
+        if(state != oldState) {
+            updateTimeTracking(oldState, state);
+        }
     }
 
     @Exclude

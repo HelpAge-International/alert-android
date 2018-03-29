@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.content_add_indicator.*
 import org.alertpreparedness.platform.alert.AlertApplication
 import org.alertpreparedness.platform.alert.BaseActivity
 import org.alertpreparedness.platform.alert.R
+import org.alertpreparedness.platform.alert.firebase.TimeTrackingModel
 import org.alertpreparedness.platform.alert.risk_monitoring.adapter.AreaRVAdapter
 import org.alertpreparedness.platform.alert.risk_monitoring.adapter.OnAreaDeleteListener
 import org.alertpreparedness.platform.alert.risk_monitoring.adapter.OnSourceDeleteListener
@@ -619,6 +620,10 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         }
         mIndicatorModel.updatedAt = DateTime.now().millis
 
+        val timeTracking = TimeTrackingModel()
+        timeTracking.updateIndicatorTracking(TimeTrackingModel.LEVEL.NEW, mIndicatorModel.triggerSelected)
+        mIndicatorModel.timeTracking = timeTracking
+
         if (mIndicatorModel.validateModel().isNotEmpty()) {
             Toasty.error(this, mIndicatorModel.validateModel()).show()
             return
@@ -654,7 +659,6 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
             }
             else -> {
                 if (mHazardId != null && mIndicatorId != null) {
-                    Timber.d(mIndicatorModel.toString())
                     //three more conditions to do update based on edit status
                     when (mEditStatus) {
                         EDIT_NO_HAZARD_CHANGE -> {
