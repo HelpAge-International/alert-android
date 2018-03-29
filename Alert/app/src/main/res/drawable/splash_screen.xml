@@ -9,5 +9,4 @@
             android:gravity="center"
             android:src="@drawable/alert_logo"/>
     </item>
-
 </layer-list>
