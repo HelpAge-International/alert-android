@@ -246,6 +246,9 @@ public class AlertModel extends FirebaseModel implements Serializable {
     }
 
     public TimeTrackingModel getTimeTracking() {
+        if(timeTracking == null) {
+            timeTracking = new TimeTrackingModel();
+        }
         return timeTracking;
     }
 

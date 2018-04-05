@@ -255,7 +255,10 @@ public class ActionModel extends FirebaseModel {
     }
 
     public TimeTrackingModel getTimeTracking() {
-        return timeTracking == null ? new TimeTrackingModel() : timeTracking;
+        if(timeTracking == null) {
+            timeTracking = new TimeTrackingModel();
+        }
+        return timeTracking;
     }
 
     public void setTimeTracking(TimeTrackingModel timeTracking) {

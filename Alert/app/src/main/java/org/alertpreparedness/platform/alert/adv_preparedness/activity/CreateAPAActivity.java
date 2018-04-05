@@ -366,7 +366,7 @@ public class CreateAPAActivity extends AppCompatActivity implements RadioGroup.O
             if(apaAction.getAssignHazard() == null && hazards.size() > 0) {
                 isActive = true;
             }
-            else {
+            else if(apaAction.getAssignHazard() != null){
                 for (Integer h : apaAction.getAssignHazard()) {
                     if (hazards.contains(h)) {
                         isActive = true;

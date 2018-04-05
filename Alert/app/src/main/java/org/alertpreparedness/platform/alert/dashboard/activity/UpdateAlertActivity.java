@@ -249,6 +249,7 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
         alert.setTimeUpdated(new Date().getTime());
         alert.setInfoNotes(info);
         alert.setEstimatedPopulation(population);
+        //TODO: get timeTracking null
         alert.getTimeTracking().updateAlertTimeTracking(mOrigionalLevel, alertLevel, alert.getRedAlertApproved());
         alert.setAlertLevel(alertLevel);
         alertRef.setValue(alert);
