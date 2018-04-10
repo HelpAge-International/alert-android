@@ -133,8 +133,7 @@ public class ActionFetcher implements RxFirebaseDataFetcher<ActionItemWrapper> {
                     .map(action -> new Pair<>(chsAction, action));
         }).map(pair -> {
             if (pair.second.exists()) {
-                //TODO: The group here shouldn't be none, should correspond to the actual action group (See rxFetchActions)
-                return new FetcherResultItem<>(ActionItemWrapper.createCHS(pair.first.getValue(), pair.second, ActionItemWrapper.Group.NONE), RxFirebaseChildEvent.EventType.CHANGED);
+                return new FetcherResultItem<>(ActionItemWrapper.createCHS(pair.first.getValue(), pair.second, ActionItemWrapper.Group.COUNTRY), RxFirebaseChildEvent.EventType.CHANGED);
             }
             else {
                 return new FetcherResultItem<>(ActionItemWrapper.createCHS(pair.first.getValue()), pair.first.getEventType() == RxFirebaseChildEvent.EventType.REMOVED ? REMOVED : UPDATED);
@@ -256,21 +255,43 @@ public class ActionFetcher implements RxFirebaseDataFetcher<ActionItemWrapper> {
             flowables.add(
                     RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(user.countryID))
                             .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
-                            .map(dataSnapshots -> Collections2.filter(dataSnapshots, input -> input.child("type").getValue() != null && input.child("type").getValue(Integer.class) == type))
+                            .map(dataSnapshots -> Collections2.filter(dataSnapshots, input ->
+                            {
+                                if(type != Constants.CHS) {
+                                    return input.child("type").getValue() != null && input.child("type").getValue(Integer.class) == type;
+                                }
+                                else {
+                                    return !input.child("type").exists() || input.child("type").exists() && input.child("type").getValue(Integer.class) == type;
+                                }
+                            }))
                             .map(childrenDataSnapshotList -> Collections2.transform(childrenDataSnapshotList, item -> ActionItemWrapper.createAction(item, ActionItemWrapper.Group.COUNTRY)))
             );
 
             for (String localNetworkId : networkFetcherResult.getLocalNetworks()) {
                 flowables.add(RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(localNetworkId))
                         .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
-                        .map(dataSnapshots -> Collections2.filter(dataSnapshots, input -> input.child("type") != null && input.child("type").getValue(Integer.class) == type))
+                        .map(dataSnapshots -> Collections2.filter(dataSnapshots, input -> {
+                            if(type != Constants.CHS) {
+                                return input.child("type").getValue() != null && input.child("type").getValue(Integer.class) == type;
+                            }
+                            else {
+                                return !input.child("type").exists() || input.child("type").exists() && input.child("type").getValue(Integer.class) == type;
+                            }
+                        }))
                         .map(childrenDataSnapshotList -> Collections2.transform(childrenDataSnapshotList, item -> ActionItemWrapper.createAction(item, ActionItemWrapper.Group.LOCAL_NETWORK)))
                 );
             }
             for (String networkCountryId : networkFetcherResult.getNetworksCountries()) {
                 flowables.add(RxFirebaseDatabase.observeValueEvent(dbActionBaseRef.child(networkCountryId))
                         .map(dataSnapshot -> Lists.newArrayList(dataSnapshot.getChildren()))
-                        .map(dataSnapshots -> Collections2.filter(dataSnapshots, input -> input.child("type").getValue() != null && input.child("type").getValue(Integer.class) == type))
+                        .map(dataSnapshots -> Collections2.filter(dataSnapshots, input -> {
+                            if(type != Constants.CHS) {
+                                return input.child("type").getValue() != null && input.child("type").getValue(Integer.class) == type;
+                            }
+                            else {
+                                return !input.child("type").exists() || input.child("type").exists() && input.child("type").getValue(Integer.class) == type;
+                            }
+                        }))
                         .map(childrenDataSnapshotList -> Collections2.transform(childrenDataSnapshotList, item -> ActionItemWrapper.createAction(item, ActionItemWrapper.Group.LOCAL_NETWORK)))
                 );
             }
@@ -288,7 +309,6 @@ public class ActionFetcher implements RxFirebaseDataFetcher<ActionItemWrapper> {
                 List<ActionItemWrapper> toReturn = new ArrayList<>();
                 for(DataSnapshot chsSnapshot : chsSnapshots){
                     Optional<ActionItemWrapper> actionItemWrapperOptional = Iterables.tryFind(actionItemWrappers, input -> input.getActionSnapshot().getKey().equals(chsSnapshot.getKey()));
-
                     if(actionItemWrapperOptional.isPresent()) {
                         toReturn.add(ActionItemWrapper.createCHS(chsSnapshot, actionItemWrapperOptional.get().getActionSnapshot(), actionItemWrapperOptional.get().getGroup()));
                     }

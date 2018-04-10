@@ -117,6 +117,9 @@ public class ActionNotificationService extends JobService {
         if (actionModel != null) {
             String title;
             String content;
+
+            if(actionModel.getLevel() == null) return;
+
             if(actionModel.getLevel() == Constants.MPA) {
                 switch (notificationType) {
                     case ActionUpdateNotificationHandler.NOTIFICATION_TYPE_EXPIRED:

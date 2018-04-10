@@ -112,11 +112,23 @@ public class ActionItemWrapper {
     public ActionModel makeModel() {
         if((type == ActionType.MANDATED || type == ActionType.CHS) && actionSnapshot != null) {
             ActionModel model = AppUtils.getFirebaseModelFromDataSnapshot(actionSnapshot, ActionModel.class);
+
+            if(model.getType() == null) {
+                //handles the case when CHS actions dont have a type field in firebase
+                model.setType(Constants.CHS);
+            }
+
             model.setLevel(typeSnapshot.child("level").getValue(Integer.class));
             model.setCreatedAt(typeSnapshot.child("createdAt").getValue(Long.class));
+
+            if(actionSnapshot.child("updatedAt").exists()) {
+                model.setUpdatedAt(actionSnapshot.child("updatedAt").getValue(Long.class));
+            }
+
             if(type == ActionType.MANDATED) {
                 model.setDepartment(typeSnapshot.child("department").getValue(String.class));
             }
+
             model.setTask(typeSnapshot.child("task").getValue(String.class));
             model.setAsignee(actionSnapshot.child("asignee").getValue(String.class));
 

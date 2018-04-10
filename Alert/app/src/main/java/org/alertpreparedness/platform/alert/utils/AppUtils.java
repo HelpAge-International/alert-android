@@ -228,26 +228,30 @@ public class AppUtils {
         boolean res = false;
         if(actionModel.hasCustomClockSettings()) {
 
-            if (actionModel.getCreatedAt() != null && actionModel.getFrequencyBase() == Constants.DUE_WEEK) {
-                res = DateHelper.isInProgressWeek(actionModel.getCreatedAt(), actionModel.getFrequencyValue());
+            Long timestamp = (actionModel.getUpdatedAt() == null ? actionModel.getCreatedAt() : actionModel.getUpdatedAt());
+
+            if (timestamp != null && actionModel.getFrequencyBase() == Constants.DUE_WEEK) {
+                res = DateHelper.isInProgressWeek(timestamp, actionModel.getFrequencyValue());
             }
-            else if (actionModel.getCreatedAt() != null && actionModel.getFrequencyBase() == Constants.DUE_MONTH) {
-                res = DateHelper.isInProgressMonth(actionModel.getCreatedAt(), actionModel.getFrequencyValue());
+            else if (timestamp != null && actionModel.getFrequencyBase() == Constants.DUE_MONTH) {
+                res = DateHelper.isInProgressMonth(timestamp, actionModel.getFrequencyValue());
             }
-            else if (actionModel.getCreatedAt() != null && actionModel.getFrequencyBase() == Constants.DUE_YEAR) {
-                res = DateHelper.isInProgressYear(actionModel.getCreatedAt(), actionModel.getFrequencyValue());
+            else if (timestamp != null && actionModel.getFrequencyBase() == Constants.DUE_YEAR) {
+                res = DateHelper.isInProgressYear(timestamp, actionModel.getFrequencyValue());
             }
 
         }
         else {
-            if (clockSetting != null && actionModel.getCreatedAt() != null && clockSetting.getDurationType() == Constants.DUE_WEEK) {
-                res = DateHelper.isInProgressWeek(actionModel.getCreatedAt(), clockSetting.getValue());
+            Long timestamp = (actionModel.getUpdatedAt() == null ? actionModel.getCreatedAt() : actionModel.getUpdatedAt());
+
+            if (clockSetting != null && timestamp != null && clockSetting.getDurationType() == Constants.DUE_WEEK) {
+                res = DateHelper.isInProgressWeek(timestamp, clockSetting.getValue());
             }
-            else if (clockSetting != null && actionModel.getCreatedAt() != null && clockSetting.getDurationType() == Constants.DUE_MONTH) {
-                res = DateHelper.isInProgressMonth(actionModel.getCreatedAt(), clockSetting.getValue());
+            else if (clockSetting != null && timestamp != null && clockSetting.getDurationType() == Constants.DUE_MONTH) {
+                res = DateHelper.isInProgressMonth(timestamp, clockSetting.getValue());
             }
-            else if (clockSetting != null && actionModel.getCreatedAt() != null && clockSetting.getDurationType() == Constants.DUE_YEAR) {
-                res = DateHelper.isInProgressYear(actionModel.getCreatedAt(), clockSetting.getValue());
+            else if (clockSetting != null && timestamp != null && clockSetting.getDurationType() == Constants.DUE_YEAR) {
+                res = DateHelper.isInProgressYear(timestamp, clockSetting.getValue());
             }
         }
         return res;
