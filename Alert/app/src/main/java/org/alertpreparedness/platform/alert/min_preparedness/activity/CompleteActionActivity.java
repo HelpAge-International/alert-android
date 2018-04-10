@@ -2,6 +2,7 @@ package org.alertpreparedness.platform.alert.min_preparedness.activity;
 
 import android.content.ActivityNotFoundException;
 import android.os.Build;
+import android.os.Environment;
 import android.support.annotation.RequiresApi;
 import android.content.Context;
 import android.content.Intent;
@@ -59,6 +60,8 @@ import org.alertpreparedness.platform.alert.utils.SnackbarHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -125,6 +128,9 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
     private boolean needsDoc;
     private String parentId;
     private String key;
+    private String filename;
+    private Uri imageUri;
+    private String mCurrentPhotoPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,11 +200,21 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
         SheetMenu.with(this).setTitle("Add attachment").setMenu(R.menu.menu_add_attachment).setClick(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.take_photo:
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent, 0);
+                    try {
+                        File photoFile = createImageFile();
+                        imageUri = Uri.fromFile(photoFile);
+
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                                Uri.fromFile(photoFile));
+
+                        startActivityForResult(intent, 0);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case R.id.take_video:
-                    intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                    Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
                     startActivityForResult(intent, VIDEO_REQUEST_CODE);
                     break;
                 case R.id.select_file:
@@ -216,19 +232,10 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
 
         switch (requestCode) {
             case IMG_REQUEST_CODE:
-                Bitmap photo = (Bitmap) data.getExtras().get("data");
 
-                Uri tempUri = getImageUri(getApplicationContext(), photo);
-                System.out.println("tempUri = " + tempUri);
-
-                Action action = new Action(tempUri);
-
-                File finalFile = new File(getRealPathFromURI(action.getPath()));
+                File finalFile = new File(filename);
 
                 String path = finalFile.toString();
-                System.out.println("path = " + path);
-
-                String filename = path.substring(path.lastIndexOf("/") + 1);
 
                 pathList.add(path);
                 imgList.add(filename);
@@ -253,6 +260,23 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        filename = "file:" + image.getAbsolutePath();
+        return image;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -354,35 +378,6 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
         else {
             SnackbarHelper.show(this, getString(R.string.txt_note_not_empty));
         }
-    }
-
-
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
-    }
-
-    public String getRealPathFromURI(Uri uri) {
-        cursor = getContentResolver().query(uri, null, null, null, null);
-        cursor.moveToFirst();
-        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-        return cursor.getString(idx);
-    }
-
-    public String getFilePathFromURI(Uri uri) {
-        String result;
-        cursor = getContentResolver().query(uri, null, null, null, null);
-        if (cursor == null) { // Source is Dropbox or other similar local file path
-            result = uri.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
-            result = cursor.getString(idx);
-            cursor.close();
-        }
-        return result;
     }
 
     private void confirmActionComplete() {

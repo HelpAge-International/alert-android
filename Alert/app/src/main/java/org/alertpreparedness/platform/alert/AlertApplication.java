@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.alert;
 
 import android.app.Application;
+import android.os.StrictMode;
 import android.support.multidex.MultiDexApplication;
 import android.support.v7.app.AppCompatDelegate;
 
@@ -76,6 +77,9 @@ public class AlertApplication extends MultiDexApplication implements ValueEventL
 
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         DependencyInjector.initialize(this);
+
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
 
         FirebaseApp.initializeApp(this);
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
