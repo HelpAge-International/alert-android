@@ -375,15 +375,17 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
 
                 model.setKey(programmSnapshot.getKey());
                 model.setCountryName(mTitle1);
-                model.setLevel1Name(
-                        ExtensionHelperKt.getLevel1Values(filter.getCountry(),
-                                mCountryDataList
-                        ).get(model.getLevel1()));
+                List<String> level1Values = ExtensionHelperKt.getLevel1Values(filter.getCountry(),
+                        mCountryDataList
+                );
+                if(level1Values != null && level1Values.size() > 0) {
+                    model.setLevel1Name(level1Values.get(model.getLevel1()));
 
-                List<String> level2Values = ExtensionHelperKt.getLevel2Values(filter.getCountry(), model.getLevel1(), mCountryDataList);
+                    List<String> level2Values = ExtensionHelperKt.getLevel2Values(filter.getCountry(), model.getLevel1(), mCountryDataList);
 
-                if(model.getLevel2() != null && level2Values != null && level2Values.size() > Integer.parseInt(model.getLevel2())) {
-                    model.setLevel2Name(level2Values.get(Integer.parseInt(model.getLevel2())));
+                    if (model.getLevel2() != null && level2Values != null && level2Values.size() > Integer.parseInt(model.getLevel2())) {
+                        model.setLevel2Name(level2Values.get(Integer.parseInt(model.getLevel2())));
+                    }
                 }
 
                 boolean hasLevel1 = filter.getLevel1() != null && filter.getLevel1() != -1;

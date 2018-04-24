@@ -69,7 +69,7 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
     @ActionGroupObservable
     Flowable<Collection<ActionItemWrapper>>  actionFlowable;
 
-    CompositeDisposable disposable;
+    CompositeDisposable disposable = new CompositeDisposable();
 
     @Nullable
     @Override

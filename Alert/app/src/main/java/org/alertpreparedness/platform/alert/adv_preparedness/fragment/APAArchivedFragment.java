@@ -72,7 +72,7 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
     @ActionGroupObservable
     Flowable<Collection<ActionItemWrapper>> actionFlowable;
 
-    CompositeDisposable disposable;
+    CompositeDisposable disposable = new CompositeDisposable();
 
     @Inject
     User user;

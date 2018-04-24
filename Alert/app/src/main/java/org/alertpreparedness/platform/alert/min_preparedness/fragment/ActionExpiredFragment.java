@@ -81,7 +81,7 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
     @Inject
     User user;
 
-    CompositeDisposable disposable;
+    CompositeDisposable disposable = new CompositeDisposable();
 
     protected ActionAdapter mExpiredAdapter;
     private String actionID;

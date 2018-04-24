@@ -115,7 +115,7 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
     @ActiveActionObservable
     Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> actionFlowable;
 
-    CompositeDisposable disposable;
+    CompositeDisposable disposable = new CompositeDisposable();
 
     private APActionAdapter mAPAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();

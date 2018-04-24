@@ -94,7 +94,7 @@ public class APAInProgressFragment extends BaseAPAFragment implements APActionAd
     @Inject
     User user;
 
-    CompositeDisposable disposable;
+    CompositeDisposable disposable = new CompositeDisposable();
 
     @Inject
     PermissionsHelper permissions;

@@ -82,7 +82,7 @@ public class APACompletedFragment extends BaseAPAFragment implements APActionAda
     @Inject
     User user;
 
-    CompositeDisposable disposable;
+    CompositeDisposable disposable = new CompositeDisposable();
 
     private APActionAdapter mAPAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();

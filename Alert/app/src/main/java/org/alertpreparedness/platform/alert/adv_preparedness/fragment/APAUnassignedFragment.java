@@ -88,7 +88,7 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
     @ActiveActionObservable
     Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> actionFlowable;
 
-    CompositeDisposable disposable;
+    CompositeDisposable disposable = new CompositeDisposable();
 
     private APActionAdapter mAPAdapter;
     private UsersListDialogFragment dialog = new UsersListDialogFragment();

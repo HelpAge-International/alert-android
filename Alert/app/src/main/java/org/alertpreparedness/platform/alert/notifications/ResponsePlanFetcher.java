@@ -187,7 +187,6 @@ public class ResponsePlanFetcher implements SynchronizedCounter.SynchronizedCoun
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            dbRef.removeEventListener(this);
             ClockSetting clockSetting = AppUtils.getValueFromDataSnapshot(dataSnapshot, ClockSetting.class);
 
             switch (responsePlanType) {
@@ -197,6 +196,8 @@ public class ResponsePlanFetcher implements SynchronizedCounter.SynchronizedCoun
             }
 
             responsePlanCounter.decrement();
+            dbRef.removeEventListener(this);
+
         }
 
         @Override

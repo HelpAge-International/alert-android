@@ -137,7 +137,7 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
     @InActiveActionObservable
     Flowable<FetcherResultItem<Collection<ActionItemWrapper>>> actionFlowable;
 
-    CompositeDisposable disposable;
+    CompositeDisposable disposable = new CompositeDisposable();
 
     @Nullable
     @Override

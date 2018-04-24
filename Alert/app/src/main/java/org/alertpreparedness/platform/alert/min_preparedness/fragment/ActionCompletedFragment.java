@@ -77,7 +77,7 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
     User user;
 
     private ActionAdapter mAdapter;
-    CompositeDisposable disposable;
+    CompositeDisposable disposable = new CompositeDisposable();
     private UsersListDialogFragment dialog = new UsersListDialogFragment();
     private String actionID;
 

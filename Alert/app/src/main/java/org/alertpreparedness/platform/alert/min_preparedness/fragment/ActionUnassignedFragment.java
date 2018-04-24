@@ -91,7 +91,7 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
     @Inject
     User user;
 
-    CompositeDisposable disposable;
+    CompositeDisposable disposable = new CompositeDisposable();
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

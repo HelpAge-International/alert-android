@@ -79,7 +79,7 @@ public class InProgressFragment extends Fragment implements ActionAdapter.Action
     @ClockSettingsActionObservable
     Flowable<Collection<ActionItemWrapper>> actionFlowable;
 
-    CompositeDisposable disposable;
+    CompositeDisposable disposable = new CompositeDisposable();
 
     @Nullable
     @Override
