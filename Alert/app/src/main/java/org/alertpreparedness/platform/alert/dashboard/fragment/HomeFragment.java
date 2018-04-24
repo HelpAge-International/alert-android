@@ -236,11 +236,16 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         ViewCompat.setNestedScrollingEnabled(alertRecyclerView, false);
         ViewCompat.setNestedScrollingEnabled(myTaskRecyclerView, false);
         scroller.setOnScrollChangeListener(this);
+        initData();
+    }
+
+    private void initData() {
+        disposable = new CompositeDisposable();
 
         disposable.add(alertFlowable.subscribe(new ItemConsumer<>(
-                this::processAlert,
-                alertResultWrapper -> removeAlert(alertResultWrapper.getAlertSnapshot().getKey())
-            )
+                        this::processAlert,
+                        alertResultWrapper -> removeAlert(alertResultWrapper.getAlertSnapshot().getKey())
+                )
         ));
 
         disposable.add(indicatorFlowable.subscribe(new ItemConsumer<>(this::processTask, dataSnapshot -> {
@@ -270,9 +275,14 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         }, actionItemWrappers -> {
             //not used
         })));
+    }
 
-        System.out.println("user = " + user);
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(disposable.isDisposed()) {
+            initData();
+        }
     }
 
     @Override

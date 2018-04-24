@@ -118,11 +118,11 @@ public class ActionItemWrapper {
                 model.setType(Constants.CHS);
             }
 
-            model.setLevel(typeSnapshot.child("level").getValue(Integer.class));
-            model.setCreatedAt(typeSnapshot.child("createdAt").getValue(Long.class));
+            model.setLevel(Integer.valueOf(typeSnapshot.child("level").getValue().toString()));
+            model.setCreatedAt(Long.valueOf(typeSnapshot.child("createdAt").getValue().toString()));
 
             if(actionSnapshot.child("updatedAt").exists()) {
-                model.setUpdatedAt(actionSnapshot.child("updatedAt").getValue(Long.class));
+                model.setUpdatedAt(Long.valueOf(actionSnapshot.child("updatedAt").getValue().toString()));
             }
 
             if(type == ActionType.MANDATED) {
