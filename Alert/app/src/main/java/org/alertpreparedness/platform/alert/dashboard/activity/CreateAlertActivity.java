@@ -209,11 +209,11 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
             hasError = true;
         }
         else if(!isRedAlert && mFieldsAdapter.getModel(2).resultTitle == null) {
-            SnackbarHelper.show(this, getString(R.string.specify_peeps));
+            SnackbarHelper.show(this, getString(R.string.red_alert_specify));
             hasError = true;
         }
         else if(isRedAlert && mFieldsAdapter.getModel(3).resultTitle == null) {
-            SnackbarHelper.show(this, getString(R.string.red_alert_specify));
+            SnackbarHelper.show(this, getString(R.string.specify_peeps));
             hasError = true;
         }
         else {

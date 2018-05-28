@@ -88,6 +88,9 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
         et_emailAddress = (EditText) findViewById(R.id.email_address);
         et_password = (EditText) findViewById(R.id.password);
+        et_emailAddress.setText("ryan+alphapkertlead@rolleragency.co.uk");
+        et_password.setText("Texas123");
+
         img_eye = (ImageView) findViewById(R.id.imgEye);
         btn_login = (Button) findViewById(R.id.btnLogin);
         txt_forgotPasword = (TextView) findViewById(R.id.forgotPassword);

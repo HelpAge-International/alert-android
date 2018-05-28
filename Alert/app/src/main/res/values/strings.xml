@@ -118,10 +118,10 @@
     <string name="save_changes">Save Changes</string>
     <string name="request_red_alert">Request red alert</string>
     <string name="confirm_alert_level">Confirm alert level</string>
-    <string name="specify_hazar">Please specify a hazard type.</string>
-    <string name="specify_alert_level">Please specify alert level.</string>
-    <string name="specify_peeps">Please estimate affected population number.</string>
-    <string name="red_alert_specify">Please state reason for red alert.</string>
+    <string name="specify_hazar">Please specify a hazard type</string>
+    <string name="specify_alert_level">Please specify alert level</string>
+    <string name="specify_peeps">Please estimate affected population number</string>
+    <string name="red_alert_specify">Please state reason for red alert</string>
     <string name="specify_areas">Please specify affected area(s)</string>
     <string name="specify_info">Please state information sources</string>
     <string name="info_and_notes">Information sources and notes:</string>
