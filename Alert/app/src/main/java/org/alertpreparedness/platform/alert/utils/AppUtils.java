@@ -32,6 +32,7 @@ import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.firebase.ClockSetting;
 import org.alertpreparedness.platform.alert.firebase.FirebaseModel;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
+import org.joda.time.DateTime;
 import org.reactivestreams.Subscriber;
 
 import java.io.StringReader;
@@ -226,34 +227,18 @@ public class AppUtils {
 
     public static boolean isActionInProgress(ActionModel actionModel, ClockSetting clockSetting) {
         boolean res = false;
+        Long timestamp = 0L;
         if(actionModel.hasCustomClockSettings()) {
-
-            Long timestamp = (actionModel.getUpdatedAt() == null ? actionModel.getCreatedAt() : actionModel.getUpdatedAt());
-
-            if (timestamp != null && actionModel.getFrequencyBase() == Constants.DUE_WEEK) {
-                res = DateHelper.isInProgressWeek(timestamp, actionModel.getFrequencyValue());
-            }
-            else if (timestamp != null && actionModel.getFrequencyBase() == Constants.DUE_MONTH) {
-                res = DateHelper.isInProgressMonth(timestamp, actionModel.getFrequencyValue());
-            }
-            else if (timestamp != null && actionModel.getFrequencyBase() == Constants.DUE_YEAR) {
-                res = DateHelper.isInProgressYear(timestamp, actionModel.getFrequencyValue());
-            }
-
+            timestamp = (actionModel.getUpdatedAt() == null ? actionModel.getCreatedAt() : actionModel.getUpdatedAt());
         }
         else {
-            Long timestamp = (actionModel.getUpdatedAt() == null ? actionModel.getCreatedAt() : actionModel.getUpdatedAt());
-
-            if (clockSetting != null && timestamp != null && clockSetting.getDurationType() == Constants.DUE_WEEK) {
-                res = DateHelper.isInProgressWeek(timestamp, clockSetting.getValue());
-            }
-            else if (clockSetting != null && timestamp != null && clockSetting.getDurationType() == Constants.DUE_MONTH) {
-                res = DateHelper.isInProgressMonth(timestamp, clockSetting.getValue());
-            }
-            else if (clockSetting != null && timestamp != null && clockSetting.getDurationType() == Constants.DUE_YEAR) {
-                res = DateHelper.isInProgressYear(timestamp, clockSetting.getValue());
-            }
+            timestamp = (actionModel.getUpdatedAt() == null ? actionModel.getCreatedAt() : actionModel.getUpdatedAt());
         }
+        try {
+            res = DateHelper.clockCalculation(clockSetting.getValue(), clockSetting.getDurationType()) + timestamp >= new DateTime().getMillis();
+        }
+        catch (Exception e) {}
+
         return res;
     }
 }

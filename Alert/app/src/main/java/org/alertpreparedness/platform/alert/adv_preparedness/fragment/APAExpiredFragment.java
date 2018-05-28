@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActiveActionObservable;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.alert.adv_preparedness.adapter.APActionAdapter;
@@ -29,6 +30,7 @@ import org.alertpreparedness.platform.alert.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.NetworkRef;
+import org.alertpreparedness.platform.alert.firebase.ClockSetting;
 import org.alertpreparedness.platform.alert.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
@@ -88,6 +90,10 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
     @Inject
     @NetworkRef
     DatabaseReference networkRef;
+
+    @Inject
+    @BaseActionRef
+    DatabaseReference baseActionRef;
 
     @Inject
     @AgencyRef
@@ -235,9 +241,10 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
                 SnackbarHelper.show(getActivity(), getString(R.string.past_date_error));
             }
             else {
-                dbActionRef.child(key).child("dueDate").setValue(newDate.getMillis());//save due date in milliSec.
+                baseActionRef.child(mAPAdapter.getItem(actionID).getParentId()).child("dueDate").setValue(newDate.getMillis());//save due date in milliSec.
 
-              new ClockSettingsFetcher(((value, durationType) -> {
+                new ClockSettingsFetcher().rxFetch(ClockSettingsFetcher.TYPE_PREPAREDNESS).subscribe(clockSettingsResult -> {
+
                     Long clocker;
                     if(mAPAdapter.getItem(actionID).getFrequencyValue() != null) {
                         clocker = DateHelper.clockCalculation(
@@ -246,12 +253,12 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
                         );
                     }
                     else {
-                        clocker = DateHelper.clockCalculation(value, durationType);
+                        ClockSetting res = clockSettingsResult.all().get(mAPAdapter.getItem(actionID).getParentId());
+                        clocker = DateHelper.clockCalculation(((Integer)res.getValue()).longValue(), ((Integer)res.getDurationType()).longValue());
                     }
+                    baseActionRef.child(mAPAdapter.getItem(actionID).getParentId()).child(key).child("updatedAt").setValue(new DateTime().plusMillis(clocker.intValue()).getMillis());
 
-                    dbActionRef.child(key).child("createdAt").setValue(newDate.plusMillis(clocker.intValue()).getMillis());
-                    dbActionRef.child(key).child("updatedAt").setValue(newDate.plusMillis(clocker.intValue()).getMillis());
-                })).fetch();
+                });
             }
 
         }, year, month, day);

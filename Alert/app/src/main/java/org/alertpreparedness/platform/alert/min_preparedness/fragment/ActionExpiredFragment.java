@@ -19,12 +19,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
 import org.alertpreparedness.platform.alert.R;
+import org.alertpreparedness.platform.alert.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.alert.dagger.annotation.ClockSettingsActionObservable;
 import org.alertpreparedness.platform.alert.firebase.ActionModel;
 import org.alertpreparedness.platform.alert.adv_preparedness.fragment.UsersListDialogFragment;
 import org.alertpreparedness.platform.alert.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.alert.firebase.ClockSetting;
 import org.alertpreparedness.platform.alert.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.alert.helper.DateHelper;
 import org.alertpreparedness.platform.alert.min_preparedness.activity.AddNotesActivity;
@@ -77,6 +79,11 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
     @Inject
     @ClockSettingsActionObservable
     Flowable<Collection<ActionItemWrapper>> actionFlowable;
+
+    @Inject
+    @BaseActionRef
+    DatabaseReference baseActionRef;
+
 
     @Inject
     User user;
@@ -206,23 +213,25 @@ public class ActionExpiredFragment extends Fragment implements UsersListDialogFr
                 SnackbarHelper.show(getActivity(), getString(R.string.past_date_error));
             }
             else {
-                dbActionRef.child(key).child("dueDate").setValue(newDate.getMillis());//save due date in milliSec.
+                baseActionRef.child(mExpiredAdapter.getItem(actionID).getParentId()).child(key).child("dueDate").setValue(newDate.getMillis());//save due date in milliSec.
 
-                new ClockSettingsFetcher(((value, durationType) -> {
+                new ClockSettingsFetcher().rxFetch(ClockSettingsFetcher.TYPE_PREPAREDNESS).subscribe(clockSettingsResult -> {
+
                     Long clocker;
                     if(mExpiredAdapter.getItem(actionID).getFrequencyValue() != null) {
                         clocker = DateHelper.clockCalculation(
                                 mExpiredAdapter.getItem(actionID).getFrequencyValue().longValue(),
                                 mExpiredAdapter.getItem(actionID).getFrequencyBase().longValue()
                         );
+
                     }
                     else {
-                        clocker = DateHelper.clockCalculation(value, durationType);
+                        ClockSetting res = clockSettingsResult.all().get(mExpiredAdapter.getItem(actionID).getParentId());
+                        clocker = DateHelper.clockCalculation(((Integer)res.getValue()).longValue(), ((Integer)res.getDurationType()).longValue());
                     }
+                    baseActionRef.child(mExpiredAdapter.getItem(actionID).getParentId()).child(key).child("updatedAt").setValue(new DateTime().plusMillis(clocker.intValue()).getMillis());
 
-                    dbActionRef.child(key).child("createdAt").setValue(newDate.plusMillis(clocker.intValue()).getMillis());
-                    dbActionRef.child(key).child("updatedAt").setValue(newDate.plusMillis(clocker.intValue()).getMillis());
-                })).fetch();
+                });
             }
 
         }, year, month, day);

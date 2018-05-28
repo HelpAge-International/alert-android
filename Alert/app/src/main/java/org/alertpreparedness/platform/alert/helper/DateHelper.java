@@ -109,4 +109,19 @@ public class DateHelper {
         }
         return val;
     }
+
+    public static Long clockCalculation(int value, int durationType) {
+        Long val = (long) (1000 * 60 * 60 * 24); // Milliseconds in one day
+        val = val * value;
+        if (durationType == Constants.DUE_WEEK) {
+            val = val * 7;
+        }
+        if (durationType == Constants.DUE_MONTH) {
+            val = val * 30;
+        }
+        if (durationType == Constants.DUE_YEAR) {
+            val = val * 365;
+        }
+        return val;
+    }
 }
