@@ -125,7 +125,7 @@ public class ActionCompletedFragment extends Fragment implements UsersListDialog
             for(ActionItemWrapper wrapper : collectionFetcherResultItem) {
                 ActionModel actionModel = wrapper.makeModel();
 
-                System.out.println("actionModel = " + actionModel);
+                System.out.println("actionID+parent = " + actionModel.getId() + " " + actionModel.getParentId());
 
                 if(actionModel.getAsignee() != null
                         && actionModel.getAsignee().equals(user.getUserID())

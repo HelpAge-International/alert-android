@@ -208,7 +208,7 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
             SnackbarHelper.show(this, getString(R.string.specify_alert_level));
             hasError = true;
         }
-        else if(mFieldsAdapter.getModel(2).resultTitle == null) {
+        else if(!isRedAlert && mFieldsAdapter.getModel(2).resultTitle == null) {
             SnackbarHelper.show(this, getString(R.string.specify_peeps));
             hasError = true;
         }
@@ -219,6 +219,10 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
         else {
             if(mFieldsAdapter.getModel(getIndex(isRedAlert, 3)).strings == null || mFieldsAdapter.getModel(getIndex(isRedAlert, 3)).strings.size() == 0) {
                 SnackbarHelper.show(this, getString(R.string.specify_areas));
+                hasError = true;
+            }
+            else if(mFieldsAdapter.getModel(getIndex(isRedAlert, 1)).strings == null || mFieldsAdapter.getModel(getIndex(isRedAlert, 2)).strings.size() == 0) {
+                SnackbarHelper.show(this, getString(R.string.specify_peeps));
                 hasError = true;
             }
             else if(mFieldsAdapter.getModel(getIndex(isRedAlert, 4)).resultTitle == null) {
