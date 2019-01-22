@@ -28,7 +28,7 @@ class StaffService(private val context: Context) {
         val staffCountry = FirebaseHelper.getStaffForCountry(PreferHelper.getString(context, Constants.APP_STATUS), countryId)
         return RxFirebaseDatabase.observeValueEvent(staffCountry)
                 .map { snap ->
-                    snap.children.map { it.key }
+                    snap.children.map { it.key!! }
                 }
     }
 

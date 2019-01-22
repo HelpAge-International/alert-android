@@ -33,7 +33,7 @@ class IndicatorLogRVAdapter(private val logs: List<ModelLog>, private val contex
         return logs.size
     }
 
-    override fun onBindViewHolder(holder: LogViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: LogViewHolder, position: Int) {
         val logModel = logs[position]
         Timber.d(logModel.toString())
         logModel.apply {
@@ -58,7 +58,7 @@ class IndicatorLogRVAdapter(private val logs: List<ModelLog>, private val contex
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): LogViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogViewHolder {
         val view = View.inflate(context, R.layout.item_view_indicator_log, null)
         return LogViewHolder(view, logs, context, indicatorId, fm)
     }

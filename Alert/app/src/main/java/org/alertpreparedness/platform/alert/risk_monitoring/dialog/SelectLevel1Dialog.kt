@@ -19,8 +19,8 @@ class SelectLevel1Dialog: DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         @Suppress("UNCHECKED_CAST")
-        val countryDataList = arguments.getSerializable(SelectAreaActivity.SELECT_DIALOG_ARGS) as ArrayList<CountryJsonData>
-        val countryId = arguments.getInt(SelectAreaActivity.SELECT_LEVEL1_DIALOG_ARGS)
+        val countryDataList = arguments!!.getSerializable(SelectAreaActivity.SELECT_DIALOG_ARGS) as ArrayList<CountryJsonData>
+        val countryId = arguments!!.getInt(SelectAreaActivity.SELECT_LEVEL1_DIALOG_ARGS)
         val selectedCountry = countryDataList.first { countryJsonData -> countryJsonData.countryId == countryId }
         return AlertDialog.Builder(activity)
                 .setAdapter(ArrayAdapter<String>(activity, R.layout.simple_list_item_1, selectedCountry.levelOneValues?.map { it.value }), { dialog, position ->

@@ -34,7 +34,7 @@ class ArchivedRiskFragment : Fragment(), OnIndicatorSelectedListener {
     private var mCountryLocation = -1
 
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         mViewModel = ViewModelProviders.of(this).get(ActiveRiskViewModel::class.java)
         mViewModel.getLiveCountryModel().observe(this, Observer<ModelCountry> { country ->
@@ -53,7 +53,7 @@ class ArchivedRiskFragment : Fragment(), OnIndicatorSelectedListener {
 //            if (size > 0) {
                 pbLoadingArchived?.hide()
 //            }
-            rvRiskArchived?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, mCountryLocation, this, mapOf(), context)
+            rvRiskArchived?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, mCountryLocation, this, mapOf(), context!!)
         })
         return view
     }

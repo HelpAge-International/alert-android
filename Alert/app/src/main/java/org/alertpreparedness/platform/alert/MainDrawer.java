@@ -38,6 +38,7 @@ import org.alertpreparedness.platform.alert.risk_monitoring.view.RiskFragment;
 import org.alertpreparedness.platform.alert.settings.SettingsFragment;
 import org.alertpreparedness.platform.alert.utils.AppUtils;
 import org.alertpreparedness.platform.alert.utils.Constants;
+import org.alertpreparedness.platform.alert.v2.GlideApp;
 
 import java.util.concurrent.TimeUnit;
 
@@ -155,7 +156,7 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                 );
                 header.mDepartment.setText(res);
                 String urlPath = (String)dataSnapshot.child("logoPath").getValue();
-                Glide.with(MainDrawer.this)
+                GlideApp.with(MainDrawer.this)
                         .load(urlPath)
                         .dontAnimate()
                         .placeholder(R.drawable.agency_icon_placeholder)

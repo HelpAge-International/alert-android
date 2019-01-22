@@ -59,8 +59,8 @@ class IndicatorLogActivityFragment : Fragment() {
     }
 
     private fun initData(view: View) {
-        mIndicatorId = activity.intent.getStringExtra(IndicatorLogActivity.INDICATOR_ID)
-        mTriggerSelection = activity.intent.getIntExtra(IndicatorLogActivity.TRIGGER_SELECTION, 0)
+        mIndicatorId = activity!!.intent.getStringExtra(IndicatorLogActivity.INDICATOR_ID)
+        mTriggerSelection = activity!!.intent.getIntExtra(IndicatorLogActivity.TRIGGER_SELECTION, 0)
         mViewmodel = ViewModelProviders.of(this).get(ActiveRiskViewModel::class.java)
         mIndicatorId?.apply {
             mViewmodel.getLiveIndicatorLogs(this).observe(this@IndicatorLogActivityFragment, Observer { logs ->
@@ -68,7 +68,7 @@ class IndicatorLogActivityFragment : Fragment() {
                     val sortedList = logs.sortedWith(Comparator({first,next ->
                          return@Comparator if (first.timeStamp > next.timeStamp) -1 else 1
                     }))
-                    view.rvIndicatorLog.adapter = IndicatorLogRVAdapter(sortedList, activity, mIndicatorId as String, fragmentManager)
+                    view.rvIndicatorLog.adapter = IndicatorLogRVAdapter(sortedList, activity!!, mIndicatorId as String, fragmentManager!!)
                 }
             })
         }
@@ -77,15 +77,15 @@ class IndicatorLogActivityFragment : Fragment() {
     private fun initListeners(view: View?) {
         view?.ivIndicatorLog?.setOnClickListener {
             if (!permissions.checkCreateNote()) {
-                SnackbarHelper.show(activity, activity.getString(R.string.permission_note_create_error))
+                SnackbarHelper.show(activity!!, activity!!.getString(R.string.permission_note_create_error))
                 return@setOnClickListener
             }
             if (view.etIndicatorLog.text.isEmpty()) {
-                SnackbarHelper.show(activity, activity.getString(R.string.note_cannot_be_empty))
+                SnackbarHelper.show(activity!!, activity!!.getString(R.string.note_cannot_be_empty))
                 return@setOnClickListener
             }
             mIndicatorId?.apply {
-                val model = ModelLog(null, PreferHelper.getString(activity, Constants.UID), view.etIndicatorLog.text.toString(), DateTime().millis, mTriggerSelection)
+                val model = ModelLog(null, PreferHelper.getString(activity!!, Constants.UID), view.etIndicatorLog.text.toString(), DateTime().millis, mTriggerSelection)
                 mViewmodel.addLogToIndicator(model, mIndicatorId as String)
             }
             AppUtils.hideSoftKeyboard(context, view.etIndicatorLog)

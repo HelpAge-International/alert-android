@@ -41,7 +41,7 @@ class ActiveRiskFragment : Fragment(), OnIndicatorSelectedListener {
         val NETWORK_COUNTRY_ID = "network_country_id"
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         mViewModel = ViewModelProviders.of(this).get(ActiveRiskViewModel::class.java)
         val view = inflater?.inflate(R.layout.fragment_active_risk, container, false)
@@ -66,7 +66,7 @@ class ActiveRiskFragment : Fragment(), OnIndicatorSelectedListener {
                     pbLoading?.hide()
                 }
 
-                rvRiskActive?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, mCountryLocation, this, mNetworkCountryMap, context)
+                rvRiskActive?.adapter = HazardAdapter(it as List<ExpandableGroup<ModelIndicator>>, mCountryLocation, this, mNetworkCountryMap, context!!)
             })
         })
 

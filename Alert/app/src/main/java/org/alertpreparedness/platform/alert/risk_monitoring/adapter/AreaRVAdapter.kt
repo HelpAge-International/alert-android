@@ -22,10 +22,10 @@ class AreaRVAdapter(private val areas: MutableList<ModelIndicatorLocation>, priv
 
     private var listener: OnAreaDeleteListener? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): AreaViewHolder =
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AreaViewHolder =
             AreaViewHolder(View.inflate(context, R.layout.area_item_view, null), listener)
 
-    override fun onBindViewHolder(holder: AreaViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: AreaViewHolder, position: Int) {
         with(areas[position]) {
             holder?.tvAreaName?.text = String.format("%s %s %s", Constants.COUNTRIES[this.country],
                     if (this.level1 != -1) this.level1?.let { ", "+countryDataList[this.country as Int].levelOneValues?.get(it)?.value } else "",

@@ -25,9 +25,9 @@ class AssignToDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): AlertDialog {
         if (arguments != null) {
-            defaultPosition = arguments.getInt(AddIndicatorActivity.ASSIGN_POSITION)
-            if (arguments.getSerializable(AddIndicatorActivity.STAFF_SELECTION) != null) {
-                mStaff = arguments.getSerializable(AddIndicatorActivity.STAFF_SELECTION) as ArrayList<ModelUserPublic>
+            defaultPosition = arguments!!.getInt(AddIndicatorActivity.ASSIGN_POSITION)
+            if (arguments!!.getSerializable(AddIndicatorActivity.STAFF_SELECTION) != null) {
+                mStaff = arguments!!.getSerializable(AddIndicatorActivity.STAFF_SELECTION) as ArrayList<ModelUserPublic>
                 if (mStaff?.first()?.firstName != "Unassigned") {
                     mStaff!!.add(0, ModelUserPublic(firstName = "Unassigned"))
                 }

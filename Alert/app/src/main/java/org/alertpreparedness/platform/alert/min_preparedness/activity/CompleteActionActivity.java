@@ -320,7 +320,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
             riversRef.putFile(Uri.parse("file://" + pathList.get(i)))
                     .addOnSuccessListener(taskSnapshot -> {
                         String title = taskSnapshot.getMetadata().getName();
-                        String downloadUri = taskSnapshot.getMetadata().getDownloadUrl().toString();
+                        String downloadUri = taskSnapshot.getMetadata().getReference().getDownloadUrl().toString();
                         Long size = taskSnapshot.getMetadata().getSizeBytes();
                         double sizeInKb = size / KB;
                         Long time = System.currentTimeMillis();

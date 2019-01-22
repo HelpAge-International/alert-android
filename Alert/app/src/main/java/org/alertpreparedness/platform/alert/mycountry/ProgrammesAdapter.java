@@ -18,6 +18,7 @@ import org.alertpreparedness.platform.alert.ExtensionHelperKt;
 import org.alertpreparedness.platform.alert.R;
 import org.alertpreparedness.platform.alert.dagger.DependencyInjector;
 import org.alertpreparedness.platform.alert.firebase.ProgrammeModel;
+import org.alertpreparedness.platform.alert.v2.GlideApp;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -127,7 +128,7 @@ public class ProgrammesAdapter extends ExpandableRecyclerViewAdapter<ProgrammesA
         public void bind(ExpandableGroup group) {
             ProgrammeInfo info = (ProgrammeInfo)group;
             title.setText(group.getTitle());
-            Glide.with(context)
+            GlideApp.with(context)
                     .load(info.getAgency().getLogoPath())
                     .placeholder(R.drawable.agency_icon_placeholder)
                     .into(icon);

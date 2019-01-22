@@ -29,11 +29,11 @@ class ShowInformationSourceDialog : DialogFragment() {
     private lateinit var mIndicatorModel: ModelIndicator
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        mIndicatorModel = arguments[BottomSheetDialog.INDICATOR_MODEL] as ModelIndicator
+        mIndicatorModel = arguments!![BottomSheetDialog.INDICATOR_MODEL] as ModelIndicator
         mSources = mIndicatorModel.source
         val view = View.inflate(activity, R.layout.show_information_source_item, null)
-        mAdapter = InfoSourceAdapter(activity, mSources)
-        return AlertDialog.Builder(activity)
+        mAdapter = InfoSourceAdapter(activity!!, mSources)
+        return AlertDialog.Builder(activity!!)
                 .setTitle("Information sources")
                 .setAdapter(mAdapter, { _, position ->
                     Timber.d("position: %s", mSources[position].toString())
@@ -41,7 +41,7 @@ class ShowInformationSourceDialog : DialogFragment() {
                     if (clickedSource.link != null && android.util.Patterns.WEB_URL.matcher(clickedSource.link).matches()) {
                         val url = if (clickedSource.link.startsWith("http://") || clickedSource.link.startsWith("https://")) clickedSource.link else "http://" + clickedSource.link
                         if (!browse(url, true)) {
-                            Toasty.warning(activity, "No activity can handle browse web url", Toast.LENGTH_LONG).show()
+                            Toasty.warning(activity!!, "No activity can handle browse web url", Toast.LENGTH_LONG).show()
                         }
                     }
                 })

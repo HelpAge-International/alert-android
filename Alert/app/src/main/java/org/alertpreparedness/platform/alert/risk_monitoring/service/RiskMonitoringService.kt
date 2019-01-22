@@ -198,7 +198,7 @@ class RiskMonitoringService(private val context : Context) {
     fun addLogToIndicator(log: ModelLog, indicatorId: String) {
         val logRef = FirebaseHelper.getIndicatorLogRef(mAppStatus, indicatorId)
         val key = logRef.push().key
-        logRef.child(key).setValue(log)
+        logRef.child(key!!).setValue(log)
     }
 
     fun updateLogContent(indicatorId: String, logId: String, content: String) {

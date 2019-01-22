@@ -21,7 +21,7 @@ class LocationSelectionDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         if (arguments != null) {
-            mPosition = arguments.getInt(AddIndicatorActivity.SELECTED_LOCATION)
+            mPosition = arguments!!.getInt(AddIndicatorActivity.SELECTED_LOCATION)
         }
 
         return AlertDialog.Builder(activity)

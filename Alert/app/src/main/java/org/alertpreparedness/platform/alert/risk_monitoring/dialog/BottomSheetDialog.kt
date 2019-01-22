@@ -68,17 +68,17 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
     private fun initData() {
         mCountryId = PreferHelper.getString(context, Constants.COUNTRY_ID)
 
-        if (arguments.containsKey(ActiveRiskFragment.HAZARD_ID)) {
-            mHazardId = arguments.get(ActiveRiskFragment.HAZARD_ID) as String
+        if (arguments!!.containsKey(ActiveRiskFragment.HAZARD_ID)) {
+            mHazardId = arguments!!.get(ActiveRiskFragment.HAZARD_ID) as String
         }
-        if (arguments.containsKey(ActiveRiskFragment.INDICATOR_ID)) {
-            mIndicatorId = arguments.get(ActiveRiskFragment.INDICATOR_ID) as String
+        if (arguments!!.containsKey(ActiveRiskFragment.INDICATOR_ID)) {
+            mIndicatorId = arguments!!.get(ActiveRiskFragment.INDICATOR_ID) as String
         }
-        if (arguments.containsKey(ActiveRiskFragment.NETWORK_ID)) {
-            mNetworkId = arguments.get(ActiveRiskFragment.NETWORK_ID) as String
+        if (arguments!!.containsKey(ActiveRiskFragment.NETWORK_ID)) {
+            mNetworkId = arguments!!.get(ActiveRiskFragment.NETWORK_ID) as String
         }
-        if (arguments.containsKey(ActiveRiskFragment.NETWORK_COUNTRY_ID)) {
-            mNetworkCountryId = arguments.get(ActiveRiskFragment.NETWORK_COUNTRY_ID) as String
+        if (arguments!!.containsKey(ActiveRiskFragment.NETWORK_COUNTRY_ID)) {
+            mNetworkCountryId = arguments!!.get(ActiveRiskFragment.NETWORK_COUNTRY_ID) as String
         }
 
         mViewModel = ViewModelProviders.of(this).get(ActiveRiskViewModel::class.java)
@@ -115,27 +115,27 @@ class BottomSheetDialog : BottomSheetDialogFragment() {
                 showInfoDialog.show(fragmentManager, "show_info_source_dialog")
                 dismiss()
             } else {
-                Toasty.error(activity, "No hazard id or indicator id!").show()
+                Toasty.error(context!!, "No hazard id or indicator id!").show()
             }
         }
 
         view.llUpdateIndicator.setOnClickListener {
             Timber.d("update clicked")
             dismiss()
-            UpdateIndicatorActivity.startActivity(activity, mHazardId, mIndicatorId)
+            UpdateIndicatorActivity.startActivity(context!!, mHazardId, mIndicatorId)
         }
 
         view.llIndicatorLog.setOnClickListener {
             Timber.d("start log activity with id: %s", mIndicatorId)
             dismiss()
             if(permissions.checkEditIndicator(activity)) {
-                IndicatorLogActivity.startActivity(activity, mIndicatorId, mIndicatorModel.triggerSelected)
+                IndicatorLogActivity.startActivity(context!!, mIndicatorId, mIndicatorModel.triggerSelected)
             }
         }
 
         view.llEditIndicator.setOnClickListener {
             dismiss()
-            AddIndicatorActivity.startActivityWithValues(activity, mHazardId, mIndicatorId, mNetworkId, mNetworkCountryId)
+            AddIndicatorActivity.startActivityWithValues(context!!, mHazardId, mIndicatorId, mNetworkId, mNetworkCountryId)
         }
     }
 

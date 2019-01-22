@@ -18,7 +18,7 @@ class SelectCountryDialog: DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         @Suppress("UNCHECKED_CAST")
-        val countryDataList = arguments.getSerializable(SelectAreaActivity.SELECT_DIALOG_ARGS) as ArrayList<CountryJsonData>
+        val countryDataList = arguments!!.getSerializable(SelectAreaActivity.SELECT_DIALOG_ARGS) as ArrayList<CountryJsonData>
         return AlertDialog.Builder(activity)
                 .setAdapter(ArrayAdapter<String>(activity, android.R.layout.simple_list_item_1, countryDataList.map { Constants.COUNTRIES[it.countryId.toInt()] }), { dialog, position ->
                     mListener?.selectedCountry(countryDataList[position])

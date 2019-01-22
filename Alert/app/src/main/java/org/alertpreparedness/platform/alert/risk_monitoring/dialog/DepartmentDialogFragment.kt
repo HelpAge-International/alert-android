@@ -26,9 +26,9 @@ class DepartmentDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): AlertDialog {
         if (arguments != null) {
-            defaultPosition = arguments.getInt(AddIndicatorActivity.ASSIGN_POSITION)
-            if (arguments.getSerializable(AddIndicatorActivity.STAFF_SELECTION) != null) {
-                mStaff = arguments.getSerializable(AddIndicatorActivity.STAFF_SELECTION) as ArrayList<DepartmentModel>
+            defaultPosition = arguments!!.getInt(AddIndicatorActivity.ASSIGN_POSITION)
+            if (arguments!!.getSerializable(AddIndicatorActivity.STAFF_SELECTION) != null) {
+                mStaff = arguments!!.getSerializable(AddIndicatorActivity.STAFF_SELECTION) as ArrayList<DepartmentModel>
 //                if (mStaff?.first()?.name != "Unassigned") {
 //                    mStaff!!.add(0, ModelUserPublic(firstName = "Unassigned"))
 //                }

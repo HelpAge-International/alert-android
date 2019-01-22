@@ -24,7 +24,7 @@ class RiskFragment : Fragment() {
     @Inject
     lateinit var permissions : PermissionsHelper
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         DependencyInjector.userScopeComponent().inject(this)
 
@@ -36,7 +36,7 @@ class RiskFragment : Fragment() {
         return v
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView()
         initListeners()
@@ -49,18 +49,16 @@ class RiskFragment : Fragment() {
     }
 
     private fun initView() {
-
-
-
         fabRiskMenu.setClosedOnTouchOutside(true)
 
         tlRisk.addTab(tlRisk.newTab())
         tlRisk.addTab(tlRisk.newTab())
         tlRisk.setupWithViewPager(vpRisk)
 
-        val pagerAdapter = RiskPagerAdapter(activity.supportFragmentManager, tlRisk.tabCount, activity)
+        val pagerAdapter = RiskPagerAdapter(activity!!.supportFragmentManager, tlRisk.tabCount, activity!!)
         vpRisk.adapter = pagerAdapter
     }
+
 
     private fun initListeners() {
 

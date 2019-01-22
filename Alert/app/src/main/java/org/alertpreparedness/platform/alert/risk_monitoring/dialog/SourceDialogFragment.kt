@@ -34,7 +34,7 @@ class SourceDialogFragment: DialogFragment() {
                         AppUtils.hideSoftKeyboard(activity, view)
                         val source = ModelSource(etName.text.toString(), etSource.text.toString())
                         if (!source.validateModel()) {
-                            Toasty.error(activity, "Source name can not be empty").show()
+                            Toasty.error(activity!!, "Source name can not be empty").show()
                             return@run
                         }
                         listener?.getCreatedSource(source)

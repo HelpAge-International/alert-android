@@ -27,9 +27,9 @@ class EditLogDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val content = arguments.getString(LOG_CONTENT) ?: ""
-        val logId = arguments.getString(LOG_ID) ?: ""
-        val indicatorId = arguments.getString(INDICATOR_ID) ?: ""
+        val content = arguments!!.getString(LOG_CONTENT) ?: ""
+        val logId = arguments!!.getString(LOG_ID) ?: ""
+        val indicatorId = arguments!!.getString(INDICATOR_ID) ?: ""
         Timber.d("indicator id: %s, log id: %s, log content: %s", indicatorId, logId, content)
         val view = View.inflate(activity, R.layout.dialog_edit_log, null)
         view.etEditLog.setText(content)
@@ -40,7 +40,7 @@ class EditLogDialog : DialogFragment() {
                 .setPositiveButton(getString(R.string.save), { _, _ ->
                     if (indicatorId.isNotEmpty() && logId.isNotEmpty() && content.isNotEmpty()) {
                         Timber.d("start updating log content*****************")
-                        RiskMonitoringService(activity).updateLogContent(indicatorId, logId, view.etEditLog.text.toString())
+                        RiskMonitoringService(context!!).updateLogContent(indicatorId, logId, view.etEditLog.text.toString())
                     }
                 })
                 .create()

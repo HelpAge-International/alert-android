@@ -23,7 +23,7 @@ class NetworkService(context : Context) {
         return RxFirebaseDatabase.observeValueEvent(networkMapRef, { snap ->
             val networkMap = mutableMapOf<String, String>()
             snap.children.forEach {
-                networkMap[it.key] = JSONObject(it.value.toString()).get("networkCountryId").toString()
+                networkMap[it.key!!] = JSONObject(it.value.toString()).get("networkCountryId").toString()
             }
             return@observeValueEvent networkMap
         })
@@ -32,7 +32,7 @@ class NetworkService(context : Context) {
     fun listLocalNetworksForCountry(agencyId: String, countryId: String): Flowable<List<String>> {
         val localNetworkRef = FirebaseHelper.getLocalNetworkRef(mAppStatus, agencyId, countryId)
         return RxFirebaseDatabase.observeValueEvent(localNetworkRef, {snap ->
-            snap.children.map { it.key }
+            snap.children.map { it.key!! }
         })
     }
 

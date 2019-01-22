@@ -27,7 +27,7 @@ public class NotificationSettingsListener implements ValueEventListener {
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        List<Integer> notificationSettings = dataSnapshot.getValue(new GenericTypeIndicator<List<Integer>>());
+        List<Integer> notificationSettings = dataSnapshot.getValue(new GenericTypeIndicator<List<Integer>>() {});
 
         if(notificationSettings != null && notificationSettings.contains(notificationSetting)){
             //Enabled

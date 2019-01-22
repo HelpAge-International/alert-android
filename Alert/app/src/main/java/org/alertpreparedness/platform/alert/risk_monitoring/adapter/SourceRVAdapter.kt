@@ -25,11 +25,11 @@ class SourceRVAdapter(private val sources: MutableList<ModelSource>, private val
         return sources.size
     }
 
-    override fun onBindViewHolder(holder: SourceViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: SourceViewHolder, position: Int) {
         holder?.tvSourceName?.text = sources[position].name
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): SourceViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SourceViewHolder {
         return SourceViewHolder(View.inflate(context, R.layout.source_item_view, null), listener)
     }
 
