@@ -1,7 +1,7 @@
 package org.alertpreparedness.platform.v1.utils;
 
 import android.app.Activity;
-import android.support.design.widget.Snackbar;
+import com.google.android.material.snackbar.Snackbar;
 
 /**
  * Created by Tj on 29/11/2017.

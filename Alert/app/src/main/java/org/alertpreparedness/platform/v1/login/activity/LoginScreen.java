@@ -6,9 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
 import android.view.View;
@@ -31,6 +31,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.alertpreparedness.platform.v1.AlertApplication;
+import org.alertpreparedness.platform.v1.BuildConfig;
 import org.alertpreparedness.platform.v1.R;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dashboard.activity.HomeScreen;
@@ -77,8 +78,10 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
 
         et_emailAddress = (EditText) findViewById(R.id.email_address);
         et_password = (EditText) findViewById(R.id.password);
-        et_emailAddress.setText("AUERTL1GAgM1@mailinator.com");
-        et_password.setText("testtest1");
+        if(BuildConfig.DEBUG) {
+            et_emailAddress.setText("ryan+ukertlead@rolleragency.co.uk");
+            et_password.setText("Texas123");
+        }
 
         img_eye = (ImageView) findViewById(R.id.imgEye);
         btn_login = (Button) findViewById(R.id.btnLogin);

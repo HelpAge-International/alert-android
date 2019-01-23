@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <android.support.v4.widget.NestedScrollView
+        <androidx.core.widget.NestedScrollView
             android:layout_below="@+id/toolbar_layout"
             android:id="@+id/scroller"
             android:layout_width="match_parent"
@@ -61,7 +61,7 @@
                     android:textAlignment="center"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:layout_below="@+id/tvResultsFor"
                     android:paddingBottom="30dp"
                     android:clipToPadding="false"
@@ -70,10 +70,10 @@
                     android:layout_height="wrap_content"/>
             </RelativeLayout>
 
-        </android.support.v4.widget.NestedScrollView>
+        </androidx.core.widget.NestedScrollView>
 
 <!--must be at the bottom-->
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:layout_below="@+id/toolbar_layout"
             android:background="@android:color/transparent"
             app:cardCornerRadius="0dp"
@@ -89,7 +89,7 @@
                 android:layout_height="wrap_content">
 
                 <!-- parent RevealLinearLayout needed for pre-lollipop support-->
-                <android.support.v7.widget.CardView
+                <androidx.cardview.widget.CardView
                     app:cardCornerRadius="0dp"
                     android:visibility="invisible"
                     android:id="@+id/cvReveal"
@@ -100,10 +100,10 @@
                         layout="@layout/reveal_menu"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
-                </android.support.v7.widget.CardView>
+                </androidx.cardview.widget.CardView>
             </io.codetail.widget.RevealLinearLayout>
 
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
     </RelativeLayout>
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -34,7 +34,7 @@
             android:layout_height="1dp"
             android:background="@color/divider_color"/>
 
-        <android.support.v7.widget.AppCompatEditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/tvAddIndicatorName"
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -53,7 +53,7 @@
             android:layout_height="1dp"
             android:background="@color/divider_color"/>
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvSources"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
@@ -88,7 +88,7 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <android.support.v7.widget.AppCompatEditText
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/tvIndicatorGreenName"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
@@ -130,7 +130,7 @@
                         android:layout_height="match_parent"
                         android:background="@color/divider_color"/>
 
-                    <android.support.v7.widget.AppCompatEditText
+                    <androidx.appcompat.widget.AppCompatEditText
                         android:id="@+id/etIndicatorGreenValue"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
@@ -190,7 +190,7 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <android.support.v7.widget.AppCompatEditText
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/tvIndicatorAmberName"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
@@ -232,7 +232,7 @@
                         android:layout_height="match_parent"
                         android:background="@color/divider_color"/>
 
-                    <android.support.v7.widget.AppCompatEditText
+                    <androidx.appcompat.widget.AppCompatEditText
                         android:id="@+id/etIndicatorAmberValue"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
@@ -292,7 +292,7 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <android.support.v7.widget.AppCompatEditText
+                <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/tvIndicatorRedName"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
@@ -334,7 +334,7 @@
                         android:layout_height="match_parent"
                         android:background="@color/divider_color"/>
 
-                    <android.support.v7.widget.AppCompatEditText
+                    <androidx.appcompat.widget.AppCompatEditText
                         android:id="@+id/etIndicatorRedValue"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
@@ -442,7 +442,7 @@
             android:layout_height="1dp"
             android:background="@color/divider_color"/>
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvLocationSubNational"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -464,4 +464,4 @@
     </LinearLayout>
 
 
-</android.support.v4.widget.NestedScrollView>
+</androidx.core.widget.NestedScrollView>

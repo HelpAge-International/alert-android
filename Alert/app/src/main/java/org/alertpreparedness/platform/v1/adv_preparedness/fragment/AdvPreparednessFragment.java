@@ -2,14 +2,16 @@ package org.alertpreparedness.platform.v1.adv_preparedness.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.ViewPager;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.alertpreparedness.platform.v1.MainDrawer;
 import org.alertpreparedness.platform.v1.R;
@@ -32,7 +34,7 @@ public class AdvPreparednessFragment extends Fragment implements View.OnClickLis
     ViewPager mPager;
 
     @BindView(R.id.fabAddAPA)
-    public android.support.design.widget.FloatingActionButton fabCreateAPA;
+    public FloatingActionButton fabCreateAPA;
 
     @Inject
     PermissionsHelper permissions;

@@ -3,7 +3,7 @@ package org.alertpreparedness.platform.v1.notifications;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 
 import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;

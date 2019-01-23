@@ -2,8 +2,8 @@ package org.alertpreparedness.platform.v1.dashboard.activity;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import org.alertpreparedness.platform.v1.MainDrawer;
 import org.alertpreparedness.platform.v1.adv_preparedness.fragment.AdvPreparednessFragment;

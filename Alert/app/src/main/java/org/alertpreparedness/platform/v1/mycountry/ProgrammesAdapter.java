@@ -17,7 +17,7 @@ import org.alertpreparedness.platform.v1.ExtensionHelperKt;
 import org.alertpreparedness.platform.v1.R;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.firebase.ProgrammeModel;
-import org.alertpreparedness.platform.v1.v2.GlideApp;
+import org.alertpreparedness.platform.v2.utils.GlideApp;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

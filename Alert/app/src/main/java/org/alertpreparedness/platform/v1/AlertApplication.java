@@ -1,8 +1,8 @@
 package org.alertpreparedness.platform.v1;
 
 import android.os.StrictMode;
-import android.support.multidex.MultiDexApplication;
-import android.support.v7.app.AppCompatDelegate;
+import androidx.multidex.MultiDexApplication;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.crashlytics.android.Crashlytics;
 import com.evernote.android.job.JobManager;
@@ -55,7 +55,7 @@ public class AlertApplication extends MultiDexApplication implements ValueEventL
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.UAT;
+    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING;
 
     @Override
     public void onCreate() {

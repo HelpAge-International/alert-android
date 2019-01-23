@@ -10,7 +10,7 @@
     tools:context="org.alertpreparedness.platform.v1.risk_monitoring.view.IndicatorLogActivityFragment"
     tools:showIn="@layout/activity_indicator_log">
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvIndicatorLog"
         android:layout_width="match_parent"
         android:layout_height="0dp"

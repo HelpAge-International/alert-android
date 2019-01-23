@@ -1,8 +1,8 @@
 package org.alertpreparedness.platform.v1.risk_monitoring.view_model
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import io.reactivex.android.schedulers.AndroidSchedulers

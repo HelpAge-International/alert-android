@@ -13,14 +13,14 @@
         android:visibility="gone"
         android:text="@string/no_indicators_have_been_added"/>
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:paddingBottom="85dp"
         android:clipToPadding="false"
         android:id="@+id/rvRiskActive"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <android.support.v4.widget.ContentLoadingProgressBar
+    <androidx.core.widget.ContentLoadingProgressBar
         android:id="@+id/pbLoading"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"

@@ -16,7 +16,7 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
 
     <application
-        android:name=".v1.AlertApplication"
+        android:name="AlertApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -27,36 +27,36 @@
         android:theme="@style/AppTheme">
         <service
             android:exported="false"
-            android:name=".v1.offline.SyncJobService">
+            android:name="offline.SyncJobService">
             <intent-filter>
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
             </intent-filter>
         </service>
         <service
             android:exported="false"
-            android:name=".v1.notifications.IndicatorNotificationService">
+            android:name=".notifications.IndicatorNotificationService">
         </service>
         <service
             android:exported="false"
-            android:name=".v1.notifications.ActionNotificationService">
+            android:name=".notifications.ActionNotificationService">
         </service>
 
         <service
-            android:name=".v1.notifications.AlertFirebaseMessagingService">
+            android:name=".notifications.AlertFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
 
         <service
-            android:name=".v1.notifications.AlertFirebaseInstanceIDService">
+            android:name=".notifications.AlertFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </service>
 
         <activity
-            android:name=".v1.login.activity.SplashActivity"
+            android:name=".login.activity.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>
@@ -66,11 +66,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".v1.login.activity.LoginScreen"
+            android:name=".login.activity.LoginScreen"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".v1.dashboard.activity.HomeScreen"
+            android:name=".dashboard.activity.HomeScreen"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
 
@@ -82,7 +82,7 @@
 
         <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
 
-        <activity android:name=".v1.MainDrawer" />
+        <activity android:name=".MainDrawer" />
         <!-- <activity -->
         <!-- android:name=".risk_monitoring.vRiskFragmentvity" -->
         <!-- android:label="@string/title_activity_risk" -->
@@ -90,81 +90,81 @@
         <!-- android:screenOrientation="portrait" -->
         <!-- android:theme="@style/AppTheme.NoActionBar" /> -->
         <activity
-            android:name=".v1.risk_monitoring.view.AddIndicatorActivity"
+            android:name=".risk_monitoring.view.AddIndicatorActivity"
             android:label="@string/title_activity_add_indicator"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".v1.risk_monitoring.view.SelectAreaActivity"
+            android:name=".risk_monitoring.view.SelectAreaActivity"
             android:label="@string/title_activity_select_area"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".v1.dashboard.activity.CreateAlertActivity"
+            android:name=".dashboard.activity.CreateAlertActivity"
             android:label="@string/title_activity_create_alert"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".v1.dashboard.activity.HazardSelectionActivity"
+            android:name=".dashboard.activity.HazardSelectionActivity"
             android:label="@string/select_hazard_title"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".v1.dashboard.activity.MultiHazardSelectionActivity"
+            android:name=".dashboard.activity.MultiHazardSelectionActivity"
             android:label="@string/select_hazard_title"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".v1.dashboard.activity.AlertDetailActivity"
-            android:parentActivityName=".v1.dashboard.activity.HomeScreen"
+            android:name=".dashboard.activity.AlertDetailActivity"
+            android:parentActivityName="dashboard.activity.HomeScreen"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
+            android:name=".android.support.PARENT_ACTIVITY"
             android:theme="@style/AppTheme.NoActionBar"
-            android:value=".v1.dashboard.activity.HomeScreen" />
+            android:value="dashboard.activity.HomeScreen" />
 
         <activity
-            android:name=".v1.risk_monitoring.view.UpdateIndicatorActivity"
+            android:name=".risk_monitoring.view.UpdateIndicatorActivity"
             android:label="@string/title_activity_update_indicator"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".v1.risk_monitoring.view.LogIndicatorActivity"
+            android:name=".risk_monitoring.view.LogIndicatorActivity"
             android:label="@string/title_activity_log_indicator"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".v1.risk_monitoring.view.IndicatorLogActivity"
+            android:name=".risk_monitoring.view.IndicatorLogActivity"
             android:label="@string/title_activity_indicator_log"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".v1.dashboard.activity.UpdateAlertActivity"
+            android:name=".dashboard.activity.UpdateAlertActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".v1.mycountry.ProgramResultsActivity"
+            android:name=".mycountry.ProgramResultsActivity"
             android:label="@string/progrmme_results"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".v1.settings.ChangeEmailActivity"
+            android:name=".settings.ChangeEmailActivity"
             android:label="@string/change_email" />
         <activity
-            android:name=".v1.settings.ChangePasswordActivity"
+            android:name=".settings.ChangePasswordActivity"
             android:label="@string/change_password" />
         <activity
-            android:name=".v1.min_preparedness.activity.CompleteActionActivity"
+            android:name=".min_preparedness.activity.CompleteActionActivity"
             android:label="@string/txt_complete_action" />
         <activity
-            android:name=".v1.min_preparedness.activity.AddNotesActivity"
+            android:name=".min_preparedness.activity.AddNotesActivity"
             android:label="Notes" />
         <activity
-            android:name=".v1.adv_preparedness.activity.CreateAPAActivity"
+            android:name=".adv_preparedness.activity.CreateAPAActivity"
             android:label="@string/txt_create_apa" />
         <activity
-            android:name=".v1.adv_preparedness.activity.EditAPAActivity"
+            android:name=".adv_preparedness.activity.EditAPAActivity"
             android:label="@string/edit_apa" />
-        <activity android:name=".v1.min_preparedness.activity.ViewAttachmentsActivity"
+        <activity android:name=".min_preparedness.activity.ViewAttachmentsActivity"
             android:label="@string/attachments"/>
     </application>
 

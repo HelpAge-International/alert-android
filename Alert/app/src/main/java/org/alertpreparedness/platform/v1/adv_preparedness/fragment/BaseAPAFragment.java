@@ -1,9 +1,9 @@
 package org.alertpreparedness.platform.v1.adv_preparedness.fragment;
 
 
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by Tj on 01/02/2018.

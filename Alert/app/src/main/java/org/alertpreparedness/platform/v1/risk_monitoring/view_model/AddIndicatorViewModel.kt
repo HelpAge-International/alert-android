@@ -1,8 +1,8 @@
 package org.alertpreparedness.platform.v1.risk_monitoring.view_model
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import android.location.Geocoder
 import android.location.Location
 import com.google.firebase.auth.FirebaseAuth

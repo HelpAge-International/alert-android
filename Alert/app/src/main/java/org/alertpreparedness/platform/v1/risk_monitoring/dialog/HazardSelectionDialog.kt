@@ -2,13 +2,13 @@ package org.alertpreparedness.platform.v1.risk_monitoring.dialog
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
+import androidx.fragment.app.DialogFragment
 import timber.log.Timber
 
 /**
  * Created by fei on 08/11/2017.
  */
-class HazardSelectionDialog() :DialogFragment() {
+class HazardSelectionDialog() : DialogFragment() {
 
     private val selection:Array<String> = arrayOf("test1","test2","test3")
     private var listener: HazardSelectionListener? = null

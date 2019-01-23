@@ -1,6 +1,6 @@
 package org.alertpreparedness.platform.v1.adv_preparedness.activity;
 
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.widget.RadioGroup;
 
 import com.google.common.collect.Collections2;

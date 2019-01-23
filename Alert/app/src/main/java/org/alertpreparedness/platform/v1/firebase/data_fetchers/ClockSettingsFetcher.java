@@ -1,7 +1,7 @@
 package org.alertpreparedness.platform.v1.firebase.data_fetchers;
 
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import android.util.Pair;
 
 import com.google.firebase.database.DataSnapshot;
