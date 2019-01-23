@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.alertpreparedness.platform.alert.risk_monitoring.view.LogIndicatorActivityFragment"
+    tools:context="org.alertpreparedness.platform.v1.risk_monitoring.view.LogIndicatorActivityFragment"
     tools:showIn="@layout/activity_log_indicator">
 
 </android.support.constraint.ConstraintLayout>

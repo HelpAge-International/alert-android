@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="org.alertpreparedness.platform.alert.risk_monitoring.view.UpdateIndicatorActivity"
+    tools:context="org.alertpreparedness.platform.v1.risk_monitoring.view.UpdateIndicatorActivity"
     tools:showIn="@layout/activity_update_indicator">
 
     <LinearLayout

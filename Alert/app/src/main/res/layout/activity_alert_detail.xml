@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.alertpreparedness.platform.alert.dashboard.activity.AlertDetailActivity">
+    tools:context="org.alertpreparedness.platform.v1.dashboard.activity.AlertDetailActivity">
 
     <include
         android:id="@+id/action_toolbar_layout"

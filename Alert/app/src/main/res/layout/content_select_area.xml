@@ -8,7 +8,7 @@
     android:orientation="vertical"
     android:background="@android:color/white"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="org.alertpreparedness.platform.alert.risk_monitoring.view.SelectAreaActivity"
+    tools:context="org.alertpreparedness.platform.v1.risk_monitoring.view.SelectAreaActivity"
     tools:showIn="@layout/activity_select_area">
 
     <LinearLayout

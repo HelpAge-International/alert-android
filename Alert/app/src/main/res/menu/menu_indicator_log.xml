@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
-      tools:context="org.alertpreparedness.platform.alert.risk_monitoring.view.IndicatorLogActivity">
+      tools:context="org.alertpreparedness.platform.v1.risk_monitoring.view.IndicatorLogActivity">
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

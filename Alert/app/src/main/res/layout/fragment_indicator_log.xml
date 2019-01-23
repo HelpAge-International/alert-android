@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/white"
     android:orientation="vertical"
-    tools:context="org.alertpreparedness.platform.alert.risk_monitoring.view.IndicatorLogActivityFragment"
+    tools:context="org.alertpreparedness.platform.v1.risk_monitoring.view.IndicatorLogActivityFragment"
     tools:showIn="@layout/activity_indicator_log">
 
     <android.support.v7.widget.RecyclerView

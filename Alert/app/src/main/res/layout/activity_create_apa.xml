@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.alertpreparedness.platform.alert.adv_preparedness.activity.CreateAPAActivity">
+    tools:context="org.alertpreparedness.platform.v1.adv_preparedness.activity.CreateAPAActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/toolbar_layout"
