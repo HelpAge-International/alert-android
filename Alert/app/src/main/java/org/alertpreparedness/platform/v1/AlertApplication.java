@@ -77,7 +77,7 @@ public class AlertApplication extends MultiDexApplication implements ValueEventL
         Fabric.with(fabric);
 
 
-//        FirebaseAuth.getInstance().signOut();
+//        FirebaseAuthExtensions.getInstance().signOut();
         Shortbread.create(this);
 
         Realm.init(this);

@@ -200,7 +200,6 @@
     <string name="internal_storage">Internal storage</string>
 
 
-
     <!--Notifications-->
     <string name="notification_indicator_7_days_title">An Indicator requires updating this week</string>
     <string name="notification_indicator_7_days_content">The following indicator: %1$s needs to be updated this week</string>
@@ -243,7 +242,7 @@
     <string name="error_logging_out">Error logging out, please try again later.</string>
     <string name="permission_assign_action_error">You dont have permission to assign the action</string>
     <string name="permission_complete_error">You dont have permission to complete this action</string>
-    <string name="permission_create_action_error" >You dont have permission to create an APA</string>
+    <string name="permission_create_action_error">You dont have permission to create an APA</string>
     <string name="permission_edit_error">You dont have permission to edit this action</string>
     <string name="permission_note_create_error">You dont have permission to create a note</string>
     <string name="permission_edit_indicator">You dont have permission to edit this indicator</string>

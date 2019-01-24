@@ -28,7 +28,7 @@ import org.alertpreparedness.platform.v1.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.PermissionRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.v1.dashboard.activity.CreateAlertActivity;
-import org.alertpreparedness.platform.v1.dashboard.fragment.HomeFragment;
+import org.alertpreparedness.platform.v2.dashboard.home.HomeFragment;
 import org.alertpreparedness.platform.v1.mycountry.MyCountryFragment;
 import org.alertpreparedness.platform.v1.min_preparedness.fragment.MinPreparednessFragment;
 import org.alertpreparedness.platform.v1.model.User;

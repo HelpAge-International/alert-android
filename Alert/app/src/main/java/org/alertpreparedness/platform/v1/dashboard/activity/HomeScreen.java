@@ -7,7 +7,7 @@ import androidx.core.content.ContextCompat;
 
 import org.alertpreparedness.platform.v1.MainDrawer;
 import org.alertpreparedness.platform.v1.adv_preparedness.fragment.AdvPreparednessFragment;
-import org.alertpreparedness.platform.v1.dashboard.fragment.HomeFragment;
+import org.alertpreparedness.platform.v2.dashboard.home.HomeFragment;
 import org.alertpreparedness.platform.v1.min_preparedness.fragment.MinPreparednessFragment;
 import org.alertpreparedness.platform.v1.risk_monitoring.view.RiskFragment;
 

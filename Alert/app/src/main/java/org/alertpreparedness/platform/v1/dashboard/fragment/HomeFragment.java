@@ -191,7 +191,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_home, container, false);
+        View v = inflater.inflate(R.layout.fragment_home_old, container, false);
 
         ButterKnife.bind(this, v);
 
