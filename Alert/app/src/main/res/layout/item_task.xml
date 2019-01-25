@@ -4,37 +4,36 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="8dp"
-    android:paddingEnd="8dp"
-    android:paddingRight="8dp">
+    android:padding="8dp">
 
     <ImageView
-        android:id="@+id/img_task"
+        android:id="@+id/ivTask"
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="14dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/home_task_red" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:srcCompat="@drawable/home_task_red" />
 
     <TextView
-        android:id="@+id/task_status"
+        android:id="@+id/tvTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="14dp"
         android:singleLine="false"
         android:textColor="@android:color/black"
         android:textSize="13sp"
+        app:layout_constraintBottom_toTopOf="@+id/tvDescription"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/img_task"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/ivTask"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingConstraints" />
+        tools:text="Title"/>
 
     <TextView
-        android:id="@+id/task_name"
+        android:id="@+id/tvDescription"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -42,7 +41,10 @@
         android:singleLine="false"
         android:textColor="@color/home_g"
         android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/img_task"
-        app:layout_constraintTop_toBottomOf="@+id/task_status" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/ivTask"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle"
+        tools:text="Content" />
 </androidx.constraintlayout.widget.ConstraintLayout>

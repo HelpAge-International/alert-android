@@ -26,7 +26,7 @@ public class DocumentModel extends FirebaseModel {
                 ", time=" + time +
                 ", uploadedBy='" + uploadedBy + '\'' +
                 ", ref=" + ref +
-                ", key='" + key + '\'' +
+                ", id='" + key + '\'' +
                 '}' +
                 super.toString();
     }

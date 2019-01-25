@@ -161,12 +161,15 @@ class ListConcat<T>: BiFunction<List<T>, List<T>, List<T>>{
     }
 }
 
-
 @Suppress("UNCHECKED_CAST")
 fun <T> combineFlatten(items: List<Observable<List<T>>>): Observable<List<T>> {
     return Observable.combineLatest(items) {list ->
         list.map { it as List<T> }.toList().flatten()
     }
+}
+
+fun <T> combineFlatten(vararg items: Observable<List<T>>): Observable<List<T>> {
+    return combineFlatten(items.toList())
 }
 
 fun <T> Observable<T>.subscribeNoError(subscribe: (T) -> Unit): Disposable {
@@ -208,3 +211,10 @@ fun ImageView.bind(urlObservable: Observable<String>): Disposable{
     }
 }
 //endregion
+
+fun <T> Observable<T>.filterSuccess(): Observable<T> {
+    return materialize()
+            .filter{ it.isOnNext || it.isOnComplete }
+            .dematerialize<T>()
+
+}

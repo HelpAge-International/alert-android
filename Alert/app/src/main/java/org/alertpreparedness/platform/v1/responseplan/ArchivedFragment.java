@@ -33,10 +33,10 @@ public class ArchivedFragment extends ActiveFragment{
 //                    int status = Integer.valueOf(String.valueOf(child.child("status").getValue()));
 //                    String name = (String) child.child("name").getValue();
 //
-//                    System.out.println("child.getKey() = " + child.getKey());
+//                    System.out.println("child.getId() = " + child.getId());
 //                    System.out.println("user.countryID = " + user.countryID);
 //
-//                    mAdapter.addItem(child.getKey(), new ResponsePlanObj(
+//                    mAdapter.addItem(child.getId(), new ResponsePlanObj(
 //                            hazardType,
 //                            percentCompleted,
 //                            name,

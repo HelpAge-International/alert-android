@@ -61,7 +61,7 @@ public class ActionModel {
                 ", level=" + level +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
-                ", path=" + path +
+                ", ref=" + path +
                 ", assignHazard=" + assignHazard +
                 ", db=" + db +
                 ", userRef=" + userRef +

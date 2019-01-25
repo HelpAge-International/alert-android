@@ -760,7 +760,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         refCountryContext?.setValue(mIndicatorModel.copy(id = null))?.continueWith {
             refCountryContext.child("hazardScenario").child("isActive").setValue(mIndicatorModel.hazardScenario.isActive)
             refCountryContext.child("hazardScenario").child("isSeasonal").setValue(mIndicatorModel.hazardScenario.isSeasonal)
-            refCountryContext.child("hazardScenario").child("key").setValue(mIndicatorModel.hazardScenario.id)
+            refCountryContext.child("hazardScenario").child("id").setValue(mIndicatorModel.hazardScenario.id)
             refCountryContext.child("hazardScenario").child("active").removeValue()
             refCountryContext.child("hazardScenario").child("seasonal").removeValue()
             refCountryContext.child("hazardScenario").child("id").removeValue()
@@ -773,7 +773,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         refCountryContext?.setValue(mIndicatorModel.copy(id = null))?.continueWith {
             refCountryContext.child("hazardScenario").child("isActive").setValue(mIndicatorModel.hazardScenario.isActive)
             refCountryContext.child("hazardScenario").child("isSeasonal").setValue(mIndicatorModel.hazardScenario.isSeasonal)
-            refCountryContext.child("hazardScenario").child("key").setValue(mIndicatorModel.hazardScenario.id)
+            refCountryContext.child("hazardScenario").child("id").setValue(mIndicatorModel.hazardScenario.id)
             refCountryContext.child("hazardScenario").child("active").removeValue()
             refCountryContext.child("hazardScenario").child("seasonal").removeValue()
             refCountryContext.child("hazardScenario").child("id").removeValue()

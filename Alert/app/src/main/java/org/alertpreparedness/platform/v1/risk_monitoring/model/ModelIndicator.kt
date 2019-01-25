@@ -303,7 +303,7 @@ data class ModelGps(val city: String? = null, val country: String? = null, var a
 
 //public id: string;
 //public category: HazardScenario = 0;
-//public triggerSelected: number;
+//public triggerLevel: number;
 //public name: string = '';
 //public source: any[] = [];
 //public assignee: string;

@@ -79,7 +79,7 @@ class UpdateIndicatorActivity : BaseActivity() {
 
     private fun initListeners() {
         tvUpdateIndicatorLevelGreen.setOnClickListener {
-//            if (mIndicatorModel.triggerSelected == GREEN_TRIGGER_POSITION) {
+//            if (mIndicatorModel.triggerLevel == GREEN_TRIGGER_POSITION) {
 //                Toasty.info(this, "Already in Green level").show()
 //                return@setOnClickListener
 //            }
@@ -92,7 +92,7 @@ class UpdateIndicatorActivity : BaseActivity() {
         }
 
         tvUpdateIndicatorLevelAmber.setOnClickListener {
-//            if (mIndicatorModel.triggerSelected == AMBER_TRIGGER_POSITION) {
+//            if (mIndicatorModel.triggerLevel == AMBER_TRIGGER_POSITION) {
 //                Toasty.info(this, "Already in Amber level").show()
 //                return@setOnClickListener
 //            }
@@ -105,7 +105,7 @@ class UpdateIndicatorActivity : BaseActivity() {
         }
 
         tvUpdateIndicatorLevelRed.setOnClickListener {
-//            if (mIndicatorModel.triggerSelected == RED_TRIGGER_POSITION) {
+//            if (mIndicatorModel.triggerLevel == RED_TRIGGER_POSITION) {
 //                Toasty.info(this, "Already in Red level").show()
 //                return@setOnClickListener
 //            }

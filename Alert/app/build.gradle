@@ -25,9 +25,41 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    flavorDimensions 'version'
+    productFlavors {
+        envSand {
+            dimension 'version'
+        }
+        envTest {
+            dimension 'version'
+        }
+        envUat {
+            dimension 'version'
+        }
+        envLive {
+            dimension 'version'
+        }
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    applicationVariants.all { variant ->
+        def name = variant.getName()
+        // Specific values
+        if(name.contains("envSand")) {
+            variant.buildConfigField 'String', 'ROOT_NODE', '"sand"'
+        }
+        else if(name.contains("envTest")) {
+            variant.buildConfigField 'String', 'ROOT_NODE', '"test"'
+        }
+        else if(name.contains("envUat")) {
+            variant.buildConfigField 'String', 'ROOT_NODE', '"uat"'
+        }
+        else if(name.contains("envLive")) {
+            variant.buildConfigField 'String', 'ROOT_NODE', '"live"'
+        }
     }
 }
 

@@ -16,7 +16,7 @@ public class IndicatorModel extends FirebaseModel {
         return "IndicatorModel{" +
                 "assignee='" + assignee + '\'' +
                 ", name='" + name + '\'' +
-                ", triggerSelected=" + triggerSelected +
+                ", triggerLevel=" + triggerSelected +
                 ", dueDate=" + dueDate +
                 ", hazardId='" + hazardId + '\'' +
                 '}' +

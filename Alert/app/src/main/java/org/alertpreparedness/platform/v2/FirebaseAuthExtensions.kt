@@ -4,7 +4,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import io.reactivex.Observable
 
-object FirebaseAuthExtensions{
+object FirebaseAuthExtensions {
 
     fun getUserAuthState():Observable<Pair<Boolean, FirebaseUser?>>{
         return Observable.create<Pair<Boolean, FirebaseUser?>> { emitter ->
@@ -31,5 +31,7 @@ object FirebaseAuthExtensions{
     fun getLoggedInUserId(): Observable<String> {
         return getLoggedInUser()
                 .map { it.uid }
+                .distinctUntilChanged()
+                .cache()
     }
 }

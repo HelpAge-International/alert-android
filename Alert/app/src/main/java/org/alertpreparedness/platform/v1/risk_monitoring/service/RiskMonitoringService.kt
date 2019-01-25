@@ -99,13 +99,13 @@ class RiskMonitoringService(private val context : Context) {
                 ref.child("hazardScenario").setValue(ModelHazardCountryContext())
             }
         } else {
-            println("indicatorRef.child(key) = ${ref}")
+            println("indicatorRef.child(id) = ${ref}")
             println("indicator = ${indicator}")
             try {
                 indicator.hazardId = indicator.hazardScenario.id!!
                 ref.setValue(indicator).continueWith {
                     val update = indicator.hazardScenario
-                    val updateMap = mutableMapOf("active" to null, "isActive" to update.isActive, "id" to null, "key" to update.id, "seasonal" to null, "isSeasonal" to update.isSeasonal)
+                    val updateMap = mutableMapOf("active" to null, "isActive" to update.isActive, "id" to null, "id" to update.id, "seasonal" to null, "isSeasonal" to update.isSeasonal)
                     ref.child("hazardScenario").updateChildren(updateMap)
                 }
             }

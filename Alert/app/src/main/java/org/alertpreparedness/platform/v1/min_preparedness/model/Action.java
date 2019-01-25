@@ -13,12 +13,15 @@ import org.alertpreparedness.platform.v1.model.User;
 
 public class Action {
     private String id;
-    private Boolean isArchived;
+    private String assignee;
+    private Long budget;
+    private Long createdAt;
+    private String department;
+    private Long dueDate;
     private Boolean isComplete;
+    private Boolean isArchived;
     private Boolean isInProgress;
     private String taskName;
-    private String department;
-    private String assignee;
     private String createdByAgencyId;
     private String createdByCountryId;
     private String networkId;
@@ -26,10 +29,7 @@ public class Action {
     private Integer frequencyValue;
     private Long frequencyBase;
     private Long actionType;
-    private Long dueDate;
-    private Long budget;
     private Long level;
-    private Long createdAt;
     private Long updatedAt;
     private boolean requireDoc;
 
@@ -262,7 +262,7 @@ public class Action {
                 ", level=" + level +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
-                ", path=" + path +
+                ", ref=" + path +
                 ", db=" + db +
                 ", userRef=" + userRef +
                 ", networkRef=" + networkRef +

@@ -263,7 +263,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
                 storageDir      /* directory */
         );
 
-        // Save a file: path for use with ACTION_VIEW intents
+        // Save a file: ref for use with ACTION_VIEW intents
         filename = "file:" + image.getAbsolutePath();
         return image;
     }
@@ -274,7 +274,7 @@ public class CompleteActionActivity extends AppCompatActivity implements SimpleA
         final Uri uri = data.getData();
         System.out.println("uri = " + uri);
         try {
-            // Get the file path from the URI
+            // Get the file ref from the URI
             final String path = FileUtils.getPath(this, uri);
             Toast.makeText(CompleteActionActivity.this,
                     "File Selected: " + path, Toast.LENGTH_LONG).show();

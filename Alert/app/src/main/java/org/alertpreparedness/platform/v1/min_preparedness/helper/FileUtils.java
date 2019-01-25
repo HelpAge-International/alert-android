@@ -93,7 +93,7 @@ public class FileUtils {
     }
 
     /**
-     * Returns the path only (without file name).
+     * Returns the ref only (without file name).
      *
      * @param file
      * @return
@@ -107,7 +107,7 @@ public class FileUtils {
                 String filename = file.getName();
                 String filepath = file.getAbsolutePath();
 
-                // Construct path without file name.
+                // Construct ref without file name.
                 String pathwithoutname = filepath.substring(0,
                         filepath.length() - filename.length());
                 if (pathwithoutname.endsWith("/")) {
@@ -194,7 +194,7 @@ public class FileUtils {
      * @param uri The Uri to query.
      * @param selection (Optional) Filter used in the query.
      * @param selectionArgs (Optional) Selection arguments used in the query.
-     * @return The value of the _data column, which is typically a file path.
+     * @return The value of the _data column, which is typically a file ref.
      * @author paulburke
      */
     public static String getDataColumn(Context context, Uri uri, String selection,
@@ -224,11 +224,11 @@ public class FileUtils {
     }
 
     /**
-     * Get a file path from a Uri. This will get the the path for Storage Access
+     * Get a file ref from a Uri. This will get the the ref for Storage Access
      * Framework Documents, as well as the _data field for the MediaStore and
      * other file-based ContentProviders.<br>
      * <br>
-     * Callers should check whether the path is local before assuming it
+     * Callers should check whether the ref is local before assuming it
      * represents a local file.
      *
      * @param context The context.
@@ -257,7 +257,7 @@ public class FileUtils {
         if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
             // LocalStorageProvider
             if (isLocalStorageDocument(uri)) {
-                // The path is the id
+                // The ref is the id
                 return DocumentsContract.getDocumentId(uri);
             }
             // ExternalStorageProvider
