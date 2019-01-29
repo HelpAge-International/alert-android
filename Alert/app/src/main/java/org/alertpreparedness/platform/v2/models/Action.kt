@@ -6,6 +6,7 @@ import org.joda.time.DateTime
 import java.util.Date
 
 class Action(
+        @SerializedName("asignee")
         val assignee: String,
         val budget: Int,
         val createdAt: DateTime,

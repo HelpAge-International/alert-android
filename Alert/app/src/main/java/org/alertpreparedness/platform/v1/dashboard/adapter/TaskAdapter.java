@@ -112,11 +112,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView txt_taskStatus;
         TextView txt_taskName;
-        ImageView ivTask;
+        ImageView ivIcon;
 
         private ViewHolder(View itemView) {
             super(itemView);
-            ivTask = (ImageView) itemView.findViewById(R.id.ivTask);
+            ivIcon = (ImageView) itemView.findViewById(R.id.ivIcon);
             txt_taskStatus = (TextView) itemView.findViewById(R.id.tvTitle);
             txt_taskName = (TextView) itemView.findViewById(R.id.tvDescription);
         }
@@ -126,40 +126,40 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> im
             if (task.getTaskType().equals("action") && DateHelper.isDueToday(task.dueDate)) {
                 txt_taskName.setText(task.getTaskName());
                 txt_taskStatus.setText(dueTodayString(task.getAlertLevel(), task));
-                ivTask.setImageResource(R.drawable.home_task_red);
+                ivIcon.setImageResource(R.drawable.home_task_red);
             }
             else if (task.getTaskType().equals("indicator") && DateHelper.isDueToday(task.dueDate)) {
                 txt_taskName.setText(task.getTaskName());
                 txt_taskStatus.setText(dueTodayString(task.getAlertLevel(), task));
-                ivTask.setImageResource(R.drawable.home_task_red);
+                ivIcon.setImageResource(R.drawable.home_task_red);
             }
             else if (task.getTaskType().equals("action") && DateHelper.isDueInWeek(task.dueDate)) {
                 txt_taskName.setText(task.getTaskName());
                 txt_taskStatus.setText(dueWeekString(task.getAlertLevel(), task));
-                ivTask.setImageResource(R.drawable.home_task_amber);
+                ivIcon.setImageResource(R.drawable.home_task_amber);
             }
             else if (task.getTaskType().equals("indicator") && DateHelper.isDueInWeek(task.dueDate)) {
                 txt_taskName.setText(task.getTaskName());
                 txt_taskStatus.setText(dueWeekString(task.getAlertLevel(), task));
-                ivTask.setImageResource(R.drawable.home_task_amber);
+                ivIcon.setImageResource(R.drawable.home_task_amber);
             }
             else if (task.getTaskType().equals("action") && DateHelper.itWasDue(task.dueDate)) {
                 txt_taskName.setText(task.getTaskName());
                 txt_taskStatus.setText(dueBeforeString(task.getAlertLevel(), task, format.format(new Date(task.dueDate))));
-                ivTask.setImageResource(R.drawable.home_task_red);
+                ivIcon.setImageResource(R.drawable.home_task_red);
             }
             else if (task.getTaskType().equals("indicator") && DateHelper.itWasDue(task.dueDate)) {
                 txt_taskName.setText(task.getTaskName());
                 txt_taskStatus.setText(dueBeforeString(task.getAlertLevel(), task, format.format(new Date(task.dueDate))));
-                ivTask.setImageResource(R.drawable.home_task_red);
+                ivIcon.setImageResource(R.drawable.home_task_red);
             }
             else {
                 txt_taskName.setText(task.getTaskName());
                 txt_taskStatus.setText(dueBeforeString(task.getAlertLevel(), task, format.format(new Date(task.dueDate))));
-                ivTask.setImageResource(R.drawable.home_task_blue);
+                ivIcon.setImageResource(R.drawable.home_task_blue);
 //                txt_taskName.setVisibility(View.GONE);
 //                txt_taskStatus.setVisibility(View.GONE);
-//                ivTask.setVisibility(View.GONE);
+//                ivIcon.setVisibility(View.GONE);
             }
         }
     }

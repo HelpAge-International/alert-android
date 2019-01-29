@@ -189,6 +189,7 @@
     <string name="txt_edit_action">Edit action</string>
     <string name="navbar_subtitle">%s for %s, %s</string>
     <string name="no_network_tasks">You don\'t have any network task</string>
+    <string name="task_empty">You have no tasks that need completing this week</string>
     <string name="txt_needs_done">What needs to be done?</string>
     <string name="txt_hazard_association">Hazard Association</string>
     <string name="txt_department">Department</string>
@@ -288,6 +289,16 @@
     <string name="hazard_volcano">Volcano</string>
     <string name="select_all">Select All</string>
     <string name="deselect_all">Deselect All</string>
+    <string name="task_indicator_due_passed">A %s level indicator was due on %s</string>
+    <string name="task_indicator_due_today">A %s level indicator needs to be completed today</string>
+    <string name="task_indicator_due_week">A %s level indicator needs to be completed this week</string>
+    <string name="green">green</string>
+    <string name="amber">amber</string>
+    <string name="red">red</string>
+    <string name="task_action_due_passed">A %s preparedness action was due on %s</string>
+    <string name="task_action_due_today">A %s preparedness action neds to be completed today</string>
+    <string name="task_action_due_week">A %s preparedness action needs to be completed this week</string>
+    <string name="task_approval">A response plan has been submitted for approval</string>
 
 
 </resources>

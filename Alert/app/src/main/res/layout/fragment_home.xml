@@ -32,8 +32,48 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/tvMyTasks"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/grpEmptyTasks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="tvEmptyTasks,ivEmptyTasks"/>
+
+        <ImageView
+            android:id="@+id/ivEmptyTasks"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/home_no_tasks"
+            android:layout_marginTop="200dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvMyTasks" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ivEmptyTasks"
+            android:id="@+id/tvEmptyTasks"
+            android:text="@string/no_network_tasks"
+            android:padding="40dp"
+            android:textColor="@color/lb_grey" />
+
+        <ProgressBar
+            android:id="@+id/pbTasks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="200dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvMyTasks"
+            android:visibility="visible"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

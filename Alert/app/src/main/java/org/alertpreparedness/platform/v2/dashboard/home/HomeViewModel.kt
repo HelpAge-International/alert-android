@@ -15,6 +15,10 @@ import org.alertpreparedness.platform.v2.models.UserType.COUNTRY_DIRECTOR
 import org.alertpreparedness.platform.v2.repository.UserRepository.userObservable
 import org.alertpreparedness.platform.v2.utils.extensions.childKeys
 import org.alertpreparedness.platform.v2.utils.extensions.combineFlatten
+import org.alertpreparedness.platform.v2.utils.extensions.hasPassed
+import org.alertpreparedness.platform.v2.utils.extensions.isThisWeek
+import org.alertpreparedness.platform.v2.utils.extensions.isToday
+import org.alertpreparedness.platform.v2.utils.extensions.print
 import org.alertpreparedness.platform.v2.utils.extensions.toModel
 import org.alertpreparedness.platform.v2.utils.extensions.withLatestFromPair
 
@@ -54,15 +58,23 @@ class HomeViewModel : BaseViewModel(), IHomeViewModel.Inputs, IHomeViewModel.Out
                 .map { (list, user) ->
                     list.filter { it.assignee == user.id }
                 }
+                .print("indicators")
 
         val actions = userObservable
                 .flatMap { user ->
                     db.child("action")
                             .child(user.countryId)
                             .asObservable()
+                            .print("A")
                             .map { it.children.toList() }
+                            .print("B")
                             .map { list -> list.map { it.toModel<Action>() } }
                 }
+                .withLatestFromPair(userObservable)
+                .map { (list, user) ->
+                    list.filter { it.assignee == user.id }
+                }
+                .print("actions")
 
         val responsePlanApprovals = userObservable
                 .filter { user ->
@@ -82,6 +94,8 @@ class HomeViewModel : BaseViewModel(), IHomeViewModel.Inputs, IHomeViewModel.Out
                                 }
                             }
                 }
+                .startWith(listOf<ResponsePlan>())
+                .print("responsePlans")
 
         return combineFlatten<Task>(
                 indicators
@@ -91,6 +105,9 @@ class HomeViewModel : BaseViewModel(), IHomeViewModel.Inputs, IHomeViewModel.Out
                 responsePlanApprovals
                         .map { list -> list.map { ApprovalTask(it) } }
         )
+                .map { list -> list
+                        .filter { it.dueDate.isThisWeek() || it.dueDate.isToday() || it.dueDate.hasPassed() }
+                        .sortedByDescending { it.dueDate } }
     }
 }
 
