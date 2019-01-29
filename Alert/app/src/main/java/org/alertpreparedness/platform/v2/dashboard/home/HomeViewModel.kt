@@ -98,6 +98,7 @@ class HomeViewModel : BaseViewModel(), IHomeViewModel.Inputs, IHomeViewModel.Out
                                 )
                             }
                 }
+                .map { list -> list.filter { !it.isComplete } }
                 .withLatestFromPair(userObservable)
                 .map { (list, user) ->
                     list.filter { it.assignee == user.id }
