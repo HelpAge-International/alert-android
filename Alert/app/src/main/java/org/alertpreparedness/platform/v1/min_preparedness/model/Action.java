@@ -256,7 +256,7 @@ public class Action {
                 ", networkId='" + networkId + '\'' +
                 ", frequencyValue=" + frequencyValue +
                 ", frequencyBase=" + frequencyBase +
-                ", actionType=" + actionType +
+                ", actionLevel=" + actionType +
                 ", dueDate=" + dueDate +
                 ", budget=" + budget +
                 ", level=" + level +

@@ -13,6 +13,8 @@ import org.alertpreparedness.platform.v1.utils.SnapshotExclusionStrat
 import org.alertpreparedness.platform.v2.models.BaseModel
 import org.alertpreparedness.platform.v2.models.ResponsePlanApprovalSerializer
 import org.alertpreparedness.platform.v2.models.ResponsePlanApprovalState
+import org.alertpreparedness.platform.v2.models.enums.ActionLevel
+import org.alertpreparedness.platform.v2.models.enums.ActionLevelSerializer
 import org.alertpreparedness.platform.v2.models.enums.ActionType
 import org.alertpreparedness.platform.v2.models.enums.ActionTypeSerializer
 import org.alertpreparedness.platform.v2.models.enums.ResponsePlanState
@@ -32,11 +34,9 @@ fun DataSnapshot.childKeys(): List<String> {
     return children.mapNotNull { it.key }
 }
 
-inline fun <reified T: BaseModel> DataSnapshot.toModel(): T {
-    return listOf(this).toModelList<T>()
-}
 
-private val gson by lazy{
+//DataSnapshot to model
+val gson: Gson by lazy{
     val gsonBuilder = GsonBuilder()
     gsonBuilder.setExclusionStrategies(SnapshotExclusionStrat())
             .registerTypeAdapter(Date::class.java, JsonDeserializer<Date> {json, _, _ -> Date(json.asJsonPrimitive.asLong) })
@@ -44,25 +44,22 @@ private val gson by lazy{
             .registerTypeAdapter(DateTime::class.java, JsonDeserializer<DateTime> {json, _, _ -> DateTime(json.asJsonPrimitive.asLong) })
             .registerTypeAdapter(DateTime::class.java, JsonSerializer<DateTime> {date, _, _ -> JsonPrimitive(date.millis) })
             .registerTypeAdapter(IndicatorTriggerLevel::class.java, IndicatorTriggerLevelSerializer)
+            .registerTypeAdapter(ActionLevel::class.java, ActionLevelSerializer)
             .registerTypeAdapter(ActionType::class.java, ActionTypeSerializer)
             .registerTypeAdapter(ResponsePlanState::class.java, ResponsePlanStateSerializer)
             .registerTypeAdapter(ResponsePlanApprovalState::class.java, ResponsePlanApprovalSerializer)
             .create()
 }
 
-inline fun <reified T: BaseModel> jsonToModel(id: String, jsonObject: JsonObject): T {
-    val reader = JsonReader(StringReader(gson.toJson(jsonObject).trim { it <= ' ' }))
-    reader.isLenient = true
-    val obj: T = gson.fromJson(reader, T::class.java)
-    obj.id = id
-    return obj
+inline fun <reified T: BaseModel> DataSnapshot.toModel(): T {
+    return listOf(this).toMergedModel()
 }
 
-fun DataSnapshot.toJson(): JsonObject {
-    return gson.toJsonTree(value).asJsonObject
+inline fun <reified T: BaseModel> Pair<DataSnapshot, DataSnapshot>.toMergedModel(): T {
+    return toList().toMergedModel()
 }
 
-inline fun <reified T: BaseModel> List<DataSnapshot>.toModelList(): T {
+inline fun <reified T: BaseModel> List<DataSnapshot>.toMergedModel(): T {
     if(isEmpty()) throw IllegalArgumentException("")
 
     val id = first().key!!
@@ -81,6 +78,18 @@ inline fun <reified T: BaseModel> List<DataSnapshot>.toModelList(): T {
     return jsonToModel(id, mergedObject)
 }
 
+inline fun <reified T: BaseModel> jsonToModel(id: String, jsonObject: JsonObject): T {
+    val reader = JsonReader(StringReader(gson.toJson(jsonObject).trim { it <= ' ' }))
+    reader.isLenient = true
+    val obj: T = gson.fromJson(reader, T::class.java)
+    obj.id = id
+    return obj
+}
+
+fun DataSnapshot.toJson(): JsonObject {
+    return gson.toJsonTree(value).asJsonObject
+}
+
 
 fun JsonObject.mergeWith(other: JsonObject): JsonObject{
     val output = JsonObject()
@@ -94,7 +103,15 @@ fun JsonObject.mergeWith(other: JsonObject): JsonObject{
             if(o1.isJsonObject && o2.isJsonObject){
                 output.add(key, o1.asJsonObject.mergeWith(o2.asJsonObject))
             }
+            else {
+                output.add(key, o1)
+            }
+        }
+        else if(o1 != null){
             output.add(key, o1)
+        }
+        else {
+            output.add(key, o2)
         }
     }
     return output

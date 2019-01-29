@@ -172,6 +172,14 @@ fun <T> combineFlatten(vararg items: Observable<List<T>>): Observable<List<T>> {
     return combineFlatten(items.toList())
 }
 
+fun <T> combineToList(items: List<Observable<T>>): Observable<List<T>> {
+    return Observable.combineLatest(items) { it.map { it as T }.toList() }
+}
+
+fun <T> combineToList(vararg items: Observable<T>): Observable<List<T>> {
+    return combineToList(items.toList())
+}
+
 fun <T> Observable<T>.subscribeNoError(subscribe: (T) -> Unit): Disposable {
     return subscribe(subscribe, {})
 }

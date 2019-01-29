@@ -1,9 +1,8 @@
 package org.alertpreparedness.platform.v2.models
 
-import org.alertpreparedness.platform.v2.models.enums.ActionType
+import org.alertpreparedness.platform.v2.models.enums.ActionLevel
 import org.alertpreparedness.platform.v2.models.enums.IndicatorTriggerLevel
 import org.joda.time.DateTime
-import java.util.Date
 
 abstract class Task(val id: String, val label: String, val dueDate: DateTime){
     override fun equals(other: Any?): Boolean {
@@ -60,14 +59,14 @@ class ActionTask(
         id: String,
         label: String,
         dueDate: DateTime,
-        val actionType: ActionType
+        val actionLevel: ActionLevel
 ) : Task(id, label, dueDate) {
 
     constructor(action: Action) : this(
             action.id,
             action.task,
             action.dueDate,
-            action.actionType
+            action.actionLevel
     )
 
     override fun equals(other: Any?): Boolean {
@@ -75,14 +74,14 @@ class ActionTask(
         if (other !is ActionTask) return false
         if (!super.equals(other)) return false
 
-        if (actionType != other.actionType) return false
+        if (actionLevel != other.actionLevel) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = super.hashCode()
-        result = 31 * result + actionType.hashCode()
+        result = 31 * result + actionLevel.hashCode()
         return result
     }
 }

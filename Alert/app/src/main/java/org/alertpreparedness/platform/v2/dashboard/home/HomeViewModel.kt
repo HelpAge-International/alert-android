@@ -12,13 +12,19 @@ import org.alertpreparedness.platform.v2.models.IndicatorTask
 import org.alertpreparedness.platform.v2.models.ResponsePlan
 import org.alertpreparedness.platform.v2.models.Task
 import org.alertpreparedness.platform.v2.models.UserType.COUNTRY_DIRECTOR
+import org.alertpreparedness.platform.v2.models.enums.ActionType.CHS
+import org.alertpreparedness.platform.v2.models.enums.ActionType.CUSTOM
+import org.alertpreparedness.platform.v2.models.enums.ActionType.MANDATED
+import org.alertpreparedness.platform.v2.models.enums.ActionTypeSerializer
 import org.alertpreparedness.platform.v2.repository.UserRepository.userObservable
 import org.alertpreparedness.platform.v2.utils.extensions.childKeys
 import org.alertpreparedness.platform.v2.utils.extensions.combineFlatten
+import org.alertpreparedness.platform.v2.utils.extensions.combineToList
 import org.alertpreparedness.platform.v2.utils.extensions.hasPassed
 import org.alertpreparedness.platform.v2.utils.extensions.isThisWeek
 import org.alertpreparedness.platform.v2.utils.extensions.isToday
 import org.alertpreparedness.platform.v2.utils.extensions.print
+import org.alertpreparedness.platform.v2.utils.extensions.toMergedModel
 import org.alertpreparedness.platform.v2.utils.extensions.toModel
 import org.alertpreparedness.platform.v2.utils.extensions.withLatestFromPair
 
@@ -65,16 +71,37 @@ class HomeViewModel : BaseViewModel(), IHomeViewModel.Inputs, IHomeViewModel.Out
                     db.child("action")
                             .child(user.countryId)
                             .asObservable()
-                            .print("A")
                             .map { it.children.toList() }
-                            .print("B")
-                            .map { list -> list.map { it.toModel<Action>() } }
+                            .switchMap { snapshots ->
+                                combineToList(
+                                        snapshots.map { snapshot ->
+                                            val typeInt = snapshot.child("type").getValue(Long::class.java)!!.toInt()
+                                            val type = ActionTypeSerializer.jsonToEnum(typeInt) ?: CUSTOM
+
+                                            when (type) {
+                                                CHS ->
+                                                    db.child("actionCHS")
+                                                            .child(user.systemAdminId)
+                                                            .child(snapshot.key!!)
+                                                            .asObservable()
+                                                            .map { Pair(snapshot, it).toMergedModel<Action>() }
+                                                MANDATED -> {
+                                                    db.child("actionMandated")
+                                                            .child(user.agencyAdminId)
+                                                            .child(snapshot.key!!)
+                                                            .asObservable()
+                                                            .map { Pair(snapshot, it).toMergedModel<Action>() }
+                                                }
+                                                CUSTOM -> Observable.just(snapshot.toModel())
+                                            }
+                                        }
+                                )
+                            }
                 }
                 .withLatestFromPair(userObservable)
                 .map { (list, user) ->
                     list.filter { it.assignee == user.id }
                 }
-                .print("actions")
 
         val responsePlanApprovals = userObservable
                 .filter { user ->
@@ -107,7 +134,7 @@ class HomeViewModel : BaseViewModel(), IHomeViewModel.Inputs, IHomeViewModel.Out
         )
                 .map { list -> list
                         .filter { it.dueDate.isThisWeek() || it.dueDate.isToday() || it.dueDate.hasPassed() }
-                        .sortedByDescending { it.dueDate } }
+                        .sortedBy { it.dueDate } }
     }
 }
 

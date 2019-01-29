@@ -9,7 +9,6 @@ import kotlinx.android.synthetic.main.item_task.view.ivIcon
 import kotlinx.android.synthetic.main.item_task.view.tvDescription
 import kotlinx.android.synthetic.main.item_task.view.tvTitle
 import org.alertpreparedness.platform.v1.R
-import org.alertpreparedness.platform.v1.utils.Constants
 import org.alertpreparedness.platform.v2.dashboard.home.HomeTasksAdapter.HomeTaskViewHolder
 import org.alertpreparedness.platform.v2.utils.DiffListAdapter
 import org.alertpreparedness.platform.v2.utils.DiffComparator
@@ -68,7 +67,7 @@ class HomeTasksAdapter(val context: Context): DiffListAdapter<Task, HomeTaskView
         private fun bindActionTask(actionTask: ActionTask) {
             setDateIcon(actionTask.dueDate)
 
-            val actionTypeString = context.getString(actionTask.actionType.string)
+            val actionTypeString = context.getString(actionTask.actionLevel.string)
 
             when {
                 actionTask.dueDate.hasPassed() -> tvTitle.text = context.getString(R.string.task_action_due_passed, actionTypeString, actionTask.dueDate.toString("dd/MM/yy"))
