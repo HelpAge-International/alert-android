@@ -8,7 +8,7 @@ import java.util.Date
 
 class Action(
         @SerializedName("asignee")
-        val assignee: String,
+        val assignee: String?,
         val budget: Int,
         val createdAt: DateTime,
         @SerializedName("department")
