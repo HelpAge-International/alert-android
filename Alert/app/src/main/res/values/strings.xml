@@ -299,6 +299,11 @@
     <string name="task_action_due_today">A %s preparedness action neds to be completed today</string>
     <string name="task_action_due_week">A %s preparedness action needs to be completed this week</string>
     <string name="task_approval">A response plan has been submitted for approval</string>
+    <string name="action_type_chs">CHS</string>
+    <string name="action_type_mandated">Mandated</string>
+    <string name="action_type_custom">Custom</string>
+    <string name="due_on">Due: %s</string>
+    <string name="not_assigned">Not Assigned</string>
 
 
 </resources>
