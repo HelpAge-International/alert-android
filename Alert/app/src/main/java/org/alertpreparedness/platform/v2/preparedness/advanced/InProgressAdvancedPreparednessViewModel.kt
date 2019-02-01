@@ -5,6 +5,10 @@ import org.alertpreparedness.platform.v2.models.User
 
 class InProgressAdvancedPreparednessViewModel : BaseAdvancedPreparednessViewModel() {
     override fun filterAction(action: Action, user: User): Boolean {
-        return super.filterAction(action, user) && !action.isComplete && action.assignee == user.id
+        return super.filterAction(action, user) &&
+                !action.isComplete &&
+                action.assignee == user.id &&
+                action.getExpirationTime().isBeforeNow &&
+                !action.isArchived
     }
 }

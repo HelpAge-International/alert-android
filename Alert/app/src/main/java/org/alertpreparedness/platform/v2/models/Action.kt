@@ -21,7 +21,8 @@ class Action(
         val actionType: ActionType,
         val requireDoc: Boolean,
         val task: String,
-        val updatedAt: DateTime
+        val updatedAt: DateTime,
+        val isArchived: Boolean
 ) : BaseModel() {
 
     @Transient
