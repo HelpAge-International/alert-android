@@ -45,7 +45,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/divider_color"/>
+            android:background="@color/grey" />
 
         <TextView
             android:id="@+id/tvUpdateIndicatorLevelAmber"
@@ -77,7 +77,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/divider_color"/>
+            android:background="@color/grey" />
 
         <TextView
             android:id="@+id/tvUpdateIndicatorLevelRed"
@@ -109,7 +109,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/divider_color"/>
+            android:background="@color/grey" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

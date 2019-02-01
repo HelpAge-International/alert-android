@@ -1,0 +1,17 @@
+package org.alertpreparedness.platform.v2.preparedness.minimum
+
+import org.alertpreparedness.platform.v1.R
+
+class ExpiredMinimumPreparednessFragment : BaseMinimumPreparednessFragment<ExpiredMinimumPreparednessViewModel>() {
+    override fun statusText(): Int {
+        return R.string.expired_title
+    }
+
+    override fun statusIcon(): Int {
+        return R.drawable.preparedness_red
+    }
+
+    override fun viewModelClass(): Class<ExpiredMinimumPreparednessViewModel> {
+        return ExpiredMinimumPreparednessViewModel::class.java
+    }
+}

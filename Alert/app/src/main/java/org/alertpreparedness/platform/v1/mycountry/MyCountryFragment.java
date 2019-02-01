@@ -1,28 +1,33 @@
 package org.alertpreparedness.platform.v1.mycountry;
 
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModelProviders;
+import butterknife.BindColor;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-
+import java.util.ArrayList;
+import java.util.List;
+import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.ExtensionHelperKt;
 import org.alertpreparedness.platform.v1.MainDrawer;
 import org.alertpreparedness.platform.v1.R;
-import org.alertpreparedness.platform.v1.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
+import org.alertpreparedness.platform.v1.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.v1.model.User;
 import org.alertpreparedness.platform.v1.risk_monitoring.dialog.OnCountrySelectedListener;
 import org.alertpreparedness.platform.v1.risk_monitoring.dialog.OnLevel1SelectedListener;
@@ -38,16 +43,6 @@ import org.alertpreparedness.platform.v1.risk_monitoring.view_model.SelectAreaVi
 import org.alertpreparedness.platform.v1.utils.Constants;
 import org.alertpreparedness.platform.v1.utils.SnackbarHelper;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import butterknife.BindColor;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 /**
  * Created by Tj on 19/12/2017.
@@ -88,7 +83,7 @@ public class MyCountryFragment extends Fragment implements OnCountrySelectedList
     @BindColor(R.color.page_indicator_color)
     int activeColor;
 
-    @BindColor(R.color.divider_color)
+    @BindColor(R.color.grey)
     int inactiveColor;
 
     @Inject @AgencyRef

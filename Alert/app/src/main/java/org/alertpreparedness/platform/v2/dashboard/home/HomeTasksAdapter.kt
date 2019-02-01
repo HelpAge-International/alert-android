@@ -4,15 +4,18 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_task.view.ivIcon
 import kotlinx.android.synthetic.main.item_task.view.tvDescription
 import kotlinx.android.synthetic.main.item_task.view.tvTitle
 import org.alertpreparedness.platform.v1.R
 import org.alertpreparedness.platform.v2.dashboard.home.HomeTasksAdapter.HomeTaskViewHolder
-import org.alertpreparedness.platform.v2.utils.DiffListAdapter
+import org.alertpreparedness.platform.v2.models.ActionTask
+import org.alertpreparedness.platform.v2.models.ApprovalTask
+import org.alertpreparedness.platform.v2.models.IndicatorTask
+import org.alertpreparedness.platform.v2.models.Task
 import org.alertpreparedness.platform.v2.utils.DiffComparator
-import org.alertpreparedness.platform.v2.models.*
+import org.alertpreparedness.platform.v2.utils.DiffListAdapter
+import org.alertpreparedness.platform.v2.utils.ViewHolder
 import org.alertpreparedness.platform.v2.utils.extensions.hasPassed
 import org.alertpreparedness.platform.v2.utils.extensions.isToday
 import org.jetbrains.anko.imageResource
@@ -33,23 +36,19 @@ class HomeTasksAdapter(val context: Context): DiffListAdapter<Task, HomeTaskView
         return HomeTaskViewHolder(LayoutInflater.from(context).inflate(R.layout.item_task, parent, false))
     }
 
-    override fun onBindViewHolder(holder: HomeTaskViewHolder, position: Int, model: Task) {
-        return holder.bind(model)
-    }
+    inner class HomeTaskViewHolder(view: View) : ViewHolder<Task>(view) {
+        override fun bind(model: Task, position: Int) {
+            tvDescription.text = model.label
+            when (model) {
+                is IndicatorTask -> bindIndicatorTask(model)
+                is ActionTask -> bindActionTask(model)
+                is ApprovalTask -> bindApprovalTask(model)
+            }
+        }
 
-    inner class HomeTaskViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val ivIcon = view.ivIcon!!
         val tvTitle = view.tvTitle!!
         val tvDescription = view.tvDescription!!
-
-        fun bind(task: Task){
-            tvDescription.text = task.label
-            when(task) {
-                is IndicatorTask -> bindIndicatorTask(task)
-                is ActionTask -> bindActionTask(task)
-                is ApprovalTask -> bindApprovalTask(task)
-            }
-        }
 
         private fun bindIndicatorTask(indicatorTask: IndicatorTask) {
             setDateIcon(indicatorTask.dueDate)

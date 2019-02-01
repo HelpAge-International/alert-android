@@ -3,33 +3,40 @@ package org.alertpreparedness.platform.v1.adv_preparedness.fragment;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import com.google.firebase.database.DatabaseReference;
-
+import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.R;
-import org.alertpreparedness.platform.v1.dagger.annotation.ActiveActionObservable;
-import org.alertpreparedness.platform.v1.dagger.annotation.BaseActionRef;
-import org.alertpreparedness.platform.v1.firebase.ActionModel;
 import org.alertpreparedness.platform.v1.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.v1.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.v1.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.ActionRef;
+import org.alertpreparedness.platform.v1.dagger.annotation.ActiveActionObservable;
 import org.alertpreparedness.platform.v1.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.AlertRef;
+import org.alertpreparedness.platform.v1.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.NetworkRef;
+import org.alertpreparedness.platform.v1.firebase.ActionModel;
 import org.alertpreparedness.platform.v1.firebase.ClockSetting;
+import org.alertpreparedness.platform.v1.firebase.data_fetchers.ClockSettingsFetcher;
 import org.alertpreparedness.platform.v1.firebase.data_fetchers.FetcherResultItem;
 import org.alertpreparedness.platform.v1.firebase.wrappers.ActionItemWrapper;
 import org.alertpreparedness.platform.v1.helper.DateHelper;
@@ -37,22 +44,10 @@ import org.alertpreparedness.platform.v1.interfaces.DisposableFragment;
 import org.alertpreparedness.platform.v1.min_preparedness.activity.AddNotesActivity;
 import org.alertpreparedness.platform.v1.min_preparedness.activity.ViewAttachmentsActivity;
 import org.alertpreparedness.platform.v1.model.User;
-import org.alertpreparedness.platform.v1.firebase.data_fetchers.ClockSettingsFetcher;
 import org.alertpreparedness.platform.v1.utils.Constants;
 import org.alertpreparedness.platform.v1.utils.PermissionsHelper;
 import org.alertpreparedness.platform.v1.utils.SnackbarHelper;
 import org.joda.time.DateTime;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import io.reactivex.Flowable;
-import io.reactivex.disposables.CompositeDisposable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
@@ -141,7 +136,7 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
 
     private void initViews() {
         assert imgActionExpired != null;
-        imgActionExpired.setImageResource(R.drawable.ic_close_round);
+        imgActionExpired.setImageResource(R.drawable.preparedness_red);
         assert tvActionExpired != null;
         tvActionExpired.setText("Expired");
         tvActionExpired.setTextColor(getResources().getColor(R.color.alertRed));

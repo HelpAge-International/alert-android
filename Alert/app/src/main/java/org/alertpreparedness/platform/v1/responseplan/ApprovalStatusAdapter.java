@@ -1,21 +1,18 @@
 package org.alertpreparedness.platform.v1.responseplan;
 
 import android.content.Context;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import org.alertpreparedness.platform.v1.R;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import java.util.ArrayList;
+import java.util.List;
+import org.alertpreparedness.platform.v1.R;
 
 /**
  * Created by Tj on 12/12/2017.
@@ -80,7 +77,7 @@ public class ApprovalStatusAdapter extends RecyclerView.Adapter<ApprovalStatusAd
             case 0://amber
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertAmber));
                 holder.status.setText(R.string.requires_submission);
-                holder.icon.setImageResource(R.drawable.icon_pending_amber);
+                holder.icon.setImageResource(R.drawable.icon_preparedness_in_progress);
                 break;
             case 3:
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertRed));

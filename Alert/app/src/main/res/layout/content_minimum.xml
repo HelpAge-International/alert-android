@@ -3,7 +3,7 @@
     android:id="@+id/cl_in_progress"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/divider_color">
+    android:background="@color/grey">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -36,7 +36,7 @@
                             android:layout_gravity="center_vertical"
                             android:layout_width="16dp"
                             android:layout_height="16dp"
-                            app:srcCompat="@drawable/ic_in_progress" />
+                            app:srcCompat="@drawable/preparedness_amber" />
 
                         <TextView
                             android:id="@+id/tvStatus"

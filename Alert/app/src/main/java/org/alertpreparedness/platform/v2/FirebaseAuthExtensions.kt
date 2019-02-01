@@ -32,6 +32,6 @@ object FirebaseAuthExtensions {
         return getLoggedInUser()
                 .map { it.uid }
                 .distinctUntilChanged()
-                .cache()
+                .share()
     }
 }
