@@ -19,6 +19,8 @@ import org.alertpreparedness.platform.v2.models.enums.ActionType
 import org.alertpreparedness.platform.v2.models.enums.ActionTypeSerializer
 import org.alertpreparedness.platform.v2.models.enums.DurationType
 import org.alertpreparedness.platform.v2.models.enums.DurationTypeSerializer
+import org.alertpreparedness.platform.v2.models.enums.HazardScenario
+import org.alertpreparedness.platform.v2.models.enums.HazardScenarioSerializer
 import org.alertpreparedness.platform.v2.models.enums.IndicatorTriggerLevel
 import org.alertpreparedness.platform.v2.models.enums.IndicatorTriggerLevelSerializer
 import org.alertpreparedness.platform.v2.models.enums.ResponsePlanState
@@ -61,6 +63,7 @@ val gson: Gson by lazy{
             .registerTypeAdapter(ResponsePlanApprovalState::class.java, ResponsePlanApprovalSerializer)
             .registerTypeAdapter(DurationType::class.java, DurationTypeSerializer)
             .registerTypeAdapter(Title::class.java, TitleSerializer)
+            .registerTypeAdapter(HazardScenario::class.java, HazardScenarioSerializer)
             .create()
 }
 

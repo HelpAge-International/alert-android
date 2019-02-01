@@ -14,6 +14,8 @@ import org.alertpreparedness.platform.v2.utils.extensions.combineFlatten
 import org.alertpreparedness.platform.v2.utils.extensions.hasPassed
 import org.alertpreparedness.platform.v2.utils.extensions.isThisWeek
 import org.alertpreparedness.platform.v2.utils.extensions.isToday
+import org.alertpreparedness.platform.v2.utils.extensions.mapList
+import org.alertpreparedness.platform.v2.utils.extensions.print
 import org.alertpreparedness.platform.v2.utils.extensions.withLatestFromPair
 
 interface IHomeViewModel {
@@ -41,15 +43,21 @@ class HomeViewModel : BaseViewModel(), IHomeViewModel.Inputs, IHomeViewModel.Out
 
         return combineFlatten<Task>(
                 indicators
-                        .map { list -> list.map { IndicatorTask(it) } },
+                        .print("Indicators") { it.size }
+                        .mapList { IndicatorTask(it) },
                 actions
-                        .map { list -> list.map { ActionTask(it) } },
+                        .print("Actions") { it.size }
+                        .mapList { ActionTask(it) },
                 responsePlansObservable
-                        .map { list -> list.map { ApprovalTask(it) } }
+                        .print("Response Plans") { it.size }
+                        .mapList { ApprovalTask(it) }
         )
+
+                .print("Pre filtered") { it.size }
                 .map { list -> list
                         .filter { it.dueDate.isThisWeek() || it.dueDate.isToday() || it.dueDate.hasPassed() }
                         .sortedBy { it.dueDate } }
+                .print("Post filtered") { it.size }
     }
 }
 

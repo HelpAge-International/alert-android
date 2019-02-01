@@ -8,6 +8,7 @@ import org.alertpreparedness.platform.v2.asObservable
 import org.alertpreparedness.platform.v2.db
 import org.alertpreparedness.platform.v2.models.Action
 import org.alertpreparedness.platform.v2.models.ClockSettings
+import org.alertpreparedness.platform.v2.models.Hazard
 import org.alertpreparedness.platform.v2.models.Indicator
 import org.alertpreparedness.platform.v2.models.ResponsePlan
 import org.alertpreparedness.platform.v2.models.User
@@ -24,12 +25,13 @@ import org.alertpreparedness.platform.v2.models.enums.ActionTypeSerializer
 import org.alertpreparedness.platform.v2.models.enums.CountryOffice
 import org.alertpreparedness.platform.v2.models.enums.DurationType.WEEK
 import org.alertpreparedness.platform.v2.models.enums.DurationTypeSerializer
-import org.alertpreparedness.platform.v2.utils.extensions.childKeys
 import org.alertpreparedness.platform.v2.utils.extensions.combineFlatten
 import org.alertpreparedness.platform.v2.utils.extensions.combineToList
 import org.alertpreparedness.platform.v2.utils.extensions.combineWithPair
 import org.alertpreparedness.platform.v2.utils.extensions.combineWithTriple
+import org.alertpreparedness.platform.v2.utils.extensions.filterList
 import org.alertpreparedness.platform.v2.utils.extensions.firstChildKey
+import org.alertpreparedness.platform.v2.utils.extensions.mapList
 import org.alertpreparedness.platform.v2.utils.extensions.toMergedModel
 import org.alertpreparedness.platform.v2.utils.extensions.toModel
 import org.alertpreparedness.platform.v2.utils.extensions.withLatestFromPair
@@ -143,56 +145,59 @@ object Repository {
     }
 
     val countryOfficeObservable: Observable<CountryOffice> by lazy {
-        userObservable.flatMap { user ->
-            db.child("countryOffice")
-                    .child(user.agencyAdminId)
-                    .child(user.countryId)
-                    .asObservable()
-                    .map {
-                        it.toModel<CountryOffice> { model, jsonObject ->
-                            val clockSettings = jsonObject["clockSettings"].asJsonObject
-                            val preparednessClockSettings = clockSettings["preparedness"].asJsonObject
-                            val responsePlanClockSettings = clockSettings["responsePlans"].asJsonObject
-                            val riskMonitoringClockSettings = clockSettings["riskMonitoring"].asJsonObject
-
-                            model.preparednessClockSettings = ClockSettings(
-                                    DurationTypeSerializer.jsonToEnum(preparednessClockSettings["durationType"].asInt)
-                                            ?: WEEK,
-                                    preparednessClockSettings["value"].asInt
-                            )
-                            model.responsePlanClockSettings = ClockSettings(
-                                    DurationTypeSerializer.jsonToEnum(responsePlanClockSettings["durationType"].asInt)
-                                            ?: WEEK,
-                                    responsePlanClockSettings["value"].asInt
-                            )
-                            model.riskMonitoringClockSettings = ClockSettings(
-                                    DurationTypeSerializer.jsonToEnum(
-                                            riskMonitoringClockSettings["durationType"].asInt) ?: WEEK,
-                                    riskMonitoringClockSettings["value"].asInt
-                            )
-                        }
-                    }
-        }
+        userObservable
+                .flatMap { user ->
+                    countryOfficeObservable(user)
+                }
                 .share()
     }
 
-    val hazardIdsObservable: Observable<List<String>> by lazy {
+    fun countryOfficeObservable(user: User): Observable<CountryOffice> {
+        return db.child("countryOffice")
+                .child(user.agencyAdminId)
+                .child(user.countryId)
+                .asObservable()
+                .map {
+                    it.toModel<CountryOffice> { model, jsonObject ->
+                        val clockSettings = jsonObject["clockSettings"].asJsonObject
+                        val preparednessClockSettings = clockSettings["preparedness"].asJsonObject
+                        val responsePlanClockSettings = clockSettings["responsePlans"].asJsonObject
+                        val riskMonitoringClockSettings = clockSettings["riskMonitoring"].asJsonObject
+
+                        model.preparednessClockSettings = ClockSettings(
+                                DurationTypeSerializer.jsonToEnum(preparednessClockSettings["durationType"].asInt)
+                                        ?: WEEK,
+                                preparednessClockSettings["value"].asInt
+                        )
+                        model.responsePlanClockSettings = ClockSettings(
+                                DurationTypeSerializer.jsonToEnum(responsePlanClockSettings["durationType"].asInt)
+                                        ?: WEEK,
+                                responsePlanClockSettings["value"].asInt
+                        )
+                    }
+                }
+    }
+
+    val hazardObservable: Observable<List<Hazard>> by lazy {
         userObservable
                 .flatMap { user ->
                     db.child("hazard")
                             .child(user.countryId)
                             .asObservable()
-                            .map {
-                                it.childKeys()
+                            .map { snapshot ->
+                                snapshot.children.map { it.toModel<Hazard>() }
                             }
                 }
                 .share()
     }
 
     val indicatorsObservable: Observable<List<Indicator>> by lazy {
-        hazardIdsObservable
+        hazardObservable
+                .filterList {
+                    it.isActive
+                }
                 .combineWithPair(userObservable)
-                .map { (hazardIds, user) -> hazardIds + user.countryId }
+                .map { (hazards, user) -> hazards.map { it.id } + user.countryId }
                 .flatMap { hazardIdList ->
                     combineFlatten(
                             hazardIdList.map { hazardId ->
@@ -213,12 +218,12 @@ object Repository {
 
     val actionsObservable: Observable<List<Action>> by lazy {
         userObservable
-                .flatMap { user ->
+                .switchMap { user ->
                     db.child("action")
                             .child(user.countryId)
                             .asObservable()
                             .map { it.children.toList() }
-                            .withLatestFromPair(countryOfficeObservable)
+                            .combineWithPair(countryOfficeObservable(user))
                             .switchMap { (snapshots, countryOffice) ->
                                 combineToList(
                                         snapshots.map { snapshot ->
@@ -256,6 +261,9 @@ object Repository {
                                         }
                                 )
                             }
+                            .filterList {
+                                !it.isArchived && !it.isComplete
+                            }
                 }
                 .share()
     }
@@ -281,13 +289,11 @@ object Repository {
                             .child(user.countryId)
                             .asObservable()
                             .map { it.children.toList() }
-                            .map { list ->
-                                list.map {
-                                    it.toModel<ResponsePlan>()
-                                }
-                                        .filter {
-                                            it.approval.countryDirector?.id == user.countryId
-                                        }
+                            .mapList {
+                                it.toModel<ResponsePlan>()
+                            }
+                            .filterList {
+                                it.approval.countryDirector?.id == user.countryId
                             }
                 }
                 .share()

@@ -25,4 +25,8 @@ class User(
     lateinit var agencyAdminId: String
     @Transient
     lateinit var systemAdminId: String
+
+    override fun toString(): String {
+        return "User(addressLine1='$addressLine1', addressLine2='$addressLine2', addressLine3='$addressLine3', city='$city', country=$country, email='$email', firstName='$firstName', lastName='$lastName', latestCoCAgreed=$latestCoCAgreed, latestToCAgreed=$latestToCAgreed, phone='$phone', postCode='$postCode', title=$title, countryId='$countryId', userType=$userType, agencyAdminId='$agencyAdminId', systemAdminId='$systemAdminId')"
+    }
 }

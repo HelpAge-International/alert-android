@@ -18,6 +18,4 @@ class CountryOffice(
     lateinit var preparednessClockSettings: ClockSettings
     @Transient
     lateinit var responsePlanClockSettings: ClockSettings
-    @Transient
-    lateinit var riskMonitoringClockSettings: ClockSettings
 }

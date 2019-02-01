@@ -226,3 +226,11 @@ fun <T> Observable<T>.filterSuccess(): Observable<T> {
             .dematerialize<T>()
 
 }
+
+fun <T> Observable<List<T>>.filterList(filter: (T) -> Boolean): Observable<List<T>> {
+    return map { it.filter(filter) }
+}
+
+fun <T, R> Observable<List<T>>.mapList(map: (T) -> R): Observable<List<R>> {
+    return map { it.map(map) }
+}

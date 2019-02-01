@@ -29,3 +29,8 @@ fun DatabaseReference.asObservable(): Observable<DataSnapshot> {
         }
     }
 }
+
+fun DatabaseReference.printRef(key: String = ""): DatabaseReference {
+    println("$key - $ref")
+    return this
+}
