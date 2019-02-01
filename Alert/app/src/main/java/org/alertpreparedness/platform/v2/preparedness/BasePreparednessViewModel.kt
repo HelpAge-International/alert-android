@@ -15,6 +15,7 @@ interface IBasePreparednessViewModel {
 
     interface Outputs {
         fun actions(): Observable<List<Action>>
+        fun user(): Observable<User>
     }
 }
 
@@ -26,5 +27,9 @@ abstract class BasePreparednessViewModel : BaseViewModel(), Inputs, Outputs {
         return actionsObservable
                 .combineWithPair(userObservable)
                 .map { (list, user) -> list.filter { filterAction(it, user) } }
+    }
+
+    override fun user(): Observable<User> {
+        return userObservable
     }
 }

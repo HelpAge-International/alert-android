@@ -23,7 +23,7 @@
             app:layout_constraintBottom_toBottomOf="@id/tvStatus"
             app:layout_constraintEnd_toStartOf="@+id/tvStatus"
             app:layout_constraintTop_toTopOf="@id/tvStatus"
-            tools:srcCompat="@drawable/ic_in_progress" />
+            tools:srcCompat="@drawable/preparedness_amber" />
 
         <TextView
             android:id="@+id/tvStatus"

@@ -1,27 +1,23 @@
 package org.alertpreparedness.platform.v1.responseplan;
 
 import android.content.Context;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-
-import org.alertpreparedness.platform.v1.R;
-import org.alertpreparedness.platform.v1.min_preparedness.model.Note;
-
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.v1.min_preparedness.model.Note;
 
 /**
  * Created by Tj on 12/12/2017.
@@ -178,8 +174,8 @@ public class ResponsePlansAdapter extends RecyclerView.Adapter<ResponsePlansAdap
             case 0://amber
                 holder.line.setBackgroundColor(context.getResources().getColor(R.color.alertAmber));
                 holder.status.setTextColor(context.getResources().getColor(R.color.alertAmber));
-                holder.status.setText(R.string.in_progress);
-                holder.statusIcon.setImageResource(R.drawable.icon_pending_amber);
+                holder.status.setText(R.string.in_progress_title);
+                holder.statusIcon.setImageResource(R.drawable.icon_preparedness_in_progress);
                 break;
             case 3:
                 holder.line.setBackgroundColor(context.getResources().getColor(R.color.alertRed));

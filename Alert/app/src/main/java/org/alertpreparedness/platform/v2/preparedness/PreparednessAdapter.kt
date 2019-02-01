@@ -12,6 +12,7 @@ import kotlinx.android.synthetic.main.item_preparedness_action.view.tvBudget
 import kotlinx.android.synthetic.main.item_preparedness_action.view.tvDate
 import org.alertpreparedness.platform.v1.R
 import org.alertpreparedness.platform.v2.models.Action
+import org.alertpreparedness.platform.v2.models.User
 import org.alertpreparedness.platform.v2.preparedness.PreparednessAdapter.PreparednessViewHolder
 import org.alertpreparedness.platform.v2.utils.DiffComparator
 import org.alertpreparedness.platform.v2.utils.DiffListAdapter
@@ -27,6 +28,13 @@ class PreparednessAdapter(val context: Context) :
                 return o1 == o2
             }
         }) {
+
+    var user: User? = null
+
+    fun updateUser(user: User) {
+        this.user = user
+        notifyAllItemsUpdated()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PreparednessViewHolder {
         return PreparednessViewHolder(
@@ -47,9 +55,16 @@ class PreparednessAdapter(val context: Context) :
             } else {
                 context.getString(R.string.not_assigned)
             }
-            //TODO: Set username when action is fetched?
-            //TODO: Also we need to fetch clock settings somehow, either calc expiration date when action is fetched (grab countryInfo clock settings too) or calc in getter for object?
-            tvActionName.text = model.assignee
+            tvActionName.text = model.task
+            if (model.assignee == null) {
+                tvAssignee.text = context.getString(R.string.unassigned_title)
+            } else if (user != null && model.assignee == user!!.id) {
+                tvAssignee.text = context.getString(R.string.full_name, user!!.firstName, user!!.lastName)
+            } else {
+                tvAssignee.text = ""
+            }
+
+            tvBudget.text = context.getString(R.string.usd_formatted, model.budget)
         }
     }
 }

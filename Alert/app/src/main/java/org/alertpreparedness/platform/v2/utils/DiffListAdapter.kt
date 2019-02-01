@@ -8,7 +8,7 @@ abstract class DiffListAdapter<MODEL, VIEW_HOLDER : ViewHolder<MODEL>>(val diffC
         RecyclerView.Adapter<VIEW_HOLDER>() {
     val items = mutableListOf<MODEL>()
 
-    fun replaceAll(newItems: List<MODEL>) {
+    fun updateItems(newItems: List<MODEL>) {
         val diffResult = DiffUtil.calculateDiff(DiffComparatorCallback(items, newItems, diffComparator))
 
         items.clear()
@@ -18,6 +18,10 @@ abstract class DiffListAdapter<MODEL, VIEW_HOLDER : ViewHolder<MODEL>>(val diffC
 
     override fun getItemCount(): Int {
         return items.size
+    }
+
+    fun notifyAllItemsUpdated() {
+        notifyItemRangeChanged(0, items.size)
     }
 
     override fun onBindViewHolder(holder: VIEW_HOLDER, position: Int) {

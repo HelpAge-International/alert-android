@@ -17,21 +17,32 @@ import org.alertpreparedness.platform.v2.models.enums.ActionLevel
 import org.alertpreparedness.platform.v2.models.enums.ActionLevelSerializer
 import org.alertpreparedness.platform.v2.models.enums.ActionType
 import org.alertpreparedness.platform.v2.models.enums.ActionTypeSerializer
-import org.alertpreparedness.platform.v2.models.enums.ResponsePlanState
-import org.alertpreparedness.platform.v2.models.enums.ResponsePlanStateSerializer
+import org.alertpreparedness.platform.v2.models.enums.DurationType
+import org.alertpreparedness.platform.v2.models.enums.DurationTypeSerializer
 import org.alertpreparedness.platform.v2.models.enums.IndicatorTriggerLevel
 import org.alertpreparedness.platform.v2.models.enums.IndicatorTriggerLevelSerializer
+import org.alertpreparedness.platform.v2.models.enums.ResponsePlanState
+import org.alertpreparedness.platform.v2.models.enums.ResponsePlanStateSerializer
+import org.alertpreparedness.platform.v2.models.enums.Title
+import org.alertpreparedness.platform.v2.models.enums.TitleSerializer
 import org.joda.time.DateTime
 import java.io.StringReader
-import java.lang.IllegalArgumentException
 import java.util.Date
+
+fun DataSnapshot.childKeys(): List<String> {
+    return children.mapNotNull { it.key }
+}
 
 fun DataSnapshot.firstChildKey(): String {
     return childKeys().first()
 }
 
-fun DataSnapshot.childKeys(): List<String> {
-    return children.mapNotNull { it.key }
+fun JsonObject.childKeys(): List<String> {
+    return keySet().mapNotNull { it }
+}
+
+fun JsonObject.firstChildKey(): String {
+    return childKeys().first()
 }
 
 
@@ -48,18 +59,22 @@ val gson: Gson by lazy{
             .registerTypeAdapter(ActionType::class.java, ActionTypeSerializer)
             .registerTypeAdapter(ResponsePlanState::class.java, ResponsePlanStateSerializer)
             .registerTypeAdapter(ResponsePlanApprovalState::class.java, ResponsePlanApprovalSerializer)
+            .registerTypeAdapter(DurationType::class.java, DurationTypeSerializer)
+            .registerTypeAdapter(Title::class.java, TitleSerializer)
             .create()
 }
 
-inline fun <reified T: BaseModel> DataSnapshot.toModel(): T {
-    return listOf(this).toMergedModel()
+inline fun <reified T : BaseModel> DataSnapshot.toModel(objectModifier: (T, JsonObject) -> Unit = { _, _ -> }): T {
+    return listOf(this).toMergedModel(objectModifier)
 }
 
-inline fun <reified T: BaseModel> Pair<DataSnapshot, DataSnapshot>.toMergedModel(): T {
-    return toList().toMergedModel()
+inline fun <reified T : BaseModel> Pair<DataSnapshot, DataSnapshot>.toMergedModel(
+        objectModifier: (T, JsonObject) -> Unit = { _, _ -> }): T {
+    return toList().toMergedModel(objectModifier)
 }
 
-inline fun <reified T: BaseModel> List<DataSnapshot>.toMergedModel(): T {
+inline fun <reified T : BaseModel> List<DataSnapshot>.toMergedModel(
+        objectModifier: (T, JsonObject) -> Unit = { _, _ -> }): T {
     if(isEmpty()) throw IllegalArgumentException("")
 
     val id = first().key!!
@@ -75,7 +90,9 @@ inline fun <reified T: BaseModel> List<DataSnapshot>.toMergedModel(): T {
         mergedObject = mergedObject.mergeWith(toMerge)
     }
 
-    return jsonToModel(id, mergedObject)
+    val toReturn: T = jsonToModel(id, mergedObject)
+    objectModifier(toReturn, mergedObject)
+    return toReturn
 }
 
 inline fun <reified T: BaseModel> jsonToModel(id: String, jsonObject: JsonObject): T {

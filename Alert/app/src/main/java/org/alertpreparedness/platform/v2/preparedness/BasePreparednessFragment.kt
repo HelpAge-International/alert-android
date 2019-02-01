@@ -22,6 +22,8 @@ abstract class BasePreparednessFragment<VM : BasePreparednessViewModel> : BaseFr
     @DrawableRes
     abstract fun statusIcon(): Int
 
+    private lateinit var adapter: PreparednessAdapter
+
     override fun initViews() {
         super.initViews()
 
@@ -31,5 +33,17 @@ abstract class BasePreparednessFragment<VM : BasePreparednessViewModel> : BaseFr
         adapter = PreparednessAdapter(context!!)
         rvActions.adapter = adapter
         rvActions.layoutManager = LinearLayoutManager(context!!)
+    }
+
+    override fun observeViewModel() {
+        disposables += viewModel.user()
+                .subscribe {
+                    adapter.updateUser(it)
+                }
+
+        disposables += viewModel.actions()
+                .subscribe {
+                    adapter.updateItems(it)
+                }
     }
 }

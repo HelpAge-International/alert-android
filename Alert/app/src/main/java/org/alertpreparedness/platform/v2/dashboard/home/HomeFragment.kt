@@ -36,7 +36,7 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
 
         disposables += viewModel.tasks()
                 .subscribe{tasks ->
-                    tasksAdapter.replaceAll(tasks)
+                    tasksAdapter.updateItems(tasks)
                 }
 
         disposables += viewModel.tasks()

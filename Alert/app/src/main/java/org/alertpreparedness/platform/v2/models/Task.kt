@@ -65,7 +65,8 @@ class ActionTask(
     constructor(action: Action) : this(
             action.id,
             action.task,
-            action.dueDate,
+            //If the aciton is assigned to the user, then there will be a due date.
+            action.dueDate!!,
             action.actionLevel
     )
 

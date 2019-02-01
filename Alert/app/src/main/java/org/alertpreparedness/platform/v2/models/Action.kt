@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName
 import org.alertpreparedness.platform.v2.models.enums.ActionLevel
 import org.alertpreparedness.platform.v2.models.enums.ActionType
 import org.joda.time.DateTime
-import java.util.Date
 
 class Action(
         @SerializedName("asignee")
@@ -15,7 +14,7 @@ class Action(
         val departmentId: String,
         val dueDate: DateTime?,
         val isComplete: Boolean,
-        val isCompleteAt: Date,
+        val isCompleteAt: DateTime?,
         @SerializedName("level")
         val actionLevel: ActionLevel,
         @SerializedName("type")
@@ -24,6 +23,17 @@ class Action(
         val task: String,
         val updatedAt: DateTime
 ) : BaseModel() {
+
+    @Transient
+    lateinit var clockSettings: ClockSettings
+
+    fun getExpirationTime(): DateTime {
+        return if (isCompleteAt != null) {
+            isCompleteAt.plus(clockSettings.calculateOffset())
+        } else {
+            updatedAt.plus(clockSettings.calculateOffset())
+        }
+    }
 
     override fun toString(): String {
         return "Action(assignee='$assignee', budget=$budget, createdAt=$createdAt, departmentId='$departmentId', dueDate=$dueDate, isComplete=$isComplete, isCompleteAt=$isCompleteAt, actionLevel=$actionLevel, requireDoc=$requireDoc, task='$task', type=$actionType, updatedAt=$updatedAt)"
@@ -45,6 +55,7 @@ class Action(
         if (requireDoc != other.requireDoc) return false
         if (task != other.task) return false
         if (updatedAt != other.updatedAt) return false
+        if (clockSettings != other.clockSettings) return false
 
         return true
     }
@@ -54,7 +65,7 @@ class Action(
         result = 31 * result + budget
         result = 31 * result + createdAt.hashCode()
         result = 31 * result + departmentId.hashCode()
-        result = 31 * result + dueDate.hashCode()
+        result = 31 * result + (dueDate?.hashCode() ?: 0)
         result = 31 * result + isComplete.hashCode()
         result = 31 * result + isCompleteAt.hashCode()
         result = 31 * result + actionLevel.hashCode()
@@ -62,6 +73,7 @@ class Action(
         result = 31 * result + requireDoc.hashCode()
         result = 31 * result + task.hashCode()
         result = 31 * result + updatedAt.hashCode()
+        result = 31 * result + clockSettings.hashCode()
         return result
     }
 }
