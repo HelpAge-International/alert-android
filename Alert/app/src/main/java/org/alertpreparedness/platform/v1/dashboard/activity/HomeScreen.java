@@ -4,13 +4,11 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import org.alertpreparedness.platform.v1.MainDrawer;
 import org.alertpreparedness.platform.v1.adv_preparedness.fragment.AdvPreparednessFragment;
-import org.alertpreparedness.platform.v2.dashboard.home.HomeFragment;
-import org.alertpreparedness.platform.v1.min_preparedness.fragment.MinPreparednessFragment;
 import org.alertpreparedness.platform.v1.risk_monitoring.view.RiskFragment;
-
+import org.alertpreparedness.platform.v2.dashboard.home.HomeFragment;
+import org.alertpreparedness.platform.v2.preparedness.MinimumPreparednessFragment;
 import timber.log.Timber;
 
 
@@ -47,13 +45,11 @@ public class HomeScreen extends MainDrawer {
                 setFragment(new AdvPreparednessFragment());
                 break;
             case SCREEN_MPA:
-                setFragment(new MinPreparednessFragment());
+                setFragment(new MinimumPreparednessFragment());
                 break;
             case SCREEN_HOME:
             default:
                 setFragment(new HomeFragment());
-
-
         }
 
     }

@@ -234,3 +234,8 @@ fun <T> Observable<List<T>>.filterList(filter: (T) -> Boolean): Observable<List<
 fun <T, R> Observable<List<T>>.mapList(map: (T) -> R): Observable<List<R>> {
     return map { it.map(map) }
 }
+
+fun <T> Observable<T>.behavior(): Observable<T> {
+    return replay(1)
+            .autoConnect()
+}

@@ -11,6 +11,7 @@ import org.alertpreparedness.platform.v2.repository.Repository.indicatorsObserva
 import org.alertpreparedness.platform.v2.repository.Repository.responsePlansObservable
 import org.alertpreparedness.platform.v2.repository.Repository.userObservable
 import org.alertpreparedness.platform.v2.utils.extensions.combineFlatten
+import org.alertpreparedness.platform.v2.utils.extensions.filterList
 import org.alertpreparedness.platform.v2.utils.extensions.hasPassed
 import org.alertpreparedness.platform.v2.utils.extensions.isThisWeek
 import org.alertpreparedness.platform.v2.utils.extensions.isToday
@@ -40,6 +41,10 @@ class HomeViewModel : BaseViewModel(), IHomeViewModel.Inputs, IHomeViewModel.Out
                 .map { (list, user) ->
                     list.filter { it.assignee == user.id }
                 }
+                .filterList {
+                    !it.isArchived && !it.isComplete
+                }
+
 
         return combineFlatten<Task>(
                 indicators

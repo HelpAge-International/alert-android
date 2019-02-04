@@ -25,6 +25,7 @@ import org.alertpreparedness.platform.v2.models.enums.ActionTypeSerializer
 import org.alertpreparedness.platform.v2.models.enums.CountryOffice
 import org.alertpreparedness.platform.v2.models.enums.DurationType.WEEK
 import org.alertpreparedness.platform.v2.models.enums.DurationTypeSerializer
+import org.alertpreparedness.platform.v2.utils.extensions.behavior
 import org.alertpreparedness.platform.v2.utils.extensions.combineFlatten
 import org.alertpreparedness.platform.v2.utils.extensions.combineToList
 import org.alertpreparedness.platform.v2.utils.extensions.combineWithPair
@@ -130,6 +131,7 @@ object Repository {
                     )
                 }
                 .share()
+                .behavior()
 
     }
 
@@ -150,6 +152,7 @@ object Repository {
                     countryOfficeObservable(user)
                 }
                 .share()
+                .behavior()
     }
 
     fun countryOfficeObservable(user: User): Observable<CountryOffice> {
@@ -189,6 +192,7 @@ object Repository {
                             }
                 }
                 .share()
+                .behavior()
     }
 
     val indicatorsObservable: Observable<List<Indicator>> by lazy {
@@ -214,6 +218,7 @@ object Repository {
                     list.filter { it.assignee == user.id }
                 }
                 .share()
+                .behavior()
     }
 
     val actionsObservable: Observable<List<Action>> by lazy {
@@ -256,16 +261,16 @@ object Repository {
                                                                 }
                                                             }
                                                 }
-                                                CUSTOM -> Observable.just(snapshot.toModel())
+                                                CUSTOM -> Observable.just(snapshot.toModel { action, jsonObject ->
+                                                    setUpActionClockSettings(action, jsonObject, countryOffice)
+                                                })
                                             }
                                         }
                                 )
                             }
-                            .filterList {
-                                !it.isArchived && !it.isComplete
-                            }
                 }
                 .share()
+                .behavior()
     }
 
     private fun setUpActionClockSettings(action: Action, json: JsonObject, countryOffice: CountryOffice) {
@@ -298,6 +303,7 @@ object Repository {
                 }
                 .share()
                 .startWith(listOf<ResponsePlan>())
+                .behavior()
     }
 }
 

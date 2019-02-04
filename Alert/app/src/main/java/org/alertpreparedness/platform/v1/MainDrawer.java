@@ -3,50 +3,45 @@ package org.alertpreparedness.platform.v1;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import com.google.android.material.navigation.NavigationView;
-import androidx.fragment.app.Fragment;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.cardview.widget.CardView;
-import androidx.appcompat.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-
+import de.hdodenhof.circleimageview.CircleImageView;
+import io.reactivex.Observable;
+import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.adv_preparedness.fragment.AdvPreparednessFragment;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.PermissionRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.v1.dashboard.activity.CreateAlertActivity;
-import org.alertpreparedness.platform.v2.dashboard.home.HomeFragment;
-import org.alertpreparedness.platform.v1.mycountry.MyCountryFragment;
-import org.alertpreparedness.platform.v1.min_preparedness.fragment.MinPreparednessFragment;
 import org.alertpreparedness.platform.v1.model.User;
+import org.alertpreparedness.platform.v1.mycountry.MyCountryFragment;
 import org.alertpreparedness.platform.v1.responseplan.ResponsePlanFragment;
 import org.alertpreparedness.platform.v1.risk_monitoring.view.RiskFragment;
 import org.alertpreparedness.platform.v1.settings.SettingsFragment;
 import org.alertpreparedness.platform.v1.utils.AppUtils;
 import org.alertpreparedness.platform.v1.utils.Constants;
+import org.alertpreparedness.platform.v2.dashboard.home.HomeFragment;
+import org.alertpreparedness.platform.v2.preparedness.MinimumPreparednessFragment;
 import org.alertpreparedness.platform.v2.utils.GlideApp;
-
-import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import de.hdodenhof.circleimageview.CircleImageView;
-import io.reactivex.Observable;
 
 public class MainDrawer extends BaseActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
@@ -289,7 +284,8 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                     Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> setFragment(new RiskFragment()));
                     break;
                 case R.id.nav_minimum:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> setFragment(new MinPreparednessFragment()));
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1)
+                            .subscribe(x -> setFragment(new MinimumPreparednessFragment()));
                     break;
                 case R.id.nav_advanced:
                     Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> setFragment(new AdvPreparednessFragment()));

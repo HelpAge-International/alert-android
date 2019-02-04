@@ -308,6 +308,7 @@
     <string name="usd_formatted">$%d</string>
     <string name="expired_title">Expired</string>
     <string name="completed_title">Completed</string>
+    <string name="no_actions">No Actions</string>
 
 
 </resources>
