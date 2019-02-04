@@ -8,7 +8,7 @@ import org.joda.time.DateTime
 class Action(
         @SerializedName("asignee")
         val assignee: String?,
-        val budget: Int,
+        val budget: Int?,
         val createdAt: DateTime,
         @SerializedName("department")
         val departmentId: String,
@@ -63,7 +63,7 @@ class Action(
 
     override fun hashCode(): Int {
         var result = assignee?.hashCode() ?: 0
-        result = 31 * result + budget
+        result = 31 * result + (budget ?: 0)
         result = 31 * result + createdAt.hashCode()
         result = 31 * result + departmentId.hashCode()
         result = 31 * result + (dueDate?.hashCode() ?: 0)

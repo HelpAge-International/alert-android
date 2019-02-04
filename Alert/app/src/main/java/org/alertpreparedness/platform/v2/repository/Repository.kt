@@ -18,16 +18,11 @@ import org.alertpreparedness.platform.v2.models.UserType.COUNTRY_DIRECTOR
 import org.alertpreparedness.platform.v2.models.UserType.ERT
 import org.alertpreparedness.platform.v2.models.UserType.ERT_LEADER
 import org.alertpreparedness.platform.v2.models.UserType.PARTNER
-import org.alertpreparedness.platform.v2.models.enums.ActionType.CHS
-import org.alertpreparedness.platform.v2.models.enums.ActionType.CUSTOM
-import org.alertpreparedness.platform.v2.models.enums.ActionType.MANDATED
-import org.alertpreparedness.platform.v2.models.enums.ActionTypeSerializer
 import org.alertpreparedness.platform.v2.models.enums.CountryOffice
 import org.alertpreparedness.platform.v2.models.enums.DurationType.WEEK
 import org.alertpreparedness.platform.v2.models.enums.DurationTypeSerializer
 import org.alertpreparedness.platform.v2.utils.extensions.behavior
 import org.alertpreparedness.platform.v2.utils.extensions.combineFlatten
-import org.alertpreparedness.platform.v2.utils.extensions.combineToList
 import org.alertpreparedness.platform.v2.utils.extensions.combineWithPair
 import org.alertpreparedness.platform.v2.utils.extensions.combineWithTriple
 import org.alertpreparedness.platform.v2.utils.extensions.filterList
@@ -224,49 +219,36 @@ object Repository {
     val actionsObservable: Observable<List<Action>> by lazy {
         userObservable
                 .switchMap { user ->
-                    db.child("action")
+                    val baseAction = db.child("action")
                             .child(user.countryId)
                             .asObservable()
                             .map { it.children.toList() }
-                            .combineWithPair(countryOfficeObservable(user))
-                            .switchMap { (snapshots, countryOffice) ->
-                                combineToList(
-                                        snapshots.map { snapshot ->
-                                            val typeInt = snapshot.child("type").getValue(Long::class.java)!!.toInt()
-                                            val type = ActionTypeSerializer.jsonToEnum(typeInt) ?: CUSTOM
 
-                                            when (type) {
-                                                CHS ->
-                                                    db.child("actionCHS")
-                                                            .child(user.systemAdminId)
-                                                            .child(snapshot.key!!)
-                                                            .asObservable()
-                                                            .map {
-                                                                Pair(snapshot, it).toMergedModel<Action>
-                                                                { action, jsonObject ->
-                                                                    setUpActionClockSettings(action, jsonObject,
-                                                                            countryOffice)
-                                                                }
-                                                            }
-                                                MANDATED -> {
-                                                    db.child("actionMandated")
-                                                            .child(user.agencyAdminId)
-                                                            .child(snapshot.key!!)
-                                                            .asObservable()
-                                                            .map {
-                                                                Pair(snapshot, it).toMergedModel<Action>
-                                                                { action, jsonObject ->
-                                                                    setUpActionClockSettings(action, jsonObject,
-                                                                            countryOffice)
-                                                                }
-                                                            }
-                                                }
-                                                CUSTOM -> Observable.just(snapshot.toModel { action, jsonObject ->
-                                                    setUpActionClockSettings(action, jsonObject, countryOffice)
-                                                })
+                    val chsAction = db.child("actionCHS")
+                            .child(user.systemAdminId)
+                            .asObservable()
+                            .map { it.children.toList() }
+
+                    val mandatedAction = db.child("actionMandated")
+                            .child(user.agencyAdminId)
+                            .asObservable()
+                            .map { it.children.toList() }
+
+
+                    baseAction.combineWithTriple(chsAction, mandatedAction)
+                            .combineWithPair(countryOfficeObservable(user))
+                            .map { (actionTriple, countryOffice) ->
+                                val (actions, chsActions, mandatedActions) = actionTriple
+
+                                (actions + chsActions + mandatedActions)
+                                        .groupBy { it.key }
+                                        .values
+                                        .toList()
+                                        .map {
+                                            it.toMergedModel<Action> { action, jsonObject ->
+                                                setUpActionClockSettings(action, jsonObject, countryOffice)
                                             }
                                         }
-                                )
                             }
                 }
                 .share()
