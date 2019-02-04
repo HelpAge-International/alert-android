@@ -5,6 +5,10 @@ import org.alertpreparedness.platform.v1.R
 class UnassignedMinimumPreparednessFragment :
         BaseMinimumPreparednessFragment<UnassignedMinimumPreparednessViewModel>() {
 
+    override fun statusColor(): Int {
+        return R.color.alertRed
+    }
+
     override fun statusText(): Int {
         return R.string.unassigned_title
     }

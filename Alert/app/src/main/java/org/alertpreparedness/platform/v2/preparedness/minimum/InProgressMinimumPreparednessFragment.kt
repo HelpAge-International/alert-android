@@ -5,6 +5,10 @@ import org.alertpreparedness.platform.v1.R
 class InProgressMinimumPreparednessFragment :
         BaseMinimumPreparednessFragment<InProgressMinimumPreparednessViewModel>() {
 
+    override fun statusColor(): Int {
+        return R.color.alertAmber
+    }
+
     override fun statusText(): Int {
         return R.string.in_progress_title
     }

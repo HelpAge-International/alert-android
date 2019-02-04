@@ -5,6 +5,10 @@ import org.alertpreparedness.platform.v1.R
 class CompleteAdvancedPreparednessFragment :
         BaseAdvancedPreparednessFragment<CompleteAdvancedPreparednessViewModel>() {
 
+    override fun statusColor(): Int {
+        return R.color.alertGreen
+    }
+
     override fun statusText(): Int {
         return R.string.completed_title
     }

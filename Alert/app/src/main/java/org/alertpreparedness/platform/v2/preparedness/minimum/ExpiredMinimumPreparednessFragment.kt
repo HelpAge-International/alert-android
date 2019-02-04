@@ -3,6 +3,11 @@ package org.alertpreparedness.platform.v2.preparedness.minimum
 import org.alertpreparedness.platform.v1.R
 
 class ExpiredMinimumPreparednessFragment : BaseMinimumPreparednessFragment<ExpiredMinimumPreparednessViewModel>() {
+
+    override fun statusColor(): Int {
+        return R.color.alertRed
+    }
+
     override fun statusText(): Int {
         return R.string.expired_title
     }

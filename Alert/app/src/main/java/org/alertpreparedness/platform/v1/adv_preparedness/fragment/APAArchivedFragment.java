@@ -91,7 +91,7 @@ public class APAArchivedFragment extends BaseAPAFragment implements APActionAdap
         imgActionArchived.setImageResource(R.drawable.preparedness_grey);
         assert tvActionArchived != null;
         tvActionArchived.setText(R.string.archived_title);
-        tvActionArchived.setTextColor(getResources().getColor(R.color.alertGray));
+        tvActionArchived.setTextColor(getResources().getColor(R.color.alertGrey));
         mAPAdapter = new APActionAdapter(getContext(), this);
         assert mAdvActionRV != null;
         mAdvActionRV.setAdapter(mAPAdapter);

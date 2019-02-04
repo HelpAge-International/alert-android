@@ -2,19 +2,24 @@ package org.alertpreparedness.platform.v1.adv_preparedness.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import com.google.firebase.database.DatabaseReference;
-
+import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
+import java.util.ArrayList;
+import java.util.Collection;
+import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.R;
 import org.alertpreparedness.platform.v1.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.v1.adv_preparedness.adapter.APActionAdapter;
@@ -39,16 +44,6 @@ import org.alertpreparedness.platform.v1.min_preparedness.activity.ViewAttachmen
 import org.alertpreparedness.platform.v1.model.User;
 import org.alertpreparedness.platform.v1.utils.Constants;
 import org.alertpreparedness.platform.v1.utils.PermissionsHelper;
-
-import java.util.ArrayList;
-import java.util.Collection;
-
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import io.reactivex.Flowable;
-import io.reactivex.disposables.CompositeDisposable;
 import ru.whalemare.sheetmenu.SheetMenu;
 
 /**
@@ -159,7 +154,7 @@ public class APAInactiveFragment extends BaseAPAFragment implements APActionAdap
         imgActionInactive.setImageResource(R.drawable.ic_in_progress_gray);
         assert tvActionInactive != null;
         tvActionInactive.setText(R.string.inactive_title);
-        tvActionInactive.setTextColor(getResources().getColor(R.color.alertGray));
+        tvActionInactive.setTextColor(getResources().getColor(R.color.alertGrey));
         mAPAdapter = new APActionAdapter(getContext(), this);
         assert mAdvActionRV != null;
         mAdvActionRV.setAdapter(mAPAdapter);

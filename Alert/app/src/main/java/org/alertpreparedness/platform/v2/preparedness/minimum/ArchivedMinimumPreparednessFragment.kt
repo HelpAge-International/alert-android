@@ -3,6 +3,11 @@ package org.alertpreparedness.platform.v2.preparedness.minimum
 import org.alertpreparedness.platform.v1.R
 
 class ArchivedMinimumPreparednessFragment : BaseMinimumPreparednessFragment<ArchivedMinimumPreparednessViewModel>() {
+
+    override fun statusColor(): Int {
+        return R.color.alertGrey
+    }
+
     override fun statusText(): Int {
         return R.string.archived_title
     }

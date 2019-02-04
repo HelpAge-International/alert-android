@@ -1,13 +1,10 @@
 package org.alertpreparedness.platform.v1.dashboard.activity;
 
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
@@ -18,13 +15,24 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProviders;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
+import io.reactivex.disposables.CompositeDisposable;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.ExtensionHelperKt;
 import org.alertpreparedness.platform.v1.R;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
@@ -37,19 +45,6 @@ import org.alertpreparedness.platform.v1.risk_monitoring.model.CountryJsonData;
 import org.alertpreparedness.platform.v1.risk_monitoring.view_model.SelectAreaViewModel;
 import org.alertpreparedness.platform.v1.utils.Constants;
 import org.alertpreparedness.platform.v1.utils.PreferHelper;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import io.reactivex.disposables.CompositeDisposable;
 
 public class AlertDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -113,7 +108,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
         countryID = user.countryID;
         isCountryDirector = user.isCountryDirector();
-        toolbar = (Toolbar) findViewById(R.id.action_toolbar);
+        toolbar = findViewById(R.id.action_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -124,118 +119,6 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
         initView();
 
-    }
-
-    private void initView() {
-
-        llButtons = findViewById(R.id.llButtons);
-        txtHazardName = (TextView) findViewById(R.id.txtHazardName);
-        txtPopulation = (TextView) findViewById(R.id.txtPopulationAffected);
-        txtAffectedArea = (TextView) findViewById(R.id.txtArea);
-        txtInfo = (TextView) findViewById(R.id.txtInfo);
-        txtLastUpdated = (TextView) findViewById(R.id.txtLastUpdated);
-        txtActionBarTitle = (TextView) findViewById(R.id.action_bar_title);
-        txtRedRequested = (TextView) findViewById(R.id.tvRedRequested);
-        imgHazard = (ImageView) findViewById(R.id.imgHazardIcon);
-        imgPopulation = (ImageView) findViewById(R.id.imgPopulationIcon);
-        imgAffectedArea = (ImageView) findViewById(R.id.imgAreaIcon);
-        imgInfo = (ImageView) findViewById(R.id.imgInfo);
-        imgClose = (ImageView) findViewById(R.id.leftImageView);
-        imgUpdate = (ImageView) findViewById(R.id.rightImageView);
-        btnApprove = (Button) findViewById(R.id.btnApprove);
-        btnReject = (Button) findViewById(R.id.btnReject);
-
-        imgUpdate.setImageResource(R.drawable.ic_create_white_24dp);
-        btnApprove.setOnClickListener(this);
-        btnReject.setOnClickListener(this);
-        imgClose.setVisibility(View.GONE);
-        txtRedRequested.setVisibility(View.GONE);
-        llButtons.setVisibility(View.GONE);
-
-        if (alert == null) {
-            Intent intent = getIntent();
-            Bundle bd = intent.getExtras();
-            if (bd != null) {
-                isRequestSent = (String) bd.get("IS_RED_REQUEST");
-            }
-            alert = (AlertModel) intent.getSerializableExtra(EXTRA_ALERT);
-            fetchDetails();
-            mAppStatus = PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS);
-
-            mReference =
-                    FirebaseDatabase
-                            .getInstance()
-                            .getReference()
-                            .child(mAppStatus)
-                            .child("alert")
-                            .child(alert.getParentKey())
-                            .child(alert.getId());
-            mReference.addValueEventListener(mValueListener);
-        }
-
-        if(alert.getAlertLevel() != Constants.TRIGGER_RED) {
-            redAlertReasonIcon.setVisibility(View.GONE);
-            redAlertReasonText.setVisibility(View.GONE);
-            redAlertTextView.setVisibility(View.GONE);
-
-
-            RelativeLayout.LayoutParams params= (RelativeLayout.LayoutParams) imgAffectedArea.getLayoutParams();
-            params.addRule(RelativeLayout.BELOW, R.id.txtInfo);
-
-            imgAffectedArea.setLayoutParams(params);
-        }
-        else {
-            redAlertReasonText.setText(alert.getReasonForRedAlert());
-        }
-    }
-
-    private void parseAlert() {
-
-        if (alert.getAlertLevel() != null) {
-            long alertLevel = alert.getAlertLevel();
-
-            if (alertLevel != 0) {
-                long hazardScenario = alert.getHazardScenario();
-
-                if (alert.getTimeUpdated() != null) {
-                    if (hazardScenario != -1) {
-                        fetchDetails();
-                    }
-                    else if (alert.getOtherName() != null) {
-                        String nameId = alert.getOtherName();
-
-                        setOtherName(nameId);
-                    }
-
-                } else if (alert.getTimeCreated() != null) {
-                    if (hazardScenario != -1) {
-                        fetchDetails();
-                    }
-                    else if (alert.getOtherName() != null) {
-                        String nameId = alert.getOtherName();
-                        setOtherName(nameId);
-                    }
-                }
-            }
-        }
-    }
-
-    private void setOtherName(String nameId) {
-
-        DatabaseReference ref = FirebaseDatabase.getInstance()
-                .getReference().child(mAppStatus).child("hazardOther").child(nameId);
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String name = (String) dataSnapshot.child("name").getValue();
-                AlertDetailActivity.this.alert.setOtherName(name);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 
     private void fetchDetails() {
@@ -297,7 +180,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                 if(alert.getTimeUpdated() != null) {
                     txtLastUpdated.setText(getUpdatedAsString(new Date(alert.getTimeUpdated())));
                 }
-                txtInfo.setText((CharSequence) alert.getInfoNotes());
+                txtInfo.setText(alert.getInfoNotes());
             } else if (alert.getOtherName() != null) {
                 Long date = alert.getTimeUpdated();
                 if(date == null) {
@@ -306,9 +189,117 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
                 imgHazard.setImageResource(R.drawable.other);
                 txtHazardName.setText(alert.getOtherName());
                 txtPopulation.setText(getPeopleAsString(alert.getEstimatedPopulation()));
-                txtInfo.setText((CharSequence) alert.getInfoNotes());
+                txtInfo.setText(alert.getInfoNotes());
                 txtLastUpdated.setText(getUpdatedAsString(new Date(date)));
             }
+        }
+    }
+
+    private void parseAlert() {
+
+        if (alert.getAlertLevel() != null) {
+            long alertLevel = alert.getAlertLevel();
+
+            if (alertLevel != 0) {
+                long hazardScenario = alert.getHazardScenario();
+
+                if (alert.getTimeUpdated() != null) {
+                    if (hazardScenario != -1) {
+                        fetchDetails();
+                    } else if (alert.getOtherName() != null) {
+                        String nameId = alert.getOtherName();
+
+                        setOtherName(nameId);
+                    }
+
+                } else if (alert.getTimeCreated() != null) {
+                    if (hazardScenario != -1) {
+                        fetchDetails();
+                    } else if (alert.getOtherName() != null) {
+                        String nameId = alert.getOtherName();
+                        setOtherName(nameId);
+                    }
+                }
+            }
+        }
+    }
+
+    private void setOtherName(String nameId) {
+
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference().child(mAppStatus).child("hazardOther").child(nameId);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String name = (String) dataSnapshot.child("name").getValue();
+                AlertDetailActivity.this.alert.setOtherName(name);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void initView() {
+
+        llButtons = findViewById(R.id.llButtons);
+        txtHazardName = findViewById(R.id.txtHazardName);
+        txtPopulation = findViewById(R.id.txtPopulationAffected);
+        txtAffectedArea = findViewById(R.id.txtArea);
+        txtInfo = findViewById(R.id.txtInfo);
+        txtLastUpdated = findViewById(R.id.txtLastUpdated);
+        txtActionBarTitle = findViewById(R.id.action_bar_title);
+        txtRedRequested = findViewById(R.id.tvRedRequested);
+        imgHazard = findViewById(R.id.imgHazardIcon);
+        imgPopulation = findViewById(R.id.imgPopulationIcon);
+        imgAffectedArea = findViewById(R.id.imgAreaIcon);
+        imgInfo = findViewById(R.id.imgInfo);
+        imgClose = findViewById(R.id.leftImageView);
+        imgUpdate = findViewById(R.id.rightImageView);
+        btnApprove = findViewById(R.id.btnApprove);
+        btnReject = findViewById(R.id.btnReject);
+
+        imgUpdate.setImageResource(R.drawable.ic_create_white_24dp);
+        btnApprove.setOnClickListener(this);
+        btnReject.setOnClickListener(this);
+        imgClose.setVisibility(View.GONE);
+        txtRedRequested.setVisibility(View.GONE);
+        llButtons.setVisibility(View.GONE);
+
+        if (alert == null) {
+            Intent intent = getIntent();
+            Bundle bd = intent.getExtras();
+            if (bd != null) {
+                isRequestSent = (String) bd.get("IS_RED_REQUEST");
+            }
+            alert = (AlertModel) intent.getSerializableExtra(EXTRA_ALERT);
+            fetchDetails();
+            mAppStatus = PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS);
+
+            mReference =
+                    FirebaseDatabase
+                            .getInstance()
+                            .getReference()
+                            .child(mAppStatus)
+                            .child("alert")
+                            .child(alert.getParentKey())
+                            .child(alert.getId());
+            mReference.addValueEventListener(mValueListener);
+        }
+
+        if (alert.getAlertLevel() != Constants.TRIGGER_RED) {
+            redAlertReasonIcon.setVisibility(View.GONE);
+            redAlertReasonText.setVisibility(View.GONE);
+            redAlertTextView.setVisibility(View.GONE);
+
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) imgAffectedArea.getLayoutParams();
+            params.addRule(RelativeLayout.BELOW, R.id.txtInfo);
+
+            imgAffectedArea.setLayoutParams(params);
+        } else {
+            redAlertReasonText.setText(alert.getReasonForRedAlert());
         }
     }
 
@@ -318,7 +309,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setStatusBarColor(getResources().getColor(R.color.sBar_Gray));
             }
-            toolbar.setBackgroundResource(R.color.alertGray);
+            toolbar.setBackgroundResource(R.color.alertGrey);
             txtActionBarTitle.setText(R.string.amber_alert_text);
             txtRedRequested.setVisibility(View.VISIBLE);
             llButtons.setVisibility(View.VISIBLE);
@@ -328,7 +319,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setStatusBarColor(getResources().getColor(R.color.sBar_Gray));
             }
-            toolbar.setBackgroundResource(R.color.alertGray);
+            toolbar.setBackgroundResource(R.color.alertGrey);
             txtActionBarTitle.setText(R.string.amber_alert_text);
             txtRedRequested.setVisibility(View.VISIBLE);
             llButtons.setVisibility(View.VISIBLE);
@@ -337,7 +328,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 window.setStatusBarColor(getResources().getColor(R.color.sBar_Gray));
             }
-            toolbar.setBackgroundResource(R.color.alertGray);
+            toolbar.setBackgroundResource(R.color.alertGrey);
             txtActionBarTitle.setText(R.string.amber_alert_text);
             txtRedRequested.setVisibility(View.VISIBLE);
         }

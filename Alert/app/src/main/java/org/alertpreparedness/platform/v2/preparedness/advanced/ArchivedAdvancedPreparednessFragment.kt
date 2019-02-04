@@ -5,6 +5,10 @@ import org.alertpreparedness.platform.v1.R
 class ArchivedAdvancedPreparednessFragment :
         BaseAdvancedPreparednessFragment<ArchivedAdvancedPreparednessViewModel>() {
 
+    override fun statusColor(): Int {
+        return R.color.alertGrey
+    }
+
     override fun statusText(): Int {
         return R.string.archived_title
     }

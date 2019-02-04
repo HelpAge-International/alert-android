@@ -83,7 +83,7 @@ public class ActionArchivedFragment extends Fragment implements ActionAdapter.Ac
         imgArchived.setImageResource(R.drawable.preparedness_grey);
         assert tvActionArchived != null;
         tvActionArchived.setText(R.string.archived_title);
-        tvActionArchived.setTextColor(getResources().getColor(R.color.alertGray));
+        tvActionArchived.setTextColor(getResources().getColor(R.color.alertGrey));
 
         mAdapter = new ActionAdapter(getContext(), this);
         mActionRV.setAdapter(mAdapter);
