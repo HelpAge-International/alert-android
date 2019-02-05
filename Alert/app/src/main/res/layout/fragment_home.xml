@@ -34,7 +34,8 @@
             app:layout_constraintTop_toBottomOf="@id/tvMyTasks"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:listitem="@layout/item_task" />
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/grpEmptyTasks"
@@ -47,9 +48,10 @@
             android:id="@+id/ivEmptyTasks"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:src="@drawable/home_no_tasks"
+            android:tint="@color/gray_material"
             android:layout_marginTop="200dp"
             app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/home_no_tasks"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvMyTasks" />
 
@@ -61,7 +63,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ivEmptyTasks"
             android:id="@+id/tvEmptyTasks"
-            android:text="@string/no_network_tasks"
+            android:text="@string/task_empty"
             android:padding="40dp"
             android:textColor="@color/lb_grey" />
 

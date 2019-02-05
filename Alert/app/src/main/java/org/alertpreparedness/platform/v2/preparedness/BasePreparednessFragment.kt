@@ -4,6 +4,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat.getColor
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_page_preparedness.ivStatus
 import kotlinx.android.synthetic.main.fragment_page_preparedness.rvActions
@@ -41,6 +42,7 @@ abstract class BasePreparednessFragment<VM : BasePreparednessViewModel> : BaseFr
         adapter = PreparednessAdapter(context!!)
         rvActions.adapter = adapter
         rvActions.layoutManager = LinearLayoutManager(context!!)
+        rvActions.addItemDecoration(DividerItemDecoration(context!!, DividerItemDecoration.VERTICAL))
     }
 
     override fun observeViewModel() {

@@ -17,6 +17,9 @@ import org.alertpreparedness.platform.v2.preparedness.PreparednessAdapter.Prepar
 import org.alertpreparedness.platform.v2.utils.DiffComparator
 import org.alertpreparedness.platform.v2.utils.DiffListAdapter
 import org.alertpreparedness.platform.v2.utils.ViewHolder
+import org.alertpreparedness.platform.v2.utils.extensions.hide
+import org.alertpreparedness.platform.v2.utils.extensions.show
+import kotlin.math.roundToLong
 
 class PreparednessAdapter(val context: Context) :
         DiffListAdapter<Action, PreparednessViewHolder>(object : DiffComparator<Action> {
@@ -64,7 +67,12 @@ class PreparednessAdapter(val context: Context) :
                 tvAssignee.text = ""
             }
 
-            tvBudget.text = context.getString(R.string.usd_formatted, model.budget)
+            if (model.budget == null) {
+                tvBudget.hide()
+            } else {
+                tvBudget.show()
+                tvBudget.text = context.getString(R.string.usd_formatted, model.budget.roundToLong())
+            }
         }
     }
 }

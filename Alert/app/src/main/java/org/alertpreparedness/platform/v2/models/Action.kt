@@ -8,7 +8,7 @@ import org.joda.time.DateTime
 class Action(
         @SerializedName("asignee")
         val assignee: String?,
-        val budget: Int?,
+        val budget: Double?,
         val createdAt: DateTime,
         @SerializedName("department")
         val departmentId: String,
@@ -56,6 +56,7 @@ class Action(
         if (requireDoc != other.requireDoc) return false
         if (task != other.task) return false
         if (updatedAt != other.updatedAt) return false
+        if (isArchived != other.isArchived) return false
         if (clockSettings != other.clockSettings) return false
 
         return true
@@ -63,17 +64,18 @@ class Action(
 
     override fun hashCode(): Int {
         var result = assignee?.hashCode() ?: 0
-        result = 31 * result + (budget ?: 0)
+        result = 31 * result + (budget?.hashCode() ?: 0)
         result = 31 * result + createdAt.hashCode()
         result = 31 * result + departmentId.hashCode()
         result = 31 * result + (dueDate?.hashCode() ?: 0)
         result = 31 * result + isComplete.hashCode()
-        result = 31 * result + isCompleteAt.hashCode()
+        result = 31 * result + (isCompleteAt?.hashCode() ?: 0)
         result = 31 * result + actionLevel.hashCode()
         result = 31 * result + actionType.hashCode()
         result = 31 * result + requireDoc.hashCode()
         result = 31 * result + task.hashCode()
         result = 31 * result + updatedAt.hashCode()
+        result = 31 * result + isArchived.hashCode()
         result = 31 * result + clockSettings.hashCode()
         return result
     }
