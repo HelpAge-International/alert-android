@@ -2,7 +2,6 @@ package org.alertpreparedness.platform.v1.dashboard.model;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
-
 import java.io.Serializable;
 
 /**
@@ -189,7 +188,7 @@ public class Alert implements Serializable{
     public String toString() {
         return "Alert{" +
                 "id='" + id + '\'' +
-                ", alertLevel=" + alertLevel +
+                ", level=" + alertLevel +
                 ", numOfAreas=" + numOfAreas +
                 ", hazardScenario=" + hazardScenario +
                 ", country=" + country +

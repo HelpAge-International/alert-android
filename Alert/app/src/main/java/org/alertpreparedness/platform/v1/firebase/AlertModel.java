@@ -69,7 +69,7 @@ public class AlertModel extends FirebaseModel implements Serializable {
                 ", agencyAdminId='" + agencyAdminId + '\'' +
                 ", parentKey='" + parentKey + '\'' +
                 ", affectedAreas=" + affectedAreas +
-                ", alertLevel=" + alertLevel +
+                ", level=" + alertLevel +
                 ", hazardScenario=" + hazardScenario +
                 ", infoNotes='" + infoNotes + '\'' +
                 ", timeCreated=" + timeCreated +

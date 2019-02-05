@@ -7,6 +7,7 @@ import org.alertpreparedness.platform.v2.FirebaseAuthExtensions
 import org.alertpreparedness.platform.v2.asObservable
 import org.alertpreparedness.platform.v2.db
 import org.alertpreparedness.platform.v2.models.Action
+import org.alertpreparedness.platform.v2.models.Alert
 import org.alertpreparedness.platform.v2.models.ClockSettings
 import org.alertpreparedness.platform.v2.models.Hazard
 import org.alertpreparedness.platform.v2.models.Indicator
@@ -18,6 +19,7 @@ import org.alertpreparedness.platform.v2.models.UserType.COUNTRY_DIRECTOR
 import org.alertpreparedness.platform.v2.models.UserType.ERT
 import org.alertpreparedness.platform.v2.models.UserType.ERT_LEADER
 import org.alertpreparedness.platform.v2.models.UserType.PARTNER
+import org.alertpreparedness.platform.v2.models.enums.AlertApprovalStateSerializer
 import org.alertpreparedness.platform.v2.models.enums.CountryOffice
 import org.alertpreparedness.platform.v2.models.enums.DurationType.WEEK
 import org.alertpreparedness.platform.v2.models.enums.DurationTypeSerializer
@@ -26,7 +28,9 @@ import org.alertpreparedness.platform.v2.utils.extensions.combineFlatten
 import org.alertpreparedness.platform.v2.utils.extensions.combineWithPair
 import org.alertpreparedness.platform.v2.utils.extensions.combineWithTriple
 import org.alertpreparedness.platform.v2.utils.extensions.filterList
+import org.alertpreparedness.platform.v2.utils.extensions.firstChild
 import org.alertpreparedness.platform.v2.utils.extensions.firstChildKey
+import org.alertpreparedness.platform.v2.utils.extensions.get
 import org.alertpreparedness.platform.v2.utils.extensions.mapList
 import org.alertpreparedness.platform.v2.utils.extensions.toMergedModel
 import org.alertpreparedness.platform.v2.utils.extensions.toModel
@@ -176,7 +180,7 @@ object Repository {
                 }
     }
 
-    val hazardObservable: Observable<List<Hazard>> by lazy {
+    val hazardsObservable: Observable<List<Hazard>> by lazy {
         userObservable
                 .flatMap { user ->
                     db.child("hazard")
@@ -191,7 +195,7 @@ object Repository {
     }
 
     val indicatorsObservable: Observable<List<Indicator>> by lazy {
-        hazardObservable
+        hazardsObservable
                 .filterList {
                     it.isActive
                 }
@@ -287,5 +291,23 @@ object Repository {
                 .startWith(listOf<ResponsePlan>())
                 .behavior()
     }
-}
 
+    val alertsObservable by lazy {
+        userObservable.switchMap { user ->
+            db.child("alert")
+                    .child(user.countryId)
+                    .asObservable()
+                    .map {
+                        it.children.toList()
+                    }
+                    .mapList {
+                        it.toModel<Alert> { alert, jsonObject ->
+                            val approvalStateInt = jsonObject["approval"]?.get("countryDirector")?.firstChild()?.asInt
+                            alert.state = AlertApprovalStateSerializer.jsonToEnum(approvalStateInt)
+                        }
+                    }
+        }
+                .share()
+                .behavior()
+    }
+}

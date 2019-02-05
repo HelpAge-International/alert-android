@@ -1,13 +1,19 @@
 package org.alertpreparedness.platform.v1.dashboard.adapter;
 
 import android.content.Context;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.ExtensionHelperKt;
 import org.alertpreparedness.platform.v1.R;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
@@ -15,16 +21,6 @@ import org.alertpreparedness.platform.v1.firebase.AlertModel;
 import org.alertpreparedness.platform.v1.interfaces.OnAlertItemClickedListener;
 import org.alertpreparedness.platform.v1.model.User;
 import org.alertpreparedness.platform.v1.utils.Constants;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 
 /**
@@ -73,7 +69,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
 //    private void updateList() {
 //        alertsList.clear();
 //        alertsList.addAll(alertsMap.values());
-//        Collections.sort(alertsList, (o1, o2) -> Long.compare(o2.getAlertLevel(), o1.getAlertLevel()));
+//        Collections.sort(alertsList, (o1, o2) -> Long.compare(o2.getLevel(), o1.getLevel()));
 //
 //        notifyDataSetChanged();
 //    }

@@ -1,13 +1,8 @@
-package org.alertpreparedness.platform.v2.preparedness
+package org.alertpreparedness.platform.v2.preparedness.minimum
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
-import org.alertpreparedness.platform.v2.preparedness.minimum.ArchivedMinimumPreparednessFragment
-import org.alertpreparedness.platform.v2.preparedness.minimum.CompleteMinimumPreparednessFragment
-import org.alertpreparedness.platform.v2.preparedness.minimum.ExpiredMinimumPreparednessFragment
-import org.alertpreparedness.platform.v2.preparedness.minimum.InProgressMinimumPreparednessFragment
-import org.alertpreparedness.platform.v2.preparedness.minimum.UnassignedMinimumPreparednessFragment
 
 class MinimumPreparednessPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
     override fun getCount(): Int {

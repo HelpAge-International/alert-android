@@ -1,6 +1,6 @@
-package org.alertpreparedness.platform.v2.preparedness
+package org.alertpreparedness.platform.v2.preparedness.minimum
 
-import kotlinx.android.synthetic.main.fragment_preparedness.viewPager
+import kotlinx.android.synthetic.main.fragment_minimum_preparedness.viewPager
 import org.alertpreparedness.platform.v1.R
 import org.alertpreparedness.platform.v2.base.BaseFragment
 
@@ -8,7 +8,7 @@ class MinimumPreparednessFragment : BaseFragment<MinimumPreparednessViewModel>()
     private lateinit var adapter: MinimumPreparednessPagerAdapter
 
     override fun getLayoutId(): Int {
-        return R.layout.fragment_preparedness
+        return R.layout.fragment_minimum_preparedness
     }
 
     override fun viewModelClass(): Class<MinimumPreparednessViewModel> {
@@ -18,7 +18,8 @@ class MinimumPreparednessFragment : BaseFragment<MinimumPreparednessViewModel>()
     override fun initViews() {
         super.initViews()
 
-        adapter = MinimumPreparednessPagerAdapter(fragmentManager!!)
+        adapter = MinimumPreparednessPagerAdapter(
+                fragmentManager!!)
         viewPager.adapter = adapter
     }
 

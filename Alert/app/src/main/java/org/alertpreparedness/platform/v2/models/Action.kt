@@ -3,6 +3,7 @@ package org.alertpreparedness.platform.v2.models
 import com.google.gson.annotations.SerializedName
 import org.alertpreparedness.platform.v2.models.enums.ActionLevel
 import org.alertpreparedness.platform.v2.models.enums.ActionType
+import org.alertpreparedness.platform.v2.models.enums.HazardScenario
 import org.joda.time.DateTime
 
 class Action(
@@ -22,7 +23,9 @@ class Action(
         val requireDoc: Boolean,
         val task: String,
         val updatedAt: DateTime,
-        val isArchived: Boolean
+        val isArchived: Boolean,
+        @SerializedName("assignHazard")
+        val assignedHazards: List<HazardScenario>?
 ) : BaseModel() {
 
     @Transient
@@ -57,6 +60,7 @@ class Action(
         if (task != other.task) return false
         if (updatedAt != other.updatedAt) return false
         if (isArchived != other.isArchived) return false
+        if (assignedHazards != other.assignedHazards) return false
         if (clockSettings != other.clockSettings) return false
 
         return true
@@ -76,6 +80,7 @@ class Action(
         result = 31 * result + task.hashCode()
         result = 31 * result + updatedAt.hashCode()
         result = 31 * result + isArchived.hashCode()
+        result = 31 * result + assignedHazards.hashCode()
         result = 31 * result + clockSettings.hashCode()
         return result
     }

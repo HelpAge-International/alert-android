@@ -4,11 +4,14 @@ import androidx.annotation.CallSuper
 import org.alertpreparedness.platform.v2.models.Action
 import org.alertpreparedness.platform.v2.models.User
 import org.alertpreparedness.platform.v2.models.enums.ActionLevel.MPA
+import org.alertpreparedness.platform.v2.models.enums.HazardScenario
 import org.alertpreparedness.platform.v2.preparedness.BasePreparednessViewModel
 
 abstract class BaseMinimumPreparednessViewModel : BasePreparednessViewModel() {
     @CallSuper
-    override fun filterAction(action: Action, user: User): Boolean {
+    override fun filterAction(action: Action,
+            user: User,
+            hazards: List<HazardScenario>): Boolean {
         return action.actionLevel == MPA
     }
 }

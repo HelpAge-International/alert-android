@@ -237,5 +237,5 @@ fun <T, R> Observable<List<T>>.mapList(map: (T) -> R): Observable<List<R>> {
 
 fun <T> Observable<T>.behavior(): Observable<T> {
     return replay(1)
-            .autoConnect()
+            .refCount()
 }

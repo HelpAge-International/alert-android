@@ -445,7 +445,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             rf.setValue(alert);
             mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_APPROVED);
             mReference.child("redAlertApproved").setValue(true);
-            mReference.child("alertLevel").setValue(Constants.TRIGGER_RED);
+            mReference.child("level").setValue(Constants.TRIGGER_RED);
 
         }
         else {

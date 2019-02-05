@@ -26,7 +26,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import io.reactivex.Observable;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
-import org.alertpreparedness.platform.v1.adv_preparedness.fragment.AdvPreparednessFragment;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.PermissionRef;
@@ -40,7 +39,8 @@ import org.alertpreparedness.platform.v1.settings.SettingsFragment;
 import org.alertpreparedness.platform.v1.utils.AppUtils;
 import org.alertpreparedness.platform.v1.utils.Constants;
 import org.alertpreparedness.platform.v2.dashboard.home.HomeFragment;
-import org.alertpreparedness.platform.v2.preparedness.MinimumPreparednessFragment;
+import org.alertpreparedness.platform.v2.preparedness.advanced.AdvancedPreparednessFragment;
+import org.alertpreparedness.platform.v2.preparedness.minimum.MinimumPreparednessFragment;
 import org.alertpreparedness.platform.v2.utils.GlideApp;
 
 public class MainDrawer extends BaseActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
@@ -288,7 +288,8 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
                             .subscribe(x -> setFragment(new MinimumPreparednessFragment()));
                     break;
                 case R.id.nav_advanced:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> setFragment(new AdvPreparednessFragment()));
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1)
+                            .subscribe(x -> setFragment(new AdvancedPreparednessFragment()));
                     break;
                 case R.id.nav_response:
                     Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> setFragment(new ResponsePlanFragment()));

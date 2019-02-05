@@ -17,6 +17,10 @@ import org.alertpreparedness.platform.v2.models.enums.ActionLevel
 import org.alertpreparedness.platform.v2.models.enums.ActionLevelSerializer
 import org.alertpreparedness.platform.v2.models.enums.ActionType
 import org.alertpreparedness.platform.v2.models.enums.ActionTypeSerializer
+import org.alertpreparedness.platform.v2.models.enums.AlertApprovalState
+import org.alertpreparedness.platform.v2.models.enums.AlertApprovalStateSerializer
+import org.alertpreparedness.platform.v2.models.enums.AlertLevel
+import org.alertpreparedness.platform.v2.models.enums.AlertLevelSerializer
 import org.alertpreparedness.platform.v2.models.enums.DurationType
 import org.alertpreparedness.platform.v2.models.enums.DurationTypeSerializer
 import org.alertpreparedness.platform.v2.models.enums.HazardScenario
@@ -38,16 +42,6 @@ fun DataSnapshot.childKeys(): List<String> {
 fun DataSnapshot.firstChildKey(): String {
     return childKeys().first()
 }
-
-fun JsonObject.childKeys(): List<String> {
-    return keySet().mapNotNull { it }
-}
-
-fun JsonObject.firstChildKey(): String {
-    return childKeys().first()
-}
-
-
 //DataSnapshot to model
 val gson: Gson by lazy{
     val gsonBuilder = GsonBuilder()
@@ -63,7 +57,9 @@ val gson: Gson by lazy{
             .registerTypeAdapter(ResponsePlanApprovalState::class.java, ResponsePlanApprovalSerializer)
             .registerTypeAdapter(DurationType::class.java, DurationTypeSerializer)
             .registerTypeAdapter(Title::class.java, TitleSerializer)
+            .registerTypeAdapter(AlertLevel::class.java, AlertLevelSerializer)
             .registerTypeAdapter(HazardScenario::class.java, HazardScenarioSerializer)
+            .registerTypeAdapter(AlertApprovalState::class.java, AlertApprovalStateSerializer)
             .create()
 }
 
