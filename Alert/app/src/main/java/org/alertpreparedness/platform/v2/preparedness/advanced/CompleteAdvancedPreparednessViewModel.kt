@@ -11,7 +11,7 @@ class CompleteAdvancedPreparednessViewModel : BaseAdvancedPreparednessViewModel(
                 action.isComplete &&
                 action.assignee == user.id &&
                 action.getExpirationTime().isAfterNow &&
-                !action.isArchived &&
-                isActive(action, hazards)
+                isActive(action, hazards) &&
+                !action.isArchived
     }
 }

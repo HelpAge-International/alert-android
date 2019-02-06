@@ -10,6 +10,7 @@ class InActiveAdvancedPreparednessViewModel : BaseAdvancedPreparednessViewModel(
             hazards: List<HazardScenario>): Boolean {
         return super.filterAction(action, user, hazards) &&
                 action.assignee == user.id &&
-                !isActive(action, hazards)
+                !isActive(action, hazards) &&
+                !action.isArchived
     }
 }
