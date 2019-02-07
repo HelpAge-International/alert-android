@@ -154,7 +154,7 @@
             android:label="@string/change_password" />
         <activity
             android:name=".min_preparedness.activity.CompleteActionActivity"
-            android:label="@string/txt_complete_action" />
+            android:label="@string/complete_action" />
         <activity
             android:name=".min_preparedness.activity.AddNotesActivity"
             android:label="Notes" />

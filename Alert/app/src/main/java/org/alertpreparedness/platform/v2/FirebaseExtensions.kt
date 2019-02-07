@@ -14,7 +14,9 @@ fun DatabaseReference.asObservable(): Observable<DataSnapshot> {
     return Observable.create<DataSnapshot> {emitter ->
         val valueEventListener = object: ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                emitter.onNext(dataSnapshot)
+                if (dataSnapshot.value != null) {
+                    emitter.onNext(dataSnapshot)
+                }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

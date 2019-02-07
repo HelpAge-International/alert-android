@@ -4,23 +4,23 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/edit"
-            android:icon="@drawable/ic_edit_gray_24px"
+            android:icon="@drawable/action_edit"
             android:title="@string/edit" />
         <item
             android:id="@+id/complete_action"
-            android:icon="@drawable/ic_check_circle_24px"
-            android:title="@string/txt_complete_action" />
+            android:icon="@drawable/complete_action"
+            android:title="@string/complete_action" />
         <item
             android:id="@+id/reassign_action"
-            android:icon="@drawable/ic_assignment_24px"
-            android:title="@string/txt_reassign_action" />
+            android:icon="@drawable/assign_action"
+            android:title="@string/reassign_action" />
         <item
             android:id="@+id/action_notes"
-            android:icon="@drawable/ic_chat_bubble_24px"
-            android:title="@string/txt_action_notes" />
+            android:icon="@drawable/notes_action"
+            android:title="@string/notes_action" />
         <item
             android:id="@+id/attachments"
-            android:icon="@drawable/ic_attach_file_24px"
+            android:icon="@drawable/attach_action"
             android:title="@string/txt_attachments" />
     </group>
 </menu>

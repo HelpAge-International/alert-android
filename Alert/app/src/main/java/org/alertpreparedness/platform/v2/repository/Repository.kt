@@ -19,11 +19,17 @@ import org.alertpreparedness.platform.v2.models.UserType.COUNTRY_DIRECTOR
 import org.alertpreparedness.platform.v2.models.UserType.ERT
 import org.alertpreparedness.platform.v2.models.UserType.ERT_LEADER
 import org.alertpreparedness.platform.v2.models.UserType.PARTNER
+import org.alertpreparedness.platform.v2.models.enums.ActionType
+import org.alertpreparedness.platform.v2.models.enums.ActionType.CHS
+import org.alertpreparedness.platform.v2.models.enums.ActionType.MANDATED
 import org.alertpreparedness.platform.v2.models.enums.AlertApprovalStateSerializer
 import org.alertpreparedness.platform.v2.models.enums.CountryOffice
 import org.alertpreparedness.platform.v2.models.enums.DurationType.WEEK
 import org.alertpreparedness.platform.v2.models.enums.DurationTypeSerializer
+import org.alertpreparedness.platform.v2.models.enums.Note
+import org.alertpreparedness.platform.v2.printRef
 import org.alertpreparedness.platform.v2.utils.extensions.behavior
+import org.alertpreparedness.platform.v2.utils.extensions.childKeys
 import org.alertpreparedness.platform.v2.utils.extensions.combineFlatten
 import org.alertpreparedness.platform.v2.utils.extensions.combineWithPair
 import org.alertpreparedness.platform.v2.utils.extensions.combineWithTriple
@@ -32,6 +38,8 @@ import org.alertpreparedness.platform.v2.utils.extensions.firstChild
 import org.alertpreparedness.platform.v2.utils.extensions.firstChildKey
 import org.alertpreparedness.platform.v2.utils.extensions.get
 import org.alertpreparedness.platform.v2.utils.extensions.mapList
+import org.alertpreparedness.platform.v2.utils.extensions.mergeCombine
+import org.alertpreparedness.platform.v2.utils.extensions.print
 import org.alertpreparedness.platform.v2.utils.extensions.toMergedModel
 import org.alertpreparedness.platform.v2.utils.extensions.toModel
 import org.alertpreparedness.platform.v2.utils.extensions.withLatestFromPair
@@ -220,6 +228,42 @@ object Repository {
                 .behavior()
     }
 
+    fun actionObservable(id: String, type: ActionType): Observable<out Action> {
+        return userObservable
+                .switchMap { user ->
+                    val observableList = mutableListOf<Observable<DataSnapshot>>()
+
+                    observableList += db.child("action")
+                            .child(user.countryId)
+                            .child(id)
+                            .asObservable()
+                            .print("CUSTOM")
+
+                    if (type == MANDATED) {
+                        observableList += db.child("actionMandated")
+                                .child(user.systemAdminId)
+                                .child(id)
+                                .asObservable()
+                                .print("MANDATED")
+                    } else if (type == CHS) {
+                        observableList += db.child("actionCHS")
+                                .child(user.agencyAdminId)
+                                .child(id)
+                                .asObservable()
+                                .print("CHS")
+                    }
+
+                    mergeCombine(observableList)
+                            .combineWithPair(countryOfficeObservable(user))
+                            .map { (actionList, countryOffice) ->
+                                actionList.toMergedModel<Action> { action, jsonObject ->
+                                    setUpAction(action, jsonObject, countryOffice)
+                                }
+                            }
+
+                }
+    }
+
     val actionsObservable: Observable<List<Action>> by lazy {
         userObservable
                 .switchMap { user ->
@@ -250,7 +294,7 @@ object Repository {
                                         .toList()
                                         .map {
                                             it.toMergedModel<Action> { action, jsonObject ->
-                                                setUpActionClockSettings(action, jsonObject, countryOffice)
+                                                setUpAction(action, jsonObject, countryOffice)
                                             }
                                         }
                             }
@@ -259,7 +303,15 @@ object Repository {
                 .behavior()
     }
 
-    private fun setUpActionClockSettings(action: Action, json: JsonObject, countryOffice: CountryOffice) {
+    private fun setUpAction(action: Action, json: JsonObject, countryOffice: CountryOffice) {
+        var documentIds = emptyList<String>()
+
+        if (json.has("documents")) {
+            documentIds = json["documents"].asJsonObject.childKeys()
+        }
+
+        action.documentIds = documentIds
+
         if (json.has("frequencyValue") && json.has("frequencyBase")) {
             action.clockSettings = ClockSettings(
                     DurationTypeSerializer.jsonToEnum(json["frequencyBase"].asInt) ?: WEEK,
@@ -309,5 +361,20 @@ object Repository {
         }
                 .share()
                 .behavior()
+    }
+
+    fun notes(id: String): Observable<List<Note>> {
+        return userObservable
+                .flatMap { user ->
+                    db.child("note")
+                            .child(user.countryId)
+                            .child(id)
+                            .printRef()
+                            .asObservable()
+                            .map {
+                                it.children.toList()
+                            }
+                            .mapList { it.toModel<Note>() }
+                }
     }
 }

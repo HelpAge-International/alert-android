@@ -31,6 +31,9 @@ class Action(
     @Transient
     lateinit var clockSettings: ClockSettings
 
+    @Transient
+    lateinit var documentIds: List<String>
+
     fun getExpirationTime(): DateTime {
         return if (isCompleteAt != null) {
             isCompleteAt.plus(clockSettings.calculateOffset())

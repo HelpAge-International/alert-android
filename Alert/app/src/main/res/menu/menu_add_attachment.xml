@@ -11,7 +11,7 @@
         android:title="@string/txt_take_video" />
     <item
         android:id="@+id/select_file"
-        android:icon="@drawable/ic_attach_file_24px"
+        android:icon="@drawable/attach_action"
         android:title="@string/txt_select_file" />
 
 </menu>

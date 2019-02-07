@@ -14,7 +14,7 @@ import io.reactivex.functions.Function3
  * @return combination [Observable] of Pair<T, O1>.
  */
 
-fun <T, O1> Observable<T>.combineWithPair(other: Observable<O1>):Observable<Pair<T, O1>>{
+fun <T, O1> Observable<T>.combineWithPair(other: Observable<O1>): Observable<Pair<T, O1>> {
     return Observable.combineLatest(this, other, CombinePair())
 }
 
@@ -22,7 +22,7 @@ fun <T, O1> Observable<T>.combineWithPair(other: Observable<O1>):Observable<Pair
  * Calls Observable.zip() on [this] and [other] creating an [Observable] of Pairs of both
  * @return combination [Observable] of Pair<T, O1>.
  */
-fun <T, O1> Observable<T>.zipWithPair(other: Observable<O1>):Observable<Pair<T, O1>>{
+fun <T, O1> Observable<T>.zipWithPair(other: Observable<O1>): Observable<Pair<T, O1>> {
     return Observable.zip(this, other, CombinePair())
 }
 
@@ -30,7 +30,8 @@ fun <T, O1> Observable<T>.zipWithPair(other: Observable<O1>):Observable<Pair<T, 
  * Calls Observable.zip() on [this] and [other] creating an [Observable] of Pairs of both
  * @return combination [Observable] of Pair<T, O1>.
  */
-fun <T, O1, O2> Observable<T>.zipWithTriple(other: Observable<O1>, other2: Observable<O2>):Observable<Triple<T, O1, O2>>{
+fun <T, O1, O2> Observable<T>.zipWithTriple(other: Observable<O1>,
+        other2: Observable<O2>): Observable<Triple<T, O1, O2>> {
     return Observable.zip(this, other, other2, CombineTriple())
 }
 
@@ -38,7 +39,8 @@ fun <T, O1, O2> Observable<T>.zipWithTriple(other: Observable<O1>, other2: Obser
  * Calls Observable.zip() on [this] and [other] creating an [Observable] of Pairs of both
  * @return combination [Observable] of Pair<T, O1>.
  */
-fun <T, O1, O2> Observable<T>.combineWithTriple(other: Observable<O1>, other2: Observable<O2>):Observable<Triple<T, O1, O2>>{
+fun <T, O1, O2> Observable<T>.combineWithTriple(other: Observable<O1>,
+        other2: Observable<O2>): Observable<Triple<T, O1, O2>> {
     return Observable.combineLatest(this, other, other2, CombineTriple())
 }
 
@@ -46,15 +48,17 @@ fun <T, O1, O2> Observable<T>.combineWithTriple(other: Observable<O1>, other2: O
  * prints a value when onNext is called on the current [Observable] with optional [key] and [transform] of the value
  * @return the original unchanged [Observable]
  */
-fun <T> Observable<T>.print(key: String = "it", transform: Function1<T, Any?> = { it }):Observable<T>{
+fun <T> Observable<T>.print(key: String = "it", transform: Function1<T, Any?> = { it }): Observable<T> {
     return doOnNext { println("$key = ${transform.invoke(it)}") }
 }
-fun <T1, T2, O1> Observable<Pair<T1, T2>>.mapFirst(function: Function1<T1, O1>):Observable<Pair<O1, T2>>{
+
+fun <T1, T2, O1> Observable<Pair<T1, T2>>.mapFirst(function: Function1<T1, O1>): Observable<Pair<O1, T2>> {
     return this.map { (t1, t2) ->
         Pair(function(t1), t2)
     }
 }
-fun <T1, T2, O2> Observable<Pair<T1, T2>>.mapSecond(function: Function1<T2, O2>):Observable<Pair<T1, O2>>{
+
+fun <T1, T2, O2> Observable<Pair<T1, T2>>.mapSecond(function: Function1<T2, O2>): Observable<Pair<T1, O2>> {
     return this.map { (t1, t2) ->
         Pair(t1, function(t2))
     }
@@ -64,7 +68,7 @@ fun <T1, T2, O2> Observable<Pair<T1, T2>>.mapSecond(function: Function1<T2, O2>)
  * applies [function] to each value on the stream, throwing away null transformations
  * @return [Observable] of name [O1]
  */
-fun <T, O1> Observable<T>.filterMap(function: Function1<T, O1?>):Observable<O1>{
+fun <T, O1> Observable<T>.filterMap(function: Function1<T, O1?>): Observable<O1> {
     return flatMap { it ->
         val result = function.invoke(it)
         if (result != null) Observable.just(result) else Observable.empty()
@@ -75,12 +79,11 @@ fun <T, O1> Observable<T>.filterMap(function: Function1<T, O1?>):Observable<O1>{
  * converts materialized [Observable] back into regular stream, ignoring errors
  * @return [Observable] of the Values within the [Notification] name
  */
-fun <T> Observable<Notification<T>>.removeError():Observable<T>{
+fun <T> Observable<Notification<T>>.removeError(): Observable<T> {
     return filterMap { notification ->
-        if (notification.isOnNext){
+        if (notification.isOnNext) {
             notification.value
-        }
-        else{
+        } else {
             null
         }
     }
@@ -90,7 +93,7 @@ fun <T> Observable<Notification<T>>.removeError():Observable<T>{
  * Converts materialized [Observable] into a [Observable] of [Throwable]'s
  * @return [Observable] of [Throwable]'s thrown by the original [Observable]
  */
-fun <T> Observable<Notification<T>>.toErrorObservable():Observable<Throwable>{
+fun <T> Observable<Notification<T>>.toErrorObservable(): Observable<Throwable> {
     return filter { it.isOnError }
             .map { it.error }
 }
@@ -99,15 +102,15 @@ fun <T> Observable<Notification<T>>.toErrorObservable():Observable<Throwable>{
  * Emits the last value on the current stream when [toListen] emits a new item
  * @return [Observable] of [T]
  */
-fun <T, O1> Observable<T>.takeWhen(toListen: Observable<O1>):Observable<T>{
-    return toListen.withLatestFrom(this, BiFunction<O1, T, T> {_, T1 -> T1})
+fun <T, O1> Observable<T>.takeWhen(toListen: Observable<O1>): Observable<T> {
+    return toListen.withLatestFrom(this, BiFunction<O1, T, T> { _, T1 -> T1 })
 }
 
 /**
  * Emits the last value on the current stream when [toListen] emits a new item
  * @return [Observable] of [T]
  */
-fun <T, O1> Observable<T>.takeIf(other: Observable<O1>, func: (O1) -> Boolean):Observable<T>{
+fun <T, O1> Observable<T>.takeIf(other: Observable<O1>, func: (O1) -> Boolean): Observable<T> {
     return this.withLatestFromPair(other)
             .filter { func(it.second) }
             .map { it.first }
@@ -117,15 +120,15 @@ fun <T, O1> Observable<T>.takeIf(other: Observable<O1>, func: (O1) -> Boolean):O
  * Emits the last value on the current stream when either a new value is emitted ot the current stream, or [toListen] emits a new item
  * @return [Observable] of [T]
  */
-fun <T, O1> Observable<T>.takeWhenEither(toListen: Observable<O1>):Observable<T>{
-    return Observable.combineLatest(this, toListen, BiFunction<T, O1, T> {T1, _ -> T1})
+fun <T, O1> Observable<T>.takeWhenEither(toListen: Observable<O1>): Observable<T> {
+    return Observable.combineLatest(this, toListen, BiFunction<T, O1, T> { T1, _ -> T1 })
 }
 
 /**
  * Calls withLatest on current observable and [other] and combines into a [Pair]
  * @return combination observable of Pair<T, O1>.
  */
-fun <T, O1> Observable<T>.withLatestFromPair(other: Observable<O1>):Observable<Pair<T, O1>>{
+fun <T, O1> Observable<T>.withLatestFromPair(other: Observable<O1>): Observable<Pair<T, O1>> {
     return this.withLatestFrom(other, CombinePair<T, O1>())
 }
 
@@ -133,14 +136,16 @@ fun <T, O1> Observable<T>.withLatestFromPair(other: Observable<O1>):Observable<P
  * Calls withLatest on current observable, [other1] and [other2] and combines into a [Triple]
  * @return combination observable of Triple<T, O1, O2>.
  */
-fun <T, O1, O2> Observable<T>.withLatestFromTriple(other1: Observable<O1>, other2: Observable<O2>):Observable<Triple<T, O1, O2>>{
+fun <T, O1, O2> Observable<T>.withLatestFromTriple(other1: Observable<O1>,
+        other2: Observable<O2>): Observable<Triple<T, O1, O2>> {
     return this.withLatestFrom(other1, other2, CombineTriple<T, O1, O2>())
 }
 
 /**
  * [BiFunction] that takes as input [T1] and [T2] and outputs a [Pair]
  */
-class CombinePair<T1, T2>: BiFunction<T1, T2, Pair<T1, T2>>{
+class CombinePair<T1, T2> : BiFunction<T1, T2, Pair<T1, T2>> {
+
     override fun apply(t1: T1, t2: T2): Pair<T1, T2> {
         return Pair(t1, t2)
     }
@@ -149,13 +154,14 @@ class CombinePair<T1, T2>: BiFunction<T1, T2, Pair<T1, T2>>{
 /**
  * [BiFunction] that takes as input [T1], [T2] and [T3] and outputs a [Triple]
  */
-class CombineTriple<T1, T2, T3>: Function3<T1, T2, T3, Triple<T1, T2, T3>>{
+class CombineTriple<T1, T2, T3> : Function3<T1, T2, T3, Triple<T1, T2, T3>> {
+
     override fun apply(t1: T1, t2: T2, t3: T3): Triple<T1, T2, T3> {
         return Triple(t1, t2, t3)
     }
 }
 
-class ListConcat<T>: BiFunction<List<T>, List<T>, List<T>>{
+class ListConcat<T> : BiFunction<List<T>, List<T>, List<T>> {
     override fun apply(list1: List<T>, list2: List<T>): List<T> {
         return list1 + list2
     }
@@ -163,7 +169,7 @@ class ListConcat<T>: BiFunction<List<T>, List<T>, List<T>>{
 
 @Suppress("UNCHECKED_CAST")
 fun <T> combineFlatten(items: List<Observable<List<T>>>): Observable<List<T>> {
-    return Observable.combineLatest(items) {list ->
+    return Observable.combineLatest(items) { list ->
         list.map { it as List<T> }.toList().flatten()
     }
 }
@@ -187,6 +193,7 @@ fun <T> Observable<T>.subscribeNoError(subscribe: (T) -> Unit): Disposable {
 fun <T> Observable<List<T>>.scanConcat(): Observable<List<T>> {
     return scan(ListConcat())
 }
+
 fun Observable<Int>.scanSum(): Observable<Int> {
     return scan(IntSum())
 }
@@ -197,21 +204,20 @@ class IntSum : BiFunction<Int, Int, Int> {
     }
 }
 
-
 //region View Bindings
-fun <T: CharSequence> TextView.bind(observable: Observable<T>): Disposable{
+fun <T : CharSequence> TextView.bind(observable: Observable<T>): Disposable {
     return observable.subscribeNoError {
         text = it
     }
 }
 
-fun TextView.bindStringResource(observable: Observable<Int>): Disposable{
+fun TextView.bindStringResource(observable: Observable<Int>): Disposable {
     return observable.subscribeNoError {
         setText(it)
     }
 }
 
-fun ImageView.bind(urlObservable: Observable<String>): Disposable{
+fun ImageView.bind(urlObservable: Observable<String>): Disposable {
     return urlObservable.subscribeNoError {
         Glide.with(this)
                 .load(it)
@@ -222,9 +228,8 @@ fun ImageView.bind(urlObservable: Observable<String>): Disposable{
 
 fun <T> Observable<T>.filterSuccess(): Observable<T> {
     return materialize()
-            .filter{ it.isOnNext || it.isOnComplete }
+            .filter { it.isOnNext || it.isOnComplete }
             .dematerialize<T>()
-
 }
 
 fun <T> Observable<List<T>>.filterList(filter: (T) -> Boolean): Observable<List<T>> {
@@ -238,4 +243,34 @@ fun <T, R> Observable<List<T>>.mapList(map: (T) -> R): Observable<List<R>> {
 fun <T> Observable<T>.behavior(): Observable<T> {
     return replay(1)
             .refCount()
+}
+
+data class MergeCombineWrapper<T>(val value: T? = null)
+
+fun <T : Any> mergeCombine(items: List<Observable<T>>): Observable<List<T>> {
+    return combineToList(
+            items.map {
+                it.map {
+                    MergeCombineWrapper(it)
+                }
+                        .startWith(MergeCombineWrapper())
+            }
+    )
+            .mapList {
+                it.value
+            }
+            .map {
+                it.filterNotNull()
+            }
+            .filter {
+                it.isNotEmpty()
+            }
+}
+
+fun <T : Any> mergeCombine(vararg items: Observable<T>): Observable<List<T>> {
+    return mergeCombine(items.toList())
+}
+
+fun <T1, T2> Observable<Pair<T1, T2>>.swap(): Observable<Pair<T2, T1>> {
+    return map { Pair(it.second, it.first) }
 }

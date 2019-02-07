@@ -32,6 +32,7 @@ class PreparednessAdapter(val context: Context) :
             }
         }) {
 
+    private val listeners = mutableListOf<OnActionClickedListener>()
     var user: User? = null
 
     fun updateUser(user: User) {
@@ -44,12 +45,31 @@ class PreparednessAdapter(val context: Context) :
                 LayoutInflater.from(context).inflate(R.layout.item_preparedness_action, parent, false))
     }
 
+    fun onActionClcked(action: Action) {
+        listeners.forEach { it.onActionClicked(action) }
+    }
+
+    fun addOnActionClickedListener(listener: OnActionClickedListener) {
+        listeners.add(listener)
+    }
+
+    fun removeOnActionClickedListener(listener: OnActionClickedListener) {
+        listeners.remove(listener)
+    }
+
     inner class PreparednessViewHolder(view: View) : ViewHolder<Action>(view) {
         val tvActionType: TextView = view.tvActionType
         val tvDate: TextView = view.tvDate
         val tvActionName: TextView = view.tvActionName
         val tvAssignee: TextView = view.tvAssignee
         val tvBudget: TextView = view.tvBudget
+        private lateinit var action: Action
+
+        init {
+            view.setOnClickListener {
+                onActionClcked(action)
+            }
+        }
 
         override fun bind(model: Action, position: Int) {
             tvActionType.setText(model.actionType.text)
@@ -73,6 +93,12 @@ class PreparednessAdapter(val context: Context) :
                 tvBudget.show()
                 tvBudget.text = context.getString(R.string.usd_formatted, model.budget.roundToLong())
             }
+
+            action = model
         }
     }
+}
+
+interface OnActionClickedListener {
+    fun onActionClicked(action: Action)
 }
