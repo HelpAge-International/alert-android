@@ -36,3 +36,17 @@ fun DatabaseReference.printRef(key: String = ""): DatabaseReference {
     println("$key - $ref")
     return this
 }
+
+fun DatabaseReference.setValueRx(value: Any): Observable<Unit> {
+    return Observable.create<Unit> { emitter ->
+        setValue(value) { databaseError, _ ->
+            if (databaseError == null) {
+                emitter.onNext(Unit)
+                emitter.onComplete()
+            } else {
+                emitter.onError(databaseError.toException())
+            }
+        }
+    }
+}
+

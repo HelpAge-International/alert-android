@@ -236,19 +236,22 @@ object Repository {
                     observableList += db.child("action")
                             .child(user.countryId)
                             .child(id)
+                            .printRef("Custom Ref")
                             .asObservable()
                             .print("CUSTOM")
 
                     if (type == MANDATED) {
                         observableList += db.child("actionMandated")
-                                .child(user.systemAdminId)
+                                .child(user.agencyAdminId)
                                 .child(id)
+                                .printRef("Mandated Ref")
                                 .asObservable()
                                 .print("MANDATED")
                     } else if (type == CHS) {
                         observableList += db.child("actionCHS")
-                                .child(user.agencyAdminId)
+                                .child(user.systemAdminId)
                                 .child(id)
+                                .printRef("CHS Ref")
                                 .asObservable()
                                 .print("CHS")
                     }
@@ -369,7 +372,6 @@ object Repository {
                     db.child("note")
                             .child(user.countryId)
                             .child(id)
-                            .printRef()
                             .asObservable()
                             .map {
                                 it.children.toList()

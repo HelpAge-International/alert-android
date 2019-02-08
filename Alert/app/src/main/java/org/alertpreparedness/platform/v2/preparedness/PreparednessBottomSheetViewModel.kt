@@ -12,7 +12,6 @@ import org.alertpreparedness.platform.v2.preparedness.IPreparednessBottomSheetVi
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption
 import org.alertpreparedness.platform.v2.repository.Repository.actionObservable
 import org.alertpreparedness.platform.v2.repository.Repository.notes
-import org.alertpreparedness.platform.v2.utils.extensions.print
 import org.alertpreparedness.platform.v2.utils.extensions.swap
 import org.alertpreparedness.platform.v2.utils.extensions.withLatestFromPair
 
@@ -58,11 +57,11 @@ class PreparednessBottomSheetViewModel : BaseViewModel(), Inputs, Outputs {
     }
 
     override fun notesCount(): Observable<Int> {
-        return actionNotes.map { it.size }.print("notes")
+        return actionNotes.map { it.size }
     }
 
     override fun attachmentCount(): Observable<Int> {
-        return action.map { it.documentIds.size }.print("attachments")
+        return action.map { it.documentIds.size }
     }
 
     override fun actionOptionClicked(): Observable<Pair<Action, PreparednessBottomSheetOption>> {

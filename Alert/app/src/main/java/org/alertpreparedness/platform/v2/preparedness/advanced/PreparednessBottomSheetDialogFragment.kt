@@ -58,11 +58,19 @@ class PreparednessBottomSheetDialogFragment : BaseBottomSheetDialogFragment<Prep
                             }
                     )
                 }
+
+        disposables += viewModel.actionOptionClicked()
+                .subscribe { (action, option) ->
+                    if (targetFragment is OnPreparednessOptionClickedListener) {
+                        (targetFragment as OnPreparednessOptionClickedListener)
+                                .onPreparednessOptionClicked(action, option)
+                    }
+                    dismiss()
+                }
     }
 
     override fun onOptionSelected(option: PreparednessBottomSheetOption) {
         viewModel.onActionOptionClicked(option)
-        dismiss()
     }
 
     private lateinit var adapter: PreparednessBottomSheetAdapter
@@ -104,7 +112,6 @@ class PreparednessBottomSheetDialogFragment : BaseBottomSheetDialogFragment<Prep
                     ACTION_ID_KEY to actionId,
                     ACTION_TYPE_KEY to actionType.ordinal,
                     OPTIONS_KEY to options.map { it.ordinal }
-
             )
 
             return fragment

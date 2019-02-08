@@ -232,6 +232,16 @@ fun <T> Observable<T>.filterSuccess(): Observable<T> {
             .dematerialize<T>()
 }
 
+fun <T> Observable<Notification<T>>.success(): Observable<T> {
+    return filter { it.isOnNext || it.isOnComplete }
+            .dematerialize<T>()
+}
+
+fun <T> Observable<Notification<T>>.failure(t: T): Observable<T> {
+    return filter { it.isOnError }
+            .map { t }
+}
+
 fun <T> Observable<List<T>>.filterList(filter: (T) -> Boolean): Observable<List<T>> {
     return map { it.filter(filter) }
 }
