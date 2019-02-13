@@ -9,7 +9,6 @@ import org.alertpreparedness.platform.v1.risk_monitoring.view.RiskFragment;
 import org.alertpreparedness.platform.v2.dashboard.home.HomeFragment;
 import org.alertpreparedness.platform.v2.preparedness.advanced.AdvancedPreparednessFragment;
 import org.alertpreparedness.platform.v2.preparedness.minimum.MinimumPreparednessFragment;
-import timber.log.Timber;
 
 
 public class HomeScreen extends MainDrawer {
@@ -23,8 +22,6 @@ public class HomeScreen extends MainDrawer {
 
     public static final String START_SCREEN = "START_SCREEN";
 
-
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -34,8 +31,6 @@ public class HomeScreen extends MainDrawer {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         int startScreen = getIntent().getIntExtra(START_SCREEN, SCREEN_HOME);
-
-        Timber.d("StartScreen: " + startScreen + " - " + getIntent().hasExtra(START_SCREEN));
 
         switch (startScreen){
             case SCREEN_INDICATOR:

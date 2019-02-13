@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.v2.preparedness.minimum
 
 import kotlinx.android.synthetic.main.fragment_minimum_preparedness.viewPager
+import org.alertpreparedness.platform.v1.MainDrawer
 import org.alertpreparedness.platform.v1.R
 import org.alertpreparedness.platform.v2.base.BaseFragment
 
@@ -17,6 +18,9 @@ class MinimumPreparednessFragment : BaseFragment<MinimumPreparednessViewModel>()
 
     override fun initViews() {
         super.initViews()
+        (activity as MainDrawer).toggleActionBarWithTitle(MainDrawer.ActionBarState.NORMAL,
+                R.string.title_min_preparedness)
+        (activity as MainDrawer).showActionbarElevation()
 
         adapter = MinimumPreparednessPagerAdapter(
                 fragmentManager!!)

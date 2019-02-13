@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_home.grpEmptyTasks
 import kotlinx.android.synthetic.main.fragment_home.pbTasks
 import kotlinx.android.synthetic.main.fragment_home.rvMyTasks
+import org.alertpreparedness.platform.v1.MainDrawer
 import org.alertpreparedness.platform.v1.R
 
 import org.alertpreparedness.platform.v2.base.BaseFragment
@@ -26,6 +27,9 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
 
     override fun initViews() {
         super.initViews()
+
+        (activity as MainDrawer).toggleActionBar(MainDrawer.ActionBarState.ALERT)
+
 
         tasksAdapter = HomeTasksAdapter(context!!)
         rvMyTasks.layoutManager = LinearLayoutManager(context)
