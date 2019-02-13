@@ -1,6 +1,5 @@
 package org.alertpreparedness.platform.v2.models
 
-import com.google.common.math.IntMath
 import com.google.gson.annotations.SerializedName
 import org.alertpreparedness.platform.v2.models.enums.IndicatorTriggerLevel
 import org.joda.time.DateTime

@@ -77,7 +77,7 @@
                 android:layout_width="@dimen/space_275"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/text_size"
-                android:text="@string/attachments_action" />
+                android:text="@string/txt_add_attachments" />
 
         </LinearLayout>
 

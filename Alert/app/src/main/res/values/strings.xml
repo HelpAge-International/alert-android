@@ -176,7 +176,8 @@
     <string name="no_programmes">There are no programmes in this region</string>
     <string name="txt_confirm">CONFIRM</string>
     <string name="txt_completion_note">Add a completion note (required)</string>
-    <string name="attachments_action">+ Add attachments (required)</string>
+    <string name="txt_add_attachments">+ Add attachments (required)</string>
+    <string name="attachments_action">@string/attachments</string>
     <string name="txt_take_photo">Take photo</string>
     <string name="txt_take_video">Take video</string>
     <string name="txt_select_file">Select file</string>

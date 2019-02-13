@@ -140,7 +140,8 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
         val timeTracking = indicator.timeTracking
         timeTracking.updateIndicatorTracking(indicator.triggerSelected, selection)
 
-        val updateMap = mutableMapOf("dueDate" to dueTime, "triggerLevel" to selection, "updatedAt" to DateTime().millis, "timeTracking" to timeTracking)
+        val updateMap = mutableMapOf("dueDate" to dueTime, "triggerSelected" to selection,
+                "updatedAt" to DateTime().millis, "timeTracking" to timeTracking)
         mDisposables.add(RiskMonitoringService(getApplication()).updateIndicator(hazardId, indicatorId, updateMap).subscribe())
     }
 
