@@ -7,6 +7,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import io.reactivex.Observable
 import org.alertpreparedness.platform.v1.BuildConfig
+import org.alertpreparedness.platform.v2.utils.extensions.gson
 
 val db by lazy { FirebaseDatabase.getInstance().reference.child(BuildConfig.ROOT_NODE) }
 
@@ -37,9 +38,9 @@ fun DatabaseReference.printRef(key: String = ""): DatabaseReference {
     return this
 }
 
-fun DatabaseReference.setValueRx(value: Any): Observable<Unit> {
+fun DatabaseReference.setValueRx(value: Any?): Observable<Unit> {
     return Observable.create<Unit> { emitter ->
-        setValue(value) { databaseError, _ ->
+        setValue(gson.fromJson(gson.toJson(value), Any::class.java)) { databaseError, _ ->
             if (databaseError == null) {
                 emitter.onNext(Unit)
                 emitter.onComplete()

@@ -7,6 +7,7 @@ import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBotto
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption.NOTES
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption.REASSIGN
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption.UPDATE_DUE_DATE
+import org.alertpreparedness.platform.v2.utils.extensions.isActive
 
 class ExpiredAdvancedPreparednessViewModel : BaseAdvancedPreparednessViewModel() {
 
@@ -26,6 +27,6 @@ class ExpiredAdvancedPreparednessViewModel : BaseAdvancedPreparednessViewModel()
                 action.assignee == user.id &&
                 action.getExpirationTime().isBeforeNow &&
                 !action.isArchived &&
-                isActive(action, hazards)
+                action.isActive(hazards)
     }
 }

@@ -1,13 +1,13 @@
 package org.alertpreparedness.platform.v1.firebase;
 
 import com.google.firebase.database.Exclude;
-
-import org.alertpreparedness.platform.v1.utils.Constants;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import org.alertpreparedness.platform.v1.utils.Constants;
+import org.alertpreparedness.platform.v2.models.TimeTracking;
+import org.alertpreparedness.platform.v2.models.TimeTrackingItem;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by Tj on 26/03/2018.
@@ -28,6 +28,33 @@ public class TimeTrackingModel implements Serializable {
     }
 
     public TimeTrackingModel() {
+    }
+
+    public TimeTrackingModel(final TimeTracking timeTracking) {
+        if (timeTracking.getTimeSpentInGreen() != null) {
+            timeSpentInGreen = new ArrayList<>();
+            for (final TimeTrackingItem timeTrackingItem : timeTracking.getTimeSpentInGreen()) {
+                timeSpentInGreen.add(new TimeTrackingItemModel(timeTrackingItem));
+            }
+        }
+        if (timeTracking.getTimeSpentInAmber() != null) {
+            timeSpentInAmber = new ArrayList<>();
+            for (final TimeTrackingItem timeTrackingItem : timeTracking.getTimeSpentInAmber()) {
+                timeSpentInAmber.add(new TimeTrackingItemModel(timeTrackingItem));
+            }
+        }
+        if (timeTracking.getTimeSpentInRed() != null) {
+            timeSpentInRed = new ArrayList<>();
+            for (final TimeTrackingItem timeTrackingItem : timeTracking.getTimeSpentInRed()) {
+                timeSpentInRed.add(new TimeTrackingItemModel(timeTrackingItem));
+            }
+        }
+        if (timeTracking.getTimeSpentInGrey() != null) {
+            timeSpentInGrey = new ArrayList<>();
+            for (final TimeTrackingItem timeTrackingItem : timeTracking.getTimeSpentInGrey()) {
+                timeSpentInGrey.add(new TimeTrackingItemModel(timeTrackingItem));
+            }
+        }
     }
 
     public ArrayList<TimeTrackingItemModel> getTimeSpentInAmber() {

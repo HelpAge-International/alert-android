@@ -158,7 +158,7 @@ public class APAUnassignedFragment extends BaseAPAFragment implements APActionAd
                         SnackbarHelper.show(getActivity(), getString(R.string.more_info_chs));
                     }
                     else {
-                        dialog.show(getActivity().getFragmentManager(), "users_list");
+                        dialog.show(getActivity().getSupportFragmentManager(), "users_list");
                     }
                     break;
                 case R.id.edit_action:

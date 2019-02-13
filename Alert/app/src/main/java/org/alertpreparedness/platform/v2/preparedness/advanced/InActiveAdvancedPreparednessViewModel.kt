@@ -5,6 +5,7 @@ import org.alertpreparedness.platform.v2.models.User
 import org.alertpreparedness.platform.v2.models.enums.HazardScenario
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption.EDIT
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption.REASSIGN
+import org.alertpreparedness.platform.v2.utils.extensions.isActive
 
 class InActiveAdvancedPreparednessViewModel : BaseAdvancedPreparednessViewModel() {
 
@@ -20,7 +21,7 @@ class InActiveAdvancedPreparednessViewModel : BaseAdvancedPreparednessViewModel(
             hazards: List<HazardScenario>): Boolean {
         return super.filterAction(action, user, hazards) &&
                 (action.assignee == user.id || action.assignee == null) &&
-                !isActive(action, hazards) &&
+                !action.isActive(hazards) &&
                 !action.isArchived
     }
 }

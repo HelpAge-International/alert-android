@@ -156,7 +156,7 @@ public class ActionUnassignedFragment extends Fragment implements UsersListDialo
                             SnackbarHelper.show(getActivity(), getString(R.string.more_info_chs));
                         }
                         else {
-                            dialog.show(getActivity().getFragmentManager(), "users_list");
+                            dialog.show(getActivity().getSupportFragmentManager(), "users_list");
                         }
                         break;
                     }

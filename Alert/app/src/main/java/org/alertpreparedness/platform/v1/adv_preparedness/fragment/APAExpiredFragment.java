@@ -194,7 +194,7 @@ public class APAExpiredFragment extends BaseAPAFragment implements APActionAdapt
                     break;
                 case R.id.reassign_action:
                     if(permissions.checkAssignAPA(mAPAdapter.getItem(pos), getActivity())) {
-                        dialog.show(getActivity().getFragmentManager(), "users_list");
+                        dialog.show(getActivity().getSupportFragmentManager(), "users_list");
                     }
                     break;
                 case R.id.action_notes:

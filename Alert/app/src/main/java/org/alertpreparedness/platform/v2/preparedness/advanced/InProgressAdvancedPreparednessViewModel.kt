@@ -6,6 +6,7 @@ import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBotto
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption.COMPLETE
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption.NOTES
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption.REASSIGN
+import org.alertpreparedness.platform.v2.utils.extensions.isActive
 
 class InProgressAdvancedPreparednessViewModel : BaseAdvancedPreparednessViewModel() {
 
@@ -26,6 +27,6 @@ class InProgressAdvancedPreparednessViewModel : BaseAdvancedPreparednessViewMode
                 action.assignee == user.id &&
                 action.getExpirationTime().isAfterNow &&
                 !action.isArchived &&
-                isActive(action, hazards)
+                action.isActive(hazards)
     }
 }

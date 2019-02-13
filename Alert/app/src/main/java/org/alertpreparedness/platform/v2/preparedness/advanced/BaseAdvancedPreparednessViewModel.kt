@@ -14,11 +14,4 @@ abstract class BaseAdvancedPreparednessViewModel : BasePreparednessViewModel() {
             hazards: List<HazardScenario>): Boolean {
         return action.actionLevel == APA
     }
-
-    fun isActive(action: Action, hazards: List<HazardScenario>): Boolean {
-        return (action.assignedHazards ?: listOf())
-                .intersect(hazards)
-                .isNotEmpty()
-                || (action.assignedHazards == null && hazards.isNotEmpty())
-    }
 }

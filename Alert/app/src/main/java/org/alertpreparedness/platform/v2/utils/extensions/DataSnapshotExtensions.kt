@@ -3,10 +3,12 @@ package org.alertpreparedness.platform.v2.utils.extensions
 import com.google.firebase.database.DataSnapshot
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
+import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.google.gson.stream.JsonReader
 import org.alertpreparedness.platform.v1.utils.SnapshotExclusionStrat
@@ -33,6 +35,7 @@ import org.alertpreparedness.platform.v2.models.enums.Title
 import org.alertpreparedness.platform.v2.models.enums.TitleSerializer
 import org.joda.time.DateTime
 import java.io.StringReader
+import java.lang.reflect.Type
 import java.util.Date
 
 fun DataSnapshot.childKeys(): List<String> {
@@ -48,8 +51,17 @@ val gson: Gson by lazy{
     gsonBuilder.setExclusionStrategies(SnapshotExclusionStrat())
             .registerTypeAdapter(Date::class.java, JsonDeserializer<Date> {json, _, _ -> Date(json.asJsonPrimitive.asLong) })
             .registerTypeAdapter(Date::class.java, JsonSerializer<Date> {date, _, _ -> JsonPrimitive(date.time) })
-            .registerTypeAdapter(DateTime::class.java, JsonDeserializer<DateTime> {json, _, _ -> DateTime(json.asJsonPrimitive.asLong) })
-            .registerTypeAdapter(DateTime::class.java, JsonSerializer<DateTime> {date, _, _ -> JsonPrimitive(date.millis) })
+            .registerTypeAdapter(DateTime::class.java, object : JsonDeserializer<DateTime>, JsonSerializer<DateTime> {
+                override fun deserialize(json: JsonElement, typeOfT: Type?,
+                        context: JsonDeserializationContext?): DateTime {
+                    return DateTime(json.asJsonPrimitive.asLong)
+                }
+
+                override fun serialize(src: DateTime, typeOfSrc: Type?,
+                        context: JsonSerializationContext?): JsonElement {
+                    return JsonPrimitive(src.millis)
+                }
+            })
             .registerTypeAdapter(IndicatorTriggerLevel::class.java, IndicatorTriggerLevelSerializer)
             .registerTypeAdapter(ActionLevel::class.java, ActionLevelSerializer)
             .registerTypeAdapter(ActionType::class.java, ActionTypeSerializer)

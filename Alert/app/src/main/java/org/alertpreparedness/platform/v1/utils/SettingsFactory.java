@@ -1,11 +1,9 @@
 package org.alertpreparedness.platform.v1.utils;
 
 import com.google.firebase.database.DataSnapshot;
-
+import io.realm.Realm;
 import org.alertpreparedness.platform.v1.model.User;
 import org.alertpreparedness.platform.v1.realm.SettingsRealm;
-
-import io.realm.Realm;
 
 /**
  * Created by Tj on 23/01/2018.
@@ -343,9 +341,14 @@ public class SettingsFactory {
     }
 
     public static SettingsRealm getSettings(User user) {
+        return getSettings(user.getUserID());
+
+    }
+
+    public static SettingsRealm getSettings(String userId) {
         Realm realm = Realm.getDefaultInstance();
 
-        return realm.where(SettingsRealm.class).equalTo("userId", user.getUserID()).findFirst();
+        return realm.where(SettingsRealm.class).equalTo("userId", userId).findFirst();
 
     }
 }

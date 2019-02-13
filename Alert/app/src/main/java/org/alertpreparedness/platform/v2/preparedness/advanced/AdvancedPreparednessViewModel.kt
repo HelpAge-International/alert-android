@@ -1,7 +1,7 @@
 package org.alertpreparedness.platform.v2.preparedness.advanced
 
 import io.reactivex.Observable
-import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import org.alertpreparedness.platform.v2.base.BaseViewModel
 import org.alertpreparedness.platform.v2.preparedness.advanced.IAdvancedPreparednessViewModel.Inputs
 import org.alertpreparedness.platform.v2.preparedness.advanced.IAdvancedPreparednessViewModel.Outputs
@@ -18,7 +18,7 @@ interface IAdvancedPreparednessViewModel {
 
 class AdvancedPreparednessViewModel : BaseViewModel(), Inputs, Outputs {
 
-    private val onAddClicked = BehaviorSubject.create<Unit>()
+    private val onAddClicked = PublishSubject.create<Unit>()
 
     override fun addButtonClicked() {
         onAddClicked.onNext(Unit)

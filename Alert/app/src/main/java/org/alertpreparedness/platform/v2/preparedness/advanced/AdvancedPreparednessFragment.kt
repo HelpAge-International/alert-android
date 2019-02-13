@@ -1,7 +1,10 @@
 package org.alertpreparedness.platform.v2.preparedness.advanced
 
+import android.content.Intent
+import kotlinx.android.synthetic.main.fragment_advanced_preparedness.btnAdd
 import kotlinx.android.synthetic.main.fragment_minimum_preparedness.viewPager
 import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.v1.adv_preparedness.activity.CreateAPAActivity
 import org.alertpreparedness.platform.v2.base.BaseFragment
 
 class AdvancedPreparednessFragment : BaseFragment<AdvancedPreparednessViewModel>() {
@@ -18,6 +21,10 @@ class AdvancedPreparednessFragment : BaseFragment<AdvancedPreparednessViewModel>
     override fun initViews() {
         super.initViews()
 
+        btnAdd.setOnClickListener {
+            viewModel.addButtonClicked()
+        }
+
         adapter = AdvancedPreparednessPagerAdapter(
                 fragmentManager!!)
         viewPager.adapter = adapter
@@ -27,7 +34,8 @@ class AdvancedPreparednessFragment : BaseFragment<AdvancedPreparednessViewModel>
         disposables += viewModel
                 .addAction()
                 .subscribe {
-                    //TODO
+                    val intent = Intent(activity, CreateAPAActivity::class.java)
+                    startActivity(intent)
                 }
     }
 }

@@ -20,12 +20,13 @@ class Action(
         val actionLevel: ActionLevel,
         @SerializedName("type")
         val actionType: ActionType,
-        val requireDoc: Boolean,
+        val requireDoc: Boolean?,
         val task: String,
-        val updatedAt: DateTime,
+        val updatedAt: DateTime?,
         val isArchived: Boolean,
         @SerializedName("assignHazard")
-        val assignedHazards: List<HazardScenario>?
+        val assignedHazards: List<HazardScenario>?,
+        val timeTracking: TimeTracking?
 ) : BaseModel() {
 
     @Transient
@@ -34,11 +35,13 @@ class Action(
     @Transient
     lateinit var documentIds: List<String>
 
-    fun getExpirationTime(): DateTime {
+    fun getExpirationTime(updatedAt: DateTime? = this.updatedAt): DateTime {
         return if (isCompleteAt != null) {
             isCompleteAt.plus(clockSettings.calculateOffset())
-        } else {
+        } else if (updatedAt != null) {
             updatedAt.plus(clockSettings.calculateOffset())
+        } else {
+            DateTime(Long.MAX_VALUE)
         }
     }
 

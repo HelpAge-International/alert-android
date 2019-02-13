@@ -6,6 +6,7 @@ import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBotto
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption.ATTACHMENTS
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption.NOTES
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption.UPDATE_DUE_DATE
+import org.alertpreparedness.platform.v2.utils.extensions.isActive
 
 class UnassignedAdvancedPreparednessViewModel : BaseAdvancedPreparednessViewModel() {
 
@@ -24,6 +25,6 @@ class UnassignedAdvancedPreparednessViewModel : BaseAdvancedPreparednessViewMode
         return super.filterAction(action, user, hazards) &&
                 action.assignee == null &&
                 !action.isArchived &&
-                isActive(action, hazards)
+                action.isActive(hazards)
     }
 }

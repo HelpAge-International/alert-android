@@ -9,6 +9,8 @@ import org.alertpreparedness.platform.v2.db
 import org.alertpreparedness.platform.v2.models.Action
 import org.alertpreparedness.platform.v2.models.Alert
 import org.alertpreparedness.platform.v2.models.ClockSettings
+import org.alertpreparedness.platform.v2.models.ClockSettingsSource.ACTION
+import org.alertpreparedness.platform.v2.models.ClockSettingsSource.COUNTRY
 import org.alertpreparedness.platform.v2.models.Hazard
 import org.alertpreparedness.platform.v2.models.Indicator
 import org.alertpreparedness.platform.v2.models.ResponsePlan
@@ -22,10 +24,13 @@ import org.alertpreparedness.platform.v2.models.UserType.PARTNER
 import org.alertpreparedness.platform.v2.models.enums.ActionType
 import org.alertpreparedness.platform.v2.models.enums.ActionType.CHS
 import org.alertpreparedness.platform.v2.models.enums.ActionType.MANDATED
+import org.alertpreparedness.platform.v2.models.enums.AlertApprovalState.APPROVED
 import org.alertpreparedness.platform.v2.models.enums.AlertApprovalStateSerializer
+import org.alertpreparedness.platform.v2.models.enums.AlertLevel.RED
 import org.alertpreparedness.platform.v2.models.enums.CountryOffice
 import org.alertpreparedness.platform.v2.models.enums.DurationType.WEEK
 import org.alertpreparedness.platform.v2.models.enums.DurationTypeSerializer
+import org.alertpreparedness.platform.v2.models.enums.HazardScenario
 import org.alertpreparedness.platform.v2.models.enums.Note
 import org.alertpreparedness.platform.v2.printRef
 import org.alertpreparedness.platform.v2.utils.extensions.behavior
@@ -175,11 +180,13 @@ object Repository {
                         val riskMonitoringClockSettings = clockSettings["riskMonitoring"].asJsonObject
 
                         model.preparednessClockSettings = ClockSettings(
+                                COUNTRY,
                                 DurationTypeSerializer.jsonToEnum(preparednessClockSettings["durationType"].asInt)
                                         ?: WEEK,
                                 preparednessClockSettings["value"].asInt
                         )
                         model.responsePlanClockSettings = ClockSettings(
+                                COUNTRY,
                                 DurationTypeSerializer.jsonToEnum(responsePlanClockSettings["durationType"].asInt)
                                         ?: WEEK,
                                 responsePlanClockSettings["value"].asInt
@@ -200,6 +207,15 @@ object Repository {
                 }
                 .share()
                 .behavior()
+    }
+
+    val redAlertHazardScenariosObservable: Observable<List<HazardScenario>> by lazy {
+        alertsObservable
+                .filterList {
+                    it.level == RED && it.state == APPROVED
+                }
+                .mapList { it.hazardScenario }
+                .map { it.distinct() }
     }
 
     val indicatorsObservable: Observable<List<Indicator>> by lazy {
@@ -317,6 +333,7 @@ object Repository {
 
         if (json.has("frequencyValue") && json.has("frequencyBase")) {
             action.clockSettings = ClockSettings(
+                    ACTION,
                     DurationTypeSerializer.jsonToEnum(json["frequencyBase"].asInt) ?: WEEK,
                     json["frequencyValue"].asInt
             )

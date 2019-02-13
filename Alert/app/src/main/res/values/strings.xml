@@ -184,6 +184,7 @@
     <string name="txt_err_add_attachments">An attachment is required to complete this action. Please enter and try again</string>
     <string name="txt_note_not_empty">Notes cannot be empty!</string>
     <string name="update_due_date_action">Update due date</string>
+    <string name="due_date_updated">Due date updated successfully</string>
     <string name="title_adv_preparedness">Adv. Preparedness</string>
     <string name="assign_action">Assign action</string>
     <string name="action_edit">Edit action</string>
@@ -309,6 +310,7 @@
     <string name="expired_title">Expired</string>
     <string name="completed_title">Completed</string>
     <string name="no_actions">No Actions</string>
+    <string name="an_error_occurred">An error occurred, please try again later.</string>
 
 
 </resources>

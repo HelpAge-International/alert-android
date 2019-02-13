@@ -5,6 +5,7 @@ import org.alertpreparedness.platform.v2.models.enums.HazardScenario
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption.ATTACHMENTS
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption.NOTES
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption.REASSIGN
+import org.alertpreparedness.platform.v2.utils.extensions.isActive
 
 class CompleteAdvancedPreparednessViewModel : BaseAdvancedPreparednessViewModel() {
 
@@ -24,7 +25,7 @@ class CompleteAdvancedPreparednessViewModel : BaseAdvancedPreparednessViewModel(
                 action.isComplete &&
                 action.assignee == user.id &&
                 action.getExpirationTime().isAfterNow &&
-                isActive(action, hazards) &&
+                action.isActive(hazards) &&
                 !action.isArchived
     }
 }

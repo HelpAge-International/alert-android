@@ -1,21 +1,24 @@
 package org.alertpreparedness.platform.v1.adv_preparedness.fragment;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.view.View;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-
+import java.util.ArrayList;
+import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.R;
 import org.alertpreparedness.platform.v1.adv_preparedness.adapter.UserListAdapter;
 import org.alertpreparedness.platform.v1.adv_preparedness.model.UserModel;
@@ -24,19 +27,13 @@ import org.alertpreparedness.platform.v1.dagger.annotation.StaffRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.v1.model.User;
 
-import java.util.ArrayList;
-
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
-
 /**
  * Created by faizmohideen on 09/01/2018.
  */
 
-public class UsersListDialogFragment extends DialogFragment implements UserListAdapter.ItemSelectedListener, ValueEventListener {
+@Deprecated
+public class UsersListDialogFragment extends DialogFragment
+        implements UserListAdapter.ItemSelectedListener, ValueEventListener {
 
     private Unbinder unbinder;
     private UserListAdapter mAdapter;
@@ -134,6 +131,7 @@ public class UsersListDialogFragment extends DialogFragment implements UserListA
     }
 
     public interface ItemSelectedListener {
-        void onItemSelected(UserModel model);
+
+        void onItemSelected(@Nullable UserModel model);
     }
 }

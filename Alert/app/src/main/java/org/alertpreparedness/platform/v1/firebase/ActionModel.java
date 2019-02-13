@@ -1,60 +1,145 @@
 package org.alertpreparedness.platform.v1.firebase;
 
-import com.google.firebase.database.Exclude;
+import static org.alertpreparedness.platform.v2.utils.extensions.ActionExtensionsKt.canBeAssigned;
 
+import com.google.firebase.database.Exclude;
 import java.util.ArrayList;
+import org.alertpreparedness.platform.v2.models.Action;
+import org.alertpreparedness.platform.v2.models.ClockSettings;
+import org.alertpreparedness.platform.v2.models.ClockSettingsSource;
+import org.alertpreparedness.platform.v2.models.enums.ActionType;
+import org.alertpreparedness.platform.v2.models.enums.HazardScenario;
 
 public class ActionModel extends FirebaseModel {
 
     private Boolean isArchived;
+
     private String asignee;
+
     private String task;
+
     private Boolean isComplete;
+
     private Long isCompleteAt;
+
     private Long createdAt;
+
     private Long dueDate;
+
     private Long updatedAt;
+
     private Integer type;
+
     private Integer level;
+
     private Long budget;
+
     private Boolean requireDoc;
+
     private Integer frequencyBase;
+
     private Integer frequencyValue;
-    private String createdByAgencyId;
-    private String createdByCountryId;
+
     private ArrayList<Integer> assignHazard;
+
     private String department;
+
     private TimeTrackingModel timeTracking;
 
     @Exclude
     private boolean isChs;
+
     @Exclude
     private boolean hasEnoughChsInfo;
 
     public ActionModel() {
     }
 
+    @Deprecated
+    /*Constructor used to link v2 action class to v1 action class*/
+    public ActionModel(Action action, String countryId) {
+        isArchived = action.isArchived();
+        asignee = action.getAssignee();
+        task = action.getTask();
+        isComplete = action.isComplete();
+        isCompleteAt = action.isCompleteAt() == null ? null : action.isCompleteAt().getMillis();
+        createdAt = action.getCreatedAt().getMillis();
+        dueDate = action.getDueDate() == null ? null : action.getDueDate().getMillis();
+        updatedAt = action.getUpdatedAt() == null ? null : action.getUpdatedAt().getMillis();
+        type = action.getActionType().getValue();
+        level = action.getActionLevel().getValue();
+        budget = action.getBudget() == null ? null : action.getBudget().longValue();
+        requireDoc = action.getRequireDoc();
+        ClockSettings clockSettings = action.getClockSettings();
+        ClockSettingsSource source = clockSettings.getClockSettingsSource();
+        frequencyBase = source == ClockSettingsSource.COUNTRY ? null : clockSettings.getType().getValue();
+        frequencyValue = source == ClockSettingsSource.COUNTRY ? null : clockSettings.getValue();
+
+        if (action.getAssignedHazards() != null) {
+            assignHazard = new ArrayList<>();
+            for (final HazardScenario assignedHazard : action.getAssignedHazards()) {
+                assignHazard.add(assignedHazard.getValue());
+            }
+        }
+
+        department = action.getDepartmentId();
+        timeTracking = action.getTimeTracking() == null ? null : new TimeTrackingModel(action.getTimeTracking());
+        isChs = action.getActionType() == ActionType.CHS;
+        setParentId(countryId);
+        setId(action.id);
+        setHasEnoughChsInfo(canBeAssigned(action));
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         ActionModel that = (ActionModel) o;
 
-        if (!asignee.equals(that.asignee)) return false;
-        if (!task.equals(that.task)) return false;
-        if (!isComplete.equals(that.isComplete)) return false;
-        if (!isCompleteAt.equals(that.isCompleteAt)) return false;
-        if (!createdAt.equals(that.createdAt)) return false;
-        if (!dueDate.equals(that.dueDate)) return false;
-        if (!updatedAt.equals(that.updatedAt)) return false;
-        if (!type.equals(that.type)) return false;
-        if (!level.equals(that.level)) return false;
-        if (!budget.equals(that.budget)) return false;
-        if (!requireDoc.equals(that.requireDoc)) return false;
-        if (!frequencyBase.equals(that.frequencyBase)) return false;
-        if (frequencyValue != null ? !frequencyValue.equals(that.frequencyValue) : that.frequencyValue != null)
+        if (!asignee.equals(that.asignee)) {
             return false;
+        }
+        if (!task.equals(that.task)) {
+            return false;
+        }
+        if (!isComplete.equals(that.isComplete)) {
+            return false;
+        }
+        if (!isCompleteAt.equals(that.isCompleteAt)) {
+            return false;
+        }
+        if (!createdAt.equals(that.createdAt)) {
+            return false;
+        }
+        if (!dueDate.equals(that.dueDate)) {
+            return false;
+        }
+        if (!updatedAt.equals(that.updatedAt)) {
+            return false;
+        }
+        if (!type.equals(that.type)) {
+            return false;
+        }
+        if (!level.equals(that.level)) {
+            return false;
+        }
+        if (!budget.equals(that.budget)) {
+            return false;
+        }
+        if (!requireDoc.equals(that.requireDoc)) {
+            return false;
+        }
+        if (!frequencyBase.equals(that.frequencyBase)) {
+            return false;
+        }
+        if (frequencyValue != null ? !frequencyValue.equals(that.frequencyValue) : that.frequencyValue != null) {
+            return false;
+        }
         return assignHazard != null ? assignHazard.equals(that.assignHazard) : that.assignHazard == null;
     }
 
@@ -214,22 +299,6 @@ public class ActionModel extends FirebaseModel {
         this.assignHazard = assignHazard;
     }
 
-    public String getCreatedByCountryId() {
-        return createdByCountryId;
-    }
-
-    public void setCreatedByCountryId(String createdByCountryId) {
-        this.createdByCountryId = createdByCountryId;
-    }
-
-    public String getCreatedByAgencyId() {
-        return createdByAgencyId;
-    }
-
-    public void setCreatedByAgencyId(String createdByAgencyId) {
-        this.createdByAgencyId = createdByAgencyId;
-    }
-
     public Boolean getIsArchived() {
         return (isArchived == null ? false : isArchived);
     }
@@ -255,7 +324,7 @@ public class ActionModel extends FirebaseModel {
     }
 
     public TimeTrackingModel getTimeTracking() {
-        if(timeTracking == null) {
+        if (timeTracking == null) {
             timeTracking = new TimeTrackingModel();
         }
         return timeTracking;

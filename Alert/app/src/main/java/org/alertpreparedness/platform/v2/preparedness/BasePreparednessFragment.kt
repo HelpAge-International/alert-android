@@ -4,24 +4,31 @@ import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
 import android.content.Intent
 import android.widget.DatePicker
+import androidx.annotation.CallSuper
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat.getColor
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_page_preparedness.ivStatus
 import kotlinx.android.synthetic.main.fragment_page_preparedness.rvActions
 import kotlinx.android.synthetic.main.fragment_page_preparedness.tvNoAction
 import kotlinx.android.synthetic.main.fragment_page_preparedness.tvStatus
 import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.v1.adv_preparedness.activity.EditAPAActivity
+import org.alertpreparedness.platform.v1.adv_preparedness.fragment.UsersListDialogFragment
+import org.alertpreparedness.platform.v1.firebase.ActionModel
 import org.alertpreparedness.platform.v1.min_preparedness.activity.AddNotesActivity
+import org.alertpreparedness.platform.v1.min_preparedness.activity.CompleteActionActivity
 import org.alertpreparedness.platform.v1.min_preparedness.activity.ViewAttachmentsActivity
 import org.alertpreparedness.platform.v2.base.BaseFragment
 import org.alertpreparedness.platform.v2.models.Action
 import org.alertpreparedness.platform.v2.preparedness.advanced.OnPreparednessOptionClickedListener
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetDialogFragment
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption
+import org.alertpreparedness.platform.v2.utils.Nullable
 import org.alertpreparedness.platform.v2.utils.extensions.show
 import org.jetbrains.anko.imageResource
 import org.joda.time.LocalDate
@@ -66,6 +73,7 @@ abstract class BasePreparednessFragment<VM : BasePreparednessViewModel> : BaseFr
         rvActions.addItemDecoration(DividerItemDecoration(context!!, DividerItemDecoration.VERTICAL))
     }
 
+    @CallSuper
     override fun observeViewModel() {
         disposables += viewModel.user()
                 .subscribe {
@@ -109,12 +117,50 @@ abstract class BasePreparednessFragment<VM : BasePreparednessViewModel> : BaseFr
 
         disposables += viewModel.updateDueDateSuccess()
                 .subscribe {
-
+                    Snackbar.make(rvActions, R.string.due_date_updated, Snackbar.LENGTH_LONG).show()
                 }
 
-        disposables += viewModel.updateDueDateFailure()
+        disposables += viewModel.assignAction()
                 .subscribe {
+                    val fragment = UsersListDialogFragment()
+                    fragment.setListener {
+                        viewModel.onAssignUser(Nullable(it?.userID))
+                    }
+                    fragment.show(fragmentManager, "Select User")
+                }
 
+        disposables += viewModel.genericError()
+                .subscribe {
+                    Snackbar.make(rvActions, R.string.an_error_occurred, Snackbar.LENGTH_LONG).show()
+                }
+
+        disposables += viewModel.showCompleteActivity()
+                .subscribe { (action, countryId) ->
+                    val intent = Intent(activity, CompleteActionActivity::class.java)
+                    intent.putExtra(CompleteActionActivity.REQUIRE_DOC, action.requireDoc)
+                    intent.putExtra(CompleteActionActivity.ACTION_KEY, action.id)
+                    intent.putExtra(CompleteActionActivity.PARENT_KEY, countryId)
+                    startActivity(intent)
+                }
+
+        disposables += viewModel.showEditActivity()
+                .subscribe { (action, countryId) ->
+                    val i = Intent(context, EditAPAActivity::class.java)
+                    i.putExtra(EditAPAActivity.MODEL, ActionModel(action, countryId))
+                    startActivity(i)
+                }
+
+        disposables += viewModel.assignActionPermissionError()
+                .subscribe {
+                    Snackbar.make(rvActions, R.string.permission_assign_action_error, Snackbar.LENGTH_LONG).show()
+                }
+        disposables += viewModel.assignActionIncompleteError()
+                .subscribe {
+                    Snackbar.make(rvActions, R.string.more_info_chs, Snackbar.LENGTH_LONG).show()
+                }
+        disposables += viewModel.completeActionPermissionError()
+                .subscribe {
+                    Snackbar.make(rvActions, R.string.permission_complete_error, Snackbar.LENGTH_LONG).show()
                 }
     }
 
