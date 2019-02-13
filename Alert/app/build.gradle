@@ -13,7 +13,7 @@ android {
         minSdkVersion 17
         targetSdkVersion 28
         versionCode 1
-        versionName "0.4"
+        versionName "0.4.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
@@ -85,8 +85,8 @@ dependencies {
     // FAB
     implementation 'com.github.clans:fab:1.6.4'
     // Firebase
-    implementation 'com.google.firebase:firebase-core:16.0.6'
-    implementation 'com.google.firebase:firebase-database:16.0.5'
+    implementation 'com.google.firebase:firebase-core:16.0.7'
+    implementation 'com.google.firebase:firebase-database:16.0.6'
     implementation 'com.google.firebase:firebase-auth:16.1.0'
     implementation 'com.google.firebase:firebase-storage:16.0.5'
     implementation 'com.google.firebase:firebase-messaging:17.3.4'
@@ -151,7 +151,7 @@ dependencies {
         transitive = true
     }
 
-    implementation 'com.google.firebase:firebase-core:16.0.6'
+    implementation 'com.google.firebase:firebase-core:16.0.7'
 
     //RxBindings
     implementation 'com.jakewharton.rxbinding3:rxbinding:3.0.0-alpha2'

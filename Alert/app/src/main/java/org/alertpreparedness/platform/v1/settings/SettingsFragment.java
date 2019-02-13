@@ -1,17 +1,21 @@
 package org.alertpreparedness.platform.v1.settings;
 
 
+import static android.app.Activity.RESULT_OK;
+
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -23,7 +27,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
-
+import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.MainDrawer;
 import org.alertpreparedness.platform.v1.R;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
@@ -34,14 +38,6 @@ import org.alertpreparedness.platform.v1.model.User;
 import org.alertpreparedness.platform.v1.notifications.NotificationIdHandler;
 import org.alertpreparedness.platform.v1.utils.PreferHelper;
 import org.alertpreparedness.platform.v1.utils.SnackbarHelper;
-
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by Tj on 27/12/2017.
@@ -76,7 +72,7 @@ public class SettingsFragment extends Fragment implements ValueEventListener {
 
         initViews();
 
-        ((MainDrawer)getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.NORMAL, R.string.nav_settings);
+        ((MainDrawer) getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.NORMAL, R.string.nav_logout);
 
         userRef.addValueEventListener(this);
 

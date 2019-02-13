@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -22,8 +23,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
@@ -31,19 +34,24 @@ import org.alertpreparedness.platform.v1.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.PermissionRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.v1.dashboard.activity.CreateAlertActivity;
+import org.alertpreparedness.platform.v1.helper.UserInfo;
+import org.alertpreparedness.platform.v1.login.activity.LoginScreen;
 import org.alertpreparedness.platform.v1.model.User;
 import org.alertpreparedness.platform.v1.mycountry.MyCountryFragment;
+import org.alertpreparedness.platform.v1.notifications.NotificationIdHandler;
 import org.alertpreparedness.platform.v1.responseplan.ResponsePlanFragment;
 import org.alertpreparedness.platform.v1.risk_monitoring.view.RiskFragment;
-import org.alertpreparedness.platform.v1.settings.SettingsFragment;
 import org.alertpreparedness.platform.v1.utils.AppUtils;
 import org.alertpreparedness.platform.v1.utils.Constants;
+import org.alertpreparedness.platform.v1.utils.PreferHelper;
+import org.alertpreparedness.platform.v1.utils.SnackbarHelper;
 import org.alertpreparedness.platform.v2.dashboard.home.HomeFragment;
 import org.alertpreparedness.platform.v2.preparedness.advanced.AdvancedPreparednessFragment;
 import org.alertpreparedness.platform.v2.preparedness.minimum.MinimumPreparednessFragment;
 import org.alertpreparedness.platform.v2.utils.GlideApp;
 
-public class MainDrawer extends BaseActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainDrawer extends BaseActivity
+        implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     private int mCurrentItem = R.id.nav_home;
 
@@ -53,12 +61,19 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     }
 
     private ActionBarDrawerToggle drawerToggle;
+
     private FirebaseAuth firebaseAuth;
+
     public static final String TAG = "MAIN_DRAWER";
 
     static class HeaderViews {
-        @BindView(R.id.tvUserName) TextView mUsername;
-        @BindView(R.id.tvDepartment) TextView mDepartment;
+
+        @BindView(R.id.tvDepartment)
+        TextView mDepartment;
+
+        @BindView(R.id.tvUserName)
+        TextView mUsername;
+
         @BindView(R.id.img_profile)
         CircleImageView logo;
     }
@@ -86,10 +101,11 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     @BindView(R.id.normal_action_bar)
     CardView normalActionbarContainer;
 
-    @Inject @UserRef
-    DatabaseReference userRef;
+    @Inject
+    public NotificationIdHandler notificationIdHandler;
 
-    @Inject @AgencyRef
+    @Inject
+    @AgencyRef
     DatabaseReference agencyRef;
 
     @Inject
@@ -98,6 +114,10 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
     @Inject
     @PermissionRef
     DatabaseReference permissionsRef;
+
+    @Inject
+    @UserRef
+    DatabaseReference userRef;
 
     @Override
     public void onCreate(Bundle saved) {
@@ -123,7 +143,7 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
 
         navigationView.setNavigationItemSelectedListener(this);
 
-        ((AlertApplication)getApplicationContext()).startPermissionListeners(permissionsRef, user);
+        ((AlertApplication) getApplicationContext()).startPermissionListeners(permissionsRef, user);
     }
 
     public void removeActionbarElevation() {
@@ -137,53 +157,76 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
         alertActionbarContainer.setCardElevation(8);
     }
 
-    private void setUserName() {
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-        agencyRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String res = String.format(
-                        getString(R.string.navbar_subtitle),
-                        AppUtils.getUserTypeString(user.getUserType()),
-                        dataSnapshot.child("name").getValue(String.class),
-                        user.getCountryName()
-                );
-                header.mDepartment.setText(res);
-                String urlPath = (String)dataSnapshot.child("logoPath").getValue();
-                GlideApp.with(MainDrawer.this)
-                        .load(urlPath)
-                        .dontAnimate()
-                        .placeholder(R.drawable.agency_icon_placeholder)
-                        .into(header.logo);
+        drawerLayout.closeDrawers();
+        if (mCurrentItem != item.getItemId()) {
+            switch (item.getItemId()) {
+                case R.id.nav_home:
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1)
+                            .subscribe(x -> setFragment(new HomeFragment()));
+                    //                setFragment(new HomeFragment());
+                    break;
+                case R.id.nav_risk:
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1)
+                            .subscribe(x -> setFragment(new RiskFragment()));
+                    break;
+                case R.id.nav_minimum:
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1)
+                            .subscribe(x -> setFragment(new MinimumPreparednessFragment()));
+                    break;
+                case R.id.nav_advanced:
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1)
+                            .subscribe(x -> setFragment(new AdvancedPreparednessFragment()));
+                    break;
+                case R.id.nav_response:
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1)
+                            .subscribe(x -> setFragment(new ResponsePlanFragment()));
+                    break;
+                case R.id.nav_my_country:
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1)
+                            .subscribe(x -> setFragment(new MyCountryFragment()));
+                    break;
+                case R.id.nav_settings:
+                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).observeOn(
+                            AndroidSchedulers.mainThread()).subscribe(x -> {
+                        AlertDialog.Builder builder;
+                        builder = new AlertDialog.Builder(this);
+                        builder.setTitle("Logout")
+                                .setMessage(
+                                        "You will be unable to log back into the app unless you have internet connection. Are you sure you want to log out?")
+                                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                                    if (FirebaseInstanceId.getInstance().getToken() != null) {
+                                        notificationIdHandler.deregisterDeviceId(user.getUserID(),
+                                                FirebaseInstanceId.getInstance().getToken(),
+                                                (databaseError, databaseReference) -> {
+                                                    if (databaseError == null) {
+                                                        logout();
+                                                    } else {
+                                                        try {
+                                                            SnackbarHelper.show(this,
+                                                                    getString(R.string.error_logging_out));
+                                                        } catch (Exception e) {
+                                                        }
+                                                    }
+                                                });
+                                    } else {
+                                        logout();
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.no, (dialog, which) -> {
+                                    // do nothing
+                                })
+                                .show();
+
+                    });
+                    break;
+
             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                try {
-                    String firstname = dataSnapshot.child("firstName").getValue(String.class);
-                    String lastname = dataSnapshot.child("lastName").getValue(String.class);
-
-                    header.mUsername.setText(String.format("%s %s", firstname, lastname));
-
-                }
-                catch (Exception e) {
-
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+            mCurrentItem = item.getItemId();
+        }
+        return false;
     }
 
     public void toggleActionBar(ActionBarState type) {
@@ -270,41 +313,59 @@ public class MainDrawer extends BaseActivity implements View.OnClickListener, Na
         }
     }
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-        drawerLayout.closeDrawers();
-        if (mCurrentItem != item.getItemId()) {
-            switch (item.getItemId()) {
-                case R.id.nav_home:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> setFragment(new HomeFragment()));
-    //                setFragment(new HomeFragment());
-                    break;
-                case R.id.nav_risk:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x -> setFragment(new RiskFragment()));
-                    break;
-                case R.id.nav_minimum:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1)
-                            .subscribe(x -> setFragment(new MinimumPreparednessFragment()));
-                    break;
-                case R.id.nav_advanced:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1)
-                            .subscribe(x -> setFragment(new AdvancedPreparednessFragment()));
-                    break;
-                case R.id.nav_response:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> setFragment(new ResponsePlanFragment()));
-                    break;
-                case R.id.nav_my_country:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> setFragment(new MyCountryFragment()));
-                    break;
-                case R.id.nav_settings:
-                    Observable.timer(Constants.MENU_CLOSING_DURATION, TimeUnit.MILLISECONDS).take(1).subscribe(x-> setFragment(new SettingsFragment()));
-                    break;
-
-            }
-            mCurrentItem = item.getItemId();
-        }
-        return false;
+    private void logout() {
+        DependencyInjector.deinit();
+        PreferHelper.getInstance(this).edit().remove(UserInfo.PREFS_USER).apply();
+        FirebaseAuth.getInstance().signOut();
+        startActivity(new Intent(this, LoginScreen.class));
+        finish();
     }
 
+    private void setUserName() {
+
+        agencyRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String res = String.format(
+                        getString(R.string.navbar_subtitle),
+                        AppUtils.getUserTypeString(user.getUserType()),
+                        dataSnapshot.child("name").getValue(String.class),
+                        user.getCountryName()
+                );
+                header.mDepartment.setText(res);
+                String urlPath = (String) dataSnapshot.child("logoPath").getValue();
+                GlideApp.with(MainDrawer.this)
+                        .load(urlPath)
+                        .dontAnimate()
+                        .placeholder(R.drawable.agency_icon_placeholder)
+                        .into(header.logo);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                try {
+                    String firstname = dataSnapshot.child("firstName").getValue(String.class);
+                    String lastname = dataSnapshot.child("lastName").getValue(String.class);
+
+                    header.mUsername.setText(String.format("%s %s", firstname, lastname));
+
+                } catch (Exception e) {
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 }
