@@ -1,14 +1,20 @@
 package org.alertpreparedness.platform.v1.firebase.data_fetchers;
 
 import android.os.Build;
-import androidx.annotation.RequiresApi;
 import android.util.Pair;
-
+import androidx.annotation.RequiresApi;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-
+import durdinapps.rxfirebase2.RxFirebaseDatabase;
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.BaseCountryOfficeRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.BaseNetworkCountryRef;
@@ -17,17 +23,6 @@ import org.alertpreparedness.platform.v1.dagger.annotation.CountryOfficeRef;
 import org.alertpreparedness.platform.v1.firebase.ClockSetting;
 import org.alertpreparedness.platform.v1.model.User;
 import org.alertpreparedness.platform.v1.utils.AppUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import durdinapps.rxfirebase2.RxFirebaseDatabase;
-import io.reactivex.Flowable;
-import io.reactivex.Observable;
 
 /**
  * Created by Tj on 01/03/2018.
@@ -75,7 +70,8 @@ public class ClockSettingsFetcher {
 
     @Deprecated
     public void fetch() {
-        countryOfficeRef.child(user.agencyAdminID).child(user.countryID).child("clockSettings").child("preparedness").addListenerForSingleValueEvent(new ValueEventListener() {
+        countryOfficeRef.child(user.agencyAdminID).child(user.countryID).child("mClockSetting").child("preparedness")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -106,9 +102,16 @@ public class ClockSettingsFetcher {
         return rxFetch(baseNetworkCountryRef.child(networkId).child(networkCountryId), key);
     }
 
-    private Flowable<ClockSetting> rxFetch(DatabaseReference dbRef, String key){
-        return RxFirebaseDatabase.observeValueEvent(dbRef.child("clockSettings").child(key))
-                .map(dataSnapshot -> AppUtils.getValueFromDataSnapshot(dataSnapshot, ClockSetting.class));
+    public Observable<ClockSettingsModel> rxFetchGroup(String type) {
+
+        DatabaseReference ref = countryOfficeRef
+                .child(user.agencyAdminID)
+                .child(user.countryID)
+                .child("mClockSetting")
+                .child("preparedness");
+
+        return RxFirebaseDatabase.observeSingleValueEvent(ref, ClockSettingsModel.class).toObservable();
+
     }
 
     public Flowable<ClockSettingsResult> rxFetch(String key) {
@@ -146,16 +149,9 @@ public class ClockSettingsFetcher {
         });
     }
 
-    public Observable<ClockSettingsModel> rxFetchGroup(String type) {
-
-        DatabaseReference ref = countryOfficeRef
-                .child(user.agencyAdminID)
-                .child(user.countryID)
-                .child("clockSettings")
-                .child("preparedness");
-
-        return RxFirebaseDatabase.observeSingleValueEvent(ref, ClockSettingsModel.class).toObservable();
-
+    private Flowable<ClockSetting> rxFetch(DatabaseReference dbRef, String key) {
+        return RxFirebaseDatabase.observeValueEvent(dbRef.child("mClockSetting").child(key))
+                .map(dataSnapshot -> AppUtils.getValueFromDataSnapshot(dataSnapshot, ClockSetting.class));
     }
 
     public interface ClockSettingsRetrievedListener {

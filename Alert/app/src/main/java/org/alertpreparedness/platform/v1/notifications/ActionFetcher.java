@@ -4,7 +4,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.BaseActionRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.BaseNetworkCountryRef;
@@ -12,18 +16,10 @@ import org.alertpreparedness.platform.v1.dagger.annotation.BaseNetworkRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.CountryOfficeRef;
 import org.alertpreparedness.platform.v1.firebase.ActionModel;
 import org.alertpreparedness.platform.v1.firebase.ClockSetting;
+import org.alertpreparedness.platform.v1.firebase.data_fetchers.NetworkFetcher;
 import org.alertpreparedness.platform.v1.model.User;
 import org.alertpreparedness.platform.v1.utils.AppUtils;
-import org.alertpreparedness.platform.v1.firebase.data_fetchers.NetworkFetcher;
 import org.alertpreparedness.platform.v1.utils.SynchronizedCounter;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import timber.log.Timber;
 
 @Deprecated
@@ -82,7 +78,9 @@ public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterLis
 
         if(country) {
             baseActionRef.child(user.getCountryID()).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ActionListener(baseActionRef, ActionType.COUNTRY, user.getCountryID(), actionFetcherResult, actionCounter));
-            countryOfficeRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(countryOfficeRef, user.getCountryID(), ActionType.COUNTRY, actionFetcherResult, actionCounter));
+            countryOfficeRef.child("mClockSetting").child("preparedness").addValueEventListener(
+                    new ClockSettingsListener(countryOfficeRef, user.getCountryID(), ActionType.COUNTRY,
+                            actionFetcherResult, actionCounter));
         }
 
         new NetworkFetcher(networkFetcherResult -> {
@@ -90,7 +88,9 @@ public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterLis
                 actionCounter.increment(networkFetcherResult.getNetworksCountries().size() * 2);
                 for(String networkCountryId : networkFetcherResult.getNetworksCountries()) {
                     baseActionRef.child(networkCountryId).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ActionListener(baseActionRef, ActionType.NETWORK_COUNTRY, networkCountryId, actionFetcherResult, actionCounter));
-                    baseNetworkCountryRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(countryOfficeRef, networkCountryId, ActionType.COUNTRY, actionFetcherResult, actionCounter));
+                    baseNetworkCountryRef.child("mClockSetting").child("preparedness").addValueEventListener(
+                            new ClockSettingsListener(countryOfficeRef, networkCountryId, ActionType.COUNTRY,
+                                    actionFetcherResult, actionCounter));
                 }
             }
 
@@ -98,7 +98,9 @@ public class ActionFetcher implements SynchronizedCounter.SynchronizedCounterLis
                 actionCounter.increment(networkFetcherResult.getLocalNetworks().size() * 2);
                 for(String localNetworkId : networkFetcherResult.getLocalNetworks()) {
                     baseActionRef.child(localNetworkId).orderByChild("asignee").equalTo(user.getUserID()).addValueEventListener(new ActionListener(baseActionRef, ActionType.LOCAL_NETWORK, localNetworkId, actionFetcherResult, actionCounter));
-                    baseNetworkRef.child("clockSettings").child("preparedness").addValueEventListener(new ClockSettingsListener(countryOfficeRef, localNetworkId, ActionType.LOCAL_NETWORK, actionFetcherResult, actionCounter));
+                    baseNetworkRef.child("mClockSetting").child("preparedness").addValueEventListener(
+                            new ClockSettingsListener(countryOfficeRef, localNetworkId, ActionType.LOCAL_NETWORK,
+                                    actionFetcherResult, actionCounter));
                 }
             }
 

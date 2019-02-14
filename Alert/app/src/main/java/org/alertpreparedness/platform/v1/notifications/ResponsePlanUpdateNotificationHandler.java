@@ -2,7 +2,6 @@ package org.alertpreparedness.platform.v1.notifications;
 
 import android.content.Context;
 import android.os.Bundle;
-
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.firebase.jobdispatcher.Lifetime;
@@ -11,23 +10,19 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-
-import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
-import org.alertpreparedness.platform.v1.dagger.annotation.CountryOfficeRef;
-import org.alertpreparedness.platform.v1.dagger.annotation.ResponsePlansRef;
-import org.alertpreparedness.platform.v1.firebase.ResponsePlanModel;
-import org.alertpreparedness.platform.v1.firebase.ClockSetting;
-import org.alertpreparedness.platform.v1.model.User;
-import org.alertpreparedness.platform.v1.utils.Constants;
-import org.alertpreparedness.platform.v1.utils.PreferHelper;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
 import javax.inject.Inject;
-
+import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
+import org.alertpreparedness.platform.v1.dagger.annotation.CountryOfficeRef;
+import org.alertpreparedness.platform.v1.dagger.annotation.ResponsePlansRef;
+import org.alertpreparedness.platform.v1.firebase.ClockSetting;
+import org.alertpreparedness.platform.v1.firebase.ResponsePlanModel;
+import org.alertpreparedness.platform.v1.model.User;
+import org.alertpreparedness.platform.v1.utils.Constants;
+import org.alertpreparedness.platform.v1.utils.PreferHelper;
 import timber.log.Timber;
 
 public class ResponsePlanUpdateNotificationHandler implements ResponsePlanFetcher.ResponsePlanFetcherListener {
@@ -103,7 +98,7 @@ public class ResponsePlanUpdateNotificationHandler implements ResponsePlanFetche
 
     public void scheduleNotification(Context context, ResponsePlanModel responsePlanModel, String groupId, String responsePlanId) {
         if(groupId.equals(user.getCountryID())){
-            DatabaseReference dbRef = countryOfficeRef.child("clockSettings").child("responsePlans");
+            DatabaseReference dbRef = countryOfficeRef.child("mClockSetting").child("responsePlans");
             dbRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {

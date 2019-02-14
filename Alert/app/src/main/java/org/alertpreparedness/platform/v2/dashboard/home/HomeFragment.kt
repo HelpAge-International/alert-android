@@ -7,14 +7,14 @@ import kotlinx.android.synthetic.main.fragment_home.pbTasks
 import kotlinx.android.synthetic.main.fragment_home.rvMyTasks
 import org.alertpreparedness.platform.v1.MainDrawer
 import org.alertpreparedness.platform.v1.R
-
+import org.alertpreparedness.platform.v2.asObservable
 import org.alertpreparedness.platform.v2.base.BaseFragment
+import org.alertpreparedness.platform.v2.db
 import org.alertpreparedness.platform.v2.utils.extensions.hide
 import org.alertpreparedness.platform.v2.utils.extensions.show
+import org.alertpreparedness.platform.v2.utils.extensions.toJson
 
 class HomeFragment : BaseFragment<HomeViewModel>() {
-
-
     private lateinit var tasksAdapter: HomeTasksAdapter
 
     override fun getLayoutId(): Int {
@@ -34,6 +34,11 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
         tasksAdapter = HomeTasksAdapter(context!!)
         rvMyTasks.layoutManager = LinearLayoutManager(context)
         rvMyTasks.adapter = tasksAdapter
+
+
+        disposables += db.child("module").child("-LVnNNkdSddoKucUh1rg").child("4").asObservable().map { it.toJson() }
+                .subscribe { println(it.toString()) }
+
     }
 
     override fun observeViewModel() {

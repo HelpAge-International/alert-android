@@ -5,7 +5,6 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'realm-android'
 apply plugin: 'io.fabric'
 
-
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -48,16 +47,13 @@ android {
     applicationVariants.all { variant ->
         def name = variant.getName()
         // Specific values
-        if(name.contains("envSand")) {
+        if (name.contains("envSand")) {
             variant.buildConfigField 'String', 'ROOT_NODE', '"sand"'
-        }
-        else if(name.contains("envTest")) {
+        } else if (name.contains("envTest")) {
             variant.buildConfigField 'String', 'ROOT_NODE', '"test"'
-        }
-        else if(name.contains("envUat")) {
+        } else if (name.contains("envUat")) {
             variant.buildConfigField 'String', 'ROOT_NODE', '"uat"'
-        }
-        else if(name.contains("envLive")) {
+        } else if (name.contains("envLive")) {
             variant.buildConfigField 'String', 'ROOT_NODE', '"live"'
         }
     }
@@ -133,7 +129,6 @@ dependencies {
 
     //Sheet menu
     implementation 'com.github.whalemare:sheetmenu:1.3.3'
-
 
     implementation 'com.github.matthiasrobbers:shortbread:1.0.2'
     kapt 'com.github.matthiasrobbers:shortbread-compiler:1.0.2'

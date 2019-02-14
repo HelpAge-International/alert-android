@@ -7,12 +7,14 @@ import org.alertpreparedness.platform.v2.FirebaseAuthExtensions
 import org.alertpreparedness.platform.v2.asObservable
 import org.alertpreparedness.platform.v2.db
 import org.alertpreparedness.platform.v2.models.Action
+import org.alertpreparedness.platform.v2.models.Agency
 import org.alertpreparedness.platform.v2.models.Alert
-import org.alertpreparedness.platform.v2.models.ClockSettings
+import org.alertpreparedness.platform.v2.models.ClockSetting
 import org.alertpreparedness.platform.v2.models.ClockSettingsSource.ACTION
 import org.alertpreparedness.platform.v2.models.ClockSettingsSource.COUNTRY
 import org.alertpreparedness.platform.v2.models.Hazard
 import org.alertpreparedness.platform.v2.models.Indicator
+import org.alertpreparedness.platform.v2.models.PrivacySetting
 import org.alertpreparedness.platform.v2.models.ResponsePlan
 import org.alertpreparedness.platform.v2.models.User
 import org.alertpreparedness.platform.v2.models.UserType
@@ -179,13 +181,13 @@ object Repository {
                         val responsePlanClockSettings = clockSettings["responsePlans"].asJsonObject
                         val riskMonitoringClockSettings = clockSettings["riskMonitoring"].asJsonObject
 
-                        model.preparednessClockSettings = ClockSettings(
+                        model.mPreparednessClockSetting = ClockSetting(
                                 COUNTRY,
                                 DurationTypeSerializer.jsonToEnum(preparednessClockSettings["durationType"].asInt)
                                         ?: WEEK,
                                 preparednessClockSettings["value"].asInt
                         )
-                        model.responsePlanClockSettings = ClockSettings(
+                        model.mResponsePlanClockSetting = ClockSetting(
                                 COUNTRY,
                                 DurationTypeSerializer.jsonToEnum(responsePlanClockSettings["durationType"].asInt)
                                         ?: WEEK,
@@ -332,13 +334,13 @@ object Repository {
         action.documentIds = documentIds
 
         if (json.has("frequencyValue") && json.has("frequencyBase")) {
-            action.clockSettings = ClockSettings(
+            action.mClockSetting = ClockSetting(
                     ACTION,
                     DurationTypeSerializer.jsonToEnum(json["frequencyBase"].asInt) ?: WEEK,
                     json["frequencyValue"].asInt
             )
         } else {
-            action.clockSettings = countryOffice.preparednessClockSettings
+            action.mClockSetting = countryOffice.mPreparednessClockSetting
         }
     }
 
@@ -395,5 +397,27 @@ object Repository {
                             }
                             .mapList { it.toModel<Note>() }
                 }
+    }
+
+    enum class PrivacySettingType(val value: Int) {
+        MPA(0),
+        APA(1),
+        CHS(2),
+        RISK_MONITORING(3),
+        CONFLICT_INDICATORS(4),
+        OFFICE_PROFILE(5),
+        RESPONSE_PLAN(6),
+    }
+
+    fun privacySettings(id: String, type: PrivacySettingType): Observable<PrivacySetting> {
+        return db.child("module").child(id).child(type.value.toString())
+                .asObservable()
+                .map { it.toModel<PrivacySetting>() }
+    }
+
+    fun agency(id: String): Observable<Agency> {
+        return db.child("agency")
+                .child(id).asObservable()
+                .map { it.toModel<Agency>() }
     }
 }

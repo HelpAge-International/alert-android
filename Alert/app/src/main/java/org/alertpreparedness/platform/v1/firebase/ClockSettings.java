@@ -7,7 +7,7 @@ public class ClockSettings extends FirebaseModel {
 
     @Override
     public String toString() {
-        return "ClockSettings{" +
+        return "ClockSetting{" +
                 "preparedness=" + preparedness +
                 ", responsePlans=" + responsePlans +
                 '}' +

@@ -26,7 +26,7 @@ data class ModelNetwork(val networkAdminId: String, val name: String, val isActi
 //public websiteAddress: string;
 //public isGlobal: boolean;
 //public countryCode: number;
-//public clockSettings:{} = {};
+//public mClockSetting:{} = {};
 //public responsePlanSettings:{} = {};
 //public id:string;
 //public agencies?: string[];

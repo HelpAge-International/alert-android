@@ -1,16 +1,6 @@
 package org.alertpreparedness.platform.v1.mycountry;
 
-import androidx.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import androidx.core.view.ViewCompat;
-import androidx.core.widget.NestedScrollView;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatCheckBox;
-import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,12 +8,30 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatCheckBox;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.core.view.ViewCompat;
+import androidx.core.widget.NestedScrollView;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-
+import io.codetail.animation.SupportAnimator;
+import io.codetail.animation.ViewAnimationUtils;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.ExtensionHelperKt;
 import org.alertpreparedness.platform.v1.R;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
@@ -36,19 +44,6 @@ import org.alertpreparedness.platform.v1.risk_monitoring.model.CountryJsonData;
 import org.alertpreparedness.platform.v1.risk_monitoring.model.ModelIndicatorLocation;
 import org.alertpreparedness.platform.v1.risk_monitoring.view_model.SelectAreaViewModel;
 import org.alertpreparedness.platform.v1.utils.AppUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
-import io.codetail.animation.SupportAnimator;
-import io.codetail.animation.ViewAnimationUtils;
 
 /**
  * Created by Tj on 19/12/2017.
@@ -126,7 +121,7 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_programme_results);
+        setContentView(R.layout.activity_programme_results_v1);
 
         ButterKnife.bind(this);
 
@@ -421,7 +416,7 @@ public class ProgramResultsActivity extends AppCompatActivity implements Support
             for (String id : agencyRequests.keySet()) {
                 if(id != null) {
                     System.out.println(agencyRequests.keySet());
-                    agencyRef.child(id).addValueEventListener(new AgencyListener());
+                    agencyRef.child(id).addListenerForSingleValueEvent(new AgencyListener());
                 }
             }
         }

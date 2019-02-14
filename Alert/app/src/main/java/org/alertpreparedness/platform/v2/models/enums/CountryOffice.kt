@@ -1,7 +1,7 @@
 package org.alertpreparedness.platform.v2.models.enums
 
 import org.alertpreparedness.platform.v2.models.BaseModel
-import org.alertpreparedness.platform.v2.models.ClockSettings
+import org.alertpreparedness.platform.v2.models.ClockSetting
 
 class CountryOffice(
         val addressLine1: String,
@@ -15,7 +15,7 @@ class CountryOffice(
 ) : BaseModel() {
 
     @Transient
-    lateinit var preparednessClockSettings: ClockSettings
+    lateinit var mPreparednessClockSetting: ClockSetting
     @Transient
-    lateinit var responsePlanClockSettings: ClockSettings
+    lateinit var mResponsePlanClockSetting: ClockSetting
 }

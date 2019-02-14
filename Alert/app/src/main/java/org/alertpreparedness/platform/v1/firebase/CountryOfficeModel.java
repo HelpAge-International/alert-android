@@ -7,7 +7,7 @@ public class CountryOfficeModel extends FirebaseModel {
     @Override
     public String toString() {
         return "CountryOfficeModel{" +
-                "clockSettings=" + clockSettings +
+                "mClockSetting=" + clockSettings +
                 '}' +
                 super.toString();
     }

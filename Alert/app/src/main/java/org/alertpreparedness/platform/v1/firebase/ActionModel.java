@@ -5,7 +5,7 @@ import static org.alertpreparedness.platform.v2.utils.extensions.ActionExtension
 import com.google.firebase.database.Exclude;
 import java.util.ArrayList;
 import org.alertpreparedness.platform.v2.models.Action;
-import org.alertpreparedness.platform.v2.models.ClockSettings;
+import org.alertpreparedness.platform.v2.models.ClockSetting;
 import org.alertpreparedness.platform.v2.models.ClockSettingsSource;
 import org.alertpreparedness.platform.v2.models.enums.ActionType;
 import org.alertpreparedness.platform.v2.models.enums.HazardScenario;
@@ -70,7 +70,7 @@ public class ActionModel extends FirebaseModel {
         level = action.getActionLevel().getValue();
         budget = action.getBudget() == null ? null : action.getBudget().longValue();
         requireDoc = action.getRequireDoc();
-        ClockSettings clockSettings = action.getClockSettings();
+        ClockSetting clockSettings = action.getMClockSetting();
         ClockSettingsSource source = clockSettings.getClockSettingsSource();
         frequencyBase = source == ClockSettingsSource.COUNTRY ? null : clockSettings.getType().getValue();
         frequencyValue = source == ClockSettingsSource.COUNTRY ? null : clockSettings.getValue();

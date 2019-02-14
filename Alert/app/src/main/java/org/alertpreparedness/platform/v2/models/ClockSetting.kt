@@ -7,7 +7,7 @@ enum class ClockSettingsSource {
     COUNTRY
 }
 
-data class ClockSettings(val clockSettingsSource: ClockSettingsSource, val type: DurationType, val value: Int) {
+data class ClockSetting(val clockSettingsSource: ClockSettingsSource, val type: DurationType, val value: Int) {
     fun calculateOffset(): Long {
         return type.millis * value
     }

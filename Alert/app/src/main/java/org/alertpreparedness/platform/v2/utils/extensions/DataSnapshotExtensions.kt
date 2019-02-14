@@ -3,6 +3,7 @@ package org.alertpreparedness.platform.v2.utils.extensions
 import com.google.firebase.database.DataSnapshot
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonArray
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
@@ -23,14 +24,20 @@ import org.alertpreparedness.platform.v2.models.enums.AlertApprovalState
 import org.alertpreparedness.platform.v2.models.enums.AlertApprovalStateSerializer
 import org.alertpreparedness.platform.v2.models.enums.AlertLevel
 import org.alertpreparedness.platform.v2.models.enums.AlertLevelSerializer
+import org.alertpreparedness.platform.v2.models.enums.Country
+import org.alertpreparedness.platform.v2.models.enums.CountrySerializer
 import org.alertpreparedness.platform.v2.models.enums.DurationType
 import org.alertpreparedness.platform.v2.models.enums.DurationTypeSerializer
 import org.alertpreparedness.platform.v2.models.enums.HazardScenario
 import org.alertpreparedness.platform.v2.models.enums.HazardScenarioSerializer
 import org.alertpreparedness.platform.v2.models.enums.IndicatorTriggerLevel
 import org.alertpreparedness.platform.v2.models.enums.IndicatorTriggerLevelSerializer
+import org.alertpreparedness.platform.v2.models.enums.Privacy
+import org.alertpreparedness.platform.v2.models.enums.PrivacySerializer
 import org.alertpreparedness.platform.v2.models.enums.ResponsePlanState
 import org.alertpreparedness.platform.v2.models.enums.ResponsePlanStateSerializer
+import org.alertpreparedness.platform.v2.models.enums.Sector
+import org.alertpreparedness.platform.v2.models.enums.SectorSerializer
 import org.alertpreparedness.platform.v2.models.enums.Title
 import org.alertpreparedness.platform.v2.models.enums.TitleSerializer
 import org.joda.time.DateTime
@@ -72,6 +79,9 @@ val gson: Gson by lazy{
             .registerTypeAdapter(AlertLevel::class.java, AlertLevelSerializer)
             .registerTypeAdapter(HazardScenario::class.java, HazardScenarioSerializer)
             .registerTypeAdapter(AlertApprovalState::class.java, AlertApprovalStateSerializer)
+            .registerTypeAdapter(Country::class.java, CountrySerializer)
+            .registerTypeAdapter(Privacy::class.java, PrivacySerializer)
+            .registerTypeAdapter(Sector::class.java, SectorSerializer)
             .create()
 }
 
@@ -116,6 +126,10 @@ inline fun <reified T: BaseModel> jsonToModel(id: String, jsonObject: JsonObject
 
 fun DataSnapshot.toJson(): JsonObject {
     return gson.toJsonTree(value).asJsonObject
+}
+
+fun DataSnapshot.toJsonArray(): JsonArray {
+    return gson.toJsonTree(value).asJsonArray
 }
 
 

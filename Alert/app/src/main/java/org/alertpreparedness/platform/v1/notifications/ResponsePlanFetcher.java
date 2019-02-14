@@ -4,7 +4,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-
+import java.util.ArrayList;
+import java.util.List;
+import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.CountryOfficeRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.ResponsePlansRef;
@@ -13,12 +15,6 @@ import org.alertpreparedness.platform.v1.firebase.ResponsePlanModel;
 import org.alertpreparedness.platform.v1.model.User;
 import org.alertpreparedness.platform.v1.utils.AppUtils;
 import org.alertpreparedness.platform.v1.utils.SynchronizedCounter;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import timber.log.Timber;
 
 public class ResponsePlanFetcher implements SynchronizedCounter.SynchronizedCounterListener {
@@ -59,7 +55,10 @@ public class ResponsePlanFetcher implements SynchronizedCounter.SynchronizedCoun
         responsePlanCounter.addListener(this);
 
         baseResponsePlanRef.addValueEventListener(new ResponsePlanFetcher.ResponsePlanListener(baseResponsePlanRef, ResponsePlanFetcher.ResponsePlanType.COUNTRY, user.getCountryID(), responsePlanFetcherResult, responsePlanCounter));
-        countryOfficeRef.child("clockSettings").child("responsePlans").addValueEventListener(new ResponsePlanFetcher.ClockSettingsListener(countryOfficeRef, ResponsePlanFetcher.ResponsePlanType.COUNTRY, responsePlanFetcherResult, responsePlanCounter));
+        countryOfficeRef.child("mClockSetting").child("responsePlans").addValueEventListener(
+                new ResponsePlanFetcher.ClockSettingsListener(countryOfficeRef,
+                        ResponsePlanFetcher.ResponsePlanType.COUNTRY, responsePlanFetcherResult,
+                        responsePlanCounter));
     }
 
     @Override

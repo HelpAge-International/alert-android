@@ -30,16 +30,16 @@ class Action(
 ) : BaseModel() {
 
     @Transient
-    lateinit var clockSettings: ClockSettings
+    lateinit var mClockSetting: ClockSetting
 
     @Transient
     lateinit var documentIds: List<String>
 
     fun getExpirationTime(updatedAt: DateTime? = this.updatedAt): DateTime {
         return if (isCompleteAt != null) {
-            isCompleteAt.plus(clockSettings.calculateOffset())
+            isCompleteAt.plus(mClockSetting.calculateOffset())
         } else if (updatedAt != null) {
-            updatedAt.plus(clockSettings.calculateOffset())
+            updatedAt.plus(mClockSetting.calculateOffset())
         } else {
             DateTime(Long.MAX_VALUE)
         }
@@ -67,7 +67,7 @@ class Action(
         if (updatedAt != other.updatedAt) return false
         if (isArchived != other.isArchived) return false
         if (assignedHazards != other.assignedHazards) return false
-        if (clockSettings != other.clockSettings) return false
+        if (mClockSetting != other.mClockSetting) return false
 
         return true
     }
@@ -87,7 +87,7 @@ class Action(
         result = 31 * result + updatedAt.hashCode()
         result = 31 * result + isArchived.hashCode()
         result = 31 * result + assignedHazards.hashCode()
-        result = 31 * result + clockSettings.hashCode()
+        result = 31 * result + mClockSetting.hashCode()
         return result
     }
 }
