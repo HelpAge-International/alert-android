@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
-        <activity android:name="org.alertpreparedness.platform.v2.mycountry.ProgramResultsActivity"></activity>
+        <activity android:name="org.alertpreparedness.platform.v2.mycountry.ProgrammeResultsActivity"></activity>
 
         <service
             android:name="offline.SyncJobService"
@@ -134,7 +134,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".mycountry.ProgramResultsActivity"
-            android:label="@string/progrmme_results"
+            android:label="@string/programme_results"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity

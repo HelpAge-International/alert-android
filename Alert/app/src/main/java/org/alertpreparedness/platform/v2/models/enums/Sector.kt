@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import org.alertpreparedness.platform.v1.R
 import org.alertpreparedness.platform.v2.utils.EnumSerializer
 
-enum class Sector(val value: Int, @StringRes string: Int) {
+enum class Sector(val value: Int, @StringRes val string: Int) {
     WASH(0, R.string.sector_wash),
     HEALTH(1, R.string.sector_health),
     SHELTER(2, R.string.sector_shelter),

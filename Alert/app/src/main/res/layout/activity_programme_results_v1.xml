@@ -5,11 +5,11 @@
     android:layout_height="match_parent">
 
     <RelativeLayout
-        android:descendantFocusability="beforeDescendants"
-        android:focusableInTouchMode="true"
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,78 +23,83 @@
 
         <ProgressBar
             android:id="@+id/progressBar"
-            android:layout_marginTop="@dimen/double_margin"
-            android:layout_centerInParent="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="@dimen/double_margin" />
 
         <androidx.core.widget.NestedScrollView
-            android:layout_below="@+id/toolbar_layout"
             android:id="@+id/scroller"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/toolbar_layout">
 
             <RelativeLayout
-                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
                 <TextView
-                    android:textStyle="bold"
-                    android:layout_marginTop="@dimen/activity_vertical_margin"
-                    android:layout_marginBottom="@dimen/activity_vertical_margin"
-                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                    android:layout_marginRight="@dimen/activity_horizontal_margin"
                     android:id="@+id/tvResultsFor"
-                    android:text="@string/results_for"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:text="@string/results_for"
+                    android:textStyle="bold" />
+
                 <TextView
                     android:id="@+id/noResults"
-                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_below="@+id/tvResultsFor"
-                    android:layout_marginTop="@dimen/activity_vertical_margin"
-                    android:layout_marginBottom="@dimen/activity_vertical_margin"
                     android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:layout_marginRight="@dimen/activity_horizontal_margin"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
                     android:text="@string/no_programmes"
                     android:textAlignment="center"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:visibility="gone" />
+
                 <androidx.recyclerview.widget.RecyclerView
-                    android:layout_below="@+id/tvResultsFor"
-                    android:paddingBottom="30dp"
-                    android:clipToPadding="false"
                     android:id="@+id/rvFields"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvResultsFor"
+                    android:clipToPadding="false"
+                    android:paddingBottom="30dp" />
             </RelativeLayout>
 
         </androidx.core.widget.NestedScrollView>
 
-<!--must be at the bottom-->
+        <!--must be at the bottom-->
         <androidx.cardview.widget.CardView
-            android:layout_below="@+id/toolbar_layout"
-            android:background="@android:color/transparent"
-            app:cardCornerRadius="0dp"
-            app:cardBackgroundColor="@android:color/transparent"
-            app:cardElevation="0dp"
             android:id="@+id/revealCon"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/toolbar_layout"
+            android:background="@android:color/transparent"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp">
+
             <io.codetail.widget.RevealLinearLayout
-                android:orientation="vertical"
                 android:id="@+id/revealContainer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <!-- parent RevealLinearLayout needed for pre-lollipop support-->
                 <androidx.cardview.widget.CardView
-                    app:cardCornerRadius="0dp"
-                    android:visibility="invisible"
                     android:id="@+id/cvReveal"
-                    app:cardElevation="8dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:visibility="invisible"
+                    app:cardCornerRadius="0dp"
+                    app:cardElevation="8dp">
+
                     <include
                         layout="@layout/reveal_menu"
                         android:layout_width="match_parent"

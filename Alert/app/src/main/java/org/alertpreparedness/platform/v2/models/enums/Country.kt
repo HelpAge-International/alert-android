@@ -5,7 +5,7 @@ import androidx.annotation.StringRes
 import org.alertpreparedness.platform.v1.R
 import org.alertpreparedness.platform.v2.utils.EnumSerializer
 
-enum class Country(val value: Int, @StringRes string: Int, @DrawableRes icon: Int) {
+enum class Country(val value: Int, @StringRes val string: Int, @DrawableRes val icon: Int) {
     AFGHANISTAN(0, R.string.afghanistan, R.drawable.af),
     ALAND_ISLANDS(1, R.string.aland_islands, R.drawable.other),
     ALBANIA(2, R.string.albania, R.drawable.al),

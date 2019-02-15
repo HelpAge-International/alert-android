@@ -159,6 +159,9 @@ dependencies {
     implementation 'com.jakewharton.rxbinding3:rxbinding-swiperefreshlayout:3.0.0-alpha2'
     implementation 'com.jakewharton.rxbinding3:rxbinding-viewpager:3.0.0-alpha2'
 
+    implementation 'com.xwray:groupie:2.3.0'
+    implementation 'com.xwray:groupie-kotlin-android-extensions:2.3.0'
+
 }
 
 // ADD THIS AT THE BOTTOM

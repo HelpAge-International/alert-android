@@ -42,6 +42,7 @@ import org.alertpreparedness.platform.v1.risk_monitoring.model.ModelIndicatorLoc
 import org.alertpreparedness.platform.v1.risk_monitoring.view_model.SelectAreaViewModel;
 import org.alertpreparedness.platform.v1.utils.Constants;
 import org.alertpreparedness.platform.v1.utils.SnackbarHelper;
+import org.alertpreparedness.platform.v2.mycountry.ProgrammeResultsActivity;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -244,16 +245,21 @@ public class MyCountryFragment extends Fragment implements OnCountrySelectedList
             int level2 = mLevel2Selected.getValue() == null ? -1 : mLevel2Selected.getValue().getId();
             int level1 = mLevel1Selected.getValue() == null ? -1 : mLevel1Selected.getValue().getId();
 
-            ModelIndicatorLocation modelArea = new ModelIndicatorLocation(mCountrySelected.getValue(), level1, level2);
+            Intent intent = new Intent(getContext(), ProgrammeResultsActivity.class);
+            intent.putExtra(ProgrammeResultsActivity.COUNTRY_KEY, mCountrySelected.getValue());
+            intent.putExtra(ProgrammeResultsActivity.LEVEL_1_KEY, level1);
+            intent.putExtra(ProgrammeResultsActivity.LEVEL_2_KEY, level2);
 
-            Intent intent = new Intent(getContext(), ProgramResultsActivity.class);
-            intent.putExtra(ProgramResultsActivity.BUNDLE_FILTER, modelArea);
-//            if(level1 != -1) {
-                intent.putExtra(ProgramResultsActivity.TITLE_1, Constants.COUNTRIES[mCountrySelected.getValue()]);
-//            }
-            if(mLevel1Selected.getValue() != null && level1 != -1) {
-                intent.putExtra(ProgramResultsActivity.TITLE_2, mLevel1Selected.getValue().getValue());
+            CountryJsonData selectedCountryData = null;
+            for (CountryJsonData countryJsonData : mCountryDataList) {
+                if(countryJsonData.getCountryId() == mCountrySelected.getValue()) {
+                    selectedCountryData = countryJsonData;
+                }
             }
+
+            assert selectedCountryData != null;
+
+            intent.putExtra(ProgrammeResultsActivity.LOCATION_DATA_KEY, selectedCountryData);
             startActivity(intent);
         }
     }

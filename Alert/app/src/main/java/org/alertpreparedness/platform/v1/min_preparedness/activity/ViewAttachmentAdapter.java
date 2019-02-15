@@ -109,7 +109,7 @@ public class ViewAttachmentAdapter extends RecyclerView.Adapter<ViewAttachmentAd
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.title)
+        @BindView(R.id.tvTitle)
         TextView title;
 
         @BindView(R.id.file)

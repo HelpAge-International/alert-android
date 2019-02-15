@@ -34,7 +34,7 @@ class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.MyViewHolder> {
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.title)
+        @BindView(R.id.tvTitle)
         TextView view;
 
         @BindView(R.id.checkbox)

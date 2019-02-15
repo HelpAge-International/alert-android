@@ -112,7 +112,7 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         TextView tvAlertLevel;
 
         @BindView(R.id.txt_hazard_name)
-        TextView tvHazardName;
+        TextView tvTitle;
 
         @BindView(R.id.txt_num_of_people)
         TextView tvPeopleCount;
@@ -169,10 +169,10 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
             }
 
             if(!hazardName.equals("Other")) {
-                tvHazardName.setText(hazardName);
+                tvTitle.setText(hazardName);
             }
             else {
-                tvHazardName.setText(alert.getOtherName());
+                tvTitle.setText(alert.getOtherName());
             }
 
             tvPeopleCount.setText(getNumOfPeopleText(alert.getEstimatedPopulation(), alert.getAffectedAreas().size()));

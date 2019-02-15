@@ -25,7 +25,7 @@ public class ApprovalStatusAdapter extends RecyclerView.Adapter<ApprovalStatusAd
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.title)
+        @BindView(R.id.tvTitle)
         TextView title;
 
         @BindView(R.id.icon)

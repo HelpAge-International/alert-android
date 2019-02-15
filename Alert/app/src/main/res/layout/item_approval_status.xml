@@ -11,7 +11,7 @@
         android:layout_marginBottom="2dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:id="@+id/title"
+        android:id="@+id/tvTitle"
         android:textSize="16sp"
         android:textStyle="bold"
         android:layout_width="wrap_content"
@@ -19,7 +19,7 @@
         tools:ignore="RtlHardcoded" />
 
     <ImageView
-        android:layout_below="@+id/title"
+        android:layout_below="@+id/tvTitle"
         android:layout_marginTop="@dimen/activity_vertical_margin_half"
         android:id="@+id/icon"
         android:layout_alignParentLeft="true"
@@ -31,7 +31,7 @@
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginTop="10dp"
         android:id="@+id/status"
-        android:layout_below="@+id/title"
+        android:layout_below="@+id/tvTitle"
         android:layout_toRightOf="@+id/icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -73,9 +73,12 @@ abstract class BaseActivity<VM : BaseViewModel> : AppCompatActivity(){
         }
     }
 
-    fun showBackButton(show: Boolean = true){
+    fun showBackButton(show: Boolean = true, @DrawableRes drawable: Int? = null){
         supportActionBar?.setDisplayHomeAsUpEnabled(show)
         supportActionBar?.setDisplayShowHomeEnabled(show)
+        if(drawable != null) {
+            supportActionBar?.setHomeAsUpIndicator(drawable)
+        }
     }
 
     fun setToolbarTitle(title: String){

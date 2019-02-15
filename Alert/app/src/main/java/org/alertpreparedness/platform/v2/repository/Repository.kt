@@ -3,37 +3,24 @@ package org.alertpreparedness.platform.v2.repository
 import com.google.firebase.database.DataSnapshot
 import com.google.gson.JsonObject
 import io.reactivex.Observable
+import io.reactivex.rxkotlin.combineLatest
 import org.alertpreparedness.platform.v2.FirebaseAuthExtensions
 import org.alertpreparedness.platform.v2.asObservable
 import org.alertpreparedness.platform.v2.db
-import org.alertpreparedness.platform.v2.models.Action
-import org.alertpreparedness.platform.v2.models.Agency
-import org.alertpreparedness.platform.v2.models.Alert
-import org.alertpreparedness.platform.v2.models.ClockSetting
+import org.alertpreparedness.platform.v2.models.*
 import org.alertpreparedness.platform.v2.models.ClockSettingsSource.ACTION
 import org.alertpreparedness.platform.v2.models.ClockSettingsSource.COUNTRY
-import org.alertpreparedness.platform.v2.models.Hazard
-import org.alertpreparedness.platform.v2.models.Indicator
-import org.alertpreparedness.platform.v2.models.PrivacySetting
-import org.alertpreparedness.platform.v2.models.ResponsePlan
-import org.alertpreparedness.platform.v2.models.User
-import org.alertpreparedness.platform.v2.models.UserType
 import org.alertpreparedness.platform.v2.models.UserType.COUNTRY_ADMIN
 import org.alertpreparedness.platform.v2.models.UserType.COUNTRY_DIRECTOR
 import org.alertpreparedness.platform.v2.models.UserType.ERT
 import org.alertpreparedness.platform.v2.models.UserType.ERT_LEADER
 import org.alertpreparedness.platform.v2.models.UserType.PARTNER
-import org.alertpreparedness.platform.v2.models.enums.ActionType
+import org.alertpreparedness.platform.v2.models.enums.*
 import org.alertpreparedness.platform.v2.models.enums.ActionType.CHS
 import org.alertpreparedness.platform.v2.models.enums.ActionType.MANDATED
 import org.alertpreparedness.platform.v2.models.enums.AlertApprovalState.APPROVED
-import org.alertpreparedness.platform.v2.models.enums.AlertApprovalStateSerializer
 import org.alertpreparedness.platform.v2.models.enums.AlertLevel.RED
-import org.alertpreparedness.platform.v2.models.enums.CountryOffice
 import org.alertpreparedness.platform.v2.models.enums.DurationType.WEEK
-import org.alertpreparedness.platform.v2.models.enums.DurationTypeSerializer
-import org.alertpreparedness.platform.v2.models.enums.HazardScenario
-import org.alertpreparedness.platform.v2.models.enums.Note
 import org.alertpreparedness.platform.v2.printRef
 import org.alertpreparedness.platform.v2.utils.extensions.behavior
 import org.alertpreparedness.platform.v2.utils.extensions.childKeys
@@ -419,5 +406,81 @@ object Repository {
         return db.child("agency")
                 .child(id).asObservable()
                 .map { it.toModel<Agency>() }
+    }
+
+    fun searchProgrammes(searchCountry: Country, searchLevel1: Int?, searchLevel2: Int?): Observable<Map<Agency, List<Programme>>> {
+        //Fetch root countryOfficeProfile/programme node
+        return db.child("countryOfficeProfile")
+                .child("programme")
+                .printRef("Base COP")
+                .asObservable()
+                //Map to Map<CountryId, List<Programmes>>
+                .print("//Map to Map<CountryId, List<Programmes>>")
+                .map { baseSnapshot ->
+                    baseSnapshot.children.map { countrySnapshot ->
+                        countrySnapshot.key!! to countrySnapshot
+                                .child("4WMapping")
+                                .children
+                                .map { programmeSnapshot ->
+                                    programmeSnapshot.toModel<Programme>()
+                                }
+                    }.toMap()
+                }
+                //Filter based on searchArea
+                .print("//Filter based on searchArea")
+                .map {
+                    it.mapValues { (_, programmes) ->
+                        programmes.filter { programme ->
+                            programme.where == searchCountry &&
+                                    (searchLevel1 == null || programme.level1 == searchLevel1) &&
+                                    (searchLevel2 == null || programme.level2 == searchLevel2)
+                        }
+                    }
+                }
+                //Fetch privacy settings for each country -> Map<CountryPrivacySetting, List<Programme>>
+                .print("//Fetch privacy settings for each country -> Map<CountryPrivacySetting, List<Programme>>")
+                .flatMap { map ->
+                    map.toList()
+                            .map { (countryId, programmes) ->
+                                privacySettings(countryId, Repository.PrivacySettingType.OFFICE_PROFILE)
+                                        .map { Pair(it, programmes) }
+                            }
+                            .combineLatest {
+                                it.toMap()
+                            }
+                }
+                //Filter based on country privacy settings
+                .print("//Filter based on country privacy settings")
+                .map {
+                    it.filter { (privacySettings, _) ->
+                        privacySettings.privacy == Privacy.PUBLIC && privacySettings.status
+                    }
+                }
+                //Remove privacy settings, flatten list, group by agencyId
+                .print("//Remove privacy settings, flatten list, group by agencyId")
+                .map { privacySettingsToProgrammes ->
+                    privacySettingsToProgrammes
+                            .values
+                            .flatten()
+                            .groupBy {
+                                it.agencyId
+                            }
+                }
+                //Grab agency, map to -> Map<Agency, List<Programme>>
+                .print("//Grab agency, map to -> Map<Agency, List<Programme>>")
+                .flatMap { agencyIdsToProgrammes ->
+                    val agencyProgramList = agencyIdsToProgrammes.toList()
+                            .map { (agencyId, programmes) ->
+                                agency(agencyId)
+                                        .map { Pair(it, programmes) }
+                            }
+                            if (agencyProgramList.isEmpty()) {
+                                Observable.just(emptyMap())
+                            }
+                                    else {
+                                agencyProgramList.combineLatest { it.toMap() }
+                            }
+                }
+                .print("RESULT")
     }
 }

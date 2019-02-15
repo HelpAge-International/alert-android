@@ -26,8 +26,8 @@ import timber.log.Timber
  */
 
 class HazardViewHolder(itemView: View, location:Int) : GroupViewHolder(itemView) {
-    private val hazardTitle: TextView = itemView.findViewById(R.id.tvHazardName)
-    private val hazardIcon: CircleImageView = itemView.findViewById(R.id.civHazard)
+    private val hazardTitle: TextView = itemView.findViewById(R.id.tvTitle)
+    private val hazardIcon: CircleImageView = itemView.findViewById(R.id.ivIcon)
     private val hazardArrow: ImageView = itemView.findViewById(R.id.ivArrow)
     private val hazardLayout: LinearLayout = itemView.find(R.id.llHazard)
     private val mCountryLocation = location
@@ -172,7 +172,7 @@ class HazardAdapter(groups: List<ExpandableGroup<ModelIndicator>>, countryLocati
     }
 
     override fun onCreateGroupViewHolder(parent: ViewGroup?, viewType: Int): HazardViewHolder {
-        val view = View.inflate(context, R.layout.risk_hazard_item_view, null)
+        val view = View.inflate(context, R.layout.item_group, null)
         return HazardViewHolder(view, mLocation)
     }
 

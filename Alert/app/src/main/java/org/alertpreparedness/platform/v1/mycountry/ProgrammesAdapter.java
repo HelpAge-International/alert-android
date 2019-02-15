@@ -8,6 +8,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder;
@@ -50,7 +51,7 @@ public class ProgrammesAdapter extends ExpandableRecyclerViewAdapter<ProgrammesA
     @Override
     public ProgrammeHolder onCreateGroupViewHolder(ViewGroup parent, int viewType) {
         assert inflater != null;
-        View view = inflater.inflate(R.layout.risk_hazard_item_view, parent, false);
+        View view = inflater.inflate(R.layout.item_group, parent, false);
         return new ProgrammeHolder(view);
     }
 
@@ -74,19 +75,19 @@ public class ProgrammesAdapter extends ExpandableRecyclerViewAdapter<ProgrammesA
 
     public class ProgrammeInfoViewHolder extends ChildViewHolder {
 
-        @BindView(R.id.title)
+        @BindView(R.id.tvTitle)
         TextView title;
 
-        @BindView(R.id.desc)
+        @BindView(R.id.tvDesc)
         TextView desc;
 
-        @BindView(R.id.to)
+        @BindView(R.id.tvTo)
         TextView to;
 
-        @BindView(R.id.in)
+        @BindView(R.id.tvIn)
         TextView in;
 
-        @BindView(R.id.from)
+        @BindView(R.id.tvFrom)
         TextView from;
 
         public ProgrammeInfoViewHolder(View itemView) {
@@ -110,10 +111,10 @@ public class ProgrammesAdapter extends ExpandableRecyclerViewAdapter<ProgrammesA
 
     public class ProgrammeHolder extends GroupViewHolder {
 
-        @BindView(R.id.tvHazardName)
+        @BindView(R.id.tvTitle)
         TextView title;
 
-        @BindView(R.id.civHazard)
+        @BindView(R.id.ivIcon)
         CircleImageView icon;
 
         @BindView(R.id.ivArrow)
