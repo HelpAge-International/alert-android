@@ -13,6 +13,7 @@ enum class HazardScenario(
         val icon: Int
 ) {
 
+    OTHER(-1, R.string.hazard_other, R.drawable.other),
     COLD_WAVE(0, R.string.hazard_cold_wave, R.drawable.cold_wave),
     CONFLICT(1, R.string.hazard_conflict, R.drawable.conflict),
     CYCLONE(2, R.string.hazard_cyclone, R.drawable.cyclone),

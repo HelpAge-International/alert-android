@@ -47,84 +47,22 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
         this.listener = listener;
     }
 
-    @Override
-    public AlertAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_alert, parent, false);
-        return new AlertAdapter.ViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(AlertAdapter.ViewHolder holder, int position) {
-        AlertModel alert = items.get(keys.get(position));
-        holder.bind(alert);
-    }
-
-    public void remove(String id){
-        int index = keys.indexOf(id);
-        keys.remove(index);
-        items.remove(id);
-        notifyItemRemoved(index);
-    }
-
-//    private void updateList() {
-//        alertsList.clear();
-//        alertsList.addAll(alertsMap.values());
-//        Collections.sort(alertsList, (o1, o2) -> Long.compare(o2.getLevel(), o1.getLevel()));
-//
-//        notifyDataSetChanged();
-//    }
-
-    public void update(String id, AlertModel alert) {
-//        System.out.println("id = [" + id + "], alert = [" + alert + "]");
-        int index = keys.indexOf(id);
-        if(index == -1) {
-            keys.add(id);
-            items.put(id, alert);
-            notifyItemInserted(keys.size() - 1);
-        }
-        else {
-            items.put(id, alert);
-            notifyDataSetChanged();
-        }
-        if((alert.isNetwork() && alert.hasNetworkApproval() || alert.getAlertLevel() == Constants.TRIGGER_GREEN) && index != -1) {
-            keys.remove(index);
-            items.remove(id);
-            notifyItemRemoved(index);
-        }
-    }
-
-    @Override
-    public int getItemCount() {
-        return keys.size();
-    }
-
-    public List<String> getAlerts() {
-        return keys;
-    }
-
-    public AlertModel getModel(String key) {
-        return items.get(key);
-    }
-
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.txt_alert_level)
+        @BindView(R.id.ivHazardIcon)
+        ImageView imgHazardIcon;
+
+        @BindView(R.id.tvAlertLevel)
         TextView tvAlertLevel;
 
-        @BindView(R.id.txt_hazard_name)
-        TextView tvTitle;
-
-        @BindView(R.id.txt_num_of_people)
+        @BindView(R.id.tvNumOfPeople)
         TextView tvPeopleCount;
 
-        @BindView(R.id.textViewAlertReq)
+        @BindView(R.id.tvHazardName)
+        TextView tvTitle;
+
+        @BindView(R.id.tvAlertRequested)
         TextView txtRedRequested;
-
-        @BindView(R.id.img_alert_colour)
-        ImageView imgAlertColour;
-
-        @BindView(R.id.img_hazard_icon)
-        ImageView imgHazardIcon;
 //
 //        @BindView(R.id.imgRedReq)
 //        ImageView imgAlertReq;
@@ -157,13 +95,11 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
                 case Constants.TRIGGER_RED:
                     fetchIcon(hazardName, imgHazardIcon);
                     tvAlertLevel.setText(R.string.red_alert_text);
-                    imgAlertColour.setImageResource(R.drawable.red_alert_left);
                     txtRedRequested.setVisibility(View.GONE);
                     break;
                 case Constants.TRIGGER_AMBER:
                     fetchIcon(hazardName, imgHazardIcon);
                     tvAlertLevel.setText(R.string.amber_alert_text);
-                    imgAlertColour.setImageResource(R.drawable.amber_alert_left);
                     txtRedRequested.setVisibility(View.GONE);
                     break;
             }
@@ -179,23 +115,79 @@ public class AlertAdapter extends RecyclerView.Adapter<AlertAdapter.ViewHolder> 
 
             if(isCountryDirector && !alert.getRedAlertApproved() && !alert.isNetwork() && alert.getAlertLevel() == Constants.TRIGGER_RED) {
                 txtRedRequested.setVisibility(View.VISIBLE);
-                imgAlertColour.setImageResource(R.drawable.gray_alert_left);
-                txtRedRequested.setText(R.string.txt_cd_red_request);
+                txtRedRequested.setText(R.string.red_alert_requested_action_required);
             }
             else if(alert.isNetwork() && !alert.getRedAlertApproved() && alert.getAgencyAdminId().equals(alert.getLeadAgencyId()) && alert.getAgencyAdminId().equals(user.getUserID())  && alert.getAlertLevel() == Constants.TRIGGER_RED) {
                 txtRedRequested.setVisibility(View.VISIBLE);
-                imgAlertColour.setImageResource(R.drawable.gray_alert_left);
-                txtRedRequested.setText(R.string.txt_cd_red_request);
+                txtRedRequested.setText(R.string.red_alert_requested_action_required);
             }
             else if(!alert.getRedAlertApproved() && !isCountryDirector && alert.getAlertLevel() == Constants.TRIGGER_RED) {
                 txtRedRequested.setVisibility(View.VISIBLE);
-                imgAlertColour.setImageResource(R.drawable.gray_alert_left);
-                txtRedRequested.setText(R.string.txt_red_requested);
+                txtRedRequested.setText(R.string.red_alert_requested);
             }
             else {
                 txtRedRequested.setVisibility(View.GONE);
             }
         }
+    }
+
+    @Override
+    public void onBindViewHolder(AlertAdapter.ViewHolder holder, int position) {
+        AlertModel alert = items.get(keys.get(position));
+        holder.bind(alert);
+    }
+
+    public void remove(String id) {
+        int index = keys.indexOf(id);
+        keys.remove(index);
+        items.remove(id);
+        notifyItemRemoved(index);
+    }
+
+//    private void updateList() {
+//        alertsList.clear();
+//        alertsList.addAll(alertsMap.values());
+//        Collections.sort(alertsList, (o1, o2) -> Long.compare(o2.getLevel(), o1.getLevel()));
+//
+//        notifyDataSetChanged();
+//    }
+
+    public void update(String id, AlertModel alert) {
+//        System.out.println("id = [" + id + "], alert = [" + alert + "]");
+        int index = keys.indexOf(id);
+        if (index == -1) {
+            keys.add(id);
+            items.put(id, alert);
+            notifyItemInserted(keys.size() - 1);
+        } else {
+            items.put(id, alert);
+            notifyDataSetChanged();
+        }
+        if ((alert.isNetwork() && alert.hasNetworkApproval() || alert.getAlertLevel() == Constants.TRIGGER_GREEN)
+                && index != -1) {
+            keys.remove(index);
+            items.remove(id);
+            notifyItemRemoved(index);
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return keys.size();
+    }
+
+    public List<String> getAlerts() {
+        return keys;
+    }
+
+    public AlertModel getModel(String key) {
+        return items.get(key);
+    }
+
+    @Override
+    public AlertAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_alert, parent, false);
+        return new AlertAdapter.ViewHolder(view);
     }
 
     public static void fetchIcon(String hazardName, ImageView imageView) {

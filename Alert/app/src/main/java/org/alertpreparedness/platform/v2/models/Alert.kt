@@ -13,8 +13,10 @@ class Alert(
         val estimatedPopulation: Long,
         val hazardScenario: HazardScenario,
         val infoNotes: String,
-        val timeCreated: DateTime
+        val timeCreated: DateTime,
+        val affectedAreas: List<Area>
 ) : BaseModel() {
 
+    @Transient
     var state: AlertApprovalState? = null
 }

@@ -31,7 +31,7 @@
             android:id="@+id/tvRedRequested"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/txt_req_red_alert"
+            android:text="@string/red_alert_requested"
             android:textAlignment="center"
             android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -46,5 +46,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/ivIcon"
         app:layout_constraintTop_toBottomOf="@+id/tvTitle"
-        tools:text="Content" />
+        android:ellipsize="end"
+        android:maxLines="2"
+        tools:text="This is some really long content. So long that it flows onto multiple lines to show how the text cuts off after 2 lines." />
 </androidx.constraintlayout.widget.ConstraintLayout>
