@@ -1,27 +1,34 @@
 package org.alertpreparedness.platform.v1.dashboard.fragment;
 
+import static org.alertpreparedness.platform.v1.dashboard.activity.AlertDetailActivity.EXTRA_ALERT;
+
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.core.view.ViewCompat;
-import androidx.core.widget.NestedScrollView;
-import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.core.view.ViewCompat;
+import androidx.core.widget.NestedScrollView;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
-
+import io.reactivex.Flowable;
+import io.reactivex.disposables.CompositeDisposable;
+import java.util.ArrayList;
+import java.util.Collection;
+import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.MainDrawer;
 import org.alertpreparedness.platform.v1.R;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
@@ -58,18 +65,6 @@ import org.alertpreparedness.platform.v1.min_preparedness.activity.CompleteActio
 import org.alertpreparedness.platform.v1.model.User;
 import org.alertpreparedness.platform.v1.risk_monitoring.view.UpdateIndicatorActivity;
 import org.alertpreparedness.platform.v1.utils.AppUtils;
-
-import java.util.ArrayList;
-import java.util.Collection;
-
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import io.reactivex.Flowable;
-import io.reactivex.disposables.CompositeDisposable;
-
-import static org.alertpreparedness.platform.v1.dashboard.activity.AlertDetailActivity.EXTRA_ALERT;
 
 /**
  * Created by Tj on 13/12/2017.
@@ -197,7 +192,9 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
 
         DependencyInjector.userScopeComponent().inject(this);
 
-        ((MainDrawer) getActivity()).toggleActionBarWithTitle(MainDrawer.ActionBarState.ALERT, R.string.green_alert_level, R.drawable.alert_green);
+        ((MainDrawer) getActivity())
+                .toggleActionBarWithTitle(MainDrawer.ActionBarState.ALERT, R.string.green_alert_level,
+                        R.drawable.alert_green_button_bg);
 
         initViews();
 
@@ -345,7 +342,7 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         boolean redPresent = false;
         boolean amberPresent = false;
 
-        updateTitle(R.string.green_alert_level, R.drawable.alert_green);
+        updateTitle(R.string.green_alert_level, R.drawable.alert_green_button_bg);
         for (String a : alertAdapter.getAlerts()) {
             AlertModel model = alertAdapter.getModel(a);
             switch (model.getAlertLevel()) {
@@ -361,13 +358,13 @@ public class HomeFragment extends Fragment implements IHomeActivity, OnAlertItem
         }
 
         if (!redPresent && !amberPresent) {
-            updateTitle(R.string.green_alert_level, R.drawable.alert_green);
+            updateTitle(R.string.green_alert_level, R.drawable.alert_green_button_bg);
         }
         else if (redPresent) {
-            updateTitle(R.string.red_alert_level, R.drawable.alert_red_main);
+            updateTitle(R.string.red_alert_level, R.drawable.alert_red_button_bg);
         }
         else {
-            updateTitle(R.string.amber_alert_level, R.drawable.alert_amber_main);
+            updateTitle(R.string.amber_alert_level, R.drawable.alert_amber_button_bg);
         }
     }
 

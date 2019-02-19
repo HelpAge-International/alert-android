@@ -70,7 +70,7 @@ public class ClockSettingsFetcher {
 
     @Deprecated
     public void fetch() {
-        countryOfficeRef.child(user.agencyAdminID).child(user.countryID).child("mClockSetting").child("preparedness")
+        countryOfficeRef.child(user.agencyAdminID).child(user.countryID).child("clockSettings").child("preparedness")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
@@ -107,7 +107,7 @@ public class ClockSettingsFetcher {
         DatabaseReference ref = countryOfficeRef
                 .child(user.agencyAdminID)
                 .child(user.countryID)
-                .child("mClockSetting")
+                .child("clockSettings")
                 .child("preparedness");
 
         return RxFirebaseDatabase.observeSingleValueEvent(ref, ClockSettingsModel.class).toObservable();
@@ -150,7 +150,7 @@ public class ClockSettingsFetcher {
     }
 
     private Flowable<ClockSetting> rxFetch(DatabaseReference dbRef, String key) {
-        return RxFirebaseDatabase.observeValueEvent(dbRef.child("mClockSetting").child(key))
+        return RxFirebaseDatabase.observeValueEvent(dbRef.child("clockSettings").child(key))
                 .map(dataSnapshot -> AppUtils.getValueFromDataSnapshot(dataSnapshot, ClockSetting.class));
     }
 

@@ -37,18 +37,47 @@ class HomeAlertsAdapter(val context: Context) :
             }
         }) {
 
+    private val listeners = mutableSetOf<OnAlertClickListener>()
+
+    fun addListener(func: (Alert) -> Unit): OnAlertClickListener {
+        val listener = object : OnAlertClickListener {
+            override fun onAlertClick(alert: Alert) {
+                func(alert)
+            }
+        }
+        listeners.add(listener)
+        return listener
+    }
+
+    fun addListener(listener: OnAlertClickListener) {
+        listeners.add(listener)
+    }
+
+    fun removeListener(listener: OnAlertClickListener) {
+        listeners.remove(listener)
+    }
+
+    private fun notifyAlertClick(model: Pair<AlertActionType, Alert>) {
+        listeners.forEach { it.onAlertClick(model.second) }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeAlertViewHolder {
         return HomeAlertViewHolder(LayoutInflater.from(context).inflate(R.layout.item_alert, parent, false))
     }
 
     inner class HomeAlertViewHolder(view: View) : ViewHolder<Pair<AlertActionType, Alert>>(view) {
-
         private val tvAlertLevel = view.tvAlertLevel
         private val ivHazardIcon = view.ivHazardIcon
         private val tvHazardName = view.tvHazardName
         private val tvNumOfPeople = view.tvNumOfPeople
+
         private val tvAlertRequested = view.tvAlertRequested
 
+        init {
+            view.setOnClickListener {
+                notifyAlertClick(model)
+            }
+        }
         override fun bind(model: Pair<AlertActionType, Alert>, position: Int) {
             val (alertActionType, alert) = model
 
@@ -78,4 +107,8 @@ class HomeAlertsAdapter(val context: Context) :
             }
         }
     }
+}
+
+interface OnAlertClickListener {
+    fun onAlertClick(alert: Alert)
 }

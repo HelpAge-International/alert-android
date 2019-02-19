@@ -7,20 +7,37 @@ import io.reactivex.rxkotlin.combineLatest
 import org.alertpreparedness.platform.v2.FirebaseAuthExtensions
 import org.alertpreparedness.platform.v2.asObservable
 import org.alertpreparedness.platform.v2.db
-import org.alertpreparedness.platform.v2.models.*
+import org.alertpreparedness.platform.v2.models.Action
+import org.alertpreparedness.platform.v2.models.Agency
+import org.alertpreparedness.platform.v2.models.Alert
+import org.alertpreparedness.platform.v2.models.ClockSetting
 import org.alertpreparedness.platform.v2.models.ClockSettingsSource.ACTION
 import org.alertpreparedness.platform.v2.models.ClockSettingsSource.COUNTRY
+import org.alertpreparedness.platform.v2.models.Hazard
+import org.alertpreparedness.platform.v2.models.Indicator
+import org.alertpreparedness.platform.v2.models.PrivacySetting
+import org.alertpreparedness.platform.v2.models.Programme
+import org.alertpreparedness.platform.v2.models.ResponsePlan
+import org.alertpreparedness.platform.v2.models.User
+import org.alertpreparedness.platform.v2.models.UserType
 import org.alertpreparedness.platform.v2.models.UserType.COUNTRY_ADMIN
 import org.alertpreparedness.platform.v2.models.UserType.COUNTRY_DIRECTOR
 import org.alertpreparedness.platform.v2.models.UserType.ERT
 import org.alertpreparedness.platform.v2.models.UserType.ERT_LEADER
 import org.alertpreparedness.platform.v2.models.UserType.PARTNER
-import org.alertpreparedness.platform.v2.models.enums.*
+import org.alertpreparedness.platform.v2.models.enums.ActionType
 import org.alertpreparedness.platform.v2.models.enums.ActionType.CHS
 import org.alertpreparedness.platform.v2.models.enums.ActionType.MANDATED
 import org.alertpreparedness.platform.v2.models.enums.AlertApprovalState.APPROVED
+import org.alertpreparedness.platform.v2.models.enums.AlertApprovalStateSerializer
 import org.alertpreparedness.platform.v2.models.enums.AlertLevel.RED
+import org.alertpreparedness.platform.v2.models.enums.Country
+import org.alertpreparedness.platform.v2.models.enums.CountryOffice
 import org.alertpreparedness.platform.v2.models.enums.DurationType.WEEK
+import org.alertpreparedness.platform.v2.models.enums.DurationTypeSerializer
+import org.alertpreparedness.platform.v2.models.enums.HazardScenario
+import org.alertpreparedness.platform.v2.models.enums.Note
+import org.alertpreparedness.platform.v2.models.enums.Privacy
 import org.alertpreparedness.platform.v2.printRef
 import org.alertpreparedness.platform.v2.utils.extensions.behavior
 import org.alertpreparedness.platform.v2.utils.extensions.childKeys
@@ -223,7 +240,13 @@ object Repository {
                                         .map { it.children.toList() }
                             }
                     )
-                            .map { list -> list.map { it.toModel<Indicator>() } }
+                            .map { list ->
+                                list.map { dataSnapshot ->
+                                    dataSnapshot.toModel<Indicator> { model, json ->
+                                        model.parentId = dataSnapshot.ref.parent!!.key!!
+                                    }
+                                }
+                            }
                 }
                 .withLatestFromPair(userObservable)
                 .map { (list, user) ->
@@ -408,7 +431,8 @@ object Repository {
                 .map { it.toModel<Agency>() }
     }
 
-    fun searchProgrammes(searchCountry: Country, searchLevel1: Int?, searchLevel2: Int?): Observable<Map<Agency, List<Programme>>> {
+    fun searchProgrammes(searchCountry: Country, searchLevel1: Int?,
+            searchLevel2: Int?): Observable<Map<Agency, List<Programme>>> {
         //Fetch root countryOfficeProfile/programme node
         return db.child("countryOfficeProfile")
                 .child("programme")
@@ -474,12 +498,11 @@ object Repository {
                                 agency(agencyId)
                                         .map { Pair(it, programmes) }
                             }
-                            if (agencyProgramList.isEmpty()) {
-                                Observable.just(emptyMap())
-                            }
-                                    else {
-                                agencyProgramList.combineLatest { it.toMap() }
-                            }
+                    if (agencyProgramList.isEmpty()) {
+                        Observable.just(emptyMap())
+                    } else {
+                        agencyProgramList.combineLatest { it.toMap() }
+                    }
                 }
                 .print("RESULT")
     }

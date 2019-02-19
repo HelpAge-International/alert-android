@@ -4,7 +4,8 @@ import android.view.View
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 
-abstract class DiffListAdapter<MODEL, VIEW_HOLDER : ViewHolder<MODEL>>(val diffComparator: DiffComparator<MODEL>) :
+abstract class DiffListAdapter<MODEL : Any, VIEW_HOLDER : ViewHolder<MODEL>>(
+        val diffComparator: DiffComparator<MODEL>) :
         RecyclerView.Adapter<VIEW_HOLDER>() {
     val items = mutableListOf<MODEL>()
 
@@ -29,7 +30,7 @@ abstract class DiffListAdapter<MODEL, VIEW_HOLDER : ViewHolder<MODEL>>(val diffC
     }
 
     open fun onBindViewHolder(holder: VIEW_HOLDER, position: Int, model: MODEL){
-        holder.bind(model, position)
+        holder.bindInt(model, position)
     }
 }
 
@@ -56,6 +57,13 @@ interface DiffComparator<MODEL> {
     fun areContentsTheSame(o1: MODEL, o2: MODEL): Boolean
 }
 
-abstract class ViewHolder<MODEL>(itemView: View) : RecyclerView.ViewHolder(itemView) {
+abstract class ViewHolder<MODEL : Any>(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+    lateinit var model: MODEL
+
+    fun bindInt(model: MODEL, position: Int) {
+        this.model = model
+        bind(model, position)
+    }
     abstract fun bind(model: MODEL, position: Int)
 }

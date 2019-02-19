@@ -21,7 +21,9 @@
             android:paddingTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             tools:itemCount="2"
-            tools:listitem="@layout/item_alert" />
+            android:visibility="gone"
+            tools:listitem="@layout/item_alert"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/tvMyTasks"
@@ -41,7 +43,8 @@
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:listitem="@layout/item_task" />
+            tools:listitem="@layout/item_task"
+            tools:visibility="visible" />
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/grpEmptyTasks"
@@ -81,7 +84,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvMyTasks"
-            android:visibility="visible"/>
+            android:visibility="visible"
+            tools:visibility="gone" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

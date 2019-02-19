@@ -1,10 +1,9 @@
 package org.alertpreparedness.platform.v1.firebase;
 
 import com.google.firebase.database.Exclude;
-
-import org.alertpreparedness.platform.v1.risk_monitoring.model.ModelIndicatorLocation;
-
 import java.io.Serializable;
+import org.alertpreparedness.platform.v1.risk_monitoring.model.ModelIndicatorLocation;
+import org.alertpreparedness.platform.v2.models.Area;
 
 public class AffectedAreaModel extends FirebaseModel implements Serializable {
 
@@ -35,6 +34,13 @@ public class AffectedAreaModel extends FirebaseModel implements Serializable {
         this.country = country;
         this.level1 = level1;
         this.level2 = level2;
+    }
+
+    //DEV NOTE: This links v1 to v2, this model needs to be completely replaced with v2 eventually
+    public AffectedAreaModel(Area area) {
+        country = area.getCountry().getValue();
+        level1 = area.getLevel1();
+        level2 = area.getLevel2();
     }
 
     @Override

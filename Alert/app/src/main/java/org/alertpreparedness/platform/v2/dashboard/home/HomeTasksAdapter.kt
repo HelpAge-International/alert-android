@@ -36,6 +36,30 @@ class HomeTasksAdapter(val context: Context): DiffListAdapter<Task, HomeTaskView
         return HomeTaskViewHolder(LayoutInflater.from(context).inflate(R.layout.item_task, parent, false))
     }
 
+    private val listeners = mutableSetOf<OnTaskClickListener>()
+
+    fun addListener(func: (Task) -> Unit): OnTaskClickListener {
+        val listener = object : OnTaskClickListener {
+            override fun onTaskClick(task: Task) {
+                func(task)
+            }
+        }
+        listeners.add(listener)
+        return listener
+    }
+
+    fun addListener(listener: OnTaskClickListener) {
+        listeners.add(listener)
+    }
+
+    fun removeListener(listener: OnTaskClickListener) {
+        listeners.remove(listener)
+    }
+
+    private fun notifyTaskClick(model: Task) {
+        listeners.forEach { it.onTaskClick(model) }
+    }
+
     inner class HomeTaskViewHolder(view: View) : ViewHolder<Task>(view) {
         override fun bind(model: Task, position: Int) {
             tvDescription.text = model.label
@@ -50,10 +74,16 @@ class HomeTasksAdapter(val context: Context): DiffListAdapter<Task, HomeTaskView
         val tvTitle = view.tvTitle!!
         val tvDescription = view.tvDescription!!
 
+        init {
+            view.setOnClickListener {
+                notifyTaskClick(model)
+            }
+        }
+
         private fun bindIndicatorTask(indicatorTask: IndicatorTask) {
             setDateIcon(indicatorTask.dueDate)
 
-            val triggerLevelString = context.getString(indicatorTask.indicatorTriggerLevel.string)
+            val triggerLevelString = context.getString(indicatorTask.indicator.triggerLevel.string)
 
             when {
                 indicatorTask.dueDate.hasPassed() -> tvTitle.text = context.getString(R.string.task_indicator_due_passed, triggerLevelString, indicatorTask.dueDate.toString("dd/MM/yy"))
@@ -66,7 +96,7 @@ class HomeTasksAdapter(val context: Context): DiffListAdapter<Task, HomeTaskView
         private fun bindActionTask(actionTask: ActionTask) {
             setDateIcon(actionTask.dueDate)
 
-            val actionTypeString = context.getString(actionTask.actionLevel.string)
+            val actionTypeString = context.getString(actionTask.action.actionLevel.string)
 
             when {
                 actionTask.dueDate.hasPassed() -> tvTitle.text = context.getString(R.string.task_action_due_passed, actionTypeString, actionTask.dueDate.toString("dd/MM/yy"))
@@ -90,4 +120,8 @@ class HomeTasksAdapter(val context: Context): DiffListAdapter<Task, HomeTaskView
             }
         }
     }
+}
+
+interface OnTaskClickListener {
+    fun onTaskClick(task: Task)
 }

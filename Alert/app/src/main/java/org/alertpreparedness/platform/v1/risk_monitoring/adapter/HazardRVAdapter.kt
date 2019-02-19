@@ -7,16 +7,20 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.bumptech.glide.request.RequestOptions
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
 import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder
 import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder
-import de.hdodenhof.circleimageview.CircleImageView
-import org.alertpreparedness.platform.v1.*
+import org.alertpreparedness.platform.v1.HAZARD_EMPTY
+import org.alertpreparedness.platform.v1.HAZARD_NOT_EMPTY
+import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.v1.getCountryImage
+import org.alertpreparedness.platform.v1.getHazardImg
 import org.alertpreparedness.platform.v1.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.v1.utils.Constants
+import org.alertpreparedness.platform.v2.utils.GlideApp
 import org.jetbrains.anko.find
-import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.textColor
 import org.joda.time.DateTime
 import timber.log.Timber
@@ -26,30 +30,35 @@ import timber.log.Timber
  */
 
 class HazardViewHolder(itemView: View, location:Int) : GroupViewHolder(itemView) {
-    private val hazardTitle: TextView = itemView.findViewById(R.id.tvTitle)
-    private val hazardIcon: CircleImageView = itemView.findViewById(R.id.ivIcon)
+
+    private val hazardTitle: TextView = itemView.findViewById(R.id.tvGroupTitle)
+    private val hazardIcon: ImageView = itemView.findViewById(R.id.ivIcon)
+    private val llGroup: LinearLayout = itemView.findViewById(R.id.llGroup)
     private val hazardArrow: ImageView = itemView.findViewById(R.id.ivArrow)
-    private val hazardLayout: LinearLayout = itemView.find(R.id.llHazard)
     private val mCountryLocation = location
 
     init {
-        hazardLayout.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        llGroup.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
     fun setHazardTitle(group: ExpandableGroup<ModelIndicator>) {
         hazardTitle.text = group.title
         when (group.title) {
             "Country Context" -> {
-                hazardIcon.imageResource = getCountryImage(mCountryLocation)
+                GlideApp.with(hazardIcon)
+                        .load(getCountryImage(mCountryLocation))
+                        .apply(RequestOptions().centerInside())
+                        .into(hazardIcon)
             }
             else -> {
-                hazardIcon.imageResource = getHazardImg(hazardTitle.text.toString())
+                GlideApp.with(hazardIcon)
+                        .load(getHazardImg(hazardTitle.text.toString()))
+                        .apply(RequestOptions().circleCrop())
+                        .into(hazardIcon)
             }
         }
-
     }
-
-
 }
 
 class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener, networkCountryMap:Map<String,String>?, private val context: Context) : ChildViewHolder(itemView) {
@@ -125,7 +134,7 @@ class IndicatorViewHolder(itemView: View, listener: OnIndicatorSelectedListener,
             }
 
             if(indicator.trigger.size > indicator.triggerSelected) {
-                indicatorLevel.text = indicator.trigger[indicator.triggerSelected].triggerValue;
+                indicatorLevel.text = indicator.trigger[indicator.triggerSelected].triggerValue
             }
 
             indicatorLevel.setOnClickListener {

@@ -27,7 +27,7 @@
                 android:layout_height="25dp"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:background="@drawable/alert_green"
+                android:background="@drawable/alert_green_button_bg"
                 android:fontFamily="@font/alef"
                 android:gravity="center"
                 android:text="@string/green_alert_level"

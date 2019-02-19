@@ -14,7 +14,14 @@ class Alert(
         val hazardScenario: HazardScenario,
         val infoNotes: String,
         val timeCreated: DateTime,
-        val affectedAreas: List<Area>
+        val reasonForRedAlert: String?,
+        val affectedAreas: List<Area>,
+        val timeUpdated: DateTime?,
+        val updatedBy: String?,
+        val otherName: String?,
+        val name: String?,
+        val timeTracking: TimeTracking?,
+        val previousIsAmber: Boolean
 ) : BaseModel() {
 
     @Transient

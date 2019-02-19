@@ -3,7 +3,12 @@ package org.alertpreparedness.platform.v1.firebase;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import org.alertpreparedness.platform.v2.models.Alert;
+import org.alertpreparedness.platform.v2.models.Area;
+import org.alertpreparedness.platform.v2.models.enums.AlertApprovalState;
+import org.alertpreparedness.platform.v2.models.enums.AlertLevel;
 
 public class AlertModel extends FirebaseModel implements Serializable {
 
@@ -41,11 +46,11 @@ public class AlertModel extends FirebaseModel implements Serializable {
 
     private String name;
 
-    private String key;
-
     private TimeTrackingModel timeTracking;
 
     private Boolean redAlertApproved;
+
+    private Boolean isPreviousAmber;
 
     public AlertModel() {
     }
@@ -59,6 +64,42 @@ public class AlertModel extends FirebaseModel implements Serializable {
         this.infoNotes = infoNotes;
         this.createdBy = createdBy;
         this.affectedAreas = affectedAreas;
+    }
+
+
+    //DEV NOTE: This is to link v1 to v2, this presumes that v2 isn't fetching network alerts, therefore isNetwork is set to false
+    public AlertModel(Alert alert, String countryId, String agencyAdminId) {
+        setId(alert.id);
+        this.agencyAdminId = agencyAdminId;
+        parentKey = countryId;
+        isNetwork = false;
+
+        for (final Area affectedArea : alert.getAffectedAreas()) {
+            affectedAreas.add(new AffectedAreaModel(affectedArea));
+        }
+        alertLevel = alert.getLevel().getValue();
+        hazardScenario = alert.getHazardScenario().getValue();
+        infoNotes = alert.getInfoNotes();
+        timeCreated = alert.getTimeCreated().getMillis();
+        createdBy = alert.getCreatedBy();
+        estimatedPopulation = alert.getEstimatedPopulation();
+        reasonForRedAlert = alert.getReasonForRedAlert();
+
+        if (alert.getState() != null) {
+            approval = new ApprovalModel();
+            HashMap<String, Integer> approvalState = new HashMap<>();
+            //NOTE: in the actual db, this is the countryDirector's id. This isnt used in v1 or v2 so here I'm setting it to a placeholder.
+            //This might cause problems in the future
+            approvalState.put(countryId, alert.getState().getValue());
+            approval.setCountryDirector(approvalState);
+        }
+        timeUpdated = alert.getTimeUpdated() == null ? null : alert.getTimeUpdated().getMillis();
+        updatedBy = alert.getUpdatedBy();
+        otherName = alert.getOtherName();
+        name = alert.getName();
+        timeTracking = alert.getTimeTracking() == null ? null : new TimeTrackingModel(alert.getTimeTracking());
+        redAlertApproved = alert.getState() == AlertApprovalState.APPROVED && alert.getLevel() == AlertLevel.RED;
+        isPreviousAmber = alert.getPreviousIsAmber();
     }
 
     @Override
@@ -227,11 +268,10 @@ public class AlertModel extends FirebaseModel implements Serializable {
     public boolean getRedAlertApproved() {
         if (redAlertApproved != null) {
             return redAlertApproved;
-        }
-        else {
+        } else {
             boolean res = false;
-            for(Integer value : approval.getCountryDirector().values()) {
-                if(value >= 1) {
+            for (Integer value : approval.getCountryDirector().values()) {
+                if (value >= 1) {
                     res = true;
                 }
             }
@@ -244,7 +284,7 @@ public class AlertModel extends FirebaseModel implements Serializable {
     }
 
     public TimeTrackingModel getTimeTracking() {
-        if(timeTracking == null) {
+        if (timeTracking == null) {
             timeTracking = new TimeTrackingModel();
         }
         return timeTracking;

@@ -13,4 +13,8 @@ class Indicator(
         @SerializedName("triggerSelected")
         val triggerLevel: IndicatorTriggerLevel,
         val name: String
-) : BaseModel()
+) : BaseModel() {
+
+    @Transient
+    lateinit var parentId: String
+}

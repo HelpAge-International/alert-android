@@ -1,7 +1,5 @@
 package org.alertpreparedness.platform.v2.models
 
-import org.alertpreparedness.platform.v2.models.enums.ActionLevel
-import org.alertpreparedness.platform.v2.models.enums.IndicatorTriggerLevel
 import org.joda.time.DateTime
 
 abstract class Task(val id: String, val label: String, val dueDate: DateTime){
@@ -28,14 +26,14 @@ class IndicatorTask(
         id: String,
         label: String,
         dueDate: DateTime,
-        val indicatorTriggerLevel: IndicatorTriggerLevel
+        val indicator: Indicator
 ) : Task(id, label, dueDate) {
 
     constructor(indicator: Indicator) : this(
             indicator.id,
             indicator.name,
             indicator.dueDate,
-            indicator.triggerLevel
+            indicator
     )
 
     override fun equals(other: Any?): Boolean {
@@ -43,14 +41,14 @@ class IndicatorTask(
         if (other !is IndicatorTask) return false
         if (!super.equals(other)) return false
 
-        if (indicatorTriggerLevel != other.indicatorTriggerLevel) return false
+        if (indicator != other.indicator) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = super.hashCode()
-        result = 31 * result + indicatorTriggerLevel.hashCode()
+        result = 31 * result + indicator.hashCode()
         return result
     }
 }
@@ -59,7 +57,7 @@ class ActionTask(
         id: String,
         label: String,
         dueDate: DateTime,
-        val actionLevel: ActionLevel
+        val action: Action
 ) : Task(id, label, dueDate) {
 
     constructor(action: Action) : this(
@@ -67,7 +65,7 @@ class ActionTask(
             action.task,
             //If the aciton is assigned to the user, then there will be a due date.
             action.dueDate!!,
-            action.actionLevel
+            action
     )
 
     override fun equals(other: Any?): Boolean {
@@ -75,25 +73,43 @@ class ActionTask(
         if (other !is ActionTask) return false
         if (!super.equals(other)) return false
 
-        if (actionLevel != other.actionLevel) return false
+        if (action != other.action) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = super.hashCode()
-        result = 31 * result + actionLevel.hashCode()
+        result = 31 * result + action.hashCode()
         return result
     }
 }
 
 class ApprovalTask(
         id: String,
-        label: String
+        label: String,
+        val responsePlan: ResponsePlan
 ) : Task(id, label, DateTime(0)) {
 
     constructor(responsePlan: ResponsePlan) : this(
             responsePlan.id,
-            responsePlan.name
+            responsePlan.name,
+            responsePlan
     )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ApprovalTask) return false
+        if (!super.equals(other)) return false
+
+        if (responsePlan != other.responsePlan) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + responsePlan.hashCode()
+        return result
+    }
 }

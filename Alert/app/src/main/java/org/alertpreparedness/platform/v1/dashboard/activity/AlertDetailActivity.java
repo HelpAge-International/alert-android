@@ -451,9 +451,8 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
         else {
             mReference.child("approval").child("countryDirector").child(countryID).setValue(Constants.REQ_REJECTED);
         }
-        Intent intent = new Intent(AlertDetailActivity.this, HomeScreen.class);
-        startActivity(intent);
 
+        finish();
     }
 
     @Override

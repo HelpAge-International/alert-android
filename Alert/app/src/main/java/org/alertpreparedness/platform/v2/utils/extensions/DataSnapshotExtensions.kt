@@ -14,8 +14,8 @@ import com.google.gson.JsonSerializer
 import com.google.gson.stream.JsonReader
 import org.alertpreparedness.platform.v1.utils.SnapshotExclusionStrat
 import org.alertpreparedness.platform.v2.models.BaseModel
+import org.alertpreparedness.platform.v2.models.ResponsePlanApproval
 import org.alertpreparedness.platform.v2.models.ResponsePlanApprovalSerializer
-import org.alertpreparedness.platform.v2.models.ResponsePlanApprovalState
 import org.alertpreparedness.platform.v2.models.enums.ActionLevel
 import org.alertpreparedness.platform.v2.models.enums.ActionLevelSerializer
 import org.alertpreparedness.platform.v2.models.enums.ActionType
@@ -73,7 +73,7 @@ val gson: Gson by lazy{
             .registerTypeAdapter(ActionLevel::class.java, ActionLevelSerializer)
             .registerTypeAdapter(ActionType::class.java, ActionTypeSerializer)
             .registerTypeAdapter(ResponsePlanState::class.java, ResponsePlanStateSerializer)
-            .registerTypeAdapter(ResponsePlanApprovalState::class.java, ResponsePlanApprovalSerializer)
+            .registerTypeAdapter(ResponsePlanApproval::class.java, ResponsePlanApprovalSerializer)
             .registerTypeAdapter(DurationType::class.java, DurationTypeSerializer)
             .registerTypeAdapter(Title::class.java, TitleSerializer)
             .registerTypeAdapter(AlertLevel::class.java, AlertLevelSerializer)

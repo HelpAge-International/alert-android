@@ -17,7 +17,7 @@
         android:layout_height="wrap_content">
 
         <ImageView
-            android:src="@drawable/alert_green"
+            android:src="@drawable/alert_green_button_bg"
             android:layout_gravity="center_vertical"
             android:layout_width="24dp"
             android:layout_height="24dp" />
@@ -50,7 +50,7 @@
 
         <ImageView
             android:layout_gravity="center_vertical"
-            android:src="@drawable/alert_amber_main"
+            android:src="@drawable/alert_amber_button_bg"
             android:layout_width="24dp"
             android:layout_height="24dp" />
 
@@ -81,7 +81,7 @@
 
         <ImageView
             android:layout_gravity="center_vertical"
-            android:src="@drawable/alert_red_main"
+            android:src="@drawable/alert_red_button_bg"
             android:layout_width="24dp"
             android:layout_height="24dp" />
 
