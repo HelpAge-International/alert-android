@@ -72,7 +72,7 @@ class HomeViewModel : BaseViewModel(), IHomeViewModel.Inputs, IHomeViewModel.Out
                 .combineWithPair(userObservable)
                 .map { (alerts, user) ->
                     alerts.map { alert ->
-                        if (alert.level == RED && alert.state == WAITING_RESPONSE) {
+                        if (alert.level == RED && (alert.state == WAITING_RESPONSE || !alert.redAlertApproved)) {
                             if (user.userType == COUNTRY_DIRECTOR) {
                                 RED_ALERT_REQUIRES_ACTION
                             } else {
