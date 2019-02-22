@@ -51,3 +51,16 @@ fun DatabaseReference.setValueRx(value: Any?): Observable<Unit> {
     }
 }
 
+fun DatabaseReference.updateChildrenRx(values: Map<String, Any?>): Observable<Unit> {
+    return Observable.create<Unit> { emitter ->
+        updateChildren(values) { databaseError, _ ->
+            if (databaseError == null) {
+                emitter.onNext(Unit)
+                emitter.onComplete()
+            } else {
+                emitter.onError(databaseError.toException())
+            }
+        }
+    }
+}
+

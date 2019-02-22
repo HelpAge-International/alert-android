@@ -19,7 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
-        <activity android:name="org.alertpreparedness.platform.v2.mycountry.ProgrammeResultsActivity"></activity>
+        <activity android:name="org.alertpreparedness.platform.v2.alert.CreateAlertActivity"></activity>
+        <activity android:name="org.alertpreparedness.platform.v2.alert.AlertDetailActivity" />
+        <activity android:name="org.alertpreparedness.platform.v2.mycountry.ProgrammeResultsActivity" />
 
         <service
             android:name="offline.SyncJobService"
@@ -30,10 +32,10 @@
         </service>
         <service
             android:name=".notifications.IndicatorNotificationService"
-            android:exported="false"></service>
+            android:exported="false" />
         <service
             android:name=".notifications.ActionNotificationService"
-            android:exported="false"></service>
+            android:exported="false" />
         <service android:name=".notifications.AlertFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

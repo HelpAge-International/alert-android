@@ -13,10 +13,12 @@ class Alert(
         val estimatedPopulation: Long,
         val hazardScenario: HazardScenario,
         val infoNotes: String,
-        val timeCreated: DateTime,
         val reasonForRedAlert: String?,
         val affectedAreas: List<Area>,
-        val timeUpdated: DateTime?,
+        @SerializedName("timeUpdated")
+        val updatedAt: DateTime?,
+        @SerializedName("timeCreated")
+        val createdAt: DateTime,
         val updatedBy: String?,
         val otherName: String?,
         val name: String?,
@@ -37,10 +39,10 @@ class Alert(
         if (estimatedPopulation != other.estimatedPopulation) return false
         if (hazardScenario != other.hazardScenario) return false
         if (infoNotes != other.infoNotes) return false
-        if (timeCreated != other.timeCreated) return false
         if (reasonForRedAlert != other.reasonForRedAlert) return false
         if (affectedAreas != other.affectedAreas) return false
-        if (timeUpdated != other.timeUpdated) return false
+        if (updatedAt != other.updatedAt) return false
+        if (createdAt != other.createdAt) return false
         if (updatedBy != other.updatedBy) return false
         if (otherName != other.otherName) return false
         if (name != other.name) return false
@@ -58,10 +60,10 @@ class Alert(
         result = 31 * result + estimatedPopulation.hashCode()
         result = 31 * result + hazardScenario.hashCode()
         result = 31 * result + infoNotes.hashCode()
-        result = 31 * result + timeCreated.hashCode()
         result = 31 * result + (reasonForRedAlert?.hashCode() ?: 0)
         result = 31 * result + affectedAreas.hashCode()
-        result = 31 * result + (timeUpdated?.hashCode() ?: 0)
+        result = 31 * result + (updatedAt?.hashCode() ?: 0)
+        result = 31 * result + createdAt.hashCode()
         result = 31 * result + (updatedBy?.hashCode() ?: 0)
         result = 31 * result + (otherName?.hashCode() ?: 0)
         result = 31 * result + (name?.hashCode() ?: 0)

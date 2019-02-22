@@ -4,98 +4,90 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.alertpreparedness.platform.v1.dashboard.activity.AlertDetailActivity">
+    android:animateLayoutChanges="true"
+    tools:context="org.alertpreparedness.platform.v2.alert.AlertDetailActivity">
 
     <include
-        android:id="@+id/action_toolbar_layout"
-        layout="@layout/action_bar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/clRedRequested"
+    <TextView
+        android:id="@+id/tvBanner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/alertRed"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/action_toolbar_layout">
+        android:gravity="center"
+        android:padding="8dp"
+        android:textColor="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        tools:text="Vincent Henson has requested the alert level to go from Amber to Red on the 27/09/2017" />
 
-        <TextView
-            android:paddingTop="@dimen/activity_horizontal_margin_half"
-            android:paddingBottom="@dimen/activity_horizontal_margin_half"
-            android:id="@+id/tvRedRequested"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/red_alert_requested"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <include
-        android:id="@+id/detail_view"
-        layout="@layout/content_alert_detail"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvAlertDetails"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/clRedRequested" />
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/tvLastUpdated"
+        app:layout_constraintTop_toBottomOf="@id/tvBanner"
+        tools:layout_editor_absoluteX="0dp"
+        tools:listitem="@layout/item_alert_detail" />
 
     <TextView
-        android:id="@+id/txtLastUpdated"
+        android:id="@+id/tvLastUpdated"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
         android:gravity="center"
-        android:text="@string/last_updated"
-        android:textColor="@android:color/black"
-        app:layout_constraintBottom_toTopOf="@+id/llButtons"/>
+        android:padding="8dp"
+        app:layout_constraintBottom_toTopOf="@id/barButtons"
+        tools:text="Last updated: 21/02/2019" />
 
-    <LinearLayout
-        android:id="@+id/llButtons"
-        android:layout_width="match_parent"
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/center"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+
+    <Button
+        android:id="@+id/btnApprove"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="left"
-        android:orientation="horizontal"
-        android:weightSum="2"
+        android:background="@color/btnColor"
+        android:text="@string/txt_approve"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/center"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btnReject"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/alertRed"
+        android:text="@string/txt_reject"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detail_view"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintStart_toStartOf="@id/center" />
 
-        <Button
-            android:id="@+id/btnApprove"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@color/btnColor"
-            android:text="@string/txt_approve"
-            android:textColor="@color/white" />
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barButtons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="top"
+        app:constraint_referenced_ids="btnApprove,btnReject" />
 
-        <Button
-            android:id="@+id/btnReject"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@color/alertRed"
-            android:text="@string/txt_reject"
-            android:textColor="@color/white" />
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/grpApproveReject"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="btnApprove, btnReject" />
 
-    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

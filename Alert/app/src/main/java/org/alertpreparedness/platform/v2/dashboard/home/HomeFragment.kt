@@ -10,10 +10,9 @@ import kotlinx.android.synthetic.main.fragment_home.rvMyTasks
 import org.alertpreparedness.platform.v1.MainDrawer
 import org.alertpreparedness.platform.v1.MainDrawer.ActionBarState.ALERT
 import org.alertpreparedness.platform.v1.R
-import org.alertpreparedness.platform.v1.dashboard.activity.AlertDetailActivity
-import org.alertpreparedness.platform.v1.firebase.AlertModel
 import org.alertpreparedness.platform.v1.min_preparedness.activity.CompleteActionActivity
 import org.alertpreparedness.platform.v1.risk_monitoring.view.UpdateIndicatorActivity
+import org.alertpreparedness.platform.v2.alert.AlertDetailActivity
 import org.alertpreparedness.platform.v2.base.BaseFragment
 import org.alertpreparedness.platform.v2.models.enums.AlertLevel.AMBER
 import org.alertpreparedness.platform.v2.models.enums.AlertLevel.GREEN
@@ -77,13 +76,9 @@ class HomeFragment : BaseFragment<HomeViewModel>() {
                 }
 
         disposables += viewModel.showAlertActivity()
-                .withLatestFromPair(userObservable)
-                .map { (alert, user) ->
-                    AlertModel(alert, user.countryId, user.agencyAdminId)
-                }
                 .subscribe { alert ->
                     val intent = Intent(activity, AlertDetailActivity::class.java)
-                    intent.putExtra(AlertDetailActivity.EXTRA_ALERT, alert)
+                    intent.putExtra(AlertDetailActivity.ALERT_ID_KEY, alert.id)
                     startActivity(intent)
                 }
 

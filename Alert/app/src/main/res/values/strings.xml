@@ -347,7 +347,7 @@
     <string name="enter_email_error">Please enter your email.</string>
     <string name="select_hazard_title">Select Hazard</string>
     <string name="alert_level">Alert Level</string>
-    <string name="estimated_peeps">Estimated population effected</string>
+    <string name="estimated_peeps">Estimated population affected</string>
     <string name="effected_area">Add affected area</string>
     <string name="info_sources">Information sources and notes</string>
     <string name="add_another_area">Add another affected area</string>
@@ -381,6 +381,7 @@
     <string name="txt_reject">Reject</string>
     <string name="red_alert_requested">Red alert requested</string>
     <string name="red_alert_requested_action_required">Red alert request requires your action</string>
+    <string name="red_alert_requested_banner">%1$s has requested the alert level to go from %2$s to %3$s on the %4$td/%4$tm/%4$ty</string>
     <string name="txt_reason_for_red">A reason for red alert is required to request a red alert, please enter and try again</string>
     <string name="txt_cannot_change_hazard">You cannot change the hazard when updating alerts</string>
     <string name="complete">%d%% Complete</string>
@@ -578,9 +579,24 @@
     <string name="hazard_other">Other</string>
     <string name="review_plan">Review plan</string>
     <string name="review_plan_content">Please log in to the web portal to review this plan.</string>
+    <string name="alert">Alert</string>
+    <string name="alert_details_risk">Risk:</string>
+    <string name="alert_details_red_reason">Reason for red alert request:</string>
+    <string name="alert_details_population">Population affected:</string>
+    <string name="alert_details_areas">Affected areas:</string>
+    <string name="alert_details_notes">Information sources and notes:</string>
+    <string name="reason_for_red_alert">Reason for red alert (required)</string>
+    <string name="information_sources_and_notes_hint">Information sources and notes</string>
+    <string name="remove">Remove</string>
+    <string name="add_area">Add affected area</string>
+
     <plurals name="alert_population">
         <item quantity="one">%,d people affected in %d area</item>
         <item quantity="other">%,d people affected in %d areas</item>
+    </plurals>
+
+    <plurals name="alert_people_affected">
+        <item quantity="other">%,d people</item>
     </plurals>
 
 

@@ -1,23 +1,28 @@
 package org.alertpreparedness.platform.v1.dashboard.activity;
 
 import android.content.Intent;
-import android.os.Parcelable;
-import androidx.annotation.DrawableRes;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
+import android.os.Parcelable;
 import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
-
+import androidx.annotation.DrawableRes;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import com.google.firebase.database.DatabaseReference;
-
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.AlertRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.BaseDatabaseRef;
-import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dashboard.adapter.AlertFieldsAdapter;
 import org.alertpreparedness.platform.v1.dashboard.model.AlertFieldModel;
 import org.alertpreparedness.platform.v1.firebase.AffectedAreaModel;
@@ -31,16 +36,6 @@ import org.alertpreparedness.platform.v1.risk_monitoring.model.ModelIndicatorLoc
 import org.alertpreparedness.platform.v1.risk_monitoring.view.SelectAreaActivity;
 import org.alertpreparedness.platform.v1.utils.Constants;
 import org.alertpreparedness.platform.v1.utils.SnackbarHelper;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import shortbread.Shortcut;
 
 @Shortcut(id = "createAlert", icon = R.drawable.fab_add, shortLabel = "Create Alert")
@@ -78,7 +73,7 @@ public class CreateAlertActivity extends AppCompatActivity implements AlertField
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_alert);
+        setContentView(R.layout.activity_create_alert_v1);
 
         ButterKnife.bind(this);
         DependencyInjector.userScopeComponent().inject(this);

@@ -80,7 +80,7 @@ public class AlertModel extends FirebaseModel implements Serializable {
         alertLevel = alert.getLevel().getValue();
         hazardScenario = alert.getHazardScenario().getValue();
         infoNotes = alert.getInfoNotes();
-        timeCreated = alert.getTimeCreated().getMillis();
+        timeCreated = alert.getCreatedAt().getMillis();
         createdBy = alert.getCreatedBy();
         estimatedPopulation = alert.getEstimatedPopulation();
         reasonForRedAlert = alert.getReasonForRedAlert();
@@ -93,7 +93,7 @@ public class AlertModel extends FirebaseModel implements Serializable {
             approvalState.put(countryId, alert.getState().getValue());
             approval.setCountryDirector(approvalState);
         }
-        timeUpdated = alert.getTimeUpdated() == null ? null : alert.getTimeUpdated().getMillis();
+        timeUpdated = alert.getUpdatedAt() == null ? null : alert.getUpdatedAt().getMillis();
         updatedBy = alert.getUpdatedBy();
         otherName = alert.getOtherName();
         name = alert.getName();
@@ -292,5 +292,21 @@ public class AlertModel extends FirebaseModel implements Serializable {
 
     public void setTimeTracking(TimeTrackingModel timeTracking) {
         this.timeTracking = timeTracking;
+    }
+
+    public Boolean getPreviousAmber() {
+        return isPreviousAmber;
+    }
+
+    public void setPreviousAmber(final Boolean previousAmber) {
+        isPreviousAmber = previousAmber;
+    }
+
+    public void setRedAlertApproved(final Boolean redAlertApproved) {
+        this.redAlertApproved = redAlertApproved;
+    }
+
+    public void setTimeCreated(final Long timeCreated) {
+        this.timeCreated = timeCreated;
     }
 }

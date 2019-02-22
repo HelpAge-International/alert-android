@@ -1,20 +1,26 @@
 package org.alertpreparedness.platform.v2.base
 
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import androidx.annotation.*
-import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
-import android.widget.TextView
+import androidx.annotation.CallSuper
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
+import androidx.annotation.IdRes
+import androidx.annotation.LayoutRes
+import androidx.annotation.MenuRes
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import org.alertpreparedness.platform.v1.R
@@ -81,12 +87,22 @@ abstract class BaseActivity<VM : BaseViewModel> : AppCompatActivity(){
         }
     }
 
-    fun setToolbarTitle(title: String){
-        supportActionBar?.title = title
+    fun setToolbarTitle(@StringRes title: Int) {
+        setToolbarTitle(title, ContextCompat.getColor(this, R.color.colorPrimary))
     }
 
-    fun setToolbarTitle(@StringRes title: Int){
-        setToolbarTitle(getString(title))
+    fun setToolbarTitle(title: String) {
+        setToolbarTitle(title, ContextCompat.getColor(this, R.color.colorPrimary))
+    }
+
+    fun setToolbarTitle(title: String, @ColorInt color: Int) {
+        supportActionBar?.title = title
+        toolbar?.setBackgroundColor(color)
+        setStatusBar(color)
+    }
+
+    fun setToolbarTitle(@StringRes title: Int, @ColorInt color: Int) {
+        setToolbarTitle(getString(title), color)
     }
 
     fun bindToolbarTitle(titleObservable: Observable<String>){
@@ -255,9 +271,9 @@ abstract class BaseActivity<VM : BaseViewModel> : AppCompatActivity(){
         loadFragment(frag, layoutRes, null)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         super.onOptionsItemSelected(item)
-        return if (item?.itemId == android.R.id.home) {
+        return if (item.itemId == android.R.id.home) {
             finish()
             true
         } else {

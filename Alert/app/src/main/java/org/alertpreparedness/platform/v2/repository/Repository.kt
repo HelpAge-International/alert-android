@@ -19,6 +19,7 @@ import org.alertpreparedness.platform.v2.models.PrivacySetting
 import org.alertpreparedness.platform.v2.models.Programme
 import org.alertpreparedness.platform.v2.models.ResponsePlan
 import org.alertpreparedness.platform.v2.models.User
+import org.alertpreparedness.platform.v2.models.UserPublic
 import org.alertpreparedness.platform.v2.models.UserType
 import org.alertpreparedness.platform.v2.models.UserType.COUNTRY_ADMIN
 import org.alertpreparedness.platform.v2.models.UserType.COUNTRY_DIRECTOR
@@ -38,7 +39,7 @@ import org.alertpreparedness.platform.v2.models.enums.DurationTypeSerializer
 import org.alertpreparedness.platform.v2.models.enums.HazardScenario
 import org.alertpreparedness.platform.v2.models.enums.Note
 import org.alertpreparedness.platform.v2.models.enums.Privacy
-import org.alertpreparedness.platform.v2.printRef
+import org.alertpreparedness.platform.v2.repository.Repository.PrivacySettingType.OFFICE_PROFILE
 import org.alertpreparedness.platform.v2.utils.extensions.behavior
 import org.alertpreparedness.platform.v2.utils.extensions.childKeys
 import org.alertpreparedness.platform.v2.utils.extensions.combineFlatten
@@ -50,7 +51,6 @@ import org.alertpreparedness.platform.v2.utils.extensions.firstChildKey
 import org.alertpreparedness.platform.v2.utils.extensions.get
 import org.alertpreparedness.platform.v2.utils.extensions.mapList
 import org.alertpreparedness.platform.v2.utils.extensions.mergeCombine
-import org.alertpreparedness.platform.v2.utils.extensions.print
 import org.alertpreparedness.platform.v2.utils.extensions.toMergedModel
 import org.alertpreparedness.platform.v2.utils.extensions.toModel
 import org.alertpreparedness.platform.v2.utils.extensions.withLatestFromPair
@@ -65,6 +65,13 @@ val refPartnerUser by lazy { db.child("partnerUser") }
 val refPartnerOrganisation by lazy { db.child("partnerOrganisation") }
 
 object Repository {
+
+    fun userPublic(id: String): Observable<UserPublic> {
+        return refUserPublic
+                .child(id)
+                .asObservable()
+                .map { it.toModel<UserPublic>() }
+    }
 
     val userObservable: Observable<User> by lazy {
         FirebaseAuthExtensions.getLoggedInUserId()
@@ -264,24 +271,18 @@ object Repository {
                     observableList += db.child("action")
                             .child(user.countryId)
                             .child(id)
-                            .printRef("Custom Ref")
                             .asObservable()
-                            .print("CUSTOM")
 
                     if (type == MANDATED) {
                         observableList += db.child("actionMandated")
                                 .child(user.agencyAdminId)
                                 .child(id)
-                                .printRef("Mandated Ref")
                                 .asObservable()
-                                .print("MANDATED")
                     } else if (type == CHS) {
                         observableList += db.child("actionCHS")
                                 .child(user.systemAdminId)
                                 .child(id)
-                                .printRef("CHS Ref")
                                 .asObservable()
-                                .print("CHS")
                     }
 
                     mergeCombine(observableList)
@@ -385,14 +386,16 @@ object Repository {
                         it.children.toList()
                     }
                     .mapList {
-                        it.toModel<Alert> { alert, jsonObject ->
-                            val approvalStateInt = jsonObject["approval"]?.get("countryDirector")?.firstChild()?.asInt
-                            alert.state = AlertApprovalStateSerializer.jsonToEnum(approvalStateInt)
-                        }
+                        it.toModel<Alert>(alertStateHandler)
                     }
         }
                 .share()
                 .behavior()
+    }
+
+    val alertStateHandler: (Alert, JsonObject) -> Unit = { alert, jsonObject ->
+        val approvalStateInt = jsonObject["approval"]?.get("countryDirector")?.firstChild()?.asInt
+        alert.state = AlertApprovalStateSerializer.jsonToEnum(approvalStateInt)
     }
 
     fun notes(id: String): Observable<List<Note>> {
@@ -431,15 +434,26 @@ object Repository {
                 .map { it.toModel<Agency>() }
     }
 
+    fun alert(id: String): Observable<Alert> {
+        return userObservable.flatMap { user ->
+            db.child("alert")
+                    .child(user.countryId)
+                    .child(id)
+                    .asObservable()
+                    .map {
+                        it.toModel<Alert>(Repository.alertStateHandler)
+                    }
+        }
+    }
+
+
     fun searchProgrammes(searchCountry: Country, searchLevel1: Int?,
             searchLevel2: Int?): Observable<Map<Agency, List<Programme>>> {
         //Fetch root countryOfficeProfile/programme node
         return db.child("countryOfficeProfile")
                 .child("programme")
-                .printRef("Base COP")
                 .asObservable()
                 //Map to Map<CountryId, List<Programmes>>
-                .print("//Map to Map<CountryId, List<Programmes>>")
                 .map { baseSnapshot ->
                     baseSnapshot.children.map { countrySnapshot ->
                         countrySnapshot.key!! to countrySnapshot
@@ -451,7 +465,6 @@ object Repository {
                     }.toMap()
                 }
                 //Filter based on searchArea
-                .print("//Filter based on searchArea")
                 .map {
                     it.mapValues { (_, programmes) ->
                         programmes.filter { programme ->
@@ -462,11 +475,10 @@ object Repository {
                     }
                 }
                 //Fetch privacy settings for each country -> Map<CountryPrivacySetting, List<Programme>>
-                .print("//Fetch privacy settings for each country -> Map<CountryPrivacySetting, List<Programme>>")
                 .flatMap { map ->
                     map.toList()
                             .map { (countryId, programmes) ->
-                                privacySettings(countryId, Repository.PrivacySettingType.OFFICE_PROFILE)
+                                privacySettings(countryId, OFFICE_PROFILE)
                                         .map { Pair(it, programmes) }
                             }
                             .combineLatest {
@@ -474,14 +486,12 @@ object Repository {
                             }
                 }
                 //Filter based on country privacy settings
-                .print("//Filter based on country privacy settings")
                 .map {
                     it.filter { (privacySettings, _) ->
                         privacySettings.privacy == Privacy.PUBLIC && privacySettings.status
                     }
                 }
                 //Remove privacy settings, flatten list, group by agencyId
-                .print("//Remove privacy settings, flatten list, group by agencyId")
                 .map { privacySettingsToProgrammes ->
                     privacySettingsToProgrammes
                             .values
@@ -491,7 +501,6 @@ object Repository {
                             }
                 }
                 //Grab agency, map to -> Map<Agency, List<Programme>>
-                .print("//Grab agency, map to -> Map<Agency, List<Programme>>")
                 .flatMap { agencyIdsToProgrammes ->
                     val agencyProgramList = agencyIdsToProgrammes.toList()
                             .map { (agencyId, programmes) ->
@@ -504,6 +513,5 @@ object Repository {
                         agencyProgramList.combineLatest { it.toMap() }
                     }
                 }
-                .print("RESULT")
     }
 }

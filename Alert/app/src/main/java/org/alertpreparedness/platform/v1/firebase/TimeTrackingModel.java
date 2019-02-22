@@ -89,9 +89,9 @@ public class TimeTrackingModel implements Serializable {
         this.timeSpentInGrey = timeSpentInGrey;
     }
 
-    public void updateAlertTimeTracking(int oldLevel, int newLevel, boolean approval) {
-        LEVEL oldState = establishLevel(oldLevel, approval);
-        LEVEL newState = establishLevel(newLevel, approval);
+    public void updateAlertTimeTracking(int oldLevel, int newLevel) {
+        LEVEL oldState = establishLevel(oldLevel);
+        LEVEL newState = establishLevel(newLevel);
         updateTimeTracking(oldState, newState);
     }
 
@@ -180,30 +180,25 @@ public class TimeTrackingModel implements Serializable {
     }
 
     public void updateIndicatorTracking(@NotNull LEVEL level, int triggerSelected) {
-        LEVEL state = establishLevel(triggerSelected, true);
+        LEVEL state = establishLevel(triggerSelected);
         if(state != level) {
             updateTimeTracking(level, state);
         }
     }
 
     public void updateIndicatorTracking(int oldSelection, int triggerSelected) {
-        LEVEL state = establishLevel(triggerSelected, true);
-        LEVEL oldState = establishLevel(oldSelection, true);
+        LEVEL state = establishLevel(triggerSelected);
+        LEVEL oldState = establishLevel(oldSelection);
         if(state != oldState) {
             updateTimeTracking(oldState, state);
         }
     }
 
     @Exclude
-    private LEVEL establishLevel(int level, boolean approval) {
+    private LEVEL establishLevel(int level) {
         switch (level) {//old level
             case Constants.TRIGGER_RED:
-                if(approval) {//red
-                    return LEVEL.RED;
-                }
-                else {//grey
-                    return LEVEL.GREY;
-                }
+                return LEVEL.RED;
             case Constants.TRIGGER_AMBER:
                 return LEVEL.AMBER;
             case Constants.TRIGGER_GREEN:

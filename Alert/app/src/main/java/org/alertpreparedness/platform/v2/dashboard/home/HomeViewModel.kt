@@ -16,7 +16,6 @@ import org.alertpreparedness.platform.v2.models.ResponsePlan
 import org.alertpreparedness.platform.v2.models.Task
 import org.alertpreparedness.platform.v2.models.UserType.COUNTRY_DIRECTOR
 import org.alertpreparedness.platform.v2.models.enums.AlertApprovalState.APPROVED
-import org.alertpreparedness.platform.v2.models.enums.AlertApprovalState.REJECTED
 import org.alertpreparedness.platform.v2.models.enums.AlertApprovalState.WAITING_RESPONSE
 import org.alertpreparedness.platform.v2.models.enums.AlertLevel
 import org.alertpreparedness.platform.v2.models.enums.AlertLevel.AMBER
@@ -67,12 +66,12 @@ class HomeViewModel : BaseViewModel(), IHomeViewModel.Inputs, IHomeViewModel.Out
     override fun alerts(): Observable<List<Pair<AlertActionType, Alert>>> {
         return alertsObservable
                 .filterList {
-                    (it.level == RED || it.level == AMBER) && it.state != REJECTED
+                    (it.level == RED || it.level == AMBER)
                 }
                 .combineWithPair(userObservable)
                 .map { (alerts, user) ->
                     alerts.map { alert ->
-                        if (alert.level == RED && (alert.state == WAITING_RESPONSE || !alert.redAlertApproved)) {
+                        if (alert.level == RED && alert.state == WAITING_RESPONSE) {
                             if (user.userType == COUNTRY_DIRECTOR) {
                                 RED_ALERT_REQUIRES_ACTION
                             } else {
@@ -81,7 +80,6 @@ class HomeViewModel : BaseViewModel(), IHomeViewModel.Inputs, IHomeViewModel.Out
                         } else {
                             NORMAL
                         } to alert
-
                     }
                 }
     }

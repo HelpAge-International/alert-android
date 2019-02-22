@@ -3,20 +3,21 @@ package org.alertpreparedness.platform.v2.models
 import org.alertpreparedness.platform.v2.models.enums.Title
 
 class User(
-        val addressLine1: String,
-        val addressLine2: String,
-        val addressLine3: String,
-        val city: String,
-        val country: Int,
-        val email: String,
-        val firstName: String,
-        val lastName: String,
-        val latestCoCAgreed: Boolean,
-        val latestToCAgreed: Boolean,
-        val phone: String,
-        val postCode: String,
-        val title: Title
-) : BaseModel() {
+        addressLine1: String,
+        addressLine2: String,
+        addressLine3: String,
+        city: String,
+        country: Int,
+        email: String,
+        firstName: String,
+        lastName: String,
+        latestCoCAgreed: Boolean,
+        latestToCAgreed: Boolean,
+        phone: String,
+        postCode: String,
+        title: Title
+) : UserPublic(addressLine1, addressLine2, addressLine3, city, country, email, firstName, lastName, latestCoCAgreed,
+        latestToCAgreed, phone, postCode, title) {
 
     lateinit var countryId: String
     @Transient

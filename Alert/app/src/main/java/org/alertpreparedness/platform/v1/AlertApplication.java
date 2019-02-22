@@ -1,9 +1,8 @@
 package org.alertpreparedness.platform.v1;
 
 import android.os.StrictMode;
-import androidx.multidex.MultiDexApplication;
 import androidx.appcompat.app.AppCompatDelegate;
-
+import androidx.multidex.MultiDexApplication;
 import com.crashlytics.android.Crashlytics;
 import com.evernote.android.job.JobManager;
 import com.google.firebase.FirebaseApp;
@@ -14,9 +13,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
-
+import io.fabric.sdk.android.Fabric;
+import io.realm.Realm;
 import net.danlew.android.joda.JodaTimeAndroid;
-
 import org.acra.annotation.AcraMailSender;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.PermissionRef;
@@ -31,9 +30,7 @@ import org.alertpreparedness.platform.v1.offline.OfflineSyncJobCreator;
 import org.alertpreparedness.platform.v1.utils.Constants;
 import org.alertpreparedness.platform.v1.utils.PreferHelper;
 import org.alertpreparedness.platform.v1.utils.SettingsFactory;
-
-import io.fabric.sdk.android.Fabric;
-import io.realm.Realm;
+import org.alertpreparedness.platform.v2.utils.AreaJsonManager;
 import shortbread.Shortbread;
 import timber.log.Timber;
 
@@ -60,6 +57,11 @@ public class AlertApplication extends MultiDexApplication implements ValueEventL
     @Override
     public void onCreate() {
         super.onCreate();
+
+        //Precache Area JSON
+        long start = System.currentTimeMillis();
+        AreaJsonManager.INSTANCE.preCache(this);
+        System.out.println("TIME: " + (System.currentTimeMillis() - start));
 
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         DependencyInjector.initialize(this);

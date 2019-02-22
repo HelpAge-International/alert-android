@@ -87,8 +87,10 @@ class HomeAlertsAdapter(val context: Context) :
             ivHazardIcon.imageResource = alert.hazardScenario.icon
             tvHazardName.setText(alert.hazardScenario.text)
 
+            val affectedAreas = alert.affectedAreas.size
+
             tvNumOfPeople.text = context.resources.getQuantityString(R.plurals.alert_population,
-                    alert.affectedAreas.size, alert.estimatedPopulation, alert.affectedAreas.size)
+                    affectedAreas, alert.estimatedPopulation, affectedAreas)
 
             when (alertActionType) {
                 NORMAL -> {

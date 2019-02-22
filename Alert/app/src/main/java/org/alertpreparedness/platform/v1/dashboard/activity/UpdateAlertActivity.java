@@ -1,15 +1,19 @@
 package org.alertpreparedness.platform.v1.dashboard.activity;
 
+import static org.alertpreparedness.platform.v1.dashboard.activity.AlertDetailActivity.EXTRA_ALERT;
+
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Window;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.R;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.AlertRef;
@@ -22,14 +26,6 @@ import org.alertpreparedness.platform.v1.risk_monitoring.view.SelectAreaActivity
 import org.alertpreparedness.platform.v1.utils.Constants;
 import org.alertpreparedness.platform.v1.utils.DBListener;
 import org.alertpreparedness.platform.v1.utils.SnackbarHelper;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import static org.alertpreparedness.platform.v1.dashboard.activity.AlertDetailActivity.EXTRA_ALERT;
 
 public class UpdateAlertActivity extends CreateAlertActivity  {
 
@@ -143,7 +139,7 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
             }
         }
 
-        int alertLevel = levelNew == -1 ? (int) alert.getAlertLevel() : levelNew;
+        int alertLevel = levelNew == -1 ? alert.getAlertLevel() : levelNew;
 
         if (alertLevel == 1) {
             mFieldsAdapter.setTextFieldValue(1, R.drawable.amber_dot_26dp, "Amber Alert");
@@ -250,7 +246,7 @@ public class UpdateAlertActivity extends CreateAlertActivity  {
         alert.setInfoNotes(info);
         alert.setEstimatedPopulation(population);
         //TODO: get timeTracking null
-        alert.getTimeTracking().updateAlertTimeTracking(mOrigionalLevel, alertLevel, alert.getRedAlertApproved());
+        alert.getTimeTracking().updateAlertTimeTracking(mOrigionalLevel, alertLevel);
         alert.setAlertLevel(alertLevel);
         alertRef.setValue(alert);
         finishAffinity();
