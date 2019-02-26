@@ -1,20 +1,31 @@
 package org.alertpreparedness.platform.v1.risk_monitoring.view
 
 import android.app.Activity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import es.dmoral.toasty.Toasty
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.activity_select_area.*
-import kotlinx.android.synthetic.main.content_select_area.*
+import kotlinx.android.synthetic.main.activity_select_area.pbSelectAreaLoading
+import kotlinx.android.synthetic.main.activity_select_area.toolbar
+import kotlinx.android.synthetic.main.content_select_area.llAreaCountry
+import kotlinx.android.synthetic.main.content_select_area.llAreaLevel1
+import kotlinx.android.synthetic.main.content_select_area.llAreaLevel2
+import kotlinx.android.synthetic.main.content_select_area.tvSelectCountry
+import kotlinx.android.synthetic.main.content_select_area.tvSelectLevel1
+import kotlinx.android.synthetic.main.content_select_area.tvSelectLevel2
 import org.alertpreparedness.platform.v1.BaseActivity
 import org.alertpreparedness.platform.v1.R
-import org.alertpreparedness.platform.v1.risk_monitoring.dialog.*
+import org.alertpreparedness.platform.v1.risk_monitoring.dialog.OnCountrySelectedListener
+import org.alertpreparedness.platform.v1.risk_monitoring.dialog.OnLevel1SelectedListener
+import org.alertpreparedness.platform.v1.risk_monitoring.dialog.OnLevel2SelectedListener
+import org.alertpreparedness.platform.v1.risk_monitoring.dialog.SelectCountryDialog
+import org.alertpreparedness.platform.v1.risk_monitoring.dialog.SelectLevel1Dialog
+import org.alertpreparedness.platform.v1.risk_monitoring.dialog.SelectLevel2Dialog
 import org.alertpreparedness.platform.v1.risk_monitoring.model.CountryJsonData
 import org.alertpreparedness.platform.v1.risk_monitoring.model.LevelOneValuesItem
 import org.alertpreparedness.platform.v1.risk_monitoring.model.LevelTwoValuesItem
@@ -23,6 +34,7 @@ import org.alertpreparedness.platform.v1.risk_monitoring.view_model.SelectAreaVi
 import org.alertpreparedness.platform.v1.utils.Constants
 import timber.log.Timber
 
+@Deprecated("Needs rewriting for V2")
 class SelectAreaActivity : BaseActivity() {
 
     private val mDisposables = CompositeDisposable()
@@ -33,7 +45,6 @@ class SelectAreaActivity : BaseActivity() {
         val SELECT_LEVEL2_DIALOG_ARGS = "select_level2_args"
         val SELECTED_AREA = "selected_area"
         val SELECTED_AREA_TEXT: String = "selected_area_text"
-
     }
 
     private lateinit var mCountryDataList: ArrayList<CountryJsonData>
@@ -58,7 +69,6 @@ class SelectAreaActivity : BaseActivity() {
         super.onDestroy()
         mDisposables.clear()
     }
-
 
     private fun initData() {
         mViewModel = ViewModelProviders.of(this).get(SelectAreaViewModel::class.java)
@@ -136,7 +146,6 @@ class SelectAreaActivity : BaseActivity() {
                 mLevel1Selected = level1Value?.id
                 tvSelectLevel1.text = level1Value?.value
             }
-
         })
 
         llAreaLevel2.setOnClickListener {
@@ -162,14 +171,12 @@ class SelectAreaActivity : BaseActivity() {
                 tvSelectLevel2.text = level2Value?.value
             }
         })
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.add_indicator_menu, menu)
         return super.onCreateOptionsMenu(menu)
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {

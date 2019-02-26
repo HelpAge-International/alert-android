@@ -3,19 +3,19 @@ package org.alertpreparedness.platform.v1.dashboard.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import org.alertpreparedness.platform.v1.R;
 import org.alertpreparedness.platform.v1.dashboard.adapter.HazardAdapter;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
+@Deprecated
 public class HazardSelectionActivity extends AppCompatActivity implements HazardAdapter.HazardSelectionListner {
 
     public static final String HAZARD_TYPE = "hazard_type";
+
     public static final String HAZARD_TITLE = "hazard_title";
 
     @BindView(R.id.toolbar)

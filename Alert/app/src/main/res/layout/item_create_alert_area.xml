@@ -19,12 +19,14 @@
         app:layout_constraintEnd_toStartOf="@+id/btnRemove"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@android:color/black"
         tools:text="United Kingdom" />
 
     <TextView
         android:id="@+id/btnRemove"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:padding="4dp"
         android:background="?attr/selectableItemBackground"
         android:gravity="center_vertical"
         android:text="@string/remove"
@@ -32,7 +34,6 @@
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Remove" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

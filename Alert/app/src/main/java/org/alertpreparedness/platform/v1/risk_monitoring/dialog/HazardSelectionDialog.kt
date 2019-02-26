@@ -8,7 +8,8 @@ import timber.log.Timber
 /**
  * Created by fei on 08/11/2017.
  */
-class HazardSelectionDialog() : DialogFragment() {
+@Deprecated("Needs Rewriting with V2 Models")
+class HazardSelectionDialog : DialogFragment() {
 
     private val selection:Array<String> = arrayOf("test1","test2","test3")
     private var listener: HazardSelectionListener? = null

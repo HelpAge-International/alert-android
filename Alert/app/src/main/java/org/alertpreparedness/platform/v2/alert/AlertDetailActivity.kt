@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.v2.alert
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.core.content.ContextCompat
@@ -9,8 +10,10 @@ import kotlinx.android.synthetic.main.activity_alert_detail.btnReject
 import kotlinx.android.synthetic.main.activity_alert_detail.grpApproveReject
 import kotlinx.android.synthetic.main.activity_alert_detail.rvAlertDetails
 import kotlinx.android.synthetic.main.activity_alert_detail.tvBanner
+import kotlinx.android.synthetic.main.activity_alert_detail.tvLastUpdated
 import org.alertpreparedness.platform.v1.R
 import org.alertpreparedness.platform.v2.base.BaseActivity
+import org.alertpreparedness.platform.v2.utils.extensions.bind
 import org.alertpreparedness.platform.v2.utils.extensions.isRedAlertRequested
 import org.alertpreparedness.platform.v2.utils.extensions.show
 
@@ -83,8 +86,13 @@ class AlertDetailActivity : BaseActivity<AlertDetailViewModel>() {
 
         disposables += viewModel.editAlert()
                 .subscribe {
-                    //TODO: Start edit activity
+                    val intent = Intent(this, CreateAlertActivity::class.java)
+                    intent.putExtra(CreateAlertActivity.ALERT_ID_KEY, it.id)
+                    startActivity(intent)
                 }
+
+        disposables += tvLastUpdated.bind(
+                viewModel.lastUpdated().map { getString(R.string.last_updated_date, it.toDate()) })
     }
 
     override fun arguments(bundle: Bundle) {

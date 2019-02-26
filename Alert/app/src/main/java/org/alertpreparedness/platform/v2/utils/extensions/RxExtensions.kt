@@ -8,6 +8,7 @@ import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Function3
+import org.jetbrains.anko.imageResource
 
 /**
  * Calls Observable.combineLatest() on [this] and [other] creating an [Observable] of Pairs of both
@@ -217,11 +218,17 @@ fun TextView.bindStringResource(observable: Observable<Int>): Disposable {
     }
 }
 
-fun ImageView.bind(urlObservable: Observable<String>): Disposable {
+fun ImageView.bindUrl(urlObservable: Observable<String>): Disposable {
     return urlObservable.subscribeNoError {
         Glide.with(this)
                 .load(it)
                 .into(this)
+    }
+}
+
+fun ImageView.bindRes(resourceObservable: Observable<Int>): Disposable {
+    return resourceObservable.subscribeNoError {
+        imageResource = it
     }
 }
 //endregion
@@ -252,7 +259,7 @@ fun <T, R> Observable<List<T>>.mapList(map: (T) -> R): Observable<List<R>> {
 
 fun <T> Observable<T>.behavior(): Observable<T> {
     return replay(1)
-            .refCount()
+            .autoConnect()
 }
 
 data class MergeCombineWrapper<T>(val value: T? = null)
@@ -283,4 +290,32 @@ fun <T : Any> mergeCombine(vararg items: Observable<T>): Observable<List<T>> {
 
 fun <T1, T2> Observable<Pair<T1, T2>>.swap(): Observable<Pair<T2, T1>> {
     return map { Pair(it.second, it.first) }
+}
+
+fun <T> Observable<Set<T>>.accumulateWith(add: Observable<T>, remove: Observable<T>): Observable<Set<T>> {
+    return Observable.create { emitter ->
+
+        var list = mutableSetOf<T>()
+        val disposables = mutableListOf<Disposable>()
+        var locked = false
+
+        disposables += this.subscribe {
+            if (!locked) {
+                list = it.toMutableSet()
+                emitter.onNext(list)
+            }
+        }
+
+        disposables += add.subscribe {
+            locked = true
+            list.add(it)
+            emitter.onNext(list)
+        }
+
+        disposables += remove.subscribe {
+            locked = true
+            list.remove(it)
+            emitter.onNext(list)
+        }
+    }
 }

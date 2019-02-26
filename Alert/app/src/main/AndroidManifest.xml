@@ -19,7 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
-        <activity android:name="org.alertpreparedness.platform.v2.alert.CreateAlertActivity"></activity>
+        <activity
+            android:name="org.alertpreparedness.platform.v2.alert.CreateAlertActivity"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name="org.alertpreparedness.platform.v2.alert.AlertDetailActivity" />
         <activity android:name="org.alertpreparedness.platform.v2.mycountry.ProgrammeResultsActivity" />
 

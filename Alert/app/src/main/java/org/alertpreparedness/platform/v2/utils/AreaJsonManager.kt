@@ -95,8 +95,8 @@ object AreaJsonManager {
 
     data class AreaData(
             val country: Country,
-            val level1Name: Level1Area?,
-            val level2Name: Level2Area?
+            val level1Data: Level1Area?,
+            val level2Data: Level2Area?
     )
 
     fun getAreaData(context: Context, area: Area): AreaData {
@@ -125,8 +125,8 @@ fun Area.getText(context: Context): String {
 
     return listOfNotNull(
             context.getString(areaData.country.string),
-            areaData.level1Name,
-            areaData.level2Name
+            areaData.level1Data?.name,
+            areaData.level2Data?.name
     )
             .joinToString(", ")
 }

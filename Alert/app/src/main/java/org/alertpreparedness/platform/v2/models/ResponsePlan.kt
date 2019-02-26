@@ -31,7 +31,8 @@ object ResponsePlanApprovalSerializer: JsonDeserializer<ResponsePlanApproval> {
         val countryState = countryDirector?.get(countryId)?.asInt
 
         return ResponsePlanApproval(
-                if(countryId != null) ResponsePlanApprovalState(countryId, ResponsePlanStateSerializer.jsonToEnum(countryState!!) ?: NOT_APPROVED) else null
+                if (countryId != null) ResponsePlanApprovalState(countryId,
+                        ResponsePlanStateSerializer.deserialize(countryState!!) ?: NOT_APPROVED) else null
         )
     }
 }

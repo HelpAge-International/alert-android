@@ -5,6 +5,8 @@ import android.os.Parcelable
 import com.google.firebase.database.Exclude
 import org.alertpreparedness.platform.v1.HAZARD_NOT_EMPTY
 import org.alertpreparedness.platform.v1.firebase.TimeTrackingModel
+import org.alertpreparedness.platform.v2.models.Area
+import org.alertpreparedness.platform.v2.models.enums.CountrySerializer
 
 data class ModelIndicator(val id: String?,
                           var hazardScenario: ModelHazard,
@@ -51,8 +53,7 @@ data class ModelIndicator(val id: String?,
             parcel.readInt(),
             parcel.readString(),
             parcel.readInt(),
-            parcel.readSerializable() as TimeTrackingModel) {
-    }
+            parcel.readSerializable() as TimeTrackingModel)
 
     constructor(modelType: Int) : this(null, ModelHazard(), 0, "", null, -1, 0, 0, listOf(), listOf(), null, null, null, null, null, modelType, timeTracking = TimeTrackingModel())
 
@@ -149,8 +150,7 @@ data class ModelTrigger(val durationType: String, val frequencyValue: String, va
     constructor(parcel: Parcel) : this(
             parcel.readString(),
             parcel.readString(),
-            parcel.readString()) {
-    }
+            parcel.readString())
 
     constructor() : this("", "", "")
 
@@ -192,8 +192,7 @@ data class ModelSource(val name: String, val link: String?) : Parcelable {
 
     constructor(parcel: Parcel) : this(
             parcel.readString(),
-            parcel.readString()) {
-    }
+            parcel.readString())
 
     constructor() : this("", null)
 
@@ -233,8 +232,7 @@ data class ModelIndicatorLocation(val country: Int = -1, var level1: Int? = null
     constructor(parcel: Parcel) : this(
             parcel.readInt(),
             parcel.readValue(Int::class.java.classLoader) as? Int,
-            parcel.readValue(Int::class.java.classLoader) as? Int) {
-    }
+            parcel.readValue(Int::class.java.classLoader) as? Int)
 
     fun validate(): String = when {
         country == -1 -> {
@@ -253,6 +251,16 @@ data class ModelIndicatorLocation(val country: Int = -1, var level1: Int? = null
 
     override fun describeContents(): Int {
         return 0
+    }
+
+    @Deprecated(
+            "This is a binding method for v2, at some point this whole class needs to be replaced with the v2 version")
+    fun toV2(): Area {
+        return Area(
+                CountrySerializer.deserialize(country)!!,
+                if (level1 == -1) null else level1,
+                if (level2 == -1) null else level2
+        )
     }
 
     companion object CREATOR : Parcelable.Creator<ModelIndicatorLocation> {
@@ -275,8 +283,7 @@ data class ModelGps(val city: String? = null, val country: String? = null, var a
             parcel.readString(),
             parcel.readString(),
             parcel.readString(),
-            parcel.readString()) {
-    }
+            parcel.readString())
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(city)

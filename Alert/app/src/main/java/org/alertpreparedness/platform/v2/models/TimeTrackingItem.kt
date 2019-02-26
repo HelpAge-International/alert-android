@@ -4,11 +4,12 @@ import org.joda.time.DateTime
 
 class TimeTrackingItem(
         var start: DateTime,
-        var finish: DateTime
+        var finish: DateTime,
+        var value: Int?
 ) {
 
     fun copy(): TimeTrackingItem {
-        return TimeTrackingItem(start, finish)
+        return TimeTrackingItem(start, finish, value)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -17,6 +18,7 @@ class TimeTrackingItem(
 
         if (start != other.start) return false
         if (finish != other.finish) return false
+        if (value != other.value) return false
 
         return true
     }
@@ -24,6 +26,7 @@ class TimeTrackingItem(
     override fun hashCode(): Int {
         var result = start.hashCode()
         result = 31 * result + finish.hashCode()
+        result = 31 * result + (value ?: 0)
         return result
     }
 }

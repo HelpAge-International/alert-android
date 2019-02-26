@@ -17,6 +17,7 @@ import org.alertpreparedness.platform.v2.models.enums.AlertLevel
 import org.alertpreparedness.platform.v2.models.enums.AlertLevel.AMBER
 import org.alertpreparedness.platform.v2.models.enums.AlertLevel.GREEN
 import org.alertpreparedness.platform.v2.models.enums.AlertLevel.RED
+import org.alertpreparedness.platform.v2.models.enums.TimeTrackingLevel
 import org.alertpreparedness.platform.v2.repository.Repository
 import org.alertpreparedness.platform.v2.repository.Repository.userObservable
 import org.alertpreparedness.platform.v2.repository.Repository.userPublic
@@ -26,6 +27,7 @@ import org.alertpreparedness.platform.v2.utils.extensions.behavior
 import org.alertpreparedness.platform.v2.utils.extensions.combineWithPair
 import org.alertpreparedness.platform.v2.utils.extensions.isRedAlertRequested
 import org.alertpreparedness.platform.v2.utils.extensions.takeWhen
+import org.alertpreparedness.platform.v2.utils.extensions.updateTimeTrackingMap
 import org.joda.time.DateTime
 import java.util.Date
 
@@ -68,7 +70,6 @@ class AlertDetailViewModel : BaseViewModel(), Inputs, Outputs {
             Repository.alert(id)
         }
                 .behavior()
-                .share()
 
         isRedRequested = alert
                 .combineWithPair(userObservable)
@@ -98,7 +99,9 @@ class AlertDetailViewModel : BaseViewModel(), Inputs, Outputs {
                                                     ),
                                                     "timeUpdated" to Date().time,
                                                     "redAlertApproved" to true,
-                                                    "reasonForRedAlert" to null
+                                                    "reasonForRedAlert" to null,
+                                                    "timeTracking" to alert.timeTracking.updateTimeTrackingMap(
+                                                            TimeTrackingLevel.RED, true)
                                             )
                                     )
                         }

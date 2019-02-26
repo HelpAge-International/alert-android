@@ -194,13 +194,13 @@ object Repository {
 
                         model.mPreparednessClockSetting = ClockSetting(
                                 COUNTRY,
-                                DurationTypeSerializer.jsonToEnum(preparednessClockSettings["durationType"].asInt)
+                                DurationTypeSerializer.deserialize(preparednessClockSettings["durationType"].asInt)
                                         ?: WEEK,
                                 preparednessClockSettings["value"].asInt
                         )
                         model.mResponsePlanClockSetting = ClockSetting(
                                 COUNTRY,
-                                DurationTypeSerializer.jsonToEnum(responsePlanClockSettings["durationType"].asInt)
+                                DurationTypeSerializer.deserialize(responsePlanClockSettings["durationType"].asInt)
                                         ?: WEEK,
                                 responsePlanClockSettings["value"].asInt
                         )
@@ -347,7 +347,7 @@ object Repository {
         if (json.has("frequencyValue") && json.has("frequencyBase")) {
             action.mClockSetting = ClockSetting(
                     ACTION,
-                    DurationTypeSerializer.jsonToEnum(json["frequencyBase"].asInt) ?: WEEK,
+                    DurationTypeSerializer.deserialize(json["frequencyBase"].asInt) ?: WEEK,
                     json["frequencyValue"].asInt
             )
         } else {
@@ -395,7 +395,7 @@ object Repository {
 
     val alertStateHandler: (Alert, JsonObject) -> Unit = { alert, jsonObject ->
         val approvalStateInt = jsonObject["approval"]?.get("countryDirector")?.firstChild()?.asInt
-        alert.state = AlertApprovalStateSerializer.jsonToEnum(approvalStateInt)
+        alert.state = AlertApprovalStateSerializer.deserialize(approvalStateInt)
     }
 
     fun notes(id: String): Observable<List<Note>> {

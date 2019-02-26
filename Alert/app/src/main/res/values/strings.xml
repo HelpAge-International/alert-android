@@ -574,6 +574,7 @@
     <string name="sector_other">Other</string>
     <string name="programme_to">To: %s</string>
     <string name="programme_from">From: %1$td/%1$tm/%1$ty - %2$td/%2$tm/%2$ty</string>
+    <string name="last_updated_date">Last Updated: %1$td/%1$tm/%1$ty</string>
     <string name="programme_in">In: %s</string>
     <string name="programme_results">Programme Results</string>
     <string name="hazard_other">Other</string>
@@ -589,6 +590,14 @@
     <string name="information_sources_and_notes_hint">Information sources and notes</string>
     <string name="remove">Remove</string>
     <string name="add_area">Add affected area</string>
+    <string name="title_activity_edit_alert">Edit Alert</string>
+    <string name="confirm_red_alert_level">Confirm Red Alert Level</string>
+    <string name="error_missing_hazard">Please enter a hazard scenario</string>
+    <string name="error_missing_alert_level">Please enter an alert level</string>
+    <string name="error_missing_red_alert_reason">Please specity a reason for this red alert</string>
+    <string name="error_missing_population">Please enter an estimate of the affected population</string>
+    <string name="error_missing_affected_areas">Please enter at least one affected area</string>
+    <string name="error_missing_information">Please add information sources and notes to this alert</string>
 
     <plurals name="alert_population">
         <item quantity="one">%,d people affected in %d area</item>

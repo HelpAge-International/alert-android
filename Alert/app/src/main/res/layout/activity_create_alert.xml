@@ -14,19 +14,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:paddingTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/btnApprove"
+        app:layout_constraintBottom_toTopOf="@+id/btnSave"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
+            android:background="?attr/selectableItemBackground"
             android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -46,9 +46,12 @@
 
                 <TextView
                     android:id="@+id/tvHazard"
+                    style="@style/Widget.AppCompat.EditText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
+                    android:background="@android:color/transparent"
+                    android:clickable="false"
                     android:gravity="center_vertical"
                     android:hint="@string/select_hazard"
                     android:minHeight="24dp"
@@ -65,25 +68,32 @@
                 android:id="@+id/btnAlertLevel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp">
+                android:background="?attr/selectableItemBackground"
+                android:paddingEnd="16dp"
+                android:paddingStart="16dp">
 
                 <ImageView
                     android:id="@+id/ivAlertLevel"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:layout_marginTop="16dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_goneMarginTop="16dp"
                     app:srcCompat="@drawable/alert_blue_icon" />
 
                 <TextView
                     android:id="@+id/tvAlertLevel"
+                    style="@style/Widget.AppCompat.EditText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
+                    android:background="@android:color/transparent"
+                    android:clickable="false"
                     android:gravity="center_vertical"
                     android:hint="@string/alert_level"
                     android:minHeight="24dp"
+                    android:paddingBottom="16dp"
+                    android:paddingTop="16dp"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/ivAlertLevel"
@@ -93,17 +103,19 @@
             <include layout="@layout/horizontal_divider" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/clRedReason"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp">
+                android:paddingEnd="16dp"
+                android:paddingStart="16dp">
 
                 <ImageView
                     android:id="@+id/ivRedAlertReason"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:layout_marginTop="16dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_goneMarginTop="16dp"
                     app:srcCompat="@drawable/alert_red_reason" />
 
                 <EditText
@@ -115,26 +127,32 @@
                     android:gravity="center_vertical"
                     android:hint="@string/reason_for_red_alert"
                     android:minHeight="24dp"
+                    android:paddingBottom="16dp"
+                    android:paddingTop="16dp"
                     android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/ivRedAlertReason"
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <include layout="@layout/horizontal_divider" />
+            <include
+                android:id="@+id/dividerRedReason"
+                layout="@layout/horizontal_divider" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp">
+                android:paddingEnd="16dp"
+                android:paddingStart="16dp">
 
                 <ImageView
                     android:id="@+id/ivPopulation"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:layout_marginTop="16dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_goneMarginTop="16dp"
                     app:srcCompat="@drawable/alert_population" />
 
                 <EditText
@@ -145,7 +163,10 @@
                     android:background="@android:color/transparent"
                     android:gravity="center_vertical"
                     android:hint="@string/estimated_peeps"
+                    android:inputType="number"
                     android:minHeight="24dp"
+                    android:paddingBottom="16dp"
+                    android:paddingTop="16dp"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/ivPopulation"
@@ -169,13 +190,14 @@
                     app:srcCompat="@drawable/alert_areas" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/etAreas"
+                    android:id="@+id/rvAreas"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:background="@android:color/transparent"
                     android:minHeight="24dp"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toEndOf="@+id/ivAreas"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:itemCount="3"
@@ -187,15 +209,16 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp">
+                android:paddingEnd="16dp"
+                android:paddingStart="16dp">
 
                 <ImageView
                     android:id="@+id/ivInformation"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:layout_marginTop="16dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_goneMarginTop="16dp"
                     app:srcCompat="@drawable/alert_information" />
 
                 <EditText
@@ -207,6 +230,8 @@
                     android:gravity="center_vertical"
                     android:hint="@string/information_sources_and_notes_hint"
                     android:minHeight="24dp"
+                    android:paddingBottom="16dp"
+                    android:paddingTop="16dp"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/ivInformation"
@@ -219,11 +244,11 @@
     </ScrollView>
 
     <Button
-        android:id="@+id/btnApprove"
+        android:id="@+id/btnSave"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/btnColor"
-        android:text="@string/txt_approve"
+        android:text="@string/save_changes"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

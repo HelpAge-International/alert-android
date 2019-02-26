@@ -11,11 +11,11 @@ import kotlinx.android.synthetic.main.item_alert_detail.view.ivIcon
 import kotlinx.android.synthetic.main.item_alert_detail.view.tvTitle
 import org.alertpreparedness.platform.v1.R
 import org.alertpreparedness.platform.v2.models.Alert
-import org.alertpreparedness.platform.v2.utils.AreaJsonManager
 import org.alertpreparedness.platform.v2.utils.DiffComparator
 import org.alertpreparedness.platform.v2.utils.DiffListAdapter
 import org.alertpreparedness.platform.v2.utils.ViewHolder
 import org.alertpreparedness.platform.v2.utils.extensions.isRedAlertRequested
+import org.alertpreparedness.platform.v2.utils.getText
 
 data class ItemAlertDetail(
         val id: String,
@@ -67,18 +67,9 @@ class AlertDetailsAdapter(val context: Context) :
                 "affectedAreas",
                 R.drawable.alert_areas,
                 R.string.alert_details_areas,
-                alert.affectedAreas
-                        .map { area ->
-                            AreaJsonManager.getAreaData(context, area)
-                        }
-                        .joinToString("\n") {
-                            listOfNotNull(
-                                    context.getString(it.country.string),
-                                    it.level1Name?.name,
-                                    it.level2Name?.name
-                            )
-                                    .joinToString(", ")
-                        }
+                alert.affectedAreas.joinToString("\n") { area ->
+                    area.getText(context)
+                }
         )
 
         items += ItemAlertDetail(

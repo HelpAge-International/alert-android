@@ -1,9 +1,14 @@
 package org.alertpreparedness.platform.v2.alert
 
 import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function7
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
+import org.alertpreparedness.platform.v2.alert.ButtonState.CONFIRM_LEVEL
+import org.alertpreparedness.platform.v2.alert.ButtonState.CONFIRM_RED_LEVEL
+import org.alertpreparedness.platform.v2.alert.ButtonState.REQUEST_RED_LEVEL
+import org.alertpreparedness.platform.v2.alert.ButtonState.SAVE_CHANGES
 import org.alertpreparedness.platform.v2.alert.ICreateAlertViewModel.Inputs
 import org.alertpreparedness.platform.v2.alert.ICreateAlertViewModel.Outputs
 import org.alertpreparedness.platform.v2.alert.SaveState.MISSING_AREAS
@@ -21,20 +26,26 @@ import org.alertpreparedness.platform.v2.models.UserType.COUNTRY_DIRECTOR
 import org.alertpreparedness.platform.v2.models.enums.AlertApprovalState.APPROVED
 import org.alertpreparedness.platform.v2.models.enums.AlertApprovalState.WAITING_RESPONSE
 import org.alertpreparedness.platform.v2.models.enums.AlertLevel
+import org.alertpreparedness.platform.v2.models.enums.AlertLevel.AMBER
 import org.alertpreparedness.platform.v2.models.enums.AlertLevel.RED
 import org.alertpreparedness.platform.v2.models.enums.HazardScenario
+import org.alertpreparedness.platform.v2.models.enums.TimeTrackingLevel
 import org.alertpreparedness.platform.v2.repository.Repository.alert
 import org.alertpreparedness.platform.v2.repository.Repository.userObservable
 import org.alertpreparedness.platform.v2.setValueRx
 import org.alertpreparedness.platform.v2.updateChildrenRx
-import org.alertpreparedness.platform.v2.utils.Add
 import org.alertpreparedness.platform.v2.utils.Nullable
-import org.alertpreparedness.platform.v2.utils.Remove
 import org.alertpreparedness.platform.v2.utils.extensions.behavior
 import org.alertpreparedness.platform.v2.utils.extensions.combineWithPair
+import org.alertpreparedness.platform.v2.utils.extensions.combineWithTriple
+import org.alertpreparedness.platform.v2.utils.extensions.isRedAlertApproved
 import org.alertpreparedness.platform.v2.utils.extensions.isRedAlertRequested
+import org.alertpreparedness.platform.v2.utils.extensions.newTimeTrackingMap
 import org.alertpreparedness.platform.v2.utils.extensions.takeWhen
+import org.alertpreparedness.platform.v2.utils.extensions.toTimeTrackingLevel
+import org.alertpreparedness.platform.v2.utils.extensions.updateTimeTrackingMap
 import org.alertpreparedness.platform.v2.utils.filterNull
+import org.joda.time.DateTime
 import java.util.Date
 
 interface ICreateAlertViewModel {
@@ -49,6 +60,8 @@ interface ICreateAlertViewModel {
         fun onInformationSourcesUpdate(information: String)
         fun onSaveClicked()
         fun onAddAreaClicked()
+        fun onHazardScenarioClicked()
+        fun onAlertLevelClicked()
     }
 
     interface Outputs {
@@ -61,7 +74,18 @@ interface ICreateAlertViewModel {
         fun showRedAlertReason(): Observable<Boolean>
         fun saveState(): Observable<SaveState>
         fun addArea(): Observable<Unit>
+        fun selectAlertLevel(): Observable<Unit>
+        fun selectHazardScenario(): Observable<Unit>
+        fun buttonState(): Observable<ButtonState>
+        fun baseAlert(): Observable<Nullable<Alert>>
     }
+}
+
+enum class ButtonState {
+    CONFIRM_LEVEL,
+    CONFIRM_RED_LEVEL,
+    SAVE_CHANGES,
+    REQUEST_RED_LEVEL
 }
 
 enum class SaveState {
@@ -74,21 +98,24 @@ enum class SaveState {
     MISSING_INFORMATION,
 }
 
-abstract class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
+class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
+
 
     private val baseAlertId = BehaviorSubject.create<Nullable<String>>()
     private val inputHazardScenario = BehaviorSubject.createDefault(Nullable<HazardScenario>())
     private val inputAlertLevel = BehaviorSubject.createDefault(Nullable<AlertLevel>())
     private val inputRedAlertReason = BehaviorSubject.createDefault(Nullable<String>())
     private val inputPopulationAffected = BehaviorSubject.createDefault(Nullable<Long>())
-    private val affectedAreaAdded = PublishSubject.create<Area>()
-    private val affectedAreaRemoved = PublishSubject.create<Area>()
+    private val affectedAreaAdded = BehaviorSubject.create<Area>()
+    private val inputAffectedAreas: Observable<Nullable<Set<Area>>>
+    private val affectedAreaRemoved = BehaviorSubject.create<Area>()
     private val inputInformationSources = BehaviorSubject.createDefault(Nullable<String>())
     private val onSaveClicked = PublishSubject.create<Unit>()
     private val onAddAreaClicked = PublishSubject.create<Unit>()
+    private val onHazardScenarioClicked = PublishSubject.create<Unit>()
+    private val onAlertLevelClicked = PublishSubject.create<Unit>()
 
     private val baseAlert: Observable<Nullable<Alert>>
-    private val inputAffectedAreas: Observable<Nullable<MutableList<Area>>>
     private val saveState: Observable<SaveState>
 
     data class AlertSaveModel(
@@ -113,22 +140,12 @@ abstract class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
                     }
                 }
 
-        inputAffectedAreas = Observable.merge(
-                affectedAreaAdded.map { Add(it) },
-                affectedAreaRemoved.map { Remove(it) }
-        )
-                .scan(Nullable()) { nullableList, newItem ->
-                    val list = nullableList.value ?: mutableListOf()
+        inputAffectedAreas = baseAlert
+                .map { it.value?.affectedAreas?.toSet() ?: emptySet() }
+                .accumulateWithNullable(affectedAreaAdded, affectedAreaRemoved)
+                .behavior()
 
-                    when (newItem) {
-                        is Add -> list += newItem.value
-                        is Remove -> list -= newItem.value
-                    }
-
-                    Nullable(list)
-                }
-
-        saveState = Observable.combineLatest<Nullable<Alert>, Nullable<HazardScenario>, Nullable<AlertLevel>, Nullable<String>, Nullable<Long>, Nullable<MutableList<Area>>, Nullable<String>, AlertSaveModel>(
+        saveState = Observable.combineLatest<Nullable<Alert>, Nullable<HazardScenario>, Nullable<AlertLevel>, Nullable<String>, Nullable<Long>, Nullable<Set<Area>>, Nullable<String>, AlertSaveModel>(
                 baseAlert,
                 inputHazardScenario,
                 inputAlertLevel,
@@ -144,7 +161,7 @@ abstract class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
                             inputAlertLevelNullable.value,
                             inputRedAlertReasonNullable.value,
                             inputPopulationAffectedNullable.value,
-                            inputAffectedAreasNullable.value,
+                            inputAffectedAreasNullable.value?.toList(),
                             inputInformationSourcesNullable.value
                     )
                 }
@@ -158,29 +175,51 @@ abstract class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
                     //SAVE EDITS
                     else if (saveModel.baseAlert != null) {
                         val updateMap = mutableMapOf(
-                                "hazardScenario" to saveModel.hazardScenario,
-                                "alertLevel" to saveModel.alertLevel,
+                                "hazardScenario" to saveModel.hazardScenario?.value,
+                                "alertLevel" to saveModel.alertLevel?.value,
                                 "reasonForRedAlert" to saveModel.redAlertReason,
                                 "estimatedPopulation" to saveModel.populationAffected,
                                 "affectedAreas" to generateAffectedAreasMap(saveModel.affectedAreas),
                                 "infoNotes" to saveModel.infoNotes,
-                                "updatedBy" to user.id
+                                "updatedBy" to user.id,
+                                "timeUpdated" to DateTime().millis
                         )
+                                .filterValues { it != null }
+                                .toMutableMap()
 
-                        if (saveModel.baseAlert.level != saveModel.alertLevel) {
+                        //If we've updated the alert level
+                        if (saveModel.baseAlert.level != saveModel.alertLevel && saveModel.alertLevel != null) {
+                            var timeTrackingLevel = saveModel.alertLevel.toTimeTrackingLevel()
                             var newState = APPROVED
+
+                            //If we've updated the alert level to red
                             if (saveModel.alertLevel == RED) {
+                                //Don't set state to waiting response if the current user isn't a country director
                                 if (user.userType != COUNTRY_DIRECTOR) {
                                     newState = WAITING_RESPONSE
+                                    //We're waiting for a response from a Country Director. Time tracking level shouldn't change while we wait.
+                                    timeTrackingLevel = if (saveModel.baseAlert.level == AMBER) TimeTrackingLevel.AMBER else TimeTrackingLevel.GREEN
+                                    //If we're moving away from amber, we need to store this in a flag
+                                    if (saveModel.baseAlert.level == AMBER) {
+                                        updateMap["previousIsAmber"] = true
+                                    }
                                 } else {
                                     updateMap["redAlertApproved"] = true
                                 }
                             }
+                            //If we were in red and we're updating away from red, delete reason for red alert
+                            else if (saveModel.baseAlert.level != RED) {
+                                updateMap["reasonForRedAlert"] = null
+                            }
+
                             updateMap["approval"] = mapOf(
                                     "countryDirector" to mapOf(
-                                            user.countryId to newState
+                                            user.countryId to newState.value
                                     )
                             )
+
+                            updateMap["timeTracking"] = saveModel.baseAlert.timeTracking.updateTimeTrackingMap(
+                                    timeTrackingLevel, true)
                         }
 
                         db.child("alert")
@@ -206,8 +245,8 @@ abstract class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
                     //SAVE NEW ALERT
                     else {
                         val createMap = mutableMapOf(
-                                "hazardScenario" to saveModel.hazardScenario,
-                                "alertLevel" to saveModel.alertLevel,
+                                "hazardScenario" to saveModel.hazardScenario.value,
+                                "alertLevel" to saveModel.alertLevel.value,
                                 "reasonForRedAlert" to saveModel.redAlertReason,
                                 "estimatedPopulation" to saveModel.populationAffected,
                                 "affectedAreas" to generateAffectedAreasMap(saveModel.affectedAreas),
@@ -217,8 +256,10 @@ abstract class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
                         )
 
                         var approvalState = APPROVED
+                        var timeTrackingLevel = saveModel.alertLevel.toTimeTrackingLevel()
                         if (saveModel.alertLevel == RED) {
                             if (user.userType != COUNTRY_DIRECTOR) {
+                                timeTrackingLevel = TimeTrackingLevel.GREEN
                                 approvalState = WAITING_RESPONSE
                             } else {
                                 createMap["redAlertApproved"] = true
@@ -226,9 +267,11 @@ abstract class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
                         }
                         createMap["approval"] = mapOf(
                                 "countryDirector" to mapOf(
-                                        user.countryId to approvalState
+                                        user.countryId to approvalState.value
                                 )
                         )
+
+                        createMap["timeTracking"] = newTimeTrackingMap(timeTrackingLevel, true)
 
                         db.child("alert")
                                 .child(user.countryId)
@@ -262,6 +305,10 @@ abstract class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
         inputHazardScenario.onNext(Nullable(hazardScenario))
     }
 
+    override fun onSaveClicked() {
+        onSaveClicked.onNext(Unit)
+    }
+
     override fun onAlertLevelUpdate(alertLevel: AlertLevel) {
         inputAlertLevel.onNext(Nullable(alertLevel))
     }
@@ -286,14 +333,26 @@ abstract class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
         inputRedAlertReason.onNext(Nullable(reason))
     }
 
+    override fun onAddAreaClicked() {
+        onAddAreaClicked.onNext(Unit)
+    }
+
+    override fun onHazardScenarioClicked() {
+        onHazardScenarioClicked.onNext(Unit)
+    }
+
+    override fun onAlertLevelClicked() {
+        onAlertLevelClicked.onNext(Unit)
+    }
+
     override fun hazardScenario(): Observable<HazardScenario> {
-        return getCurrentValueObservable(inputHazardScenario) {
+        return getCurrentValueObservable(inputHazardScenario, false) {
             it?.hazardScenario
         }
     }
 
     override fun alertLevel(): Observable<AlertLevel> {
-        return getCurrentValueObservable(inputAlertLevel) {
+        return getCurrentValueObservable(inputAlertLevel, false) {
             it?.level
         }
     }
@@ -302,7 +361,7 @@ abstract class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
         return baseAlert
                 .combineWithPair(inputAlertLevel)
                 .map { (baseAlert, alertLevel) ->
-                    baseAlert.isNull() || !baseAlert.value!!.isRedAlertRequested() && alertLevel.value == RED
+                    baseAlert.isNull() || (!baseAlert.value!!.isRedAlertRequested() && alertLevel.value == RED)
                 }
     }
 
@@ -313,7 +372,7 @@ abstract class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
     }
 
     override fun affectedAreas(): Observable<List<Area>> {
-        return getCurrentValueObservable(inputAffectedAreas.map { Nullable(it.value?.toList()) }) {
+        return getCurrentValueObservable(inputAffectedAreas.map { Nullable(it.value?.toList()) }, false) {
             it?.affectedAreas
         }
     }
@@ -324,19 +383,18 @@ abstract class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
         }
     }
 
-    private fun <T> getCurrentValueObservable(inputObservable: Observable<Nullable<T>>,
+    private fun <T> getCurrentValueObservable(inputObservable: Observable<Nullable<T>>, onlyTakeOne: Boolean = true,
             valueFromBase: (Alert?) -> T?): Observable<T> {
-        return baseAlert
+        var observable = baseAlert
                 .combineWithPair(inputObservable)
                 .map { (baseAlert, inputValue) ->
                     Nullable(inputValue.value ?: valueFromBase(baseAlert.value))
                 }
-                .take(1)
-                .filterNull()
-    }
 
-    override fun onSaveClicked() {
-        onSaveClicked.onNext(Unit)
+        if (onlyTakeOne) {
+            observable = observable.take(1)
+        }
+        return observable.filterNull()
     }
 
     override fun redAlertReason(): Observable<String> {
@@ -353,8 +411,66 @@ abstract class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
         return onAddAreaClicked
     }
 
-    override fun onAddAreaClicked() {
-        onAddAreaClicked.onNext(Unit)
+    override fun selectAlertLevel(): Observable<Unit> {
+        return onAlertLevelClicked
+    }
+
+    override fun selectHazardScenario(): Observable<Unit> {
+        return onHazardScenarioClicked
+    }
+
+    override fun buttonState(): Observable<ButtonState> {
+        return baseAlert
+                .combineWithTriple(inputAlertLevel, userObservable)
+                .map { (baseAlert, inputAlertLevel, user) ->
+                    if (baseAlert.isNull()) {
+                        if (inputAlertLevel.value == RED && user.userType != COUNTRY_DIRECTOR) {
+                            CONFIRM_RED_LEVEL
+                        } else {
+                            CONFIRM_LEVEL
+                        }
+                    } else {
+                        val baseAlertValue = baseAlert.value!!
+                        if (!(baseAlertValue.isRedAlertApproved() || baseAlert.value.isRedAlertRequested()) && inputAlertLevel.value == RED && user.userType != COUNTRY_DIRECTOR) {
+                            REQUEST_RED_LEVEL
+                        } else {
+                            SAVE_CHANGES
+                        }
+                    }
+                }
+    }
+
+    override fun baseAlert(): Observable<Nullable<Alert>> {
+        return baseAlert
     }
 }
 
+fun <T> Observable<Set<T>>.accumulateWithNullable(add: Observable<T>,
+        remove: Observable<T>): Observable<Nullable<Set<T>>> {
+    return Observable.create { emitter ->
+
+        emitter.onNext(Nullable())
+
+        var list = mutableSetOf<T>()
+        val disposables = mutableListOf<Disposable>()
+        var locked = false
+
+        disposables += this.subscribe {
+            if (!locked) {
+                list = it.toMutableSet()
+            }
+        }
+
+        disposables += add.subscribe {
+            locked = true
+            list.add(it)
+            emitter.onNext(Nullable(list))
+        }
+
+        disposables += remove.subscribe {
+            locked = true
+            list.remove(it)
+            emitter.onNext(Nullable(list))
+        }
+    }
+}

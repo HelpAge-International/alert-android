@@ -97,17 +97,27 @@ abstract class BaseActivity<VM : BaseViewModel> : AppCompatActivity(){
 
     fun setToolbarTitle(title: String, @ColorInt color: Int) {
         supportActionBar?.title = title
-        toolbar?.setBackgroundColor(color)
-        setStatusBar(color)
+        setToolbarColor(color)
     }
 
     fun setToolbarTitle(@StringRes title: Int, @ColorInt color: Int) {
         setToolbarTitle(getString(title), color)
     }
 
+    fun setToolbarColor(@ColorInt color: Int) {
+        toolbar?.setBackgroundColor(color)
+        setStatusBar(color)
+    }
+
     fun bindToolbarTitle(titleObservable: Observable<String>){
         disposables += titleObservable.subscribeNoError {
             setToolbarTitle(it)
+        }
+    }
+
+    fun bindToolbarTitleColor(titleObservable: Observable<Pair<String, Int>>) {
+        disposables += titleObservable.subscribeNoError { (title, color) ->
+            setToolbarTitle(title, color)
         }
     }
 

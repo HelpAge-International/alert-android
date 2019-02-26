@@ -23,11 +23,11 @@ open class EnumSerializer<T : Enum<T>>(val clazz: Class<T>, val converter: (T?) 
         return value ?: clazz.enumConstants.first()
     }
 
-    fun jsonToEnum(jsonVal: Int?): T? {
+    fun deserialize(jsonVal: Int?): T? {
         return clazz.enumConstants.firstOrNull { converter(it) == jsonVal }
     }
 
-    fun enumToJson(t: T?): Int? {
+    fun serialize(t: T?): Int? {
         return converter(t)
     }
 }

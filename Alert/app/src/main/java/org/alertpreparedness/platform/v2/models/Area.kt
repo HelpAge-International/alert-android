@@ -25,4 +25,8 @@ class Area(
         result = 31 * result + (level2 ?: 0)
         return result
     }
+
+    override fun toString(): String {
+        return "Area(country=$country, level1=$level1, level2=$level2)"
+    }
 }

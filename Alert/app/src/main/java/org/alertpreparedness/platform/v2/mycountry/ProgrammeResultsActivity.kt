@@ -3,8 +3,9 @@ package org.alertpreparedness.platform.v2.mycountry
 import android.os.Bundle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.activity_programme_results.*
-import kotlinx.android.synthetic.main.item_programme.*
+import kotlinx.android.synthetic.main.activity_programme_results.progressBar
+import kotlinx.android.synthetic.main.activity_programme_results.rvResults
+import kotlinx.android.synthetic.main.activity_programme_results.tvResultsFor
 import org.alertpreparedness.platform.v1.R
 import org.alertpreparedness.platform.v1.risk_monitoring.model.CountryJsonData
 import org.alertpreparedness.platform.v2.base.BaseActivity
@@ -58,7 +59,7 @@ class ProgrammeResultsActivity : BaseActivity<ProgrammeResultsViewModel>() {
     }
 
     override fun arguments(bundle: Bundle) {
-        country = CountrySerializer.jsonToEnum(bundle.getInt(COUNTRY_KEY))!!
+        country = CountrySerializer.deserialize(bundle.getInt(COUNTRY_KEY))!!
         level1 = bundle.getInt(LEVEL_1_KEY, -1)
         if(level1 == -1) level1 = null
 

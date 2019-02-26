@@ -2,20 +2,19 @@ package org.alertpreparedness.platform.v1.helper;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import androidx.fragment.app.DialogFragment;
-import androidx.appcompat.app.AlertDialog;
 import android.view.View;
-
-import org.alertpreparedness.platform.v1.R;
-
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import org.alertpreparedness.platform.v1.R;
 
 /**
  * Created by Tj on 06/12/2017.
  */
 
+@Deprecated
 public class AlertLevelDialog extends DialogFragment {
 
     private TypeSelectedListener mListener;
