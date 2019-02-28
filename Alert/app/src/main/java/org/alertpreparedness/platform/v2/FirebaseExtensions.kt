@@ -13,7 +13,7 @@ fun DatabaseReference.asObservable(): Observable<DataSnapshot> {
     return Observable.create<DataSnapshot> {emitter ->
         val valueEventListener = object: ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if (!emitter.isDisposed && dataSnapshot.value != null) {
+                if (!emitter.isDisposed) {
                     emitter.onNext(dataSnapshot)
                 }
             }

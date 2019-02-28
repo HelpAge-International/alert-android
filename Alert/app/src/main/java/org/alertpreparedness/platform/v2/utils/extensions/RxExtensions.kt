@@ -259,6 +259,10 @@ fun <T, R> Observable<List<T>>.mapList(map: (T) -> R): Observable<List<R>> {
     return map { it.map(map) }
 }
 
+fun <T, R : Any> Observable<List<T>>.mapListNotNull(map: (T) -> R?): Observable<List<R>> {
+    return map { it.mapNotNull(map) }
+}
+
 fun <T> Observable<T>.behavior(debug: Boolean = false): Observable<T> {
     return BehaviorObservable(this, debug)
 }

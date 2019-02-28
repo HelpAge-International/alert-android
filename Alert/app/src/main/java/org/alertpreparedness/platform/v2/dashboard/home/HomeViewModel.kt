@@ -33,6 +33,7 @@ import org.alertpreparedness.platform.v2.utils.extensions.hasPassed
 import org.alertpreparedness.platform.v2.utils.extensions.isThisWeek
 import org.alertpreparedness.platform.v2.utils.extensions.isToday
 import org.alertpreparedness.platform.v2.utils.extensions.mapList
+import org.alertpreparedness.platform.v2.utils.extensions.print
 import org.alertpreparedness.platform.v2.utils.extensions.withLatestFromPair
 
 interface IHomeViewModel {
@@ -86,6 +87,7 @@ class HomeViewModel : BaseViewModel(), IHomeViewModel.Inputs, IHomeViewModel.Out
 
     override fun tasks(): Observable<List<Task>> {
         val indicators = indicatorsObservable
+                .print("Got indicators")
                 .withLatestFromPair(userObservable)
                 .map { (list, user) ->
                     list.filter { it.assignee == user.id }
@@ -103,10 +105,13 @@ class HomeViewModel : BaseViewModel(), IHomeViewModel.Inputs, IHomeViewModel.Out
 
         return combineFlatten<Task>(
                 indicators
+                        .print("GOT INDICATORS!")
                         .mapList { IndicatorTask(it) },
                 actions
+                        .print("GOT ACTIONS!")
                         .mapList { ActionTask(it) },
                 responsePlansObservable
+                        .print("GOT RESPONSE PLANS!")
                         .mapList { ApprovalTask(it) }
         )
                 .map { list ->

@@ -85,17 +85,17 @@ val gson: Gson by lazy{
             .create()
 }
 
-inline fun <reified T : BaseModel> DataSnapshot.toModel(objectModifier: (T, JsonObject) -> Unit = { _, _ -> }): T {
+inline fun <reified T : BaseModel> DataSnapshot.toModel(objectModifier: (T, JsonObject) -> Unit = { _, _ -> }): T? {
     return listOf(this).toMergedModel(objectModifier)
 }
 
 inline fun <reified T : BaseModel> Pair<DataSnapshot, DataSnapshot>.toMergedModel(
-        objectModifier: (T, JsonObject) -> Unit = { _, _ -> }): T {
+        objectModifier: (T, JsonObject) -> Unit = { _, _ -> }): T? {
     return toList().toMergedModel(objectModifier)
 }
 
 inline fun <reified T : BaseModel> List<DataSnapshot>.toMergedModel(
-        objectModifier: (T, JsonObject) -> Unit = { _, _ -> }): T {
+        objectModifier: (T, JsonObject) -> Unit = { _, _ -> }): T? {
     if(isEmpty()) throw IllegalArgumentException("")
 
     val id = first().key!!
@@ -103,6 +103,7 @@ inline fun <reified T : BaseModel> List<DataSnapshot>.toMergedModel(
     val jsonList = map {
         it.toJson()
     }
+            .filterNotNull()
 
     var mergedObject = jsonList.first()
     val toMergeList = jsonList.subList(1, size)
@@ -124,16 +125,16 @@ inline fun <reified T: BaseModel> jsonToModel(id: String, jsonObject: JsonObject
     return obj
 }
 
-fun DataSnapshot.toJson(): JsonObject {
-    return gson.toJsonTree(value).asJsonObject
+fun DataSnapshot.toJson(): JsonObject? {
+    return if(value == null) null else gson.toJsonTree(value).asJsonObject
 }
 
-fun DataSnapshot.toJsonArray(): JsonArray {
-    return gson.toJsonTree(value).asJsonArray
+fun DataSnapshot.toJsonArray(): JsonArray? {
+    return if (value == null) null else gson.toJsonTree(value).asJsonArray
 }
 
 
-fun JsonObject.mergeWith(other: JsonObject): JsonObject{
+fun JsonObject.mergeWith(other: JsonObject): JsonObject {
     val output = JsonObject()
 
     val keys = keySet().union(other.keySet())

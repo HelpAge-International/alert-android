@@ -41,6 +41,7 @@ import org.alertpreparedness.platform.v2.models.enums.HazardScenario
 import org.alertpreparedness.platform.v2.models.enums.Note
 import org.alertpreparedness.platform.v2.models.enums.Privacy
 import org.alertpreparedness.platform.v2.repository.Repository.PrivacySettingType.OFFICE_PROFILE
+import org.alertpreparedness.platform.v2.utils.Nullable
 import org.alertpreparedness.platform.v2.utils.ResettableLazyManager
 import org.alertpreparedness.platform.v2.utils.extensions.behavior
 import org.alertpreparedness.platform.v2.utils.extensions.childKeys
@@ -52,10 +53,13 @@ import org.alertpreparedness.platform.v2.utils.extensions.firstChild
 import org.alertpreparedness.platform.v2.utils.extensions.firstChildKey
 import org.alertpreparedness.platform.v2.utils.extensions.get
 import org.alertpreparedness.platform.v2.utils.extensions.mapList
+import org.alertpreparedness.platform.v2.utils.extensions.mapListNotNull
 import org.alertpreparedness.platform.v2.utils.extensions.mergeCombine
+import org.alertpreparedness.platform.v2.utils.extensions.print
 import org.alertpreparedness.platform.v2.utils.extensions.toMergedModel
 import org.alertpreparedness.platform.v2.utils.extensions.toModel
 import org.alertpreparedness.platform.v2.utils.extensions.withLatestFromPair
+import org.alertpreparedness.platform.v2.utils.filterNull
 import org.alertpreparedness.platform.v2.utils.resettableLazy
 
 
@@ -84,7 +88,8 @@ object Repository {
         return refUserPublic
                 .child(id)
                 .asObservable()
-                .map { it.toModel<UserPublic>() }
+                .map { Nullable(it.toModel<UserPublic>()) }
+                .filterNull()
     }
 
     val userObservable: Observable<User> by resettableLazy(resettableLazyManager) {
@@ -151,7 +156,7 @@ object Repository {
                                     partnerOrganisation.combineWithTriple(userPublic, partnerUser)
                                             .map { (organisationSnap, userPublic, userSnap) ->
 
-                                                Pair(userSnap, userPublic).toMergedModel<User> { model, jsonObject ->
+                                                Nullable(Pair(userSnap, userPublic).toMergedModel<User> { model, jsonObject ->
                                                     model.userType = PARTNER
                                                     model.agencyAdminId = jsonObject["agencyAdmin"].asJsonObject.firstChildKey()
                                                     model.systemAdminId = jsonObject["systemAdmin"].asJsonObject.firstChildKey()
@@ -163,8 +168,9 @@ object Repository {
                                                     model.systemAdminId = userSnap.child(
                                                             "systemAdmin").firstChildKey()
 
-                                                }
+                                                })
                                             }
+                                            .filterNull()
                             )
 
                     )
@@ -176,12 +182,13 @@ object Repository {
     private fun Observable<Pair<DataSnapshot, DataSnapshot>>.mapNormalUser(userType: UserType): Observable<User> {
         return map { (userSnapshot, publicUserSnapshot) ->
 
-            Pair(userSnapshot, publicUserSnapshot).toMergedModel<User> { model, jsonObject ->
+            Nullable(Pair(userSnapshot, publicUserSnapshot).toMergedModel<User> { model, jsonObject ->
                 model.userType = userType
                 model.agencyAdminId = jsonObject["agencyAdmin"].asJsonObject.firstChildKey()
                 model.systemAdminId = jsonObject["systemAdmin"].asJsonObject.firstChildKey()
-            }
+            })
         }
+                .filterNull()
     }
 
     val countryOfficeObservable: Observable<CountryOffice> by resettableLazy(resettableLazyManager) {
@@ -199,7 +206,7 @@ object Repository {
                 .child(user.countryId)
                 .asObservable()
                 .map {
-                    it.toModel<CountryOffice> { model, jsonObject ->
+                    Nullable(it.toModel<CountryOffice> { model, jsonObject ->
                         val clockSettings = jsonObject["clockSettings"].asJsonObject
                         val preparednessClockSettings = clockSettings["preparedness"].asJsonObject
                         val responsePlanClockSettings = clockSettings["responsePlans"].asJsonObject
@@ -217,20 +224,24 @@ object Repository {
                                         ?: WEEK,
                                 responsePlanClockSettings["value"].asInt
                         )
-                    }
+                    })
+
                 }
+                .filterNull()
     }
 
     val hazardsObservable: Observable<List<Hazard>> by resettableLazy(resettableLazyManager) {
         userObservable
+                .print("user")
                 .flatMap { user ->
                     db.child("hazard")
                             .child(user.countryId)
                             .asObservable()
                             .map { snapshot ->
-                                snapshot.children.map { it.toModel<Hazard>() }
+                                snapshot.children.map { it.toModel<Hazard>() }.filterNotNull()
                             }
                 }
+                .print("user, hazards")
                 .behavior()
     }
 
@@ -245,32 +256,44 @@ object Repository {
 
     val indicatorsObservable: Observable<List<Indicator>> by resettableLazy(resettableLazyManager) {
         hazardsObservable
+                .print("hazards")
                 .filterList {
                     it.isActive
                 }
+                .print("hazards, filtered")
                 .combineWithPair(userObservable)
+                .print("hazards, with user")
                 .map { (hazards, user) -> hazards.map { it.id } + user.countryId }
+                .print("hazards full list")
                 .flatMap { hazardIdList ->
+                    println("Inside flatmap")
                     combineFlatten(
                             hazardIdList.map { hazardId ->
                                 db.child("indicator")
                                         .child(hazardId)
                                         .asObservable()
+                                        .print("GOT HAZARDS")
                                         .map { it.children.toList() }
                             }
                     )
+                            .print("flattned")
                             .map { list ->
                                 list.map { dataSnapshot ->
                                     dataSnapshot.toModel<Indicator> { model, json ->
                                         model.parentId = dataSnapshot.ref.parent!!.key!!
                                     }
                                 }
+                                        .filterNotNull()
                             }
+                            .print("POST MAP")
                 }
+                .print("indicators")
                 .withLatestFromPair(userObservable)
+                .print("indicators with user again..")
                 .map { (list, user) ->
                     list.filter { it.assignee == user.id }
                 }
+                .print("filtered indicators")
                 .behavior()
     }
 
@@ -299,10 +322,11 @@ object Repository {
                     mergeCombine(observableList)
                             .combineWithPair(countryOfficeObservable(user))
                             .map { (actionList, countryOffice) ->
-                                actionList.toMergedModel<Action> { action, jsonObject ->
+                                Nullable(actionList.toMergedModel<Action> { action, jsonObject ->
                                     setUpAction(action, jsonObject, countryOffice)
-                                }
+                                })
                             }
+                            .filterNull()
 
                 }
     }
@@ -340,6 +364,7 @@ object Repository {
                                                 setUpAction(action, jsonObject, countryOffice)
                                             }
                                         }
+                                        .filterNotNull()
                             }
                 }
                 .behavior()
@@ -375,8 +400,8 @@ object Repository {
                             .child(user.countryId)
                             .asObservable()
                             .map { it.children.toList() }
-                            .mapList {
-                                it.toModel<ResponsePlan>()
+                            .map {list ->
+                                list.mapNotNull { it.toModel<ResponsePlan>() }
                             }
                             .filterList {
                                 it.approval.countryDirector?.id == user.countryId
@@ -394,7 +419,7 @@ object Repository {
                     .map {
                         it.children.toList()
                     }
-                    .mapList {
+                    .mapListNotNull {
                         it.toModel(alertStateHandler)
                     }
         }
@@ -417,7 +442,7 @@ object Repository {
                             .map {
                                 it.children.toList()
                             }
-                            .mapList { it.toModel<Note>() }
+                            .mapListNotNull { it.toModel<Note>() }
                 }
     }
 
@@ -471,6 +496,7 @@ object Repository {
                                 .map { programmeSnapshot ->
                                     programmeSnapshot.toModel<Programme>()
                                 }
+                                .filterNotNull()
                     }.toMap()
                 }
                 //Filter based on searchArea
