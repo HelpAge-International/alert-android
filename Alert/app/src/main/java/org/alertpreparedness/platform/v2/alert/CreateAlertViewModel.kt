@@ -533,25 +533,3 @@ class BehaviorAccumulatorObservable<T>(val source: Observable<Set<T>>, val add: 
     }
     //endregion
 }
-
-//        emitter.onNext(Nullable())
-//
-//        val disposables = mutableListOf<Disposable>()
-//        var locked = false
-//
-//
-//        disposables += add.subscribe {
-//            locked = true
-//            list.add(it)
-//            emitter.onNext(Nullable(list))
-//        }
-//
-//        disposables += remove.subscribe {
-//            locked = true
-//            list.remove(it)
-//            emitter.onNext(Nullable(list))
-//        }
-//
-//        emitter.onDispose {
-//            disposables.forEach { it.dispose() }
-//        }
