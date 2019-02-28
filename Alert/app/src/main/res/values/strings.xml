@@ -598,6 +598,7 @@
     <string name="error_missing_population">Please enter an estimate of the affected population</string>
     <string name="error_missing_affected_areas">Please enter at least one affected area</string>
     <string name="error_missing_information">Please add information sources and notes to this alert</string>
+    <string name="assignee_updated_success">Action assignee updated successfully</string>
 
     <plurals name="alert_population">
         <item quantity="one">%,d people affected in %d area</item>

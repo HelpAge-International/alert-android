@@ -9,17 +9,18 @@ import org.alertpreparedness.platform.v2.models.enums.TimeTrackingLevel.AMBER
 import org.alertpreparedness.platform.v2.models.enums.TimeTrackingLevel.GREEN
 import org.alertpreparedness.platform.v2.models.enums.TimeTrackingLevel.GREY
 import org.alertpreparedness.platform.v2.models.enums.TimeTrackingLevel.RED
+import org.alertpreparedness.platform.v2.printRef
 import org.alertpreparedness.platform.v2.repository.Repository.db
+import org.alertpreparedness.platform.v2.setValueRx
 import org.alertpreparedness.platform.v2.updateChildrenRx
 import org.joda.time.DateTime
 
 fun Action.updateTimeTracking(countryId: String, level: TimeTrackingLevel): Observable<Unit> {
-    return db.child("alert")
+    return db.child("action")
             .child(countryId)
             .child(id)
             .child("timeTracking")
-            .updateChildrenRx(this.timeTracking.updateTimeTrackingMap(level, false))
-            .map { Unit }
+            .setValueRx(this.timeTracking.updateTimeTrackingMap(level, false))
 }
 
 fun Action.getNewTimeTrackingLevel(hazards: List<HazardScenario>, updatedAt: DateTime? = this.updatedAt,

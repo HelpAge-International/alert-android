@@ -162,6 +162,10 @@ abstract class BasePreparednessFragment<VM : BasePreparednessViewModel> : BaseFr
                 .subscribe {
                     Snackbar.make(rvActions, R.string.permission_complete_error, Snackbar.LENGTH_LONG).show()
                 }
+        disposables += viewModel.assignActionSuccess()
+                .subscribe {
+                    Snackbar.make(rvActions, R.string.assignee_updated_success, Snackbar.LENGTH_LONG).show()
+                }
     }
 
     override fun onActionClicked(action: Action) {
