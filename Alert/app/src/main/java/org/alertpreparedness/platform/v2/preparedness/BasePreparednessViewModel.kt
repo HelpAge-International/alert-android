@@ -6,7 +6,6 @@ import io.reactivex.rxkotlin.combineLatest
 import io.reactivex.subjects.PublishSubject
 import org.alertpreparedness.platform.v1.utils.PermissionsHelper
 import org.alertpreparedness.platform.v2.base.BaseViewModel
-import org.alertpreparedness.platform.v2.db
 import org.alertpreparedness.platform.v2.models.Action
 import org.alertpreparedness.platform.v2.models.User
 import org.alertpreparedness.platform.v2.models.enums.HazardScenario
@@ -21,6 +20,7 @@ import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBotto
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption.REASSIGN
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption.UPDATE_DUE_DATE
 import org.alertpreparedness.platform.v2.repository.Repository.actionsObservable
+import org.alertpreparedness.platform.v2.repository.Repository.db
 import org.alertpreparedness.platform.v2.repository.Repository.redAlertHazardScenariosObservable
 import org.alertpreparedness.platform.v2.repository.Repository.userObservable
 import org.alertpreparedness.platform.v2.setValueRx
@@ -95,7 +95,6 @@ abstract class BasePreparednessViewModel : BaseViewModel(), Inputs, Outputs {
                 .map {
                     PermissionsHelper(it.id)
                 }
-                .share()
                 .behavior()
 
         onAssignClickedWithPermissions = onPreparednessOptionClicked

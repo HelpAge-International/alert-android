@@ -22,7 +22,11 @@ import org.alertpreparedness.platform.v2.utils.extensions.hide
 import org.alertpreparedness.platform.v2.utils.extensions.show
 import org.alertpreparedness.platform.v2.utils.extensions.withLatestFromPair
 
-class HomeFragment : BaseFragment<HomeViewModel>() {
+class HomeFragment : BaseFragment<HomeViewModel>(), MainDrawer.LogOutCallback {
+    override fun onLogOut() {
+        disposeAll()
+    }
+
     private lateinit var tasksAdapter: HomeTasksAdapter
     private lateinit var alertsAdapter: HomeAlertsAdapter
 

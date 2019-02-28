@@ -5,6 +5,8 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import io.reactivex.Notification
 import io.reactivex.Observable
+import io.reactivex.ObservableEmitter
+import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Function3
@@ -257,9 +259,67 @@ fun <T, R> Observable<List<T>>.mapList(map: (T) -> R): Observable<List<R>> {
     return map { it.map(map) }
 }
 
-fun <T> Observable<T>.behavior(): Observable<T> {
-    return replay(1)
-            .autoConnect()
+fun <T> Observable<T>.behavior(debug: Boolean = false): Observable<T> {
+    return BehaviorObservable(this, debug)
+}
+
+class BehaviorObservable<T>(val source: Observable<T>, val debug: Boolean = false) : Observable<T>(), Observer<T> {
+
+    var cached: T? = null
+    val observers = mutableListOf<Observer<in T>>()
+    var sourceDisposable: Disposable? = null
+
+    override fun subscribeActual(observer: Observer<in T>) {
+        if (cached != null) {
+            observer.onNext(cached!!)
+        }
+
+        observer.onSubscribe(ChildDisposable(observer))
+        observers.add(observer)
+
+        if (observers.count() == 1) {
+            source.subscribe(this)
+        }
+    }
+
+    private fun dispose(observer: Observer<in T>) {
+        observers.remove(observer)
+        if (observers.size == 0) {
+            sourceDisposable?.dispose()
+        }
+    }
+
+    inner class ChildDisposable(val observer: Observer<in T>) : Disposable {
+
+        override fun isDisposed(): Boolean {
+            return observers.contains(observer)
+        }
+
+        override fun dispose() {
+            dispose(observer)
+        }
+    }
+
+    //region Observer
+    override fun onSubscribe(d: Disposable) {
+        sourceDisposable = d
+    }
+
+    override fun onNext(t: T) {
+        cached = t
+        observers.forEach { it.onNext(t) }
+    }
+
+    override fun onComplete() {
+        observers.forEach { it.onComplete() }
+        observers.clear()
+    }
+
+    override fun onError(e: Throwable) {
+        observers.forEach { it.onError(e) }
+        observers.clear()
+    }
+    //endregion
 }
 
 data class MergeCombineWrapper<T>(val value: T? = null)
@@ -317,5 +377,23 @@ fun <T> Observable<Set<T>>.accumulateWith(add: Observable<T>, remove: Observable
             list.remove(it)
             emitter.onNext(list)
         }
+
+        emitter.onDispose {
+            disposables.forEach { it.dispose() }
+        }
     }
+}
+
+fun <T> ObservableEmitter<T>.onDispose(function: () -> Unit) {
+    setDisposable(object : Disposable {
+        var disposed = false
+        override fun isDisposed(): Boolean {
+            return disposed
+        }
+
+        override fun dispose() {
+            disposed = true
+            function()
+        }
+    })
 }

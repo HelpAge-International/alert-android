@@ -1,12 +1,13 @@
 package org.alertpreparedness.platform.v2.repository
 
 import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.JsonObject
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.combineLatest
+import org.alertpreparedness.platform.v1.BuildConfig
 import org.alertpreparedness.platform.v2.FirebaseAuthExtensions
 import org.alertpreparedness.platform.v2.asObservable
-import org.alertpreparedness.platform.v2.db
 import org.alertpreparedness.platform.v2.models.Action
 import org.alertpreparedness.platform.v2.models.Agency
 import org.alertpreparedness.platform.v2.models.Alert
@@ -40,6 +41,7 @@ import org.alertpreparedness.platform.v2.models.enums.HazardScenario
 import org.alertpreparedness.platform.v2.models.enums.Note
 import org.alertpreparedness.platform.v2.models.enums.Privacy
 import org.alertpreparedness.platform.v2.repository.Repository.PrivacySettingType.OFFICE_PROFILE
+import org.alertpreparedness.platform.v2.utils.ResettableLazyManager
 import org.alertpreparedness.platform.v2.utils.extensions.behavior
 import org.alertpreparedness.platform.v2.utils.extensions.childKeys
 import org.alertpreparedness.platform.v2.utils.extensions.combineFlatten
@@ -54,17 +56,29 @@ import org.alertpreparedness.platform.v2.utils.extensions.mergeCombine
 import org.alertpreparedness.platform.v2.utils.extensions.toMergedModel
 import org.alertpreparedness.platform.v2.utils.extensions.toModel
 import org.alertpreparedness.platform.v2.utils.extensions.withLatestFromPair
+import org.alertpreparedness.platform.v2.utils.resettableLazy
 
-val refUserPublic by lazy { db.child("userPublic") }
-val refCountryAdmin by lazy { db.child("administratorCountry") }
-val refCountryDirector by lazy { db.child("countryDirector") }
-val refErt by lazy { db.child("ert") }
-val refErtLeader by lazy { db.child("ertLeader") }
-val refPartner by lazy { db.child("partner") }
-val refPartnerUser by lazy { db.child("partnerUser") }
-val refPartnerOrganisation by lazy { db.child("partnerOrganisation") }
 
 object Repository {
+
+    private val resettableLazyManager = ResettableLazyManager()
+
+    fun reset() {
+        resettableLazyManager.reset()
+    }
+
+    val db by resettableLazy(resettableLazyManager) {
+        FirebaseDatabase.getInstance().reference.child(BuildConfig.ROOT_NODE)
+    }
+    val refUserPublic by resettableLazy(resettableLazyManager) { db.child("userPublic") }
+    val refCountryAdmin by resettableLazy(resettableLazyManager) { db.child("administratorCountry") }
+    val refCountryDirector by resettableLazy(resettableLazyManager) { db.child("countryDirector") }
+    val refErt by resettableLazy(resettableLazyManager) { db.child("ert") }
+    val refErtLeader by resettableLazy(resettableLazyManager) { db.child("ertLeader") }
+    val refPartner by resettableLazy(resettableLazyManager) { db.child("partner") }
+    val refPartnerUser by resettableLazy(resettableLazyManager) { db.child("partnerUser") }
+    val refPartnerOrganisation by resettableLazy(resettableLazyManager) { db.child("partnerOrganisation") }
+
 
     fun userPublic(id: String): Observable<UserPublic> {
         return refUserPublic
@@ -73,7 +87,7 @@ object Repository {
                 .map { it.toModel<UserPublic>() }
     }
 
-    val userObservable: Observable<User> by lazy {
+    val userObservable: Observable<User> by resettableLazy(resettableLazyManager) {
         FirebaseAuthExtensions.getLoggedInUserId()
                 .flatMap { userId ->
                     val userPublic = refUserPublic
@@ -155,7 +169,6 @@ object Repository {
 
                     )
                 }
-                .share()
                 .behavior()
 
     }
@@ -171,7 +184,7 @@ object Repository {
         }
     }
 
-    val countryOfficeObservable: Observable<CountryOffice> by lazy {
+    val countryOfficeObservable: Observable<CountryOffice> by resettableLazy(resettableLazyManager) {
         userObservable
                 .flatMap { user ->
                     countryOfficeObservable(user)
@@ -208,7 +221,7 @@ object Repository {
                 }
     }
 
-    val hazardsObservable: Observable<List<Hazard>> by lazy {
+    val hazardsObservable: Observable<List<Hazard>> by resettableLazy(resettableLazyManager) {
         userObservable
                 .flatMap { user ->
                     db.child("hazard")
@@ -218,11 +231,10 @@ object Repository {
                                 snapshot.children.map { it.toModel<Hazard>() }
                             }
                 }
-                .share()
                 .behavior()
     }
 
-    val redAlertHazardScenariosObservable: Observable<List<HazardScenario>> by lazy {
+    val redAlertHazardScenariosObservable: Observable<List<HazardScenario>> by resettableLazy(resettableLazyManager) {
         alertsObservable
                 .filterList {
                     it.level == RED && it.state == APPROVED
@@ -231,7 +243,7 @@ object Repository {
                 .map { it.distinct() }
     }
 
-    val indicatorsObservable: Observable<List<Indicator>> by lazy {
+    val indicatorsObservable: Observable<List<Indicator>> by resettableLazy(resettableLazyManager) {
         hazardsObservable
                 .filterList {
                     it.isActive
@@ -259,7 +271,6 @@ object Repository {
                 .map { (list, user) ->
                     list.filter { it.assignee == user.id }
                 }
-                .share()
                 .behavior()
     }
 
@@ -296,7 +307,7 @@ object Repository {
                 }
     }
 
-    val actionsObservable: Observable<List<Action>> by lazy {
+    val actionsObservable: Observable<List<Action>> by resettableLazy(resettableLazyManager) {
         userObservable
                 .switchMap { user ->
                     val baseAction = db.child("action")
@@ -331,7 +342,6 @@ object Repository {
                                         }
                             }
                 }
-                .share()
                 .behavior()
     }
 
@@ -355,7 +365,7 @@ object Repository {
         }
     }
 
-    val responsePlansObservable: Observable<List<ResponsePlan>> by lazy {
+    val responsePlansObservable: Observable<List<ResponsePlan>> by resettableLazy(resettableLazyManager) {
         userObservable
                 .filter { user ->
                     user.userType == COUNTRY_DIRECTOR
@@ -372,12 +382,11 @@ object Repository {
                                 it.approval.countryDirector?.id == user.countryId
                             }
                 }
-                .share()
                 .startWith(listOf<ResponsePlan>())
                 .behavior()
     }
 
-    val alertsObservable by lazy {
+    val alertsObservable by resettableLazy(resettableLazyManager) {
         userObservable.switchMap { user ->
             db.child("alert")
                     .child(user.countryId)
@@ -386,7 +395,7 @@ object Repository {
                         it.children.toList()
                     }
                     .mapList {
-                        it.toModel<Alert>(alertStateHandler)
+                        it.toModel(alertStateHandler)
                     }
         }
                 .share()

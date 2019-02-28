@@ -1,6 +1,7 @@
 package org.alertpreparedness.platform.v2.alert
 
 import io.reactivex.Observable
+import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function7
 import io.reactivex.subjects.BehaviorSubject
@@ -19,7 +20,6 @@ import org.alertpreparedness.platform.v2.alert.SaveState.MISSING_POPULATION
 import org.alertpreparedness.platform.v2.alert.SaveState.MISSING_RED_ALERT_REASON
 import org.alertpreparedness.platform.v2.alert.SaveState.SUCCESS
 import org.alertpreparedness.platform.v2.base.BaseViewModel
-import org.alertpreparedness.platform.v2.db
 import org.alertpreparedness.platform.v2.models.Alert
 import org.alertpreparedness.platform.v2.models.Area
 import org.alertpreparedness.platform.v2.models.UserType.COUNTRY_DIRECTOR
@@ -31,6 +31,7 @@ import org.alertpreparedness.platform.v2.models.enums.AlertLevel.RED
 import org.alertpreparedness.platform.v2.models.enums.HazardScenario
 import org.alertpreparedness.platform.v2.models.enums.TimeTrackingLevel
 import org.alertpreparedness.platform.v2.repository.Repository.alert
+import org.alertpreparedness.platform.v2.repository.Repository.db
 import org.alertpreparedness.platform.v2.repository.Repository.userObservable
 import org.alertpreparedness.platform.v2.setValueRx
 import org.alertpreparedness.platform.v2.updateChildrenRx
@@ -99,8 +100,6 @@ enum class SaveState {
 }
 
 class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
-
-
     private val baseAlertId = BehaviorSubject.create<Nullable<String>>()
     private val inputHazardScenario = BehaviorSubject.createDefault(Nullable<HazardScenario>())
     private val inputAlertLevel = BehaviorSubject.createDefault(Nullable<AlertLevel>())
@@ -143,7 +142,7 @@ class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
         inputAffectedAreas = baseAlert
                 .map { it.value?.affectedAreas?.toSet() ?: emptySet() }
                 .accumulateWithNullable(affectedAreaAdded, affectedAreaRemoved)
-                .behavior()
+
 
         saveState = Observable.combineLatest<Nullable<Alert>, Nullable<HazardScenario>, Nullable<AlertLevel>, Nullable<String>, Nullable<Long>, Nullable<Set<Area>>, Nullable<String>, AlertSaveModel>(
                 baseAlert,
@@ -361,7 +360,8 @@ class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
         return baseAlert
                 .combineWithPair(inputAlertLevel)
                 .map { (baseAlert, alertLevel) ->
-                    baseAlert.isNull() || (!baseAlert.value!!.isRedAlertRequested() && alertLevel.value == RED)
+                    (baseAlert.isNotNull() && !baseAlert.value!!.isRedAlertRequested() && alertLevel.value == RED) ||
+                            baseAlert.isNull() && alertLevel.value == RED
                 }
     }
 
@@ -447,30 +447,112 @@ class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
 
 fun <T> Observable<Set<T>>.accumulateWithNullable(add: Observable<T>,
         remove: Observable<T>): Observable<Nullable<Set<T>>> {
-    return Observable.create { emitter ->
+    return BehaviorAccumulatorObservable(this, add, remove)
+}
 
-        emitter.onNext(Nullable())
+class BehaviorAccumulatorObservable<T>(val source: Observable<Set<T>>, val add: Observable<T>,
+        val remove: Observable<T>) : Observable<Nullable<Set<T>>>(), Observer<Set<T>> {
 
-        var list = mutableSetOf<T>()
-        val disposables = mutableListOf<Disposable>()
-        var locked = false
+    var cached: Nullable<Set<T>> = Nullable()
+    val observers = mutableListOf<Observer<in Nullable<Set<T>>>>()
+    var sourceDisposable: Disposable? = null
+    val disposables = mutableListOf<Disposable>()
+    var locked = false
 
-        disposables += this.subscribe {
-            if (!locked) {
-                list = it.toMutableSet()
+    override fun subscribeActual(observer: Observer<in Nullable<Set<T>>>) {
+        observer.onNext(cached)
+
+        observer.onSubscribe(ChildDisposable(observer))
+        observers.add(observer)
+
+        if (observers.count() == 1) {
+            source.subscribe(this)
+            disposables += add.subscribe {
+                onAdd(it)
+            }
+            disposables += remove.subscribe {
+                onRemove(it)
             }
         }
+    }
 
-        disposables += add.subscribe {
-            locked = true
-            list.add(it)
-            emitter.onNext(Nullable(list))
-        }
-
-        disposables += remove.subscribe {
-            locked = true
-            list.remove(it)
-            emitter.onNext(Nullable(list))
+    private fun onRemove(t: T) {
+        cached = Nullable((cached.value ?: mutableSetOf()) - t)
+        observers.forEach {
+            it.onNext(cached)
         }
     }
+
+    private fun onAdd(t: T) {
+        cached = Nullable((cached.value ?: mutableSetOf()) + t)
+        observers.forEach {
+            it.onNext(cached)
+        }
+    }
+
+    private fun dispose(observer: Observer<in Nullable<Set<T>>>) {
+        observers.remove(observer)
+        if (observers.size == 0) {
+            sourceDisposable?.dispose()
+        }
+    }
+
+    inner class ChildDisposable(val observer: Observer<in Nullable<Set<T>>>) : Disposable {
+
+        override fun isDisposed(): Boolean {
+            return observers.contains(observer)
+        }
+
+        override fun dispose() {
+            dispose(observer)
+        }
+    }
+
+    //region Observer
+    override fun onSubscribe(d: Disposable) {
+        sourceDisposable = d
+    }
+
+    override fun onNext(t: Set<T>) {
+        if (!locked) {
+            cached = Nullable((cached.value ?: mutableSetOf()) + t)
+            observers.forEach {
+                it.onNext(cached)
+            }
+        }
+        locked = true
+    }
+
+    override fun onComplete() {
+//        observers.forEach { it.onComplete() }
+//        observers.clear()
+    }
+
+    override fun onError(e: Throwable) {
+        observers.forEach { it.onError(e) }
+        observers.clear()
+    }
+    //endregion
 }
+
+//        emitter.onNext(Nullable())
+//
+//        val disposables = mutableListOf<Disposable>()
+//        var locked = false
+//
+//
+//        disposables += add.subscribe {
+//            locked = true
+//            list.add(it)
+//            emitter.onNext(Nullable(list))
+//        }
+//
+//        disposables += remove.subscribe {
+//            locked = true
+//            list.remove(it)
+//            emitter.onNext(Nullable(list))
+//        }
+//
+//        emitter.onDispose {
+//            disposables.forEach { it.dispose() }
+//        }

@@ -1,17 +1,16 @@
 package org.alertpreparedness.platform.v2.base
 
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import android.content.pm.PackageManager
 import android.os.Bundle
-import androidx.annotation.LayoutRes
-import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.LayoutRes
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import io.reactivex.disposables.Disposable
-import org.alertpreparedness.platform.v2.base.BaseActivity
 
 abstract class BaseFragment<VM: BaseViewModel>: Fragment() {
 
@@ -78,13 +77,16 @@ abstract class BaseFragment<VM: BaseViewModel>: Fragment() {
     override fun onPause() {
         super.onPause()
         if (disposeOnPause()) {
-            disposables.forEach { it.dispose() }
+            disposeAll()
         }
     }
     open fun disposeOnPause(): Boolean {
         return true
     }
 
+    fun disposeAll() {
+        disposables.forEach { it.dispose() }
+    }
 
     /**
      * State restoration methods for passing data to the view models

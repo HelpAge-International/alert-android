@@ -33,7 +33,6 @@ import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.PermissionRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.UserRef;
-import org.alertpreparedness.platform.v1.dashboard.activity.CreateAlertActivity;
 import org.alertpreparedness.platform.v1.helper.UserInfo;
 import org.alertpreparedness.platform.v1.login.activity.LoginScreen;
 import org.alertpreparedness.platform.v1.model.User;
@@ -45,9 +44,11 @@ import org.alertpreparedness.platform.v1.utils.AppUtils;
 import org.alertpreparedness.platform.v1.utils.Constants;
 import org.alertpreparedness.platform.v1.utils.PreferHelper;
 import org.alertpreparedness.platform.v1.utils.SnackbarHelper;
+import org.alertpreparedness.platform.v2.alert.CreateAlertActivity;
 import org.alertpreparedness.platform.v2.dashboard.home.HomeFragment;
 import org.alertpreparedness.platform.v2.preparedness.advanced.AdvancedPreparednessFragment;
 import org.alertpreparedness.platform.v2.preparedness.minimum.MinimumPreparednessFragment;
+import org.alertpreparedness.platform.v2.repository.Repository;
 import org.alertpreparedness.platform.v2.utils.GlideApp;
 
 public class MainDrawer extends BaseActivity
@@ -313,12 +314,9 @@ public class MainDrawer extends BaseActivity
         }
     }
 
-    private void logout() {
-        DependencyInjector.deinit();
-        PreferHelper.getInstance(this).edit().remove(UserInfo.PREFS_USER).apply();
-        FirebaseAuth.getInstance().signOut();
-        startActivity(new Intent(this, LoginScreen.class));
-        finish();
+    public interface LogOutCallback {
+
+        void onLogOut();
     }
 
     private void setUserName() {
@@ -367,5 +365,19 @@ public class MainDrawer extends BaseActivity
 
             }
         });
+    }
+
+    private void logout() {
+        DependencyInjector.deinit();
+        Repository.INSTANCE.reset();
+        for (final Fragment fragment : getSupportFragmentManager().getFragments()) {
+            if (fragment instanceof LogOutCallback) {
+                ((LogOutCallback) fragment).onLogOut();
+            }
+        }
+        PreferHelper.getInstance(this).edit().remove(UserInfo.PREFS_USER).apply();
+        FirebaseAuth.getInstance().signOut();
+        startActivity(new Intent(this, LoginScreen.class));
+        finish();
     }
 }

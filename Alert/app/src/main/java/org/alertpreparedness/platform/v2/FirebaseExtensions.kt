@@ -3,31 +3,34 @@ package org.alertpreparedness.platform.v2
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import io.reactivex.Observable
-import org.alertpreparedness.platform.v1.BuildConfig
 import org.alertpreparedness.platform.v2.utils.extensions.gson
-
-val db by lazy { FirebaseDatabase.getInstance().reference.child(BuildConfig.ROOT_NODE) }
+import org.alertpreparedness.platform.v2.utils.extensions.onDispose
 
 fun DatabaseReference.asObservable(): Observable<DataSnapshot> {
+    val stackTrace = Thread.currentThread().stackTrace.joinToString("\n")
     return Observable.create<DataSnapshot> {emitter ->
         val valueEventListener = object: ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if (dataSnapshot.value != null) {
+                if (!emitter.isDisposed && dataSnapshot.value != null) {
                     emitter.onNext(dataSnapshot)
                 }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                emitter.onError(databaseError.toException())
+                if (!emitter.isDisposed) {
+                    printRef("Errored at: ")
+                    println(stackTrace)
+                    emitter.onError(databaseError.toException())
+                }
             }
         }
 
         addValueEventListener(valueEventListener)
 
-        emitter.setCancellable {
+        emitter.onDispose {
+            println("Removed value event listener")
             removeEventListener(valueEventListener)
         }
     }

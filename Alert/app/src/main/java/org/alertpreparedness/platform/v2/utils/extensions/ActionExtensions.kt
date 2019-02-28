@@ -1,7 +1,6 @@
 package org.alertpreparedness.platform.v2.utils.extensions
 
 import io.reactivex.Observable
-import org.alertpreparedness.platform.v2.db
 import org.alertpreparedness.platform.v2.models.Action
 import org.alertpreparedness.platform.v2.models.enums.ActionLevel.MPA
 import org.alertpreparedness.platform.v2.models.enums.HazardScenario
@@ -10,6 +9,7 @@ import org.alertpreparedness.platform.v2.models.enums.TimeTrackingLevel.AMBER
 import org.alertpreparedness.platform.v2.models.enums.TimeTrackingLevel.GREEN
 import org.alertpreparedness.platform.v2.models.enums.TimeTrackingLevel.GREY
 import org.alertpreparedness.platform.v2.models.enums.TimeTrackingLevel.RED
+import org.alertpreparedness.platform.v2.repository.Repository.db
 import org.alertpreparedness.platform.v2.updateChildrenRx
 import org.joda.time.DateTime
 

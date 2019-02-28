@@ -6,7 +6,6 @@ import io.reactivex.subjects.PublishSubject
 import org.alertpreparedness.platform.v2.alert.IAlertDetailViewModel.Inputs
 import org.alertpreparedness.platform.v2.alert.IAlertDetailViewModel.Outputs
 import org.alertpreparedness.platform.v2.base.BaseViewModel
-import org.alertpreparedness.platform.v2.db
 import org.alertpreparedness.platform.v2.models.Alert
 import org.alertpreparedness.platform.v2.models.UserPublic
 import org.alertpreparedness.platform.v2.models.UserType.COUNTRY_DIRECTOR
@@ -19,6 +18,7 @@ import org.alertpreparedness.platform.v2.models.enums.AlertLevel.GREEN
 import org.alertpreparedness.platform.v2.models.enums.AlertLevel.RED
 import org.alertpreparedness.platform.v2.models.enums.TimeTrackingLevel
 import org.alertpreparedness.platform.v2.repository.Repository
+import org.alertpreparedness.platform.v2.repository.Repository.db
 import org.alertpreparedness.platform.v2.repository.Repository.userObservable
 import org.alertpreparedness.platform.v2.repository.Repository.userPublic
 import org.alertpreparedness.platform.v2.updateChildrenRx
