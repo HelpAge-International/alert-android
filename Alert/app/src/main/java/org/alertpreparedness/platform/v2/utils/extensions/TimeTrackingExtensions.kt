@@ -13,9 +13,9 @@ fun List<TimeTrackingItem>.isTimerRunning(): Boolean {
     return isNotEmpty() && last().finish.millis == -1L
 }
 
-fun newTimeTrackingMap(level: TimeTrackingLevel, uploadValue: Boolean = true) {
-    mapOf(
-            level.firebasePath to TimeTrackingItem(DateTime(), DateTime(-1), level.value).toMap(uploadValue)
+fun newTimeTracking(level: TimeTrackingLevel, uploadValue: Boolean = true): Map<String, Any> {
+    return mapOf(
+            level.firebasePath to listOf(TimeTrackingItem(DateTime(), DateTime(-1), level.value).toMap(uploadValue))
     )
 }
 

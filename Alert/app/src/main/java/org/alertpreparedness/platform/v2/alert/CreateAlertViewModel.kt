@@ -36,12 +36,11 @@ import org.alertpreparedness.platform.v2.repository.Repository.userObservable
 import org.alertpreparedness.platform.v2.setValueRx
 import org.alertpreparedness.platform.v2.updateChildrenRx
 import org.alertpreparedness.platform.v2.utils.Nullable
-import org.alertpreparedness.platform.v2.utils.extensions.behavior
 import org.alertpreparedness.platform.v2.utils.extensions.combineWithPair
 import org.alertpreparedness.platform.v2.utils.extensions.combineWithTriple
 import org.alertpreparedness.platform.v2.utils.extensions.isRedAlertApproved
 import org.alertpreparedness.platform.v2.utils.extensions.isRedAlertRequested
-import org.alertpreparedness.platform.v2.utils.extensions.newTimeTrackingMap
+import org.alertpreparedness.platform.v2.utils.extensions.newTimeTracking
 import org.alertpreparedness.platform.v2.utils.extensions.takeWhen
 import org.alertpreparedness.platform.v2.utils.extensions.toTimeTrackingLevel
 import org.alertpreparedness.platform.v2.utils.extensions.updateTimeTrackingMap
@@ -140,7 +139,8 @@ class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
                 }
 
         inputAffectedAreas = baseAlert
-                .map { it.value?.affectedAreas?.toSet() ?: emptySet() }
+                .filterNull()
+                .map { it.affectedAreas.toSet() }
                 .accumulateWithNullable(affectedAreaAdded, affectedAreaRemoved)
 
 
@@ -270,7 +270,7 @@ class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
                                 )
                         )
 
-                        createMap["timeTracking"] = newTimeTrackingMap(timeTrackingLevel, true)
+                        createMap["timeTracking"] = newTimeTracking(timeTrackingLevel, true)
 
                         db.child("alert")
                                 .child(user.countryId)
@@ -283,7 +283,6 @@ class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
                                 }
                     }
                 }
-                .behavior()
     }
 
     private fun generateAffectedAreasMap(affectedAreas: List<Area>?): List<Map<String, Any>>? {
