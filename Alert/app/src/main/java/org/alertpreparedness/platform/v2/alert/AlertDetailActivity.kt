@@ -92,7 +92,7 @@ class AlertDetailActivity : BaseActivity<AlertDetailViewModel>() {
                 }
 
         disposables += tvLastUpdated.bind(
-                viewModel.lastUpdated().map { getString(R.string.last_updated_date, it.toDate()) })
+                viewModel.lastUpdated().map { getString(R.string.date, it.toDate()) })
     }
 
     override fun arguments(bundle: Bundle) {
