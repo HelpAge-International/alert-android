@@ -44,7 +44,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             tools:listitem="@layout/item_task"
-            tools:visibility="visible" />
+            tools:visibility="visible"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:clipToPadding="false"/>
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/grpEmptyTasks"
