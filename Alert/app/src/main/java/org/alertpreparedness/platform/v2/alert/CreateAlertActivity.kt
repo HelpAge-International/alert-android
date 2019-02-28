@@ -100,7 +100,7 @@ class CreateAlertActivity : BaseActivity<CreateAlertViewModel>(), AreaListener {
         }
 
         etPopulation.afterTextChanged {
-            viewModel.onPopulationAffectedUpdate(it.toLong())
+            viewModel.onPopulationAffectedUpdate(it.toLongOrNull() ?: -1)
         }
 
         etRedAlertReason.afterTextChanged {

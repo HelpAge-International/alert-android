@@ -168,8 +168,12 @@ class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
                 .combineWithPair(userObservable)
                 .takeWhen(onSaveClicked)
                 .switchMap { (saveModel, user) ->
-                    if (saveModel.redAlertReason == null && saveModel.alertLevel == RED && saveModel.baseAlert?.level != RED) {
+                    if (saveModel.redAlertReason.isNullOrEmpty() && saveModel.alertLevel == RED && saveModel.baseAlert?.level != RED) {
                         Observable.just(MISSING_RED_ALERT_REASON)
+                    } else if (saveModel.baseAlert != null && saveModel.populationAffected == -1L) {
+                        Observable.just(MISSING_POPULATION)
+                    } else if (saveModel.baseAlert != null && saveModel.infoNotes != null && saveModel.infoNotes.isEmpty()) {
+                        Observable.just(MISSING_INFORMATION)
                     }
                     //SAVE EDITS
                     else if (saveModel.baseAlert != null) {
@@ -224,9 +228,7 @@ class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
                         db.child("alert")
                                 .child(user.countryId)
                                 .child(saveModel.baseAlert.id)
-                                .updateChildrenRx(
-                                        updateMap.filterValues { it != null }
-                                )
+                                .updateChildrenRx(updateMap)
                                 .map {
                                     SUCCESS
                                 }
@@ -236,7 +238,7 @@ class CreateAlertViewModel : BaseViewModel(), Inputs, Outputs {
                         Observable.just(MISSING_LEVEL)
                     } else if (saveModel.populationAffected == null) {
                         Observable.just(MISSING_POPULATION)
-                    } else if (saveModel.affectedAreas == null) {
+                    } else if (saveModel.affectedAreas.isNullOrEmpty()) {
                         Observable.just(MISSING_AREAS)
                     } else if (saveModel.infoNotes == null) {
                         Observable.just(MISSING_INFORMATION)
