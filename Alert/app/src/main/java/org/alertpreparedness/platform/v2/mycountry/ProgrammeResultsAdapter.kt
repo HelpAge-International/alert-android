@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.item_group.view.*
 import kotlinx.android.synthetic.main.item_programme.view.*
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.risk_monitoring.model.CountryJsonData
 import org.alertpreparedness.platform.v2.models.Agency
 import org.alertpreparedness.platform.v2.models.Programme

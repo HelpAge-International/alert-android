@@ -9,7 +9,7 @@ import androidx.annotation.StringRes
 import kotlinx.android.synthetic.main.fragment_my_country.view.tvDescription
 import kotlinx.android.synthetic.main.item_alert_detail.view.ivIcon
 import kotlinx.android.synthetic.main.item_alert_detail.view.tvTitle
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v2.models.Alert
 import org.alertpreparedness.platform.v2.utils.DiffComparator
 import org.alertpreparedness.platform.v2.utils.DiffListAdapter

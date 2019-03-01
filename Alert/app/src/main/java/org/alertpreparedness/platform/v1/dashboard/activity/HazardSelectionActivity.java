@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.dashboard.adapter.HazardAdapter;
 
 @Deprecated

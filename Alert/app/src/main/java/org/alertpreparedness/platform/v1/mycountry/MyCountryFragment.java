@@ -25,7 +25,7 @@ import java.util.List;
 import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.ExtensionHelperKt;
 import org.alertpreparedness.platform.v1.MainDrawer;
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.v1.model.User;

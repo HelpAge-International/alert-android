@@ -11,7 +11,7 @@ import android.os.StrictMode;
 import androidx.core.app.NotificationCompat;
 import android.webkit.MimeTypeMap;
 
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 
 import java.io.BufferedInputStream;
 import java.io.File;

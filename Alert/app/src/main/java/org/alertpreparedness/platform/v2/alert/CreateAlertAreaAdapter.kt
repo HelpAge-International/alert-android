@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_create_alert_area.view.btnRemove
 import kotlinx.android.synthetic.main.item_create_alert_area.view.tvArea
 import kotlinx.android.synthetic.main.item_create_alert_area_add.view.tvText
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v2.models.Area
 import org.alertpreparedness.platform.v2.utils.extensions.show
 import org.alertpreparedness.platform.v2.utils.getText

@@ -34,8 +34,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import javax.inject.Inject;
+import org.alertpreparedness.platform.BuildConfig;
 import org.alertpreparedness.platform.v1.ExtensionHelperKt;
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.BaseAlertRef;
 import org.alertpreparedness.platform.v1.dashboard.adapter.AlertAdapter;
@@ -228,7 +229,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
             }
             alert = (AlertModel) intent.getSerializableExtra(EXTRA_ALERT);
             fetchDetails();
-            mAppStatus = PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS);
+            mAppStatus = BuildConfig.ROOT_NODE;
 
             mReference =
                     FirebaseDatabase
@@ -473,7 +474,7 @@ public class AlertDetailActivity extends AppCompatActivity implements View.OnCli
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
         DatabaseReference db = ref.
-                child(PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS)).
+                child(BuildConfig.ROOT_NODE).
                 child("userPublic").child(userId);
 
         System.out.println("REF: " + db.getRef());

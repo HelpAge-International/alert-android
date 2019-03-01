@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import kotlinx.android.synthetic.main.item_task.view.ivIcon
 import kotlinx.android.synthetic.main.item_task.view.tvDescription
 import kotlinx.android.synthetic.main.item_task.view.tvTitle
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v2.dashboard.home.HomeTasksAdapter.HomeTaskViewHolder
 import org.alertpreparedness.platform.v2.models.ActionTask
 import org.alertpreparedness.platform.v2.models.ApprovalTask

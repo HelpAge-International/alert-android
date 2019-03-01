@@ -14,7 +14,7 @@ import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder
 import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder
 import org.alertpreparedness.platform.v1.HAZARD_EMPTY
 import org.alertpreparedness.platform.v1.HAZARD_NOT_EMPTY
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.getCountryImage
 import org.alertpreparedness.platform.v1.getHazardImg
 import org.alertpreparedness.platform.v1.risk_monitoring.model.ModelIndicator

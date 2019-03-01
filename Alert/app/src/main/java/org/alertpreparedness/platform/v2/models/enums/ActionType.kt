@@ -1,7 +1,7 @@
 package org.alertpreparedness.platform.v2.models.enums
 
 import androidx.annotation.StringRes
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v2.utils.EnumSerializer
 
 enum class ActionType(val value: Int, @StringRes val text: Int) {

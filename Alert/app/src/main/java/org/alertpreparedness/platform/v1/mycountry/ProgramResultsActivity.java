@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.ExtensionHelperKt;
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.AgencyBaseRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.NetworkRef;

@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.item_preparedness_action.view.tvActionType
 import kotlinx.android.synthetic.main.item_preparedness_action.view.tvAssignee
 import kotlinx.android.synthetic.main.item_preparedness_action.view.tvBudget
 import kotlinx.android.synthetic.main.item_preparedness_action.view.tvDate
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v2.models.Action
 import org.alertpreparedness.platform.v2.models.User
 import org.alertpreparedness.platform.v2.preparedness.PreparednessAdapter.PreparednessViewHolder

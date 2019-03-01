@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.risk_monitoring.view.ActiveRiskFragment
 import org.alertpreparedness.platform.v1.risk_monitoring.view.ArchivedRiskFragment
 

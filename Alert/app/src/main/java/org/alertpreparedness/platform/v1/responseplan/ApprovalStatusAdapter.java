@@ -12,7 +12,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import java.util.ArrayList;
 import java.util.List;
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 
 /**
  * Created by Tj on 12/12/2017.

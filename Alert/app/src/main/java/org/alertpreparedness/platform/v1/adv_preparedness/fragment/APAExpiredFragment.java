@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import javax.inject.Inject;
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.adv_preparedness.activity.EditAPAActivity;
 import org.alertpreparedness.platform.v1.adv_preparedness.adapter.APActionAdapter;
 import org.alertpreparedness.platform.v1.adv_preparedness.model.UserModel;

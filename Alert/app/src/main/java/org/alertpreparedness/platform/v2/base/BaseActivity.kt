@@ -23,7 +23,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v2.utils.ColorUtil
 import org.alertpreparedness.platform.v2.utils.extensions.subscribeNoError
 

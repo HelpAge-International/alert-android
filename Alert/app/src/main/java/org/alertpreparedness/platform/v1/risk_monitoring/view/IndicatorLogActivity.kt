@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_indicator_log.*
 import org.alertpreparedness.platform.v1.BaseActivity
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 
 class IndicatorLogActivity : BaseActivity() {
 

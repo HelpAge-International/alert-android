@@ -10,7 +10,7 @@ import io.reactivex.Observable
 import kotlinx.android.synthetic.main.fragment_risk_monitoring.*
 import kotlinx.android.synthetic.main.content_risk.*
 import org.alertpreparedness.platform.v1.MainDrawer
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector
 import org.alertpreparedness.platform.v1.dashboard.activity.CreateAlertActivity
 import org.alertpreparedness.platform.v1.risk_monitoring.adapter.RiskPagerAdapter

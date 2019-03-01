@@ -5,7 +5,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_bottom_sheet_preparedness.rvList
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v2.base.BaseBottomSheetDialogFragment
 import org.alertpreparedness.platform.v2.models.Action
 import org.alertpreparedness.platform.v2.models.enums.ActionType

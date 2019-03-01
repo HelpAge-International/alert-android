@@ -9,7 +9,7 @@ import kotlinx.android.synthetic.main.fragment_home.rvAlerts
 import kotlinx.android.synthetic.main.fragment_home.rvMyTasks
 import org.alertpreparedness.platform.v1.MainDrawer
 import org.alertpreparedness.platform.v1.MainDrawer.ActionBarState.ALERT
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.min_preparedness.activity.CompleteActionActivity
 import org.alertpreparedness.platform.v1.risk_monitoring.view.UpdateIndicatorActivity
 import org.alertpreparedness.platform.v2.alert.AlertDetailActivity

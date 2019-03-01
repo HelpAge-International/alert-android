@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_programme_results.progressBar
 import kotlinx.android.synthetic.main.activity_programme_results.rvResults
 import kotlinx.android.synthetic.main.activity_programme_results.tvResultsFor
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.risk_monitoring.model.CountryJsonData
 import org.alertpreparedness.platform.v2.base.BaseActivity
 import org.alertpreparedness.platform.v2.models.enums.Country

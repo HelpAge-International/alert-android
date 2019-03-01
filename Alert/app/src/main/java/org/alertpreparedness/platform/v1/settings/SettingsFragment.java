@@ -29,7 +29,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import javax.inject.Inject;
 import org.alertpreparedness.platform.v1.MainDrawer;
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.UserRef;
 import org.alertpreparedness.platform.v1.helper.UserInfo;

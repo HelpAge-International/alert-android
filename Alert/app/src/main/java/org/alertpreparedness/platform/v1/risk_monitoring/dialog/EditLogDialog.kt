@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import android.view.View
 import kotlinx.android.synthetic.main.dialog_edit_log.view.*
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.risk_monitoring.service.RiskMonitoringService
 import timber.log.Timber
 

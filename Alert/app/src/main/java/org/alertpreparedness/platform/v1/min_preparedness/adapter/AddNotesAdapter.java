@@ -12,7 +12,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.dagger.annotation.UserPublicRef;
 import org.alertpreparedness.platform.v1.min_preparedness.model.Note;
 

@@ -7,7 +7,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v2.models.enums.IndicatorTriggerLevel.GREEN
 import org.alertpreparedness.platform.v2.utils.EnumSerializer
 import java.lang.reflect.Type

@@ -12,7 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import es.dmoral.toasty.Toasty
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.v1.risk_monitoring.model.ModelSource
 import org.jetbrains.anko.find

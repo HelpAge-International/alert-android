@@ -25,7 +25,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 
 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
 public class LocalStorageProvider extends DocumentsProvider {

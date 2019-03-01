@@ -12,7 +12,7 @@ android {
         minSdkVersion 17
         targetSdkVersion 28
         versionCode 1
-        versionName "0.9.5"
+        versionName "0.9.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
@@ -28,15 +28,22 @@ android {
     productFlavors {
         envSand {
             dimension 'version'
+            applicationIdSuffix ".sand"
+            versionNameSuffix "-sand"
         }
         envTest {
             dimension 'version'
+            applicationIdSuffix ".test"
+            versionNameSuffix "-test"
         }
         envUat {
             dimension 'version'
+            applicationIdSuffix ".uat"
+            versionNameSuffix "-uat"
         }
         envLive {
             dimension 'version'
+            versionNameSuffix "-live"
         }
     }
     compileOptions {
@@ -60,9 +67,6 @@ android {
 }
 
 dependencies {
-    def acraVersion = '5.0.0'
-    implementation "ch.acra:acra-mail:$acraVersion"
-
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'

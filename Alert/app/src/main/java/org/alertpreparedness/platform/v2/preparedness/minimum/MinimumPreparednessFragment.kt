@@ -2,7 +2,7 @@ package org.alertpreparedness.platform.v2.preparedness.minimum
 
 import kotlinx.android.synthetic.main.fragment_minimum_preparedness.viewPager
 import org.alertpreparedness.platform.v1.MainDrawer
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v2.base.BaseFragment
 
 class MinimumPreparednessFragment : BaseFragment<MinimumPreparednessViewModel>() {

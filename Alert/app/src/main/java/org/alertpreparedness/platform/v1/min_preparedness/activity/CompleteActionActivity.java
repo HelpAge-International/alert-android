@@ -30,7 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 
 
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.ActionRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.BaseActionRef;

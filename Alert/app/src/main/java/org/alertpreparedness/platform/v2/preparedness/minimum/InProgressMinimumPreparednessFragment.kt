@@ -1,6 +1,6 @@
 package org.alertpreparedness.platform.v2.preparedness.minimum
 
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 
 class InProgressMinimumPreparednessFragment :
         BaseMinimumPreparednessFragment<InProgressMinimumPreparednessViewModel>() {

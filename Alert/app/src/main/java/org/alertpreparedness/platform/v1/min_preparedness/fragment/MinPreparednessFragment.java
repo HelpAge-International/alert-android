@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.alertpreparedness.platform.v1.MainDrawer;
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

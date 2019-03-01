@@ -12,7 +12,7 @@ import android.view.MenuItem;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.dashboard.adapter.MultiHazardAdapter;
 import org.alertpreparedness.platform.v1.utils.Constants;
 

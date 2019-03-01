@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.fragment_page_preparedness.ivStatus
 import kotlinx.android.synthetic.main.fragment_page_preparedness.rvActions
 import kotlinx.android.synthetic.main.fragment_page_preparedness.tvNoAction
 import kotlinx.android.synthetic.main.fragment_page_preparedness.tvStatus
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.adv_preparedness.activity.EditAPAActivity
 import org.alertpreparedness.platform.v1.adv_preparedness.fragment.UsersListDialogFragment
 import org.alertpreparedness.platform.v1.firebase.ActionModel

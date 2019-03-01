@@ -5,7 +5,7 @@ import android.app.AlertDialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import android.widget.ArrayAdapter
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.adv_preparedness.activity.DepartmentModel
 import org.alertpreparedness.platform.v1.risk_monitoring.model.ModelUserPublic
 import org.alertpreparedness.platform.v1.risk_monitoring.view.AddIndicatorActivity

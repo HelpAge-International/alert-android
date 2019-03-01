@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import durdinapps.rxfirebase2.RxFirebaseDatabase
 import io.reactivex.Flowable
+import org.alertpreparedness.platform.BuildConfig
 import org.alertpreparedness.platform.v1.risk_monitoring.model.ModelUserPublic
 import org.alertpreparedness.platform.v1.utils.Constants
 import org.alertpreparedness.platform.v1.utils.FirebaseHelper
@@ -20,7 +21,7 @@ class StaffService(private val context: Context) {
     val gson = Gson()
 
     fun getCountryStaff(countryId: String): Flowable<List<String>> {
-        val staffCountry = FirebaseHelper.getStaffForCountry(PreferHelper.getString(context, Constants.APP_STATUS), countryId)
+        val staffCountry = FirebaseHelper.getStaffForCountry(BuildConfig.ROOT_NODE, countryId)
         return RxFirebaseDatabase.observeValueEvent(staffCountry)
                 .map { snap ->
                     snap.children.map { it.key!! }
@@ -28,23 +29,22 @@ class StaffService(private val context: Context) {
     }
 
     fun getCountryAdmin(countryId : String): Flowable<ModelUserPublic> {
-        val userDetail = FirebaseHelper.getUserDetail(PreferHelper.getString(context, Constants.APP_STATUS), PreferHelper.getString(context, Constants.COUNTRY_ID))
+        val userDetail = FirebaseHelper.getUserDetail(BuildConfig.ROOT_NODE, PreferHelper.getString(context, Constants.COUNTRY_ID))
 
-        return RxFirebaseDatabase.observeValueEvent(userDetail, { snap ->
+        return RxFirebaseDatabase.observeValueEvent(userDetail) { snap ->
             val toJson = RiskMonitoringService(context).gson.toJson(snap.value)
             val reader = JsonReader(StringReader(toJson.trim()))
             reader.isLenient = true
             val fromJson = RiskMonitoringService(context).gson.fromJson<ModelUserPublic>(reader, ModelUserPublic::class.java)
             fromJson.id = countryId
             return@observeValueEvent fromJson
-        })
-
+        }
     }
 
     fun getUserDetail(userId: String): Flowable<ModelUserPublic> {
-        val userDetail = FirebaseHelper.getUserDetail(PreferHelper.getString(context, Constants.APP_STATUS), userId)
+        val userDetail = FirebaseHelper.getUserDetail(BuildConfig.ROOT_NODE, userId)
         return RxFirebaseDatabase.observeValueEvent(userDetail)
-                .map({ snapshot: DataSnapshot ->
+                .map { snapshot: DataSnapshot ->
 
                     val toJson = RiskMonitoringService(context).gson.toJson(snapshot.value)
                     val reader = JsonReader(StringReader(toJson.trim()))
@@ -53,15 +53,15 @@ class StaffService(private val context: Context) {
 
                     model.id = userId
                     return@map model
-                })
+                }
     }
 
     fun getCountryAdminDetail(userId: String): Flowable<ModelUserPublic> {
-        val userDetail = FirebaseHelper.getUserDetail(PreferHelper.getString(context, Constants.APP_STATUS), userId)
+        val userDetail = FirebaseHelper.getUserDetail(BuildConfig.ROOT_NODE, userId)
         return RxFirebaseDatabase.observeValueEvent(userDetail, ModelUserPublic::class.java)
-                .map({ model: ModelUserPublic ->
+                .map { model: ModelUserPublic ->
                     model.id = userId
                     return@map model
-                })
+                }
     }
 }

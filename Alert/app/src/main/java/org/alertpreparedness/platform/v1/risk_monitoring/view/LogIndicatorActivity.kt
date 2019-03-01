@@ -3,7 +3,7 @@ package org.alertpreparedness.platform.v1.risk_monitoring.view
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_log_indicator.*
 import org.alertpreparedness.platform.v1.BaseActivity
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 
 class LogIndicatorActivity : BaseActivity() {
 

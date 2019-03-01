@@ -29,6 +29,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
+import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.AgencyRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.PermissionRef;

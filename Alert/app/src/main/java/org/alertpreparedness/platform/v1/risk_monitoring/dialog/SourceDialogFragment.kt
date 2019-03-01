@@ -6,7 +6,7 @@ import androidx.fragment.app.DialogFragment
 import android.view.View
 import android.widget.EditText
 import es.dmoral.toasty.Toasty
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.risk_monitoring.model.ModelSource
 import org.alertpreparedness.platform.v1.utils.AppUtils
 import org.jetbrains.anko.find

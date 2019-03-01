@@ -14,6 +14,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import org.alertpreparedness.platform.v1.AlertApplication;
+import org.alertpreparedness.platform.BuildConfig;
 import org.alertpreparedness.platform.v1.dagger.annotation.AppStatusConst;
 import org.alertpreparedness.platform.v1.dagger.annotation.BaseDatabaseRef;
 import org.alertpreparedness.platform.v1.dagger.annotation.UserEmail;
@@ -80,7 +81,7 @@ public class ApplicationModule {
     @Singleton
     @AppStatusConst
     public String provideAppStatus() {
-        return PreferHelper.getString(application, Constants.APP_STATUS);
+        return BuildConfig.ROOT_NODE;
     }
 
     @Provides

@@ -13,7 +13,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import es.dmoral.toasty.Toasty
 import kotlinx.android.synthetic.main.bottom_sheet_indicator.view.*
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector
 import org.alertpreparedness.platform.v1.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.v1.risk_monitoring.view.ActiveRiskFragment

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="org.alertpreparedness.platform.v1">
+    package="org.alertpreparedness.platform">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- <uses-permission android:name="android.permission.CAMERA" /> -->
@@ -11,7 +11,7 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <application
-        android:name=".AlertApplication"
+        android:name=".v1.AlertApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -20,37 +20,37 @@
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
         <activity
-            android:name="org.alertpreparedness.platform.v2.alert.CreateAlertActivity"
+            android:name=".v2.alert.CreateAlertActivity"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name="org.alertpreparedness.platform.v2.alert.AlertDetailActivity" />
-        <activity android:name="org.alertpreparedness.platform.v2.mycountry.ProgrammeResultsActivity" />
+        <activity android:name=".v2.alert.AlertDetailActivity" />
+        <activity android:name=".v2.mycountry.ProgrammeResultsActivity" />
 
         <service
-            android:name="offline.SyncJobService"
+            android:name=".v1.offline.SyncJobService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
             </intent-filter>
         </service>
         <service
-            android:name=".notifications.IndicatorNotificationService"
+            android:name=".v1.notifications.IndicatorNotificationService"
             android:exported="false" />
         <service
-            android:name=".notifications.ActionNotificationService"
+            android:name=".v1.notifications.ActionNotificationService"
             android:exported="false" />
-        <service android:name=".notifications.AlertFirebaseMessagingService">
+        <service android:name=".v1.notifications.AlertFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service android:name=".notifications.AlertFirebaseInstanceIDService">
+        <service android:name=".v1.notifications.AlertFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
 
         <activity
-            android:name=".login.activity.SplashActivity"
+            android:name=".v1.login.activity.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>
@@ -60,11 +60,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".login.activity.LoginScreen"
+            android:name=".v1.login.activity.LoginScreen"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".dashboard.activity.HomeScreen"
+            android:name=".v1.dashboard.activity.HomeScreen"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
 
@@ -78,38 +78,38 @@
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
 
-        <activity android:name=".MainDrawer" /> <!-- <activity -->
+        <activity android:name=".v1.MainDrawer" /> <!-- <activity -->
         <!-- android:name=".risk_monitoring.vRiskFragmentvity" -->
         <!-- android:label="@string/title_activity_risk" -->
         <!-- android:launchMode="singleTask" -->
         <!-- android:screenOrientation="portrait" -->
         <!-- android:theme="@style/AppTheme.NoActionBar" /> -->
         <activity
-            android:name=".risk_monitoring.view.AddIndicatorActivity"
+            android:name=".v1.risk_monitoring.view.AddIndicatorActivity"
             android:label="@string/title_activity_add_indicator"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".risk_monitoring.view.SelectAreaActivity"
+            android:name=".v1.risk_monitoring.view.SelectAreaActivity"
             android:label="@string/title_activity_select_area"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".dashboard.activity.CreateAlertActivity"
+            android:name=".v1.dashboard.activity.CreateAlertActivity"
             android:label="@string/title_activity_create_alert"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".dashboard.activity.HazardSelectionActivity"
+            android:name=".v1.dashboard.activity.HazardSelectionActivity"
             android:label="@string/select_hazard_title"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".dashboard.activity.MultiHazardSelectionActivity"
+            android:name=".v1.dashboard.activity.MultiHazardSelectionActivity"
             android:label="@string/select_hazard_title"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".dashboard.activity.AlertDetailActivity"
-            android:parentActivityName="dashboard.activity.HomeScreen"
+            android:name=".v1.dashboard.activity.AlertDetailActivity"
+            android:parentActivityName=".v1.dashboard.activity.HomeScreen"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
@@ -119,48 +119,48 @@
             android:value="dashboard.activity.HomeScreen" />
 
         <activity
-            android:name=".risk_monitoring.view.UpdateIndicatorActivity"
+            android:name=".v1.risk_monitoring.view.UpdateIndicatorActivity"
             android:label="@string/title_activity_update_indicator"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".risk_monitoring.view.LogIndicatorActivity"
+            android:name=".v1.risk_monitoring.view.LogIndicatorActivity"
             android:label="@string/title_activity_log_indicator"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".risk_monitoring.view.IndicatorLogActivity"
+            android:name=".v1.risk_monitoring.view.IndicatorLogActivity"
             android:label="@string/title_activity_indicator_log"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".dashboard.activity.UpdateAlertActivity"
+            android:name=".v1.dashboard.activity.UpdateAlertActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".mycountry.ProgramResultsActivity"
+            android:name=".v1.mycountry.ProgramResultsActivity"
             android:label="@string/programme_results"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".settings.ChangeEmailActivity"
+            android:name=".v1.settings.ChangeEmailActivity"
             android:label="@string/change_email" />
         <activity
-            android:name=".settings.ChangePasswordActivity"
+            android:name=".v1.settings.ChangePasswordActivity"
             android:label="@string/change_password" />
         <activity
-            android:name=".min_preparedness.activity.CompleteActionActivity"
+            android:name=".v1.min_preparedness.activity.CompleteActionActivity"
             android:label="@string/complete_action" />
         <activity
-            android:name=".min_preparedness.activity.AddNotesActivity"
+            android:name=".v1.min_preparedness.activity.AddNotesActivity"
             android:label="Notes" />
         <activity
-            android:name=".adv_preparedness.activity.CreateAPAActivity"
+            android:name=".v1.adv_preparedness.activity.CreateAPAActivity"
             android:label="@string/txt_create_apa" />
         <activity
-            android:name=".adv_preparedness.activity.EditAPAActivity"
+            android:name=".v1.adv_preparedness.activity.EditAPAActivity"
             android:label="@string/edit_apa" />
         <activity
-            android:name=".min_preparedness.activity.ViewAttachmentsActivity"
+            android:name=".v1.min_preparedness.activity.ViewAttachmentsActivity"
             android:label="@string/attachments" />
     </application>
 

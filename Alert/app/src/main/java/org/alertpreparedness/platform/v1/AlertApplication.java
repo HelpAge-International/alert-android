@@ -16,7 +16,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import io.fabric.sdk.android.Fabric;
 import io.realm.Realm;
 import net.danlew.android.joda.JodaTimeAndroid;
-import org.acra.annotation.AcraMailSender;
+import org.alertpreparedness.platform.BuildConfig;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.PermissionRef;
 import org.alertpreparedness.platform.v1.helper.UserInfo;
@@ -37,31 +37,28 @@ import timber.log.Timber;
 /**
  * Created by fei on 06/11/2017.
  */
-@AcraMailSender(mailTo = "tj@rolleragency.co.uk")
 public class AlertApplication extends MultiDexApplication implements ValueEventListener {
 
-    public static final boolean IS_LIVE = false;
     private User user;
-
-//    public static final String API_KEY = "";
 
     public enum APP_STATUS {
         LIVE,
         SAND,
-        TESTING,
+        TEST,
         UAT
     }
 
-    public static final APP_STATUS CURRENT_STATUS = APP_STATUS.TESTING;
+    public static final APP_STATUS CURRENT_STATUS = BuildConfig.FLAVOR.equals("envSand") ? APP_STATUS.SAND :
+                                                    BuildConfig.FLAVOR.equals("envUat") ? APP_STATUS.UAT :
+                                                    BuildConfig.FLAVOR.equals("envTest") ? APP_STATUS.TEST :
+                                                    APP_STATUS.LIVE;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         //Precache Area JSON
-        long start = System.currentTimeMillis();
         AreaJsonManager.INSTANCE.preCache(this);
-        System.out.println("TIME: " + (System.currentTimeMillis() - start));
 
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         DependencyInjector.initialize(this);
@@ -78,7 +75,6 @@ public class AlertApplication extends MultiDexApplication implements ValueEventL
                 .build();
         Fabric.with(fabric);
 
-
 //        FirebaseAuthExtensions.getInstance().signOut();
         Shortbread.create(this);
 
@@ -88,21 +84,10 @@ public class AlertApplication extends MultiDexApplication implements ValueEventL
 
         boolean loggedIn = FirebaseAuth.getInstance().getCurrentUser() != null;
 
-        if(!PreferHelper.getBoolean(this, Constants.HAS_RUN_BEFORE)) {
+        if (!PreferHelper.getBoolean(this, Constants.HAS_RUN_BEFORE)) {
             FirebaseAuth.getInstance().signOut();
             PreferHelper.deleteString(this, Constants.UID);
             PreferHelper.putBoolean(this, Constants.HAS_RUN_BEFORE, true);
-        }
-
-        // Live-Only additions
-        if (!IS_LIVE && CURRENT_STATUS == APP_STATUS.SAND) {
-            // Leak Canary
-//            if (LeakCanary.isInAnalyzerProcess(this)) {
-//                // This process is dedicated to LeakCanary for heap analysis.
-//                // You should not init your app in this process.
-//                return;
-//            }
-//            LeakCanary.install(this);
         }
 
         // Debug-Only builds
@@ -110,21 +95,7 @@ public class AlertApplication extends MultiDexApplication implements ValueEventL
             Timber.plant(new Timber.DebugTree());
         }
 
-        // Check APP Status
-        if (CURRENT_STATUS == APP_STATUS.LIVE) {
-            PreferHelper.putString(getApplicationContext(), Constants.APP_STATUS, Constants.APP_STATUS_LIVE);
-        }
-        else if (CURRENT_STATUS == APP_STATUS.TESTING) {
-            PreferHelper.putString(getApplicationContext(), Constants.APP_STATUS, Constants.APP_STATUS_TEST);
-        }
-        else if (CURRENT_STATUS == APP_STATUS.UAT) {
-            PreferHelper.putString(getApplicationContext(), Constants.APP_STATUS, Constants.APP_STATUS_UAT);
-        }
-        else if (CURRENT_STATUS == APP_STATUS.SAND) {
-            PreferHelper.putString(getApplicationContext(), Constants.APP_STATUS, Constants.APP_STATUS_SAND);
-        }
-
-        if(loggedIn) {
+        if (loggedIn) {
 
             DependencyInjector.initialize(this);
             DependencyInjector.initializeUserScope();
@@ -137,18 +108,18 @@ public class AlertApplication extends MultiDexApplication implements ValueEventL
             new ActionUpdateNotificationHandler(this).scheduleAllNotifications();
             new ResponsePlanUpdateNotificationHandler(this).scheduleAllNotifications();
 
-            if(FirebaseInstanceId.getInstance().getToken() != null) {
-                new NotificationIdHandler().registerDeviceId(new UserInfo().getUser().getUserID(), FirebaseInstanceId.getInstance().getToken());
+            if (FirebaseInstanceId.getInstance().getToken() != null) {
+                new NotificationIdHandler().registerDeviceId(new UserInfo().getUser().getUserID(),
+                        FirebaseInstanceId.getInstance().getToken());
             }
 
-        }
-        else{
+        } else {
             //TODO: CANCEL ALL NOTIFICATIONS?
         }
     }
 
     public void startPermissionListeners(@PermissionRef DatabaseReference permissionsRef, User user) {
-        if(permissionsRef != null) {
+        if (permissionsRef != null) {
             this.user = user;
             permissionsRef.addValueEventListener(this);
         }
@@ -157,10 +128,9 @@ public class AlertApplication extends MultiDexApplication implements ValueEventL
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        if(dataSnapshot.getKey().equals("permissionSettings")) {
+        if (dataSnapshot.getKey().equals("permissionSettings")) {
             SettingsFactory.processCountryLevelSettings(dataSnapshot, user);
-        }
-        else {
+        } else {
             SettingsFactory.proccessPartnerSettings(dataSnapshot, user);
         }
     }

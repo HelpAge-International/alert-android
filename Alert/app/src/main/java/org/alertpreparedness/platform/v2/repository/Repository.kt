@@ -5,7 +5,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.JsonObject
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.combineLatest
-import org.alertpreparedness.platform.v1.BuildConfig
+import org.alertpreparedness.platform.BuildConfig
 import org.alertpreparedness.platform.v2.FirebaseAuthExtensions
 import org.alertpreparedness.platform.v2.asObservable
 import org.alertpreparedness.platform.v2.models.Action
@@ -404,7 +404,7 @@ object Repository {
                                 list.mapNotNull { it.toModel<ResponsePlan>() }
                             }
                             .filterList {
-                                it.approval.countryDirector?.id == user.countryId
+                                it.approval?.countryDirector?.id == user.countryId
                             }
                 }
                 .startWith(listOf<ResponsePlan>())

@@ -31,8 +31,8 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.alertpreparedness.platform.v1.AlertApplication;
-import org.alertpreparedness.platform.v1.BuildConfig;
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.BuildConfig;
+import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dashboard.activity.HomeScreen;
 import org.alertpreparedness.platform.v1.helper.UserInfo;
@@ -121,15 +121,23 @@ public class LoginScreen extends AppCompatActivity implements View.OnClickListen
         }
 
         if (view == txt_forgotPasword) {
+            String url;
             switch (AlertApplication.CURRENT_STATUS) {
-
-                case LIVE:
-                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://platform.alertpreparedness.org/forgot-password")));
+                case UAT:
+                    url = "https://uat.portal.alertpreparedness.org/forgot-password";
                     break;
+                case TEST:
+                    url = "https://test.portal.alertpreparedness.org/forgot-password";
+                    break;
+                case SAND:
+                    url = "https://alert-190fa.firebaseapp.com//forgot-password";
+                    break;
+                case LIVE:
                 default:
-                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://uat.portal.alertpreparedness.org/forgot-password")));
+                    url = "https://platform.alertpreparedness.org/forgot-password";
                     break;
             }
+            startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(url)));
         }
     }
 

@@ -19,7 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import javax.inject.Inject;
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.adv_preparedness.adapter.UserListAdapter;
 import org.alertpreparedness.platform.v1.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;

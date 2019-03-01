@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.activity_create_alert.ivAlertLevel
 import kotlinx.android.synthetic.main.activity_create_alert.rvAreas
 import kotlinx.android.synthetic.main.activity_create_alert.tvAlertLevel
 import kotlinx.android.synthetic.main.activity_create_alert.tvHazard
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.dashboard.activity.HazardSelectionActivity
 import org.alertpreparedness.platform.v1.dashboard.activity.HazardSelectionActivity.HAZARD_TYPE
 import org.alertpreparedness.platform.v1.helper.AlertLevelDialog

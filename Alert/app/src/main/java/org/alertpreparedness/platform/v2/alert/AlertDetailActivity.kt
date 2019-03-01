@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.activity_alert_detail.grpApproveReject
 import kotlinx.android.synthetic.main.activity_alert_detail.rvAlertDetails
 import kotlinx.android.synthetic.main.activity_alert_detail.tvBanner
 import kotlinx.android.synthetic.main.activity_alert_detail.tvLastUpdated
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v2.base.BaseActivity
 import org.alertpreparedness.platform.v2.utils.extensions.bind
 import org.alertpreparedness.platform.v2.utils.extensions.isRedAlertRequested

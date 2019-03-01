@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import kotlinx.android.synthetic.main.item_preparedness_bottom_sheet.view.ivIcon
 import kotlinx.android.synthetic.main.item_preparedness_bottom_sheet.view.tvNumberIndicator
 import kotlinx.android.synthetic.main.item_preparedness_bottom_sheet.view.tvTitle
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v2.preparedness.PreparednessBottomSheetAdapter.PreparednessBottomSheetViewHolder
 import org.alertpreparedness.platform.v2.preparedness.advanced.PreparednessBottomSheetOption
 import org.alertpreparedness.platform.v2.utils.DiffComparator

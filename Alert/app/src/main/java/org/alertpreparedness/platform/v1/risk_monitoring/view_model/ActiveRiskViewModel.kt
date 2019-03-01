@@ -147,7 +147,7 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
 
     fun getLiveNetworkMap(): MutableLiveData<Map<String, String>> {
         mDisposables.add(
-                NetworkService(getApplication()).mapNetworksForCountry(mAgencyId, mCountryId)
+                NetworkService().mapNetworksForCountry(mAgencyId, mCountryId)
                         .subscribe({ map ->
                             mNetworkMapLive.value = map
                         }, { error ->
@@ -278,7 +278,7 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
         mDisposables.add(disposableHazard)
 
         //network hazard and indicators
-        val disposableNetwork = NetworkService(getApplication()).mapNetworksForCountry(mAgencyId, mCountryId)
+        val disposableNetwork = NetworkService().mapNetworksForCountry(mAgencyId, mCountryId)
                 .subscribe({ networkMap ->
                     networkMap.forEach { (networkId, networkCountryId) ->
 
@@ -292,7 +292,7 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
                                 })
                         )
 
-                        mDisposables.add(NetworkService(getApplication()).getNetworkDetail(networkId)
+                        mDisposables.add(NetworkService().getNetworkDetail(networkId)
                                 .subscribe({ network ->
 
                                     mDisposables.add(RiskMonitoringService(getApplication()).getHazards(networkCountryId)
@@ -395,7 +395,7 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
 
         //local network hazard and indicators
         mDisposables.add(
-                NetworkService(getApplication()).listLocalNetworksForCountry(mAgencyId, mCountryId)
+                NetworkService().listLocalNetworksForCountry(mAgencyId, mCountryId)
                         .subscribe({ localNetworkList ->
                             Timber.d("local networks: %s", localNetworkList.size)
                             localNetworkList.forEach { localNetworkId ->
@@ -413,7 +413,7 @@ class ActiveRiskViewModel : AndroidViewModel, FirebaseAuth.AuthStateListener {
                                         })
                                 )
 
-                                mDisposables.add(NetworkService(getApplication()).getNetworkDetail(localNetworkId)
+                                mDisposables.add(NetworkService().getNetworkDetail(localNetworkId)
                                         .subscribe({ network ->
                                             Timber.d(network.toString())
 

@@ -21,7 +21,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import java.util.ArrayList;
 import java.util.Collection;
 import javax.inject.Inject;
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.adv_preparedness.fragment.UsersListDialogFragment;
 import org.alertpreparedness.platform.v1.adv_preparedness.model.UserModel;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;

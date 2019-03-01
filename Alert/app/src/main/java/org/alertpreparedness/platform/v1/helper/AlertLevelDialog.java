@@ -8,7 +8,7 @@ import androidx.fragment.app.DialogFragment;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 
 /**
  * Created by Tj on 06/12/2017.

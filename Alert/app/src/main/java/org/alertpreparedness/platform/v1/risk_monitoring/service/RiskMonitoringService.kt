@@ -7,6 +7,7 @@ import durdinapps.rxfirebase2.RxFirebaseDatabase
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Observable
+import org.alertpreparedness.platform.BuildConfig
 import org.alertpreparedness.platform.v1.risk_monitoring.model.*
 import org.alertpreparedness.platform.v1.utils.AppUtils
 import org.alertpreparedness.platform.v1.utils.Constants
@@ -23,7 +24,6 @@ import java.io.StringReader
 class RiskMonitoringService(private val context : Context) {
 
     public val gson: Gson = Gson()
-    private val mAppStatus = PreferHelper.getString(context, Constants.APP_STATUS)
 
     fun readJsonFile(): Observable<String> {
         return Observable.create { subscriber ->
@@ -51,7 +51,7 @@ class RiskMonitoringService(private val context : Context) {
 
     fun getHazards(countryId: String): Flowable<List<ModelHazard>> {
 
-        val hazardsRef = FirebaseHelper.getHazardsRef(mAppStatus, countryId)
+        val hazardsRef = FirebaseHelper.getHazardsRef(BuildConfig.ROOT_NODE, countryId)
         return RxFirebaseDatabase.observeValueEvent(hazardsRef, { snap ->
             println("hazardsRefsnap = ${snap}")
             if (snap.value != null && snap.children.count() > 0) {
@@ -69,7 +69,7 @@ class RiskMonitoringService(private val context : Context) {
     }
 
     fun getHazardOtherName(hazard: ModelHazard): Flowable<Pair<String, String>> {
-        val hazardsOtherNameRef = FirebaseHelper.getHazardsOtherNameRef(mAppStatus, hazard.otherName)
+        val hazardsOtherNameRef = FirebaseHelper.getHazardsOtherNameRef(BuildConfig.ROOT_NODE, hazard.otherName)
         return RxFirebaseDatabase.observeValueEvent(hazardsOtherNameRef)
                 .map { snap ->
                     hazard.id?.let { Pair<String, String>(it, JSONObject(gson.toJson(snap.value)).getString("name")) }
@@ -77,7 +77,7 @@ class RiskMonitoringService(private val context : Context) {
     }
 
     fun getIndicators(hazardId: String): Flowable<List<ModelIndicator>> {
-        val indicatorRef = FirebaseHelper.getIndicatorsRef(mAppStatus, hazardId)
+        val indicatorRef = FirebaseHelper.getIndicatorsRef(BuildConfig.ROOT_NODE, hazardId)
         return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
             snap.children.map {
                 val toJson = gson.toJson(it.value)
@@ -91,7 +91,7 @@ class RiskMonitoringService(private val context : Context) {
     }
 
     fun addIndicatorToHazard(indicator: ModelIndicator, countryContext: Boolean) {
-        val indicatorRef = FirebaseHelper.getIndicatorsRef(mAppStatus, if (countryContext) PreferHelper.getString(context, Constants.COUNTRY_ID) else indicator.hazardScenario.id)
+        val indicatorRef = FirebaseHelper.getIndicatorsRef(BuildConfig.ROOT_NODE, if (countryContext) PreferHelper.getString(context, Constants.COUNTRY_ID) else indicator.hazardScenario.id)
         val ref = indicatorRef.push()
         println("mIndicatorModeltriggerSelected = ${ref}")
         if (countryContext) {
@@ -116,7 +116,7 @@ class RiskMonitoringService(private val context : Context) {
     }
 
     fun getIndicatorsForAssignee(hazardId: String, network: ModelNetwork?): Flowable<List<ModelIndicator>> {
-        val indicatorRef = FirebaseHelper.getIndicatorsRef(mAppStatus, hazardId).orderByChild("assignee").equalTo(PreferHelper.getString(context, Constants.UID))
+        val indicatorRef = FirebaseHelper.getIndicatorsRef(BuildConfig.ROOT_NODE, hazardId).orderByChild("assignee").equalTo(PreferHelper.getString(context, Constants.UID))
         return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
             snap.children.map {
                 val toJson = gson.toJson(it.value)
@@ -136,7 +136,7 @@ class RiskMonitoringService(private val context : Context) {
 
     fun getIndicatorsForLocalNetwork(hazardId: String, network: ModelNetwork?, s: String?): Flowable<List<ModelIndicator>> {
 //        println("getIndicatorsForLocalNetworks = ${s}")
-        val indicatorRef = FirebaseHelper.getIndicatorsRef(mAppStatus, hazardId).orderByChild("assignee")
+        val indicatorRef = FirebaseHelper.getIndicatorsRef(BuildConfig.ROOT_NODE, hazardId).orderByChild("assignee")
         return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
             snap.children
             .filter {
@@ -162,7 +162,7 @@ class RiskMonitoringService(private val context : Context) {
 
     fun getIndicatorModel(hazardId: String, indicatorId: String): Flowable<ModelIndicator> {
         Timber.d("actual ids: %s, %s", hazardId, indicatorId)
-        val indicatorRef = FirebaseHelper.getIndicatorRef(mAppStatus, hazardId, indicatorId)
+        val indicatorRef = FirebaseHelper.getIndicatorRef(BuildConfig.ROOT_NODE, hazardId, indicatorId)
         return RxFirebaseDatabase.observeValueEvent(indicatorRef, { snap ->
             val toJson = gson.toJson(snap.value)
             val jsonReader = JsonReader(StringReader(toJson))
@@ -174,12 +174,12 @@ class RiskMonitoringService(private val context : Context) {
     }
 
     fun updateIndicator(hazardId: String, indicatorId: String, updateData: Map<String, Any>): Completable {
-        val indicatorRef = FirebaseHelper.getIndicatorRef(mAppStatus, hazardId, indicatorId)
+        val indicatorRef = FirebaseHelper.getIndicatorRef(BuildConfig.ROOT_NODE, hazardId, indicatorId)
         return RxFirebaseDatabase.updateChildren(indicatorRef, updateData)
     }
 
     fun getLogs(id: String): Flowable<List<ModelLog>> {
-        val logRef = FirebaseHelper.getIndicatorLogRef(mAppStatus, id)
+        val logRef = FirebaseHelper.getIndicatorLogRef(BuildConfig.ROOT_NODE, id)
         return RxFirebaseDatabase.observeValueEvent(logRef, { snap ->
             snap.children.map {
                 val toJson = gson.toJson(it.value)
@@ -191,23 +191,23 @@ class RiskMonitoringService(private val context : Context) {
     }
 
     fun deleteLog(id: String, logId: String) {
-        val logRef = FirebaseHelper.getIndicatorLogRef(mAppStatus, id)
+        val logRef = FirebaseHelper.getIndicatorLogRef(BuildConfig.ROOT_NODE, id)
         logRef.child(logId).removeValue()
     }
 
     fun addLogToIndicator(log: ModelLog, indicatorId: String) {
-        val logRef = FirebaseHelper.getIndicatorLogRef(mAppStatus, indicatorId)
+        val logRef = FirebaseHelper.getIndicatorLogRef(BuildConfig.ROOT_NODE, indicatorId)
         val key = logRef.push().key
         logRef.child(key!!).setValue(log)
     }
 
     fun updateLogContent(indicatorId: String, logId: String, content: String) {
-        val logRef = FirebaseHelper.getIndicatorLogRef(mAppStatus, indicatorId)
+        val logRef = FirebaseHelper.getIndicatorLogRef(BuildConfig.ROOT_NODE, indicatorId)
         logRef.child(logId).child("content").setValue(content)
     }
 
     fun getHazardOtherNameString(id: String): Flowable<String> {
-        val otherNameRef = AppUtils.getDatabase().getReference(mAppStatus).child("hazardOther").child(id).child("name")
+        val otherNameRef = AppUtils.getDatabase().getReference(BuildConfig.ROOT_NODE).child("hazardOther").child(id).child("name")
         return RxFirebaseDatabase.observeValueEvent(otherNameRef, String::class.java)
     }
 

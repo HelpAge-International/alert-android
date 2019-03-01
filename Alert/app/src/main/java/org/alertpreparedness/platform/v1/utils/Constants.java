@@ -4,16 +4,9 @@ package org.alertpreparedness.platform.v1.utils;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.StringRes;
 
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 
 public final class Constants {
-
-    //Database tags
-    public static final String APP_STATUS = "app_status";
-    public static final String APP_STATUS_SAND = "sand";
-    public static final String APP_STATUS_TEST = "test";
-    public static final String APP_STATUS_UAT = "uat";
-    public static final String APP_STATUS_LIVE = "live";
 
     //animation delay
     public static final long MENU_CLOSING_DURATION = 250;

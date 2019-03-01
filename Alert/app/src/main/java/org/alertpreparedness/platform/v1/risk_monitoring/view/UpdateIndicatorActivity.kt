@@ -12,7 +12,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_update_indicator.*
 import kotlinx.android.synthetic.main.content_update_indicator.*
 import org.alertpreparedness.platform.v1.BaseActivity
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.risk_monitoring.model.ModelIndicator
 import org.alertpreparedness.platform.v1.risk_monitoring.model.ModelLog
 import org.alertpreparedness.platform.v1.risk_monitoring.view_model.ActiveRiskViewModel

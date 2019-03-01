@@ -2,7 +2,7 @@ package org.alertpreparedness.platform.v2.models.enums
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v2.utils.EnumSerializer
 
 enum class HazardScenario(

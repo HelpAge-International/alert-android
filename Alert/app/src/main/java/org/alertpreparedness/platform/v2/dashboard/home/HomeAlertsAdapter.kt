@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.item_alert.view.tvAlertLevel
 import kotlinx.android.synthetic.main.item_alert.view.tvAlertRequested
 import kotlinx.android.synthetic.main.item_alert.view.tvHazardName
 import kotlinx.android.synthetic.main.item_alert.view.tvNumOfPeople
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v2.dashboard.home.AlertActionType.NORMAL
 import org.alertpreparedness.platform.v2.dashboard.home.AlertActionType.RED_ALERT_REQUESTED
 import org.alertpreparedness.platform.v2.dashboard.home.AlertActionType.RED_ALERT_REQUIRES_ACTION

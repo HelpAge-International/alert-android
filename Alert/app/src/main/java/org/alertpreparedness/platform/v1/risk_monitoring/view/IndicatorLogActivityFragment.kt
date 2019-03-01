@@ -11,7 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_indicator_log.view.*
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector
 import org.alertpreparedness.platform.v1.risk_monitoring.adapter.IndicatorLogRVAdapter
 import org.alertpreparedness.platform.v1.risk_monitoring.model.ModelLog

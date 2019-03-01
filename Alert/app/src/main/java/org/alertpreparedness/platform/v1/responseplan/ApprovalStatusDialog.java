@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 
 import java.util.Arrays;
 

@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseReference;
 
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.dagger.annotation.ClockSettingsActionObservable;
 import org.alertpreparedness.platform.v1.firebase.ActionModel;
 import org.alertpreparedness.platform.v1.adv_preparedness.fragment.UsersListDialogFragment;

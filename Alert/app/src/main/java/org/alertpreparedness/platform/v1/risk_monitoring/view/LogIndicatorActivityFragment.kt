@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 
 /**
  * A placeholder fragment containing a simple view.

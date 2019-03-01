@@ -9,7 +9,7 @@ import org.alertpreparedness.platform.v2.models.enums.ResponsePlanStateSerialize
 import java.lang.reflect.Type
 
 class ResponsePlan(
-        val approval: ResponsePlanApproval,
+        val approval: ResponsePlanApproval?,
         val name: String,
         val status: ResponsePlanState
 ): BaseModel()

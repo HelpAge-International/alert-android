@@ -2,7 +2,7 @@ package org.alertpreparedness.platform.v1.utils;
 
 import android.app.Activity;
 import androidx.fragment.app.FragmentActivity;
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.firebase.ActionModel;
 import org.alertpreparedness.platform.v1.realm.SettingsRealm;
 import org.alertpreparedness.platform.v2.models.Action;

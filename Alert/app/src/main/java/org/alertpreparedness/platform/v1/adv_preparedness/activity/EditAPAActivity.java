@@ -8,7 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.firebase.ActionModel;
 import org.alertpreparedness.platform.v1.firebase.consumers.ItemConsumer;
 import org.alertpreparedness.platform.v1.risk_monitoring.dialog.AssignToListener;

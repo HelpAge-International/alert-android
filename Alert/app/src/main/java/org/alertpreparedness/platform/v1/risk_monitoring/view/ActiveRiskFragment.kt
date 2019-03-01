@@ -13,7 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
 import kotlinx.android.synthetic.main.fragment_active_risk.*
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.risk_monitoring.adapter.HazardAdapter
 import org.alertpreparedness.platform.v1.risk_monitoring.adapter.OnIndicatorSelectedListener
 import org.alertpreparedness.platform.v1.risk_monitoring.dialog.BottomSheetDialog

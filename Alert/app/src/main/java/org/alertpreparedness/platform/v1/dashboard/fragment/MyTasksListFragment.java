@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 
 
 /**

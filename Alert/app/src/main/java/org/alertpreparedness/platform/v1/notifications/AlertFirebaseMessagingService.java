@@ -8,6 +8,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import org.alertpreparedness.platform.BuildConfig;
 import org.alertpreparedness.platform.v1.firebase.ActionModel;
 import org.alertpreparedness.platform.v1.firebase.IndicatorModel;
 import org.alertpreparedness.platform.v1.firebase.ResponsePlanModel;
@@ -69,7 +70,7 @@ public class AlertFirebaseMessagingService extends FirebaseMessagingService {
 
         User user = new UserInfo().getUser();
 
-        DatabaseReference db = FirebaseDatabase.getInstance().getReference().child(PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS)).child("indicator").child(hazardId).child(indicatorId);
+        DatabaseReference db = FirebaseDatabase.getInstance().getReference().child(BuildConfig.ROOT_NODE).child("indicator").child(hazardId).child(indicatorId);
 
         if(user != null){
             db.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -97,7 +98,7 @@ public class AlertFirebaseMessagingService extends FirebaseMessagingService {
 
         User user = new UserInfo().getUser();
 
-        DatabaseReference db = FirebaseDatabase.getInstance().getReference().child(PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS)).child("action").child(groupId).child(actionId);
+        DatabaseReference db = FirebaseDatabase.getInstance().getReference().child(BuildConfig.ROOT_NODE).child("action").child(groupId).child(actionId);
 
         if(user != null){
             db.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -125,7 +126,7 @@ public class AlertFirebaseMessagingService extends FirebaseMessagingService {
 
         User user = new UserInfo().getUser();
 
-        DatabaseReference db = FirebaseDatabase.getInstance().getReference().child(PreferHelper.getString(getApplicationContext(), Constants.APP_STATUS)).child("responsePlan").child(groupId).child(responsePlanId);
+        DatabaseReference db = FirebaseDatabase.getInstance().getReference().child(BuildConfig.ROOT_NODE).child("responsePlan").child(groupId).child(responsePlanId);
 
         if(user != null){
             db.addListenerForSingleValueEvent(new ValueEventListener() {

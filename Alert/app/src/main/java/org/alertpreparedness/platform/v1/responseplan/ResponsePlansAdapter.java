@@ -16,7 +16,7 @@ import com.google.firebase.database.DatabaseReference;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.alertpreparedness.platform.v1.R;
+import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.min_preparedness.model.Note;
 
 /**

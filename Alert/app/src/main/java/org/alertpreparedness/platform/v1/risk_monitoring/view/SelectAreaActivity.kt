@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.content_select_area.tvSelectCountry
 import kotlinx.android.synthetic.main.content_select_area.tvSelectLevel1
 import kotlinx.android.synthetic.main.content_select_area.tvSelectLevel2
 import org.alertpreparedness.platform.v1.BaseActivity
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.risk_monitoring.dialog.OnCountrySelectedListener
 import org.alertpreparedness.platform.v1.risk_monitoring.dialog.OnLevel1SelectedListener
 import org.alertpreparedness.platform.v1.risk_monitoring.dialog.OnLevel2SelectedListener

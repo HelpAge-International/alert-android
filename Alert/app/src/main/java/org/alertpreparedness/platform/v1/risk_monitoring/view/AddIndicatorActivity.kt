@@ -21,7 +21,8 @@ import es.dmoral.toasty.Toasty
 import kotlinx.android.synthetic.main.activity_add_indicator.*
 import kotlinx.android.synthetic.main.content_add_indicator.*
 import org.alertpreparedness.platform.v1.BaseActivity
-import org.alertpreparedness.platform.v1.R
+import org.alertpreparedness.platform.BuildConfig
+import org.alertpreparedness.platform.R
 import org.alertpreparedness.platform.v1.firebase.TimeTrackingModel
 import org.alertpreparedness.platform.v1.risk_monitoring.adapter.AreaRVAdapter
 import org.alertpreparedness.platform.v1.risk_monitoring.adapter.OnAreaDeleteListener
@@ -662,7 +663,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
                         EDIT_NO_HAZARD_CHANGE -> {
                             Timber.d("EDIT_NO_HAZARD_CHANGE")
 //                            mRiskViewModel.updateIndicatorModel(mHazardId as String, mIndicatorId as String, mIndicatorModel.copy(id = null))
-                            val indicatorRef = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this, Constants.APP_STATUS), mHazardId, mIndicatorId)
+                            val indicatorRef = FirebaseHelper.getIndicatorRef(BuildConfig.ROOT_NODE, mHazardId, mIndicatorId)
                             when (mIsCountryContext) {
                                 true -> {
                                     val context = ModelHazardCountryContext()
@@ -684,7 +685,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
                             Timber.d("EDIT_FROM_COUNTRY_WITH_HAZARD_CHANGE")
                             when (mIsCountryContext) {
                                 true -> {
-                                    val refCountryContext = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this, Constants.APP_STATUS), PreferHelper.getString(this, Constants.COUNTRY_ID), mIndicatorId)
+                                    val refCountryContext = FirebaseHelper.getIndicatorRef(BuildConfig.ROOT_NODE, PreferHelper.getString(this, Constants.COUNTRY_ID), mIndicatorId)
                                     updateAndClearOldForContext(refCountryContext, mIndicatorModel)
                                 }
                                 else -> {
@@ -694,7 +695,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
                                             val find = mHazards?.filter { it.hazardScenario == -1 }?.find { it.otherName == mIndicatorModel.hazardScenario.otherName }
                                             Timber.d(find.toString())
                                             find?.id?.apply {
-                                                val refNewHazard = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this@AddIndicatorActivity, Constants.APP_STATUS), find.id, mIndicatorId)
+                                                val refNewHazard = FirebaseHelper.getIndicatorRef(BuildConfig.ROOT_NODE, find.id, mIndicatorId)
                                                 updateAndClearOld(refNewHazard, mIndicatorModel)
                                             }
                                         }
@@ -703,7 +704,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
                                             val find = mHazards?.filter { it.hazardScenario != -1 }?.find { it.hazardScenario == mIndicatorModel.hazardScenario.hazardScenario }
                                             Timber.d("found hazard id: %s", find?.id)
                                             find?.id?.apply {
-                                                val refNewHazard = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this@AddIndicatorActivity, Constants.APP_STATUS), find.id, mIndicatorId)
+                                                val refNewHazard = FirebaseHelper.getIndicatorRef(BuildConfig.ROOT_NODE, find.id, mIndicatorId)
                                                 updateAndClearOld(refNewHazard, mIndicatorModel)
                                             }
                                         }
@@ -716,7 +717,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
                             Timber.d("check this, %s", mIndicatorModel.hazardScenario)
                             when (mIsCountryContext) {
                                 true -> {
-                                    val indicatorRef = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this, Constants.APP_STATUS), PreferHelper.getString(this, Constants.COUNTRY_ID), mIndicatorId)
+                                    val indicatorRef = FirebaseHelper.getIndicatorRef(BuildConfig.ROOT_NODE, PreferHelper.getString(this, Constants.COUNTRY_ID), mIndicatorId)
                                     updateAndClearOldForContextNetwork(indicatorRef, mIndicatorModel)
                                 }
                                 else -> {
@@ -726,7 +727,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
                                             val find = mHazards?.filter { it.hazardScenario == -1 }?.find { it.otherName == mIndicatorModel.hazardScenario.otherName }
                                             Timber.d(find.toString())
                                             find?.id?.apply {
-                                                val refNewHazard = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this@AddIndicatorActivity, Constants.APP_STATUS), find.id, mIndicatorId)
+                                                val refNewHazard = FirebaseHelper.getIndicatorRef(BuildConfig.ROOT_NODE, find.id, mIndicatorId)
                                                 updateAndClearOldNetwork(refNewHazard, mIndicatorModel)
                                             }
                                         }
@@ -735,7 +736,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
                                             val find = mHazards?.filter { it.hazardScenario != -1 }?.find { it.hazardScenario == mIndicatorModel.hazardScenario.hazardScenario }
                                             Timber.d("found hazard id: %s", find?.id)
                                             find?.id?.apply {
-                                                val refNewHazard = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this@AddIndicatorActivity, Constants.APP_STATUS), find.id, mIndicatorId)
+                                                val refNewHazard = FirebaseHelper.getIndicatorRef(BuildConfig.ROOT_NODE, find.id, mIndicatorId)
                                                 updateAndClearOldNetwork(refNewHazard, mIndicatorModel)
                                             }
                                         }
@@ -764,7 +765,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
             refCountryContext.child("hazardScenario").child("active").removeValue()
             refCountryContext.child("hazardScenario").child("seasonal").removeValue()
             refCountryContext.child("hazardScenario").child("id").removeValue()
-            val refToDelete = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this, Constants.APP_STATUS), mHazardId, mIndicatorId)
+            val refToDelete = FirebaseHelper.getIndicatorRef(BuildConfig.ROOT_NODE, mHazardId, mIndicatorId)
             refToDelete.removeValue()
         }
     }
@@ -784,7 +785,7 @@ class AddIndicatorActivity : BaseActivity(), OnSourceDeleteListener, OnAreaDelet
         refCountryContext?.setValue(mIndicatorModel.copy(id = null))?.continueWith {
             val hazardContext = ModelHazardCountryContext()
             refCountryContext.child("hazardScenario").setValue(hazardContext)
-            val refToDelete = FirebaseHelper.getIndicatorRef(PreferHelper.getString(this, Constants.APP_STATUS), mHazardId, mIndicatorId)
+            val refToDelete = FirebaseHelper.getIndicatorRef(BuildConfig.ROOT_NODE, mHazardId, mIndicatorId)
             refToDelete.removeValue()
         }
     }
