@@ -1,6 +1,10 @@
 package org.alertpreparedness.platform.v1.min_preparedness.activity;
 
+import android.app.DownloadManager;
+import android.app.DownloadManager.Request;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,6 +17,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 
+import es.dmoral.toasty.Toasty;
+import java.io.File;
 import org.alertpreparedness.platform.R;
 import org.alertpreparedness.platform.v1.dagger.DependencyInjector;
 import org.alertpreparedness.platform.v1.dagger.annotation.BaseActionRef;
@@ -113,7 +119,7 @@ public class ViewAttachmentsActivity extends AppCompatActivity implements ViewAt
                             dbDocRef.child(actionParentKey).child(document.getKey()).removeValue();
                             break;
                         case R.id.download:
-                            new DownloadFileFromURL(this, document.getFileName()).execute(document.getFilePath());
+                            downloadDocument(document);
                             break;
                     }
                 } else {
@@ -127,7 +133,7 @@ public class ViewAttachmentsActivity extends AppCompatActivity implements ViewAt
                 if (AppUtils.isDeviceOnline(this)) {
                     switch (menuItem.getItemId()) {
                         case R.id.download:
-                            new DownloadFileFromURL(this, document.getFileName()).execute(document.getFilePath());
+                            downloadDocument(document);
                             break;
                     }
                 } else {
@@ -136,6 +142,17 @@ public class ViewAttachmentsActivity extends AppCompatActivity implements ViewAt
                 return false;
             }).show();
         }
+    }
+
+    private void downloadDocument(final DocumentModel document) {
+        DownloadManager.Request request = new Request(Uri.parse(document.getFilePath()))
+                .setTitle(document.getFileName())
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, document.getFileName())
+                .setNotificationVisibility(Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+        downloadManager.enqueue(request);
+
+        Toasty.normal(this, getString(R.string.download_started)).show();
     }
 
     private class FetchDocumentKeys implements ChildEventListener {

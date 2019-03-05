@@ -1,5 +1,6 @@
 package org.alertpreparedness.platform.v1.utils;
 
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.os.StrictMode;
 import androidx.core.app.NotificationCompat;
 import android.webkit.MimeTypeMap;
 
+import org.alertpreparedness.platform.BuildConfig;
 import org.alertpreparedness.platform.R;
 
 import java.io.BufferedInputStream;
@@ -44,7 +46,15 @@ public class DownloadFileFromURL extends AsyncTask<String, String, String> {
     protected void onPreExecute() {
         super.onPreExecute();
         mNotifyManager =(NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mBuilder = new NotificationCompat.Builder(context);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            String channelId = "download_channel";
+            CharSequence channelName = "Download";
+            NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
+            mNotifyManager.createNotificationChannel(notificationChannel);
+        }
+
+        mBuilder = new NotificationCompat.Builder(context, "Download");
         mBuilder.setContentTitle("File Download")
                 .setContentText("Download in progress")
                 .setSmallIcon(R.drawable.download);
