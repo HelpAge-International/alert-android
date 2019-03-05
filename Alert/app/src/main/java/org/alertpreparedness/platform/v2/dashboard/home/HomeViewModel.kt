@@ -23,6 +23,7 @@ import org.alertpreparedness.platform.v2.models.enums.AlertLevel.GREEN
 import org.alertpreparedness.platform.v2.models.enums.AlertLevel.RED
 import org.alertpreparedness.platform.v2.repository.Repository.actionsObservable
 import org.alertpreparedness.platform.v2.repository.Repository.alertsObservable
+import org.alertpreparedness.platform.v2.repository.Repository.hazardsObservable
 import org.alertpreparedness.platform.v2.repository.Repository.indicatorsObservable
 import org.alertpreparedness.platform.v2.repository.Repository.responsePlansObservable
 import org.alertpreparedness.platform.v2.repository.Repository.userObservable
@@ -30,6 +31,7 @@ import org.alertpreparedness.platform.v2.utils.extensions.combineFlatten
 import org.alertpreparedness.platform.v2.utils.extensions.combineWithPair
 import org.alertpreparedness.platform.v2.utils.extensions.filterList
 import org.alertpreparedness.platform.v2.utils.extensions.hasPassed
+import org.alertpreparedness.platform.v2.utils.extensions.isActive
 import org.alertpreparedness.platform.v2.utils.extensions.isThisWeek
 import org.alertpreparedness.platform.v2.utils.extensions.isToday
 import org.alertpreparedness.platform.v2.utils.extensions.mapList
@@ -87,7 +89,6 @@ class HomeViewModel : BaseViewModel(), IHomeViewModel.Inputs, IHomeViewModel.Out
 
     override fun tasks(): Observable<List<Task>> {
         val indicators = indicatorsObservable
-                .print("Got indicators")
                 .withLatestFromPair(userObservable)
                 .map { (list, user) ->
                     list.filter { it.assignee == user.id }
@@ -98,20 +99,18 @@ class HomeViewModel : BaseViewModel(), IHomeViewModel.Inputs, IHomeViewModel.Out
                 .map { (list, user) ->
                     list.filter { it.assignee == user.id }
                 }
-                .filterList {
-                    !it.isArchived && !it.isComplete
+                .withLatestFromPair(hazardsObservable.mapList { it.scenario })
+                .map { (actions, hazards) ->
+                     actions.filter { action -> !action.isArchived && !action.isComplete && action.isActive(hazards) }
                 }
 
 
         return combineFlatten<Task>(
                 indicators
-                        .print("GOT INDICATORS!")
                         .mapList { IndicatorTask(it) },
                 actions
-                        .print("GOT ACTIONS!")
                         .mapList { ActionTask(it) },
                 responsePlansObservable
-                        .print("GOT RESPONSE PLANS!")
                         .mapList { ApprovalTask(it) }
         )
                 .map { list ->

@@ -232,7 +232,6 @@ object Repository {
 
     val hazardsObservable: Observable<List<Hazard>> by resettableLazy(resettableLazyManager) {
         userObservable
-                .print("user")
                 .flatMap { user ->
                     db.child("hazard")
                             .child(user.countryId)
@@ -241,7 +240,6 @@ object Repository {
                                 snapshot.children.map { it.toModel<Hazard>() }.filterNotNull()
                             }
                 }
-                .print("user, hazards")
                 .behavior()
     }
 

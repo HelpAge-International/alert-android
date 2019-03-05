@@ -1,0 +1,104 @@
+{
+  "project_info": {
+    "project_number": "305491871378",
+    "firebase_url": "https://alert-190fa.firebaseio.com",
+    "project_id": "alert-190fa",
+    "storage_bucket": "alert-190fa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:305491871378:android:f6ce2efa9809d7e8",
+        "android_client_info": {
+          "package_name": "org.alertpreparedness.platform.alert.sand"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "305491871378-bddbtv8mp8sgl2v0moch8h7a8eg2t0mn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOaPwiPmFI_dME340TVgjIYL2eHUTVrfY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:305491871378:android:41e7e869e27c76d6",
+        "android_client_info": {
+          "package_name": "org.alertpreparedness.platform.alert.test"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "305491871378-bddbtv8mp8sgl2v0moch8h7a8eg2t0mn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOaPwiPmFI_dME340TVgjIYL2eHUTVrfY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:305491871378:android:8abfee1084b392a4",
+        "android_client_info": {
+          "package_name": "org.alertpreparedness.platform.alert.uat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "305491871378-bddbtv8mp8sgl2v0moch8h7a8eg2t0mn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOaPwiPmFI_dME340TVgjIYL2eHUTVrfY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

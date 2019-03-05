@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "44847393433",
+    "firebase_url": "https://alert-live.firebaseio.com",
+    "project_id": "alert-live",
+    "storage_bucket": "alert-live.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:44847393433:android:1020b5c7e3aff587",
+        "android_client_info": {
+          "package_name": "com.alertpreparedness.platform.alert"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "44847393433-s6p2uau0q4ohcl6lkcp9u4k5umr4hjdf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkzvgWPObmkWunXLA-vximCR1t8JKMKV8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
