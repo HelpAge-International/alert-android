@@ -105,6 +105,10 @@ inline fun <reified T : BaseModel> List<DataSnapshot>.toMergedModel(
     }
             .filterNotNull()
 
+    if(jsonList.isEmpty()){
+        return null
+    }
+
     var mergedObject = jsonList.first()
     val toMergeList = jsonList.subList(1, jsonList.size)
 

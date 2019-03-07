@@ -237,7 +237,7 @@ object Repository {
                             .child(user.countryId)
                             .asObservable()
                             .map { snapshot ->
-                                snapshot.children.map { it.toModel<Hazard>() }.filterNotNull()
+                                snapshot.children.mapNotNull { it.toModel<Hazard>() }
                             }
                 }
                 .behavior()
@@ -254,27 +254,20 @@ object Repository {
 
     val indicatorsObservable: Observable<List<Indicator>> by resettableLazy(resettableLazyManager) {
         hazardsObservable
-                .print("hazards")
                 .filterList {
                     it.isActive
                 }
-                .print("hazards, filtered")
                 .combineWithPair(userObservable)
-                .print("hazards, with user")
                 .map { (hazards, user) -> hazards.map { it.id } + user.countryId }
-                .print("hazards full list")
                 .flatMap { hazardIdList ->
-                    println("Inside flatmap")
                     combineFlatten(
                             hazardIdList.map { hazardId ->
                                 db.child("indicator")
                                         .child(hazardId)
                                         .asObservable()
-                                        .print("GOT HAZARDS")
                                         .map { it.children.toList() }
                             }
                     )
-                            .print("flattned")
                             .map { list ->
                                 list.map { dataSnapshot ->
                                     dataSnapshot.toModel<Indicator> { model, json ->
@@ -283,15 +276,11 @@ object Repository {
                                 }
                                         .filterNotNull()
                             }
-                            .print("POST MAP")
                 }
-                .print("indicators")
                 .withLatestFromPair(userObservable)
-                .print("indicators with user again..")
                 .map { (list, user) ->
                     list.filter { it.assignee == user.id }
                 }
-                .print("filtered indicators")
                 .behavior()
     }
 
@@ -356,13 +345,11 @@ object Repository {
                                 (actions + chsActions + mandatedActions)
                                         .groupBy { it.key }
                                         .values
-                                        .toList()
-                                        .map {
+                                        .toList().mapNotNull {
                                             it.toMergedModel<Action> { action, jsonObject ->
                                                 setUpAction(action, jsonObject, countryOffice)
                                             }
                                         }
-                                        .filterNotNull()
                             }
                 }
                 .behavior()
@@ -481,7 +468,7 @@ object Repository {
 
     fun searchProgrammes(searchCountry: Country, searchLevel1: Int?,
             searchLevel2: Int?): Observable<Map<Agency, List<Programme>>> {
-        //Fetch root countryOfficeProfile/programme node
+        //Fetch root countryOfficeProfile/programme node 6
         return db.child("countryOfficeProfile")
                 .child("programme")
                 .asObservable()
@@ -491,32 +478,41 @@ object Repository {
                         countrySnapshot.key!! to countrySnapshot
                                 .child("4WMapping")
                                 .children
-                                .map { programmeSnapshot ->
+                                .filter {
+                                    val whereChild = it.child("where").value
+
+                                    whereChild is Int || (whereChild is String && whereChild.toIntOrNull() != null)
+                                }.mapNotNull { programmeSnapshot ->
                                     programmeSnapshot.toModel<Programme>()
                                 }
-                                .filterNotNull()
                     }.toMap()
                 }
                 //Filter based on searchArea
-                .map {
-                    it.mapValues { (_, programmes) ->
+                .map { map ->
+                    map.mapValues { (_, programmes) ->
                         programmes.filter { programme ->
                             programme.where == searchCountry &&
                                     (searchLevel1 == null || programme.level1 == searchLevel1) &&
                                     (searchLevel2 == null || programme.level2 == searchLevel2)
                         }
                     }
+                            .filterValues { it.isNotEmpty() }
                 }
                 //Fetch privacy settings for each country -> Map<CountryPrivacySetting, List<Programme>>
                 .flatMap { map ->
-                    map.toList()
-                            .map { (countryId, programmes) ->
-                                privacySettings(countryId, OFFICE_PROFILE)
-                                        .map { Pair(it, programmes) }
-                            }
-                            .combineLatest {
-                                it.toMap()
-                            }
+                    if(map.isEmpty()){
+                        Observable.just(emptyMap())
+                    }
+                    else {
+                        map.toList()
+                                .map { (countryId, programmes) ->
+                                    privacySettings(countryId, OFFICE_PROFILE)
+                                            .map { Pair(it, programmes) }
+                                }
+                                .combineLatest {
+                                    it.toMap()
+                                }
+                    }
                 }
                 //Filter based on country privacy settings
                 .map {
