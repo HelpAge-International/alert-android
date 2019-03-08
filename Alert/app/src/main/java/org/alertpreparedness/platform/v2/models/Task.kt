@@ -59,12 +59,14 @@ class ActionTask(
         dueDate: DateTime,
         val action: Action
 ) : Task(id, label, dueDate) {
-
     constructor(action: Action) : this(
             action.id,
             action.task,
-            //If the aciton is assigned to the user, then there will be a due date.
-            action.dueDate!!,
+            // If the action is assigned to the user, then there will be a due date.
+            // ... OR at least it should be, for some reason some actions in live don't
+            // have a due date so to stop it crashing here the default is set to 1 year from now
+            // (So the task will never be visible in app)
+            action.dueDate ?: DateTime().plusYears(1),
             action
     )
 
